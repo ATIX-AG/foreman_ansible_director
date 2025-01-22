@@ -1,7 +1,7 @@
 require "pulpcore_client"
 module ForemanPulsible
   module Pulp3
-    class Core
+    class CoreBase
       class << self
 
         def pulp3_configuration(config_class)
