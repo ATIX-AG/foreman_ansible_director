@@ -4,15 +4,15 @@ module ForemanPulsible
     isolate_namespace ForemanPulsible
     engine_name 'foreman_pulsible'
 
-    # Autoloader config
-    config.autoload_paths += Dir["#{config.root}/lib/**/"]
-    config.autoload_paths += Dir["#{config.root}/app/services/katello/foreman_pulsible"]
-
     # Add any db migrations
     initializer 'foreman_pulsible.load_app_instance_data' do |app|
       ForemanPulsible::Engine.paths['db/migrate'].existent.each do |path|
         app.config.paths['db/migrate'] << path
       end
+
+      app.config.autoload_paths += Dir["#{config.root}/app/lib"]
+      app.config.autoload_paths += Dir["#{config.root}/lib"]
+      app.config.autoload_paths += Dir["#{config.root}/app/services/foreman_pulsible"]
     end
 
     initializer 'foreman_pulsible.require_dynflow', :before => 'foreman_tasks.initialize_dynflow' do |app|

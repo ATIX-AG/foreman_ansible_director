@@ -17,7 +17,7 @@ module ForemanPulsible
         end
 
         def core_api_client
-          PulpcoreClient::StatusApi.new(PulpcoreClient::ApiClient.new(pulp3_configuration(PulpcoreClient::Configuration)))
+          PulpcoreClient::ApiClient.new(pulp3_configuration(PulpcoreClient::Configuration))
         end
       end
     end
