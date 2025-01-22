@@ -1,8 +1,8 @@
-require File.expand_path('lib/foreman_pulsible/version', __dir__)
+require File.expand_path('lib/foreman_pulsible/constants', __dir__)
 
 Gem::Specification.new do |s|
   s.name        = 'foreman_pulsible'
-  s.version     = ForemanPulsible::VERSION
+  s.version     = ForemanPulsible::Constants::PLUGIN_VERSION
   s.metadata    = { 'is_foreman_plugin' => 'true' }
   s.license     = 'GPL-3.0'
   s.authors     = ['Your name']
