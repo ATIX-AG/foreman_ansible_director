@@ -1,7 +1,7 @@
 require "pulpcore_client"
 module ForemanPulsible
   module Pulp3
-    class CoreBase
+    class BaseClient
       class << self
 
         def pulp3_configuration(config_class)
@@ -18,6 +18,10 @@ module ForemanPulsible
 
         def core_api_client
           PulpcoreClient::ApiClient.new(pulp3_configuration(PulpcoreClient::Configuration))
+        end
+
+        def ansible_api_client
+          PulpAnsibleClient::ApiClient.new(pulp3_configuration(PulpAnsibleClient::Configuration))
         end
       end
     end
