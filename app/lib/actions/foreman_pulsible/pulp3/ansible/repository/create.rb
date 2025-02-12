@@ -6,13 +6,20 @@ module Actions
         module Repository
           class Create < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-            def plan(repository_attributes)
-              plan_self(repository_attributes)
+            input_format do
+              param :name, String, required: true
+            end
+
+            output_format do
+              param :repository_create_response, Hash
             end
 
             def run
-              repository = PulpAnsibleClient::AnsibleAnsibleRepository.new(input[:repository_attributes])
-              output[:repository_create_response] = ::ForemanPulsible::Pulp3::Ansible::Repository::Create.new(repository).request
+              repository = PulpAnsibleClient::AnsibleAnsibleRepository.new(
+                { :name => input[:name]
+                                                                           })
+              response = ::ForemanPulsible::Pulp3::Ansible::Repository::Create.new(repository).request
+              output.update(repository_create_response: response)
             end
 
             def task_output

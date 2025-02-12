@@ -7,13 +7,24 @@ module Actions
           module Git
             class Create < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-              def plan(git_remote_attributes)
-                plan_self(git_remote_attributes)
+              input_format do
+                param :name, String, required: true
+                param :url, String, required: true
+                param :git_ref, String, required: true
+              end
+
+              output_format do
+                param :git_remote_create_response, Hash
               end
 
               def run
-                git_remote = PulpAnsibleClient::AnsibleGitRemote.new(input[:git_remote_attributes])
-                output[:git_remote_create_response] = ::ForemanPulsible::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
+                git_remote = PulpAnsibleClient::AnsibleGitRemote.new({
+                  :name => input[:name],
+                  :url => input[:url],
+                  :git_ref => input[:git_ref],
+                                                                     })
+                response = ::ForemanPulsible::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
+                output.update(git_remote_create_response: response)
               end
 
               def task_output

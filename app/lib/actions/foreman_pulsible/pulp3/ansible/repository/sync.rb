@@ -6,13 +6,21 @@ module Actions
         module Repository
           class Sync < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-            def plan(snyc_attributes)
-              plan_self(snyc_attributes)
+            input_format do
+              param :repository_href, String, required: true
+              param :remote_href, String, required: true
+            end
+
+            output_format do
+              param :repository_sync_response, Hash
             end
 
             def run
-              repository_sync = PulpAnsibleClient::AnsibleRepositorySyncURL.new(input[:sync_attributes][:repository_sync_attributes])
-              output[:repository_sync_response] = ::ForemanPulsible::Pulp3::Ansible::Repository::Sync.new(input[:sync_attributes][:repository_href], repository_sync).request
+              repository_sync = PulpAnsibleClient::AnsibleRepositorySyncURL.new({
+                                                                                  :remote => input[:remote_href],
+                                                                                })
+              response = ::ForemanPulsible::Pulp3::Ansible::Repository::Sync.new(input[:repository_href], repository_sync).request
+              output.update(repository_sync_response: response)
             end
 
             def task_output

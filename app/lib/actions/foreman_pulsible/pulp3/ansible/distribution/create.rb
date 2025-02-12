@@ -6,13 +6,24 @@ module Actions
         module Distribution
           class Create < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-            def plan(distribution_attributes)
-              plan_self(distribution_attributes)
+            input_format do
+              param :name, String, required: true
+              param :base_path, String, required: true
+              param :repository_href, String, required: true
+            end
+
+            output_format do
+              param :distribution_create_response, Hash
             end
 
             def run
-              distribution = PulpAnsibleClient::AnsibleAnsibleDistribution.new(input[:distribution_attributes])
-              output[:distribution_create_response] = ::ForemanPulsible::Pulp3::Ansible::Distribution::Create.new(distribution).request
+              distribution = PulpAnsibleClient::AnsibleAnsibleDistribution.new({
+                                                                                 :name => input[:name],
+                                                                                 :base_path => input[:base_path],
+                                                                                 :repository => input[:repository_href]
+                                                                               })
+              response = ::ForemanPulsible::Pulp3::Ansible::Distribution::Create.new(distribution).request
+              output.update(distribution_create_response: response)
             end
 
             def task_output

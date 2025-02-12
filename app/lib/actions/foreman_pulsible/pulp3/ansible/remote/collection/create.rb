@@ -7,13 +7,24 @@ module Actions
           module Collection
             class Create < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-              def plan(collection_remote_attributes)
-                plan_self(collection_remote_attributes)
+              input_format do
+                param :name, String, required: true
+                param :url, String, required: true
+                param :requirements, String, required: true
+              end
+
+              output_format do
+                param :collection_remote_create_response, Hash
               end
 
               def run
-                collection_remote = PulpAnsibleClient::AnsibleCollectionRemote.new(input[:collection_remote_attributes])
-                output[:collection_remote_create_response] = ::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
+                collection_remote = PulpAnsibleClient::AnsibleCollectionRemote.new({
+                                                                                     :name => input[:name],
+                                                                                     :url => input[:url],
+                                                                                     :requirements_file => input[:requirements]
+                                                                                   })
+                response = ::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
+                output.update(collection_remote_create_response: response)
               end
 
               def task_output

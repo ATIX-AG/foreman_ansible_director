@@ -7,13 +7,17 @@ module Actions
           module Git
             class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-              def plan(git_remote_attributes)
-                plan_self(git_remote_attributes)
+              input_format do
+                param :git_remote_href, String, required: true
+              end
+
+              output_format do
+                param :git_remote_destroy_response, Hash
               end
 
               def run
-                git_remote = PulpAnsibleClient::AnsibleGitRemote.new(input[:git_remote_attributes])
-                output[:git_remote_destroy_response] = ::ForemanPulsible::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
+                response = ::ForemanPulsible::Pulp3::Ansible::Remote::Git::Destroy.new(input[:git_remote_href]).request
+                output.update(git_remote_destroy_response: response)
               end
 
               def task_output

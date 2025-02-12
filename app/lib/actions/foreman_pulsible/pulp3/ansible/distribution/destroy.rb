@@ -6,12 +6,17 @@ module Actions
         module Distribution
           class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-            def plan(distribution_href)
-              plan_self(distribution_href)
+            input_format do
+              param :distribution_href, String, required: true
+            end
+
+            output_format do
+              param :distribution_destroy_response, Hash
             end
 
             def run
-              output[:distribution_destroy_response] = ::ForemanPulsible::Pulp3::Ansible::Distribution::Destroy.new(input[:distribution_href]).request
+              response = ::ForemanPulsible::Pulp3::Ansible::Distribution::Destroy.new(input[:distribution_href]).request
+              output.update(distribution_destroy_response: response)
             end
 
             def task_output

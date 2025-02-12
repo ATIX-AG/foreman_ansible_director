@@ -7,16 +7,21 @@ module Actions
           module Collection
             class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-              def plan(collection_remote_href)
-                plan_self(collection_remote_href)
+              input_format do
+                param :collection_remote_href, String, required: true
+              end
+
+              output_format do
+                param :collection_remote_destroy_response, Hash
               end
 
               def run
-                output[:collection_remote_create_response] = ::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Destroy.new(input[:collection_remote_href]).request
+                response = ::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Destroy.new(input[:collection_remote_href]).request
+                output.update(collection_remote_destroy_response: response)
               end
 
               def task_output
-                output[:collection_remote_create_response]
+                output[:collection_remote_destroy_response]
               end
             end
           end

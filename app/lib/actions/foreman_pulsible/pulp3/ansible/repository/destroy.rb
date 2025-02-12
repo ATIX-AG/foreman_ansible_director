@@ -6,12 +6,17 @@ module Actions
         module Repository
           class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
 
-            def plan(repository_href)
-              plan_self(repository_href)
+            input_format do
+              param :repository_href, String, required: true
+            end
+
+            output_format do
+              param :repository_destroy_response, Hash
             end
 
             def run
-              output[:repository_create_response] = ::ForemanPulsible::Pulp3::Ansible::Repository::Destroy.new(input[:repository_href]).request
+              response = ::ForemanPulsible::Pulp3::Ansible::Repository::Destroy.new(input[:repository_href]).request
+              output.update(repository_create_response: response)
             end
 
             def task_output
