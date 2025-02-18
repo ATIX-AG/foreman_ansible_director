@@ -6,8 +6,8 @@ module Actions
           ::ForemanPulsible::DYNFLOW_QUEUE
         end
 
-        def plan()
-          plan_self
+        def plan(*args)
+          plan_self *args
         end
 
         def run
