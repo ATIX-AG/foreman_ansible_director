@@ -16,7 +16,7 @@ module Actions
               name: pcu.name
             )
 
-            _distribution_create_action = plan_action(
+            distribution_create_action = plan_action(
               ::Actions::ForemanPulsible::Pulp3::Ansible::Distribution::Create,
               name: pcu.name,
               base_path: "pulsible",
@@ -40,12 +40,14 @@ module Actions
                   url: pcu.source,
                   requirements: pcu.collection_file
                 )
+
+                remote_href = collection_remote_create_action.output['collection_remote_create_response']['pulp_href']
               end
 
               _snyc_action = plan_action(
                 ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
-                remote_href: collection_remote_create_action.output['collection_remote_create_response']['pulp_href'],
+                remote_href: remote_href,
               )
 
             when :role
@@ -58,10 +60,12 @@ module Actions
                   url: pcu.role_url
                 )
 
+                remote_href = role_remote_create_action.output['role_remote_create_response']['pulp_href']
+
                 _snyc_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
                   repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
-                  remote_href: role_remote_create_action.output['role_remote_create_response']['pulp_href'],
+                  remote_href: remote_href,
                 )
               end
 
@@ -69,9 +73,11 @@ module Actions
               # TODO: Handle invalid PCU
             end
 
-            index_action = plan_action(
+            _index_action = plan_action(
               Index,
               repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
+              remote_href: remote_href,
+              distribution_href: distribution_create_action.output['distribution_create_response']['pulp_href'],
               content_unit_type: pcu.unit_type
             )
 

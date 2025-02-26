@@ -37,6 +37,13 @@ module Actions
               t = ::ForemanPulsible::Pulp3::Core::Task::Status.new(distribution_create_task_href).request
               t = ::Parsers::Pulp3::Core::Task::Status.new(t)
 
+              if t.task_completed?
+                output.update(
+                  distribution_create_response: output[:distribution_create_response]
+                                                  .merge(pulp_href: t.raw_response['created_resources'][0])
+                )
+              end
+
               {progress: t.progress}
             end
 
