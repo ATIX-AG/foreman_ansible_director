@@ -26,9 +26,24 @@ module AnsibleRequirements
       end
     end
 
+    # Full name of the content unit
+    # "theforeman.operations" --> "theforeman.operations"
     def name
       return @name if @name
       infer_name_from_source
+    end
+
+
+    # Name of the content unit with respect to the namespace:
+    # "theforeman.operations" --> "operations"
+    def unit_name
+      name.split(".").last
+    end
+
+    # Namespace of the content unit
+    # "theforeman.operations" --> "theforeman"
+    def unit_namespace
+      name.split(".").first
     end
 
     def role_url

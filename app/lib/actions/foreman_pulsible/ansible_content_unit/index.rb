@@ -14,8 +14,19 @@ module Actions
 
         def plan(args)
           sequence do
-            list_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Content::Collection::List, repository_href: args[:repository_href],)
-            plan_self(args.merge(list_action_output: list_action.output))
+            repository_show_action = plan_action(
+              ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Show,
+              repository_href: args[:repository_href]
+            )
+            list_action = plan_action(
+              ::Actions::ForemanPulsible::Pulp3::Ansible::Content::Collection::List,
+              repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
+            )
+            plan_self(
+              args.merge(
+                list_action_output: list_action.output,
+                repository_show_action_output: repository_show_action.output)
+            )
           end
         end
 
@@ -40,24 +51,53 @@ module Actions
 
         def finalize
           units = input[:indexed_units]
-          units.each do |unit| # TODO: Implement Update workflow
-            if input[:content_unit_type] == 'collection'
-              unit_record = AnsibleCollection.new(
-                unit[:unit].merge(
+
+          if input[:index_mode] == "import"
+
+            units.each do |unit|
+              if input[:content_unit_type] == 'collection'
+                unit_record = AnsibleCollection.new(
+                  unit[:unit].merge(
+                    latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                     pulp_repository_href: input[:repository_href],
                     pulp_remote_href: input[:remote_href],
                     pulp_distribution_href: input[:distribution_href],
+                  )
                 )
+              else
+                'role' # PCU type is validated in parent
+                # TODO: Role support
+              end
+              unit_record.ansible_content_versions.new(
+                version: unit[:version][:version],
+                artifact_href: unit[:version][:artifact],
+                sha256: unit[:version][:sha256],
+                source: input[:content_unit_source],
               )
-            else input[:content_unit_type] == 'role' # PCU type is validated in parent
-              # TODO: Role support
+              unit_record.save
             end
-            unit_record.ansible_content_versions.new(
-              version: unit[:version][:version],
-              artifact_href: unit[:version][:artifact],
-              sha256: unit[:version][:sha256]
-            )
-            unit_record.save
+
+          elsif input[:index_mode] == "update"
+
+            if input[:content_unit_type] == 'collection'
+              existing_unit = AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
+              existing_unit_versions = existing_unit.ansible_content_versions.pluck(:version)
+
+              existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
+
+              new_unit_versions = units.select { |unit| !existing_unit_versions.include?(unit[:version][:version]) }
+
+              new_unit_versions.each do |new_version|
+                existing_unit.ansible_content_versions << AnsibleContentVersion.new(
+                  version: new_version[:version][:version],
+                  artifact_href: new_version[:version][:artifact],
+                  sha256: new_version[:version][:sha256],
+                  source: input[:content_unit_source],
+                )
+              end
+            else
+                # TODO: Role support
+            end
           end
         end
       end

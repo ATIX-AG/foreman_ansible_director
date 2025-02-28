@@ -5,13 +5,13 @@ module ForemanPulsible
         module Collection
           class List < ContentCollectionApi
 
-            def initialize(repository_href)
+            def initialize(repository_version_href)
               super
-              @repository_href = repository_href
+              @repository_version_href = repository_version_href
             end
 
             def request
-              @content_collection_api_client.list({ :query_params => { :offset => 0, :repository_version => "#{@repository_href}versions/1/", # Since we only use "latest", the version can be hard-coded
+              @content_collection_api_client.list({ :query_params => { :offset => 0, :repository_version => @repository_version_href, # Since we only use "latest", the version can be hard-coded
                                                                        :limit => 2000 } })
             end
           end
