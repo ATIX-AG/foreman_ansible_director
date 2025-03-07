@@ -6,14 +6,6 @@ module Actions
           ::ForemanPulsible::DYNFLOW_QUEUE
         end
 
-        def plan(*args)
-          plan_self *args
-        end
-
-        def run
-          fail NotImplementedError
-        end
-
         def task_output
           if Rails.env.development?
             return output
