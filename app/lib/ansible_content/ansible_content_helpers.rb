@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AnsibleRequirements
+module AnsibleContent
   class AnsibleRequirementsHelpers
     class << self
       def decode_requirements_yml(raw_file)

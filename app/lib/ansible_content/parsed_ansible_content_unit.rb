@@ -1,4 +1,4 @@
-module AnsibleRequirements
+module AnsibleContent
   class ParsedAnsibleContentUnit
     attr_reader :unit_type, :version, :source, :type, :src, :scm
 
