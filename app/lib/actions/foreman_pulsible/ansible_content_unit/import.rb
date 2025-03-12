@@ -4,52 +4,46 @@ module Actions
       class Import < ::Actions::ForemanPulsible::Base::PulsibleAction
 
         input_format do
-          param :parsed_content_unit, Object, required: true
+          param :unit, Object, required: true # SimpleAnsibleContentUnit
         end
 
         def plan(args)
-          pcu = args[:parsed_content_unit]
-          op_type = operation_type pcu
+          unit = args[:unit]
+          op_type = operation_type unit
 
           if op_type == :import
-            plan_import(pcu)
+            plan_import(unit)
           elsif op_type == :update
-            plan_update(pcu)
+            plan_update(unit)
           end
         end
 
         private
 
-        def plan_import(pcu)
+        def plan_import(unit)
           sequence do
             repository_create_action = plan_action(
               ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Create,
-              name: pcu.name
+              name: unit.name
             )
 
             distribution_create_action = plan_action(
               ::Actions::ForemanPulsible::Pulp3::Ansible::Distribution::Create,
-              name: pcu.name,
-              base_path: "pulsible",
+              name: unit.name,
+              base_path: unit.name,
               repository_href: repository_create_action.output['repository_create_response']['pulp_href']
             )
 
-            case pcu.unit_type
+            case unit.unit_type
             when :collection
-              # TODO: This configuration does not work. Fix as OR-5511
-              if pcu.git?
-                collection_remote_create_action = plan_action(
-                  ::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Git::Create,
-                  name: pcu.name,
-                  url: pcu.source,
-                  git_ref: pcu.version
-                )
+              if false # TODO: OR-5511 - Git support
+
               else
                 collection_remote_create_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Create,
-                  name: pcu.name,
-                  url: pcu.source,
-                  requirements: pcu.collection_file
+                  name: unit.name,
+                  url: unit.source,
+                  requirements: unit.collection_file
                 )
 
                 remote_href = collection_remote_create_action.output['collection_remote_create_response']['pulp_href']
@@ -62,13 +56,13 @@ module Actions
               )
 
             when :role
-              if pcu.git?
+              if unit.git?
                 # TODO: Git support: OR-5511
               else
                 role_remote_create_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Role::Create,
-                  name: pcu.name,
-                  url: pcu.role_url
+                  name: unit.name,
+                  url: unit.role_url
                 )
 
                 remote_href = role_remote_create_action.output['role_remote_create_response']['pulp_href']
@@ -90,26 +84,28 @@ module Actions
               repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
               remote_href: remote_href,
               distribution_href: distribution_create_action.output['distribution_create_response']['pulp_href'],
-              content_unit_type: pcu.unit_type,
-              content_unit_source: pcu.source,
+              content_unit_type: unit.unit_type,
+              content_unit_source: unit.source,
+              unit_name: unit.unit_name,
+              unit_namespace: unit.unit_namespace
             )
 
           end
         end
 
-        def plan_update(pcu)
-          existing_unit = AnsibleCollection.find_by(namespace: pcu.unit_namespace, name: pcu.unit_name)
+        def plan_update(scu)
+          existing_unit = AnsibleCollection.find_by(namespace: scu.unit_namespace, name: scu.unit_name)
 
           repository_href = existing_unit.pulp_repository_href
           remote_href = existing_unit.pulp_remote_href
           distribution_href = existing_unit.pulp_distribution_href
 
 
-          if pcu.unit_type == :collection
+          if scu.unit_type == :collection
             sequence do
             _remote_update_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update,
                         collection_remote_href: remote_href,
-                        requirements: existing_unit.requirements_file(pcu))
+                        requirements: existing_unit.requirements_file(scu))
 
             _snyc_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
@@ -123,8 +119,8 @@ module Actions
               repository_href: repository_href,
               remote_href: remote_href,
               distribution_href: distribution_href,
-              content_unit_type: pcu.unit_type,
-              content_unit_source: pcu.source,
+              content_unit_type: scu.unit_type,
+              content_unit_source: scu.source,
             )
             end
           else
@@ -146,15 +142,15 @@ module Actions
         # | 1 | 1 | 0 | NOOP    |
         # | 1 | 1 | 1 | :update |
         # TODO: Unit test this
-        def operation_type(pcu)
+        def operation_type(unit)
 
           force_override = false # TODO: Setting
 
-          if pcu.unit_type == :collection
-            existing_unit = AnsibleCollection.find_by(namespace: pcu.unit_namespace, name: pcu.unit_name)
+          if unit.unit_type == :collection
+            existing_unit = AnsibleCollection.find_by(namespace: unit.unit_namespace, name: unit.unit_name)
             return :import unless existing_unit
 
-            unless existing_unit.ansible_content_versions.select{ |x| x.version == pcu.version }.empty?
+            if existing_unit.ansible_content_versions.select{ |x| unit.versions.include? x.version }.empty?
               unless force_override
                 return :noop
               end

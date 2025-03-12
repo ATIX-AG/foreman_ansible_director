@@ -4,38 +4,42 @@ module Actions
       class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
 
         input_format do
-          param :content_unit_name, String, required: false
-          param :content_unit_id, Integer, required: false
-          param :content_unit_version, String, required: false
-          param :content_unit_version_id, Integer, required: false
-          param :content_unit_type, String, required: true
+          param :unit
         end
 
         def plan(args)
+          unit = args[:unit]
 
-          if args[:content_unit_version]
-            plan_partial_destroy(args)
+          if unit.versions
+            plan_partial_destroy(unit)
           else
-            plan_full_destroy(args)
+            plan_full_destroy(unit)
           end
-          plan_self(args)
+          plan_self(
+            unit_name: unit.unit_name,
+            unit_namespace: unit.unit_namespace,
+            unit_type: unit.unit_type,
+            unit_versions: unit.versions
+          )
         end
 
         def finalize
-          if input[:content_unit_type] == "collection"
-            existing_unit = AnsibleCollection.find_by(id: input[:content_unit_id]) # find_unit
-            if input[:content_unit_version] # partial
-              existing_unit.ansible_content_versions.find_by(version: input[:content_unit_version]).destroy
+          acu = find_unit(name: input[:unit_name], namespace: input[:unit_namespace])
+          if input[:unit_type] == "collection"
+            if (versions = input[:unit_versions]) # partial
+              versions.each do |version|
+                acu.ansible_content_versions.find_by(version: version).destroy
+              end
             else
-              existing_unit.destroy # find_unit
+              acu.destroy
             end
           end
         end
 
         private
 
-        def plan_full_destroy(args)
-          acu = AnsibleCollection.find_by(id: args[:content_unit_id]) # find_unit
+        def plan_full_destroy(unit)
+          acu = find_unit(name: unit.unit_name, namespace: unit.unit_namespace) # find_unit
 
           concurrence do
 
@@ -44,37 +48,35 @@ module Actions
             plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Distribution::Destroy,
                         distribution_href: acu.pulp_distribution_href)
 
-            if args[:content_unit_type] == :collection
+            if acu.is_collection?
               plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Destroy,
                           collection_remote_href: acu.pulp_remote_href)
             end
           end
         end
 
-        def plan_partial_destroy(args)
-          if args[:content_unit_type] == :collection
-            acu = AnsibleCollection.find_by(id: args[:content_unit_id]) # find_unit
+        def plan_partial_destroy(unit)
+          acu = ::AnsibleContentUnit.find_any(name: unit.unit_name, namespace: unit.unit_namespace)
+          if acu.is_collection?
 
-            _remote_update_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update,
-                        collection_remote_href: acu.pulp_remote_href,
-                        requirements: acu.requirements_file(::AnsibleContent::ParsedAnsibleContentUnit.new(:collection, **{ "name" => "nextcloud.admin", "version" => "2.0.0" }), true))
-            _snyc_action = plan_action(
-                  ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
-                  repository_href: acu.pulp_repository_href,
-                  remote_href: acu.pulp_remote_href,
+            sequence do
+              _remote_update_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update,
+                                                  collection_remote_href: acu.pulp_remote_href,
+                                                  requirements: acu.requirements_file(unit, subtractive = true))
+              _snyc_action = plan_action(
+                ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
+                repository_href: acu.pulp_repository_href,
+                remote_href: acu.pulp_remote_href,
               )
+            end
+
           else
             # TODO: Role support
           end
         end
 
-        def find_unit(args)
-          case args[:content_unit_name]
-          when :collection
-          when :role
-          else
-            # TODO: Error
-          end
+        def find_unit(**args)
+          ::AnsibleContentUnit.find_any(args)
         end
 
       end

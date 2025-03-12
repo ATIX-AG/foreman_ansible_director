@@ -6,6 +6,8 @@ module Actions
         input_format do
           param :repository_href, String, required: true
           param :content_unit_type, Symbol, required: true
+          param :unit_name, String, required: true
+          param :unit_namespace, String, required: true
         end
 
         output_format do
@@ -31,51 +33,50 @@ module Actions
         end
 
         def run
-          units = []
+          unit_versions = []
           list_results = input.dig(:list_action_output, :repository_artifacts, :results)
+
           if list_results
-            list_results.each do |result| units.append(
-              {
-                unit: result.slice(:name, :namespace), # See Pulp3 content API response for valid attrs
-                version: result.slice(:artifact, :version, :sha256)
-              }
-            )
+            list_results.each do |result|
+              unit_versions.push(result.slice(:artifact, :version, :sha256))
             end
 
           else # If we are here, something went wrong...
                # TODO: Handle inconsistent state
           end
 
-          input.update(indexed_units: units)
+          input.update(indexed_unit_versions: unit_versions)
         end
 
         def finalize
-          units = input[:indexed_units]
+          unit_versions = input[:indexed_unit_versions]
 
           if input[:index_mode] == "import"
 
-            units.each do |unit|
               if input[:content_unit_type] == 'collection'
                 unit_record = AnsibleCollection.new(
-                  unit[:unit].merge(
+                  {
+                    name: input[:unit_name],
+                    namespace: input[:unit_namespace],
                     latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                     pulp_repository_href: input[:repository_href],
                     pulp_remote_href: input[:remote_href],
-                    pulp_distribution_href: input[:distribution_href],
-                  )
+                    pulp_distribution_href: input[:distribution_href]
+                  }
                 )
               else
                 'role' # PCU type is validated in parent
                 # TODO: Role support
               end
-              unit_record.ansible_content_versions.new(
-                version: unit[:version][:version],
-                artifact_href: unit[:version][:artifact],
-                sha256: unit[:version][:sha256],
+              unit_versions.each do |version|
+                unit_record.ansible_content_versions.new(
+                version: version[:version],
+                artifact_href: version[:artifact],
+                sha256: version[:sha256],
                 source: input[:content_unit_source],
               )
+              end
               unit_record.save
-            end
 
           elsif input[:index_mode] == "update"
 
@@ -85,13 +86,13 @@ module Actions
 
               existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
 
-              new_unit_versions = units.select { |unit| !existing_unit_versions.include?(unit[:version][:version]) }
+              new_unit_versions = unit_versions.select { |unit_version| !existing_unit_versions.include?(unit_version[:version]) }
 
               new_unit_versions.each do |new_version|
                 existing_unit.ansible_content_versions << AnsibleContentVersion.new(
-                  version: new_version[:version][:version],
-                  artifact_href: new_version[:version][:artifact],
-                  sha256: new_version[:version][:sha256],
+                  version: new_version[:version],
+                  artifact_href: new_version[:artifact],
+                  sha256: new_version[:sha256],
                   source: input[:content_unit_source],
                 )
               end

@@ -3,9 +3,9 @@
 class AnsibleCollection < AnsibleContentUnit
   has_many :ansible_content_versions, as: :versionable, dependent: :destroy
 
-  def requirements_file(pcu = nil, subtractive = false)
+  def requirements_file(simple_content_unit = nil, subtractive = false)
     units = []
-    self.ansible_content_versions.each do | content_version |
+    self.ansible_content_versions.each do |content_version|
       units.append(
         "name" => "#{self.namespace}.#{self.name}",
         "version" => content_version.version,
@@ -13,18 +13,21 @@ class AnsibleCollection < AnsibleContentUnit
       )
     end
 
-    if pcu
+    if simple_content_unit
       if subtractive
-        units = units.select { |unit| unit["version"] != pcu.version}
+        units = units.select { |unit| !simple_content_unit.versions.include?(unit["version"]) }
       else
-        units.append(
-          "name" => pcu.name,
-          "version" => pcu.version,
-          "source" => pcu.source,
-        )
+        simple_content_unit.versions.each do |version|
+          units.append(
+            "name" => simple_content_unit.name,
+            "version" => version,
+            "source" => simple_content_unit.source,
+          )
+        end
+
       end
     end
 
-    YAML.dump({"collections" => units })
+    YAML.dump({ "collections" => units })
   end
 end
