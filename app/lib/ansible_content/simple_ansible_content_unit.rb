@@ -9,8 +9,8 @@ module AnsibleContent
     def initialize(**kwargs)
       @unit_type = kwargs[:unit_type]
       @name = kwargs[:unit_name]
-      @versions = kwargs[:unit_versions]
-      @source = kwargs[:unit_source]
+      @versions = kwargs[:unit_versions] || []
+      @source = kwargs[:unit_source] || "https://galaxy.ansible.com/" # TODO: global param
       @type = kwargs[:unit_type]
       @src = kwargs[:unit_src]
       @scm = kwargs[:unit_scm]
@@ -28,16 +28,35 @@ module AnsibleContent
 
     def collection_file
       if @unit_type == :collection
-        YAML.dump(
-          {"collections" => @versions.map { |version|
-            {
-                 "name"=> @name,
-                 "version"=> version,
-                 "source"=> @source,
-                 "type"=> @type
-               }.compact
-          }
-          })
+        if @versions.length > 0
+          YAML.dump(
+            { "collections" => @versions.map { |version|
+              {
+                "name" => @name,
+                "version" => version,
+                "source" => @source,
+                "type" => @type
+              }.compact
+            }
+            })
+        else
+          YAML.dump(
+            { "collections" =>
+                [
+                  {
+                    "name" => @name,
+                    "source" => @source,
+                  }
+                ]
+            }
+          )
+        end
+      end
+    end
+
+    def role_url
+      if @unit_type == :role
+        "#{self.source}api/v1/roles/?namespace=#{self.unit_namespace}&name=#{self.unit_name}" # TODO: version restriction
       end
     end
 

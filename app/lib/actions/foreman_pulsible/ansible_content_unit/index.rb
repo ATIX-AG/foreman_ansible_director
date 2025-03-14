@@ -20,10 +20,18 @@ module Actions
               ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Show,
               repository_href: args[:repository_href]
             )
-            list_action = plan_action(
-              ::Actions::ForemanPulsible::Pulp3::Ansible::Content::Collection::List,
-              repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
-            )
+            if args[:content_unit_type] == :collection
+              list_action = plan_action(
+                ::Actions::ForemanPulsible::Pulp3::Ansible::Content::Collection::List,
+                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
+              )
+            else
+              list_action = plan_action(
+                ::Actions::ForemanPulsible::Pulp3::Ansible::Content::Role::List,
+                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
+              )
+            end
+
             plan_self(
               args.merge(
                 list_action_output: list_action.output,
@@ -41,8 +49,9 @@ module Actions
               unit_versions.push(result.slice(:artifact, :version, :sha256))
             end
 
-          else # If we are here, something went wrong...
-               # TODO: Handle inconsistent state
+          else
+            # If we are here, something went wrong...
+            # TODO: Handle inconsistent state
           end
 
           input.update(indexed_unit_versions: unit_versions)
@@ -53,30 +62,39 @@ module Actions
 
           if input[:index_mode] == "import"
 
-              if input[:content_unit_type] == 'collection'
-                unit_record = AnsibleCollection.new(
-                  {
-                    name: input[:unit_name],
-                    namespace: input[:unit_namespace],
-                    latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
-                    pulp_repository_href: input[:repository_href],
-                    pulp_remote_href: input[:remote_href],
-                    pulp_distribution_href: input[:distribution_href]
-                  }
-                )
-              else
-                'role' # PCU type is validated in parent
-                # TODO: Role support
-              end
-              unit_versions.each do |version|
-                unit_record.ansible_content_versions.new(
+            if input[:content_unit_type] == 'collection'
+              unit_record = AnsibleCollection.new(
+                {
+                  name: input[:unit_name],
+                  namespace: input[:unit_namespace],
+                  latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                  pulp_repository_href: input[:repository_href],
+                  pulp_remote_href: input[:remote_href],
+                  pulp_distribution_href: input[:distribution_href]
+                }
+              )
+            else
+              # Make intellisense shut up - input[:content_unit_type] == 'role'
+              unit_record = AnsibleRole.new(
+                {
+                  name: input[:unit_name],
+                  namespace: input[:unit_namespace],
+                  latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                  pulp_repository_href: input[:repository_href],
+                  pulp_remote_href: input[:remote_href],
+                  pulp_distribution_href: input[:distribution_href]
+                }
+              )
+            end
+            unit_versions.each do |version|
+              unit_record.ansible_content_versions.new(
                 version: version[:version],
                 artifact_href: version[:artifact],
                 sha256: version[:sha256],
                 source: input[:content_unit_source],
               )
-              end
-              unit_record.save
+            end
+            unit_record.save
 
           elsif input[:index_mode] == "update"
 
@@ -97,7 +115,7 @@ module Actions
                 )
               end
             else
-                # TODO: Role support
+              # TODO: Role version support
             end
           end
         end

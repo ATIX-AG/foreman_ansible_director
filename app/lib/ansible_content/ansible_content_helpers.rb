@@ -37,12 +37,16 @@ module AnsibleContent
 
           unit_type = existing_unit.is_collection? ? :collection : :role
 
-          versions = unit[:unit_versions]&.select do |version|
-            existing_unit.ansible_content_versions.find_by(version: version)
-          end
+          versions = nil
 
-          if versions && versions.length == existing_unit.ansible_content_versions.count
-            versions = nil # In this case, we are deleting the complete unit
+          if unit_type == :collection
+            versions = unit[:unit_versions]&.select do |version|
+              existing_unit.ansible_content_versions.find_by(version: version)
+            end
+
+            if versions && versions.length == existing_unit.ansible_content_versions.count
+              versions = nil # In this case, we are deleting the complete unit
+            end
           end
 
           simple_unit = AnsibleContent::SimpleAnsibleContentUnit.new(
@@ -104,7 +108,7 @@ module AnsibleContent
       end
 
       def valid_unit_versions!(unit_versions)
-        unit_versions.each do |version|
+        unit_versions&.each do |version|
           unless version.match(/^\d+\.\d+\.\d+$/)
             fail # TODO: Exception
           end

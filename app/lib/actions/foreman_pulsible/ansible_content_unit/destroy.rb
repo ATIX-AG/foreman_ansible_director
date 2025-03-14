@@ -28,11 +28,13 @@ module Actions
           if input[:unit_type] == "collection"
             if (versions = input[:unit_versions]) # partial
               versions.each do |version|
-                acu.ansible_content_versions.find_by(version: version).destroy
+                acu&.ansible_content_versions.&find_by(version: version).destroy
               end
             else
-              acu.destroy
+              acu&.destroy
             end
+          else
+            acu&.destroy
           end
         end
 
@@ -51,13 +53,16 @@ module Actions
             if acu.is_collection?
               plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Destroy,
                           collection_remote_href: acu.pulp_remote_href)
+            else
+              plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Role::Destroy,
+                          role_remote_href: acu.pulp_remote_href)
             end
           end
         end
 
         def plan_partial_destroy(unit)
           acu = ::AnsibleContentUnit.find_any(name: unit.unit_name, namespace: unit.unit_namespace)
-          if acu.is_collection?
+          if acu&.is_collection?
 
             sequence do
               _remote_update_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update,

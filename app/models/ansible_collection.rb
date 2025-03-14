@@ -17,10 +17,17 @@ class AnsibleCollection < AnsibleContentUnit
       if subtractive
         units = units.select { |unit| !simple_content_unit.versions.include?(unit["version"]) }
       else
-        simple_content_unit.versions.each do |version|
+        if simple_content_unit.versions&.length > 0
+          simple_content_unit.versions.each do |version|
+            units.append(
+              "name" => simple_content_unit.name,
+              "version" => version,
+              "source" => simple_content_unit.source,
+            )
+          end
+        else
           units.append(
             "name" => simple_content_unit.name,
-            "version" => version,
             "source" => simple_content_unit.source,
           )
         end

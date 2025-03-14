@@ -56,7 +56,7 @@ module Actions
               )
 
             when :role
-              if unit.git?
+              if false
                 # TODO: Git support: OR-5511
               else
                 role_remote_create_action = plan_action(
@@ -146,19 +146,16 @@ module Actions
 
           force_override = false # TODO: Setting
 
-          if unit.unit_type == :collection
-            existing_unit = AnsibleCollection.find_by(namespace: unit.unit_namespace, name: unit.unit_name)
-            return :import unless existing_unit
+          existing_unit = ::AnsibleContentUnit.find_any(namespace: unit.unit_namespace, name: unit.unit_name)
+          return :import unless existing_unit
 
-            if existing_unit.ansible_content_versions.select{ |x| unit.versions.include? x.version }.empty?
-              unless force_override
-                return :noop
-              end
+          if existing_unit.ansible_content_versions.select{ |x| unit.versions.include? x.version }.empty?
+            unless force_override
+              return :noop
             end
-            :update
-          else # type == :role
-
           end
+          :update
+
         end
       end
     end

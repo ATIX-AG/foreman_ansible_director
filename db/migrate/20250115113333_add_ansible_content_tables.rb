@@ -22,7 +22,7 @@ class AddAnsibleContentTables < ActiveRecord::Migration[6.1]
       t.belongs_to :versionable, :polymorphic => true
       t.string :version, :null => false, :limit => 255
       t.string :source, :null => false, :limit => 255
-      t.string :sha256, :null => false, :limit => 64, :unique => true
+      t.string :sha256, :limit => 64, :unique => true
       t.string :artifact_href, :null => false, :limit => 255, :unique => true
     end
   end
