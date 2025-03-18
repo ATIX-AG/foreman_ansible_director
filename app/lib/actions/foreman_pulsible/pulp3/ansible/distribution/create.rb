@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
@@ -18,11 +19,13 @@ module Actions
             end
 
             def invoke_external_task
-              distribution = PulpAnsibleClient::AnsibleAnsibleDistribution.new({
-                                                                                 :name => input[:name],
-                                                                                 :base_path => input[:base_path],
-                                                                                 :repository => input[:repository_href]
-                                                                               })
+              distribution = PulpAnsibleClient::AnsibleAnsibleDistribution.new(
+                {
+                  name: input[:name],
+                  base_path: input[:base_path],
+                  repository: input[:repository_href],
+                }
+              )
               response = ::ForemanPulsible::Pulp3::Ansible::Distribution::Create.new(distribution).request
               output.update(distribution_create_response: response)
               nil
@@ -33,18 +36,18 @@ module Actions
             end
 
             def poll_external_task
-              distribution_create_task_href = output&.[](:distribution_create_response)&.[](:task) # TODO: Error handling
-              t = ::ForemanPulsible::Pulp3::Core::Task::Status.new(distribution_create_task_href).request
-              t = ::Parsers::Pulp3::Core::Task::Status.new(t)
+              distribution_create_task_href = output&.[](:distribution_create_response)&.[](:task) # TODO: Handle Error
+              task = ::ForemanPulsible::Pulp3::Core::Task::Status.new(distribution_create_task_href).request
+              task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
 
-              if t.task_completed?
+              if task_status.task_completed?
                 output.update(
                   distribution_create_response: output[:distribution_create_response]
-                                                  .merge(pulp_href: t.raw_response['created_resources'][0])
+                                                  .merge(pulp_href: task_status.raw_response['created_resources'][0])
                 )
               end
 
-              {progress: t.progress}
+              { progress: task_status.progress }
             end
 
             def task_output

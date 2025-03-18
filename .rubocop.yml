@@ -1,3 +1,34 @@
 inherit_gem:
   theforeman-rubocop:
     - default.yml
+
+
+AllCops:
+  TargetRubyVersion: 3.0
+  TargetRailsVersion: 7.0
+  Exclude:
+    - 'locale/**/*'
+    - 'app/lib/ansible_content/parsed_ansible_content_unit.rb'
+    - 'app/lib/actions/foreman_pulsible/pulp3/ansible/remote/git/**' # TODO: Git support
+    - 'test/**/*'
+
+Rails/CreateTableWithTimestamps:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false

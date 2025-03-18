@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
@@ -18,9 +19,11 @@ module Actions
 
             def invoke_external_task
               repository_sync = PulpAnsibleClient::AnsibleRepositorySyncURL.new({
-                                                                                  :remote => input[:remote_href],
-                                                                                })
-              response = ::ForemanPulsible::Pulp3::Ansible::Repository::Sync.new(input[:repository_href], repository_sync).request
+                remote: input[:remote_href],
+              })
+              response = ::ForemanPulsible::Pulp3::Ansible::Repository::Sync.new(
+                input[:repository_href], repository_sync
+              ).request
               output.update(repository_sync_response: response)
               nil # We return nil here, because the return value of this method becomes output[:task]
             end
@@ -31,10 +34,10 @@ module Actions
 
             def poll_external_task
               sync_task_href = output&.[](:repository_sync_response)&.[](:task) # TODO: Error handling
-              t = ::ForemanPulsible::Pulp3::Core::Task::Status.new(sync_task_href).request
-              t = ::Parsers::Pulp3::Core::Task::Status.new(t)
+              task = ::ForemanPulsible::Pulp3::Core::Task::Status.new(sync_task_href).request
+              task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
 
-              {progress: t.progress}
+              { progress: task_status.progress }
             end
 
             def task_output

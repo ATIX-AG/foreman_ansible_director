@@ -9,11 +9,11 @@ module AnsibleContent
         collections = []
         roles = []
 
-        decoded_yml["collections"]&.each do |collection|
+        decoded_yml['collections']&.each do |collection|
           collections.push(ParsedAnsibleContentUnit.new(:collection, **collection))
         end
 
-        decoded_yml["roles"]&.each do |role|
+        decoded_yml['roles']&.each do |role|
           roles.push(ParsedAnsibleContentUnit.new(:role, **role))
         end
 
@@ -35,7 +35,7 @@ module AnsibleContent
 
           raise "Unit not found: #{name}" unless existing_unit # TODO: Proper error code
 
-          unit_type = existing_unit.is_collection? ? :collection : :role
+          unit_type = existing_unit.collection? ? :collection : :role
 
           versions = nil
 
@@ -64,7 +64,6 @@ module AnsibleContent
       def resolve_import_payload(payload)
         units = {}
         payload.each do |unit|
-
           unit_type = valid_unit_type! unit[:unit_type]
           unit_name = valid_unit_name! unit[:unit_name]
           unit_source = valid_unit_source! unit[:unit_source]
@@ -78,11 +77,10 @@ module AnsibleContent
               unit_type: unit_type,
               unit_name: unit_name,
               unit_source: unit_source,
-              unit_versions: unit_versions,
+              unit_versions: unit_versions
             )
             units[unit_id] = sacu
           end
-
         end
         units.values
       end
@@ -90,37 +88,33 @@ module AnsibleContent
       private
 
       def valid_unit_name!(unit_name)
-        if unit_name.match(/^(.*)\.(.*)$/)
-          return unit_name
-        end
-        fail # TODO: Exception
+        return unit_name if /^(.*)\.(.*)$/.match?(unit_name)
+        raise # TODO: Exception
       end
 
       def valid_unit_type!(unit_type)
-        if (type = { "collection" => :collection, "role" => :role }[unit_type])
+        if (type = { 'collection' => :collection, 'role' => :role }[unit_type])
           return type
         end
-        fail # TODO: Exception
+        raise # TODO: Exception
       end
 
       def valid_unit_source!(unit_source)
-        unit_source || "https://galaxy.ansible.com/" # TODO: global param
+        unit_source || 'https://galaxy.ansible.com/' # TODO: global param
       end
 
       def valid_unit_versions!(unit_versions)
         unit_versions&.each do |version|
-          unless version.match(/^\d+\.\d+\.\d+$/)
-            fail # TODO: Exception
+          unless /^\d+\.\d+\.\d+$/.match?(version)
+            raise # TODO: Exception
           end
         end
         unit_versions
       end
 
       def base64_to_yml(base64_string)
-        if base64_string.start_with?('data:application/x-yaml;base64,')
-          base64_string = base64_string.split(',')[1]
-        end
-        YAML.load(Base64.decode64(base64_string))
+        base64_string = base64_string.split(',')[1] if base64_string.start_with?('data:application/x-yaml;base64,')
+        YAML.safe_load(Base64.decode64(base64_string))
       end
     end
   end

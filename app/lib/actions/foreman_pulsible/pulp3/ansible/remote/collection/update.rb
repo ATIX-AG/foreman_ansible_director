@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
@@ -18,9 +19,11 @@ module Actions
               end
 
               def invoke_external_task
-                collection_remote = PulpAnsibleClient::PatchedansibleCollectionRemote.new({
-                                                                                     :requirements_file => input[:requirements]
-                                                                                   })
+                collection_remote = PulpAnsibleClient::PatchedansibleCollectionRemote.new(
+                  {
+                    requirements_file: input[:requirements],
+                  }
+                )
                 response = ::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update.new(
                   input[:collection_remote_href],
                   collection_remote
@@ -33,20 +36,17 @@ module Actions
                 output[:task]&.[](:progress) == 1
               end
 
-
               def poll_external_task
                 remote_update_task = output&.[](:collection_remote_update_response)&.[](:task) # TODO: Error handling
-                raw_task_status = ::ForemanPulsible::Pulp3::Core::Task::Status.new(remote_update_task).request
-                task_status = ::Parsers::Pulp3::Core::Task::Status.new(raw_task_status)
+                task = ::ForemanPulsible::Pulp3::Core::Task::Status.new(remote_update_task).request
+                task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
 
-                {progress: task_status.progress}
+                { progress: task_status.progress }
               end
-
 
               def task_output
                 output[:collection_remote_update_response]
               end
-
             end
           end
         end

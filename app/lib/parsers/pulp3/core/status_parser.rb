@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers
   module Pulp3
     module Core

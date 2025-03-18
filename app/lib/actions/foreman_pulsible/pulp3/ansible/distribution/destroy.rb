@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
@@ -27,10 +28,10 @@ module Actions
 
             def poll_external_task
               distribution_destroy_task = output&.[](:distribution_destroy_response)&.[](:task)
-              t = ::ForemanPulsible::Pulp3::Core::Task::Status.new(distribution_destroy_task).request
-              t = ::Parsers::Pulp3::Core::Task::Status.new(t)
+              task = ::ForemanPulsible::Pulp3::Core::Task::Status.new(distribution_destroy_task).request
+              task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
 
-              {progress: t.progress}
+              { progress: task_status.progress }
             end
 
             def task_output

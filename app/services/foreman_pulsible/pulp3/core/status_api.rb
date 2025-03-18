@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module ForemanPulsible
   module Pulp3
     module Core
       class StatusApi < CoreApi
-
         def initialize
           super
           @request_client = PulpcoreClient::StatusApi.new(@core_api_client)
@@ -11,7 +12,6 @@ module ForemanPulsible
         def request
           @request_client.status_read(@options)
         end
-
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Base
@@ -7,9 +9,7 @@ module Actions
         end
 
         def task_output
-          if Rails.env.development?
-            return output
-          end
+          return output if Rails.env.development?
           # TODO: Change default output so something sensible
           humanized_name
         end
@@ -17,7 +17,6 @@ module Actions
         def humanized_name
           "#{::ForemanPulsible::Constants::PLUGIN_NAME.camelize}: #{self.class.name}"
         end
-
       end
     end
   end

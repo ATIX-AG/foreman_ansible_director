@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
@@ -6,7 +7,6 @@ module Actions
         module Remote
           module Collection
             class Create < ::Actions::ForemanPulsible::Base::PulsibleAction
-
               input_format do
                 param :name, String, required: true
                 param :url, String, required: true
@@ -18,11 +18,13 @@ module Actions
               end
 
               def run
-                collection_remote = PulpAnsibleClient::AnsibleCollectionRemote.new({
-                                                                                     :name => input[:name],
-                                                                                     :url => input[:url],
-                                                                                     :requirements_file => input[:requirements]
-                                                                                   })
+                collection_remote = PulpAnsibleClient::AnsibleCollectionRemote.new(
+                  {
+                    name: input[:name],
+                    url: input[:url],
+                    requirements_file: input[:requirements],
+                  }
+                )
                 response = ::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
                 output.update(collection_remote_create_response: response)
               end

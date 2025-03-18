@@ -1,18 +1,20 @@
-require "pulpcore_client"
+# frozen_string_literal: true
+
+require 'pulpcore_client'
 module ForemanPulsible
   module Pulp3
     class BaseClient
       class << self
-
         def pulp3_configuration(config_class)
           # TODO: parameterize
           url = 'https://centos9-katello-devel-stable.example.com'
           k = URI.parse(url)
-          config_class.new do |config| uri = k
-          config.host = uri.host
-          config.scheme = uri.scheme
-          config.ssl_client_cert = ::ForemanPulsible::Cert::Certs.ssl_client_cert
-          config.ssl_client_key = ::ForemanPulsible::Cert::Certs.ssl_client_key
+          config_class.new do |config|
+            uri = k
+            config.host = uri.host
+            config.scheme = uri.scheme
+            config.ssl_client_cert = ::ForemanPulsible::Cert::Certs.ssl_client_cert
+            config.ssl_client_key = ::ForemanPulsible::Cert::Certs.ssl_client_key
           end
         end
 

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module AnsibleContentUnit
       class Import < ::Actions::ForemanPulsible::Base::PulsibleAction
-
         input_format do
           param :unit, Object, required: true # SimpleAnsibleContentUnit
         end
@@ -11,9 +12,10 @@ module Actions
           unit = args[:unit]
           op_type = operation_type unit
 
-          if op_type == :import
+          case op_type
+          when :import
             plan_import(unit)
-          elsif op_type == :update
+          when :update
             plan_update(unit)
           end
         end
@@ -36,8 +38,9 @@ module Actions
 
             case unit.unit_type
             when :collection
-              if false # TODO: OR-5511 - Git support
-
+              # rubocop:disable Lint/LiteralAsCondition
+              if false
+                # TODO: OR-5511 - Git support
               else
                 collection_remote_create_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Create,
@@ -52,10 +55,11 @@ module Actions
               _snyc_action = plan_action(
                 ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
-                remote_href: remote_href,
+                remote_href: remote_href
               )
-
+              # rubocop:enable Lint/LiteralAsCondition
             when :role
+              # rubocop:disable Lint/LiteralAsCondition
               if false
                 # TODO: Git support: OR-5511
               else
@@ -70,17 +74,16 @@ module Actions
                 _snyc_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
                   repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
-                  remote_href: remote_href,
+                  remote_href: remote_href
                 )
               end
+              # rubocop:enable Lint/LiteralAsCondition
 
-            else
-              # TODO: Handle invalid PCU
             end
 
             _index_action = plan_action(
               Index,
-              index_mode: "import",
+              index_mode: 'import',
               repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
               remote_href: remote_href,
               distribution_href: distribution_create_action.output['distribution_create_response']['pulp_href'],
@@ -89,7 +92,6 @@ module Actions
               unit_name: unit.unit_name,
               unit_namespace: unit.unit_namespace
             )
-
           end
         end
 
@@ -100,35 +102,28 @@ module Actions
           remote_href = existing_unit.pulp_remote_href
           distribution_href = existing_unit.pulp_distribution_href
 
-
-          if scu.unit_type == :collection
-            sequence do
+          sequence do
             _remote_update_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update,
-                        collection_remote_href: remote_href,
-                        requirements: existing_unit.requirements_file(scu))
+              collection_remote_href: remote_href,
+              requirements: existing_unit.requirements_file(scu))
 
             _snyc_action = plan_action(
-                  ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
-                  repository_href: repository_href,
-                  remote_href: remote_href,
-              )
+              ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Sync,
+              repository_href: repository_href,
+              remote_href: remote_href
+            )
 
             _index_action = plan_action(
               Index,
-              index_mode: "update",
+              index_mode: 'update',
               repository_href: repository_href,
               remote_href: remote_href,
               distribution_href: distribution_href,
               content_unit_type: scu.unit_type,
-              content_unit_source: scu.source,
+              content_unit_source: scu.source
             )
-            end
-          else
-            # TODO: Role support
           end
-
         end
-
 
         # Helper method to decide the operation type:
         # e = Unit exists; v = Unit.version exists; s = Force override
@@ -143,19 +138,17 @@ module Actions
         # | 1 | 1 | 1 | :update |
         # TODO: Unit test this
         def operation_type(unit)
-
           force_override = false # TODO: Setting
 
           existing_unit = ::AnsibleContentUnit.find_any(namespace: unit.unit_namespace, name: unit.unit_name)
           return :import unless existing_unit
 
-          if existing_unit.ansible_content_versions.select{ |x| unit.versions.include? x.version }.empty?
-            unless force_override
-              return :noop
-            end
+          if existing_unit.ansible_content_versions.select do |x|
+               unit.versions.include? x.version
+             end.empty? && !force_override
+            return :noop
           end
           :update
-
         end
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPulsible
   module Cert
     module Certs

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
       module Ansible
         module Repository
           class Create < ::Actions::ForemanPulsible::Base::PulsibleAction
-
             input_format do
               param :name, String, required: true
             end
@@ -16,8 +16,8 @@ module Actions
 
             def run
               repository = PulpAnsibleClient::AnsibleAnsibleRepository.new(
-                { :name => input[:name]
-                                                                           })
+                { name: input[:name] }
+              )
               response = ::ForemanPulsible::Pulp3::Ansible::Repository::Create.new(repository).request
               output.update(repository_create_response: response)
             end

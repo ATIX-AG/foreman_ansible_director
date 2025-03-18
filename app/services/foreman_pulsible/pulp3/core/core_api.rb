@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ForemanPulsible
   module Pulp3
     module Core
@@ -8,7 +10,7 @@ module ForemanPulsible
         end
 
         def request
-          fail NotImplementedError
+          raise NotImplementedError
         end
       end
     end

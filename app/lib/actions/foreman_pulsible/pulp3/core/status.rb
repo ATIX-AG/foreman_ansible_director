@@ -1,14 +1,15 @@
+# frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
       module Core
         class Status < ::Actions::ForemanPulsible::Base::PulsibleAction
-
           def queue
             ::ForemanPulsible::DYNFLOW_QUEUE
           end
 
-          def plan()
+          def plan
             plan_self
           end
 

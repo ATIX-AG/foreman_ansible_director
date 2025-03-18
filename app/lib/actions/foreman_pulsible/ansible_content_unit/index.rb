@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module AnsibleContentUnit
       class Index < ::Actions::ForemanPulsible::Base::PulsibleAction
-
         input_format do
           param :repository_href, String, required: true
           param :content_unit_type, Symbol, required: true
@@ -35,7 +36,8 @@ module Actions
             plan_self(
               args.merge(
                 list_action_output: list_action.output,
-                repository_show_action_output: repository_show_action.output)
+                repository_show_action_output: repository_show_action.output
+              )
             )
           end
         end
@@ -44,23 +46,20 @@ module Actions
           unit_versions = []
           list_results = input.dig(:list_action_output, :repository_artifacts, :results)
 
-          if list_results
-            list_results.each do |result|
-              unit_versions.push(result.slice(:artifact, :version, :sha256))
-            end
-
-          else
-            # If we are here, something went wrong...
-            # TODO: Handle inconsistent state
+          raise unless list_results
+          list_results.each do |result|
+            unit_versions.push(result.slice(:artifact, :version, :sha256))
           end
 
           input.update(indexed_unit_versions: unit_versions)
         end
 
         def finalize
+          # rubocop:disable Layout/LineLength
           unit_versions = input[:indexed_unit_versions]
 
-          if input[:index_mode] == "import"
+          case input[:index_mode]
+          when 'import'
 
             if input[:content_unit_type] == 'collection'
               unit_record = AnsibleCollection.new(
@@ -70,7 +69,7 @@ module Actions
                   latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                   pulp_repository_href: input[:repository_href],
                   pulp_remote_href: input[:remote_href],
-                  pulp_distribution_href: input[:distribution_href]
+                  pulp_distribution_href: input[:distribution_href],
                 }
               )
             else
@@ -82,7 +81,7 @@ module Actions
                   latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                   pulp_repository_href: input[:repository_href],
                   pulp_remote_href: input[:remote_href],
-                  pulp_distribution_href: input[:distribution_href]
+                  pulp_distribution_href: input[:distribution_href],
                 }
               )
             end
@@ -91,33 +90,32 @@ module Actions
                 version: version[:version],
                 artifact_href: version[:artifact],
                 sha256: version[:sha256],
-                source: input[:content_unit_source],
+                source: input[:content_unit_source]
               )
             end
             unit_record.save
 
-          elsif input[:index_mode] == "update"
+          when 'update'
 
-            if input[:content_unit_type] == 'collection'
-              existing_unit = AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
-              existing_unit_versions = existing_unit.ansible_content_versions.pluck(:version)
+            existing_unit = AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
+            existing_unit_versions = existing_unit.ansible_content_versions.pluck(:version)
 
-              existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
+            existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
 
-              new_unit_versions = unit_versions.select { |unit_version| !existing_unit_versions.include?(unit_version[:version]) }
+            new_unit_versions = unit_versions.reject do |unit_version|
+              existing_unit_versions.include?(unit_version[:version])
+            end
 
-              new_unit_versions.each do |new_version|
-                existing_unit.ansible_content_versions << AnsibleContentVersion.new(
-                  version: new_version[:version],
-                  artifact_href: new_version[:artifact],
-                  sha256: new_version[:sha256],
-                  source: input[:content_unit_source],
-                )
-              end
-            else
-              # TODO: Role version support
+            new_unit_versions.each do |new_version|
+              existing_unit.ansible_content_versions << AnsibleContentVersion.new(
+                version: new_version[:version],
+                artifact_href: new_version[:artifact],
+                sha256: new_version[:sha256],
+                source: input[:content_unit_source]
+              )
             end
           end
+          # rubocop:enable Layout/LineLength
         end
       end
     end

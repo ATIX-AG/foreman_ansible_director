@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class AnsibleContentUnit < PulsibleModel
   self.abstract_class = true
 
@@ -10,13 +11,11 @@ class AnsibleContentUnit < PulsibleModel
     nil
   end
 
-  def is_collection?
-    self.is_a? AnsibleCollection
+  def collection?
+    is_a? AnsibleCollection
   end
 
-  def is_role?
-    self.is_a? AnsibleRole
+  def role?
+    is_a? AnsibleRole
   end
-
 end
-

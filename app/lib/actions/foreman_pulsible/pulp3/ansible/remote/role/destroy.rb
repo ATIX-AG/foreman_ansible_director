@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanPulsible
     module Pulp3
@@ -6,7 +7,6 @@ module Actions
         module Remote
           module Role
             class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
-
               input_format do
                 param :role_remote_href, String, required: true
               end
@@ -16,7 +16,9 @@ module Actions
               end
 
               def run
-                response = ::ForemanPulsible::Pulp3::Ansible::Remote::Role::Destroy.new(input[:role_remote_href]).request
+                response = ::ForemanPulsible::Pulp3::Ansible::Remote::Role::Destroy.new(
+                  input[:role_remote_href]
+                ).request
                 output.update(role_remote_destroy_response: response)
               end
 

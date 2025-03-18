@@ -1,29 +1,31 @@
+# frozen_string_literal: true
+
 class AddAnsibleContentTables < ActiveRecord::Migration[6.1]
   def change
     create_table :pulsible_ansible_collections do |t|
-      t.string :name, :null => false, :limit => 255, :unique => true
-      t.string :namespace, :null => false, :limit => 255, :index => true
-      t.string :latest_version_href, :null => false, :limit => 255, :unique => true
-      t.string :pulp_repository_href, :null => false, :limit => 255, :unique => true
-      t.string :pulp_remote_href, :null => false, :limit => 255, :unique => true
-      t.string :pulp_distribution_href, :null => false, :limit => 255, :unique => true
+      t.string :name, null: false, limit: 255, unique: true
+      t.string :namespace, null: false, limit: 255, index: true
+      t.string :latest_version_href, null: false, limit: 255, unique: true
+      t.string :pulp_repository_href, null: false, limit: 255, unique: true
+      t.string :pulp_remote_href, null: false, limit: 255, unique: true
+      t.string :pulp_distribution_href, null: false, limit: 255, unique: true
     end
 
     create_table :pulsible_ansible_roles do |t|
-      t.string :name, :null => false, :limit => 255, :unique => true
-      t.string :namespace, :null => false, :limit => 255, :index => true
-      t.string :latest_version_href, :null => false, :limit => 255, :unique => true
-      t.string :pulp_repository_href, :null => false, :limit => 255, :unique => true
-      t.string :pulp_remote_href, :null => false, :limit => 255, :unique => true
-      t.string :pulp_distribution_href, :null => false, :limit => 255, :unique => true
+      t.string :name, null: false, limit: 255, unique: true
+      t.string :namespace, null: false, limit: 255, index: true
+      t.string :latest_version_href, null: false, limit: 255, unique: true
+      t.string :pulp_repository_href, null: false, limit: 255, unique: true
+      t.string :pulp_remote_href, null: false, limit: 255, unique: true
+      t.string :pulp_distribution_href, null: false, limit: 255, unique: true
     end
 
     create_table :pulsible_ansible_content_versions do |t|
-      t.belongs_to :versionable, :polymorphic => true
-      t.string :version, :null => false, :limit => 255
-      t.string :source, :null => false, :limit => 255
-      t.string :sha256, :limit => 64, :unique => true
-      t.string :artifact_href, :null => false, :limit => 255, :unique => true
+      t.belongs_to :versionable, polymorphic: true
+      t.string :version, null: false, limit: 255
+      t.string :source, null: false, limit: 255
+      t.string :sha256, limit: 64, unique: true
+      t.string :artifact_href, null: false, limit: 255, unique: true
     end
   end
 end

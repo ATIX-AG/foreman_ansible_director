@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('lib/foreman_pulsible/constants', __dir__)
 
 Gem::Specification.new do |s|
@@ -15,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib,locale,webpack}/**/*'] + ['LICENSE', 'Rakefile', 'README.md', 'package.json']
   s.test_files = Dir['test/**/*'] + Dir['webpack/**/__tests__/*.js']
 
-  s.required_ruby_version = '>= 2.7', '< 4'
+  s.required_ruby_version = '>= 3.0', '< 4'
 
   s.add_dependency 'dynflow', '>= 1.0.2', '< 2.0.0'
   s.add_dependency 'foreman-tasks', '>= 8.3.0'
