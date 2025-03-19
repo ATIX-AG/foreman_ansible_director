@@ -37,7 +37,7 @@ module AnsibleContent
 
           unit_type = existing_unit.collection? ? :collection : :role
 
-          versions = nil
+          versions = []
 
           if unit_type == :collection
             versions = unit[:unit_versions]&.select do |version|
@@ -45,7 +45,7 @@ module AnsibleContent
             end
 
             if versions && versions.length == existing_unit.ansible_content_versions.count
-              versions = nil # In this case, we are deleting the complete unit
+              versions = [] # In this case, we are deleting the complete unit
             end
           end
 

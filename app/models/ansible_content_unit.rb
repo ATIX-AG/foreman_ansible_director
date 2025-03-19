@@ -3,6 +3,10 @@
 class AnsibleContentUnit < PulsibleModel
   self.abstract_class = true
 
+  scope :all_content_units, lambda {
+                              descendants.reduce(AnsibleContentUnit.none) { |scope, subclass| scope.or(subclass.all) }
+                            }
+
   def self.find_any(attributes)
     descendants.each do |subclass|
       result = subclass.find_by(attributes)

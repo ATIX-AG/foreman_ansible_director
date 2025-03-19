@@ -1,9 +1,21 @@
-ForemanPulsible::Engine.routes.draw do
-  get 'new_action', to: 'example#new_action', as: 'new_action'
-  get 'plugin_template_description', to: 'example#react_template_page_description'
-  get 'welcome', to: '/react#index', as: 'welcome'
-end
+# frozen_string_literal: true
 
-Foreman::Application.routes.draw do
-  mount ForemanPulsible::Engine, at: '/foreman_pulsible'
+Rails.application.routes.draw do
+  namespace :api do
+    scope '(:apiv)',
+      module: :v2,
+      defaults: { apiv: 'v2' },
+      apiv: /v1|v2/,
+      constraints: ApiConstraints.new(version: 2, default: true) do
+      scope '/pulsible' do
+        resources :ansible_content, only: [] do
+          collection do
+            post '/', action: :create_units
+            get '/', action: :index_units
+            delete '/', action: :destroy_units
+          end
+        end
+      end
+    end
+  end
 end

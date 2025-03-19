@@ -11,7 +11,7 @@ module Actions
         def plan(args)
           unit = args[:unit]
 
-          if unit.versions
+          if !unit.versions.empty?
             plan_partial_destroy(unit)
           else
             plan_full_destroy(unit)
@@ -27,7 +27,7 @@ module Actions
         def finalize
           acu = find_unit(name: input[:unit_name], namespace: input[:unit_namespace])
           if input[:unit_type] == 'collection'
-            if (versions = input[:unit_versions]) # partial
+            if !(versions = input[:unit_versions].empty?) # partial
               versions.each do |version|
                 acu&.ansible_content_versions.&find_by(version: version).destroy
               end
