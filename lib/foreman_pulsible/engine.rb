@@ -35,6 +35,7 @@ module ForemanPulsible
           register_gettext
 
           widget 'foreman_pulsible_widget', name: N_('Foreman plugin template widget'), sizex: 4, sizey: 1
+          register_global_js_file 'global'
         end
       end
     end

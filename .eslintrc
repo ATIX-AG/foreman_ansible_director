@@ -1,4 +1,11 @@
 {
   "plugins": ["@theforeman/foreman"],
-  "extends": ["plugin:@theforeman/foreman/core", "plugin:@theforeman/foreman/plugins"]
+  "extends": ["plugin:@theforeman/foreman/core", "plugin:@theforeman/foreman/plugins"],
+    "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  }
 }
