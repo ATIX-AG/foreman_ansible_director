@@ -12,8 +12,8 @@ module Api
           resolved_content_units: resolved)
       end
 
-      def index_units
-        @ansible_content_units = AnsibleContentUnit.all_content_units.paginate(page: 1, per_page: 25)
+      def index
+        @ansible_content_units = resource_scope_for_index
       end
 
       def destroy_units
@@ -27,6 +27,10 @@ module Api
       def validate_requirements_payload
         # TODO: Grammar
         params.require(:requirements_file)
+      end
+
+      def resource_scope
+        AnsibleContentUnit.all_content_units
       end
     end
   end

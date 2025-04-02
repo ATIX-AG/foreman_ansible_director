@@ -3,6 +3,8 @@
 class AnsibleContentUnit < PulsibleModel
   self.abstract_class = true
 
+  scoped_search on: %i[name namespace]
+
   scope :all_content_units, lambda {
                               descendants.reduce(AnsibleContentUnit.none) { |scope, subclass| scope.or(subclass.all) }
                             }

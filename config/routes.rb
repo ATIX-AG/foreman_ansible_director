@@ -11,11 +11,13 @@ Rails.application.routes.draw do
         resources :ansible_content, only: [] do
           collection do
             post '/', action: :create_units
-            get '/', action: :index_units
+            get '/', action: :index
             delete '/', action: :destroy_units
           end
         end
       end
     end
   end
+
+  match '/ansible/content' => 'react#index', :via => [:get]
 end
