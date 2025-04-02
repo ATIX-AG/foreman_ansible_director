@@ -1,4 +1,3 @@
-import React from 'react';
 import { registerRoutes } from 'foremanReact/routes/RoutingService';
 import routes from './routes/routes';
 

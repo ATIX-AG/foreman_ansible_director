@@ -1,10 +1,35 @@
 {
-  "plugins": ["@theforeman/foreman"],
-  "extends": ["plugin:@theforeman/foreman/core", "plugin:@theforeman/foreman/plugins"],
-    "settings": {
+  "extends": [
+    "plugin:@theforeman/foreman/core",
+    "plugin:@theforeman/foreman/plugins"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2019,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "no-unused-vars": "error",
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"]
+  },
+  "settings": {
     "import/resolver": {
+
+    "typescript": { // This uses the tsconfig.json for path resolution
+        "alwaysTryTypes": true // Try to resolve .d.ts files first
+      },
+
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [".js", ".jsx", ".ts", ".d.ts", ".tsx"]
       }
     }
   }

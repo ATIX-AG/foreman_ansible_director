@@ -2,12 +2,14 @@
   "compilerOptions": {
     "target": "es2019",
     "lib": ["dom", "dom.iterable"],
+    "skipLibCheck": true,
     "allowJs": true,
     "esModuleInterop": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "jsx": "react-jsx",
+    "paths": {"foremanReact/*" :  ["./types/foremanReact/*"]}
   },
   "include": [
     "./webpack/**/*"

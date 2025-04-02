@@ -30,13 +30,7 @@ module ForemanPulsible
 
     initializer 'foreman_pulsible.register_plugin', before: :finisher_hook do |app|
       app.reloader.to_prepare do
-        Foreman::Plugin.register :foreman_pulsible do
-          requires_foreman '>= 3.12.0'
-          register_gettext
-
-          widget 'foreman_pulsible_widget', name: N_('Foreman plugin template widget'), sizex: 4, sizey: 1
-          register_global_js_file 'global'
-        end
+        require 'foreman_pulsible/register'
       end
     end
 
