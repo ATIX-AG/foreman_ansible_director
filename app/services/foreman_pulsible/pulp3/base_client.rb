@@ -13,6 +13,7 @@ module ForemanPulsible
             uri = k
             config.host = uri.host
             config.scheme = uri.scheme
+            config.ssl_ca_file = ::ForemanPulsible::Cert::Certs.ca_cert_file
             config.ssl_client_cert = ::ForemanPulsible::Cert::Certs.ssl_client_cert
             config.ssl_client_key = ::ForemanPulsible::Cert::Certs.ssl_client_key
           end
