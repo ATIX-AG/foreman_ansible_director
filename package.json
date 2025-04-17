@@ -2,7 +2,6 @@
   "name": "foreman_pulsible",
   "version": "0.1.0",
   "description": "DESCRIPTION",
-  "main": "index.js",
   "scripts": {
     "lint": "npx eslint -c .eslintrc 'webpack/**/'",
     "test": "tfm-test --config jest.config.js",
@@ -12,28 +11,32 @@
     "create-react-component": "yo react-domain"
   },
   "peerDependencies": {
-    "@theforeman/vendor": ">= 6.0.0"
+    "@theforeman/vendor": "^15.0.1"
   },
   "dependencies": {
-    "react-intl": "^2.8.0"
+    "react-intl": "^7.1.10"
   },
   "devDependencies": {
     "@babel/core": "^7.7.0",
+    "@monaco-editor/react":"^4.7.0",
+    "@patternfly/react-code-editor": "^5.4.14",
+    "@patternfly/react-core": "^5.4.14",
+    "@patternfly/react-table": "^5.4.14",
     "@sheerun/mutationobserver-shim": "^0.3.3",
-    "@theforeman/builder": "^6.0.0",
-    "@theforeman/eslint-plugin-foreman": "6.0.0",
-    "@theforeman/find-foreman": "^4.8.0",
-    "@theforeman/test": "^8.0.0",
-    "@theforeman/vendor-dev": "^6.0.0",
+    "@theforeman/builder": "^15.0.1",
+    "@theforeman/eslint-plugin-foreman": "^15.0.1",
+    "@theforeman/test": "^15.0.1",
     "@types/node": "^22.13.10",
     "@types/react": "^16.14.0",
     "@types/react-dom": "^16.9.25",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "axios": "^1.8.4",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.7.2",
     "eslint-import-resolver-typescript": "^4.2.3",
     "eslint-plugin-import": "^2.31.0",
+    "monaco-editor": "^0.52.2",
     "prettier": "^1.19.1",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.2",
