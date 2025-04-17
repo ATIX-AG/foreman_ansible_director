@@ -22,9 +22,7 @@ declare module 'foremanReact/common/hooks/API/APIHooks' {
   export interface IndexResponse extends PaginationProps {
     total: number;
     subtotal: number;
-    page: number;
     // eslint-disable-next-line camelcase
-    per_page: number;
     search: string | null;
     sort: SortOptions;
   }

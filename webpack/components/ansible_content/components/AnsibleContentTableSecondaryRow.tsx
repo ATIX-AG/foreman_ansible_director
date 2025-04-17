@@ -8,7 +8,7 @@ import {
   Td,
   ExpandableRowContent,
 } from '@patternfly/react-table';
-import { AnsibleContentVersion } from './AnsibleContentTableWrapper';
+import { AnsibleContentVersion } from '../../../types/AnsibleContentTypes';
 
 interface AnsibleContentTableSecondaryRowProps {
   identifier: string; // Needed for keys

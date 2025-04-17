@@ -11,6 +11,8 @@ import {
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { AnsibleContentTable } from './AnsibleContentTable';
+import AnsibleContentWizard from './AnsibleContentWizard/AnsibleContentWizard';
+import { AnsibleContentVersion } from '../../../types/AnsibleContentTypes';
 
 export interface GetAnsibleContentResponse extends IndexResponse {
   results: AnsibleContentResult[];
@@ -23,16 +25,12 @@ export interface AnsibleContentResult {
   versions: AnsibleContentVersion[];
 }
 
-export interface AnsibleContentVersion {
-  version: string;
-}
-
 const AnsibleContentTableWrapper: React.FC = () => {
-  const contentRequest: UseAPIReturn<GetAnsibleContentResponse> = useTableIndexAPIResponse(
-    {
-      apiUrl: foremanUrl('/api/v2/pulsible/ansible_content'),
-    }
-  );
+  const contentRequest: UseAPIReturn<GetAnsibleContentResponse> = useTableIndexAPIResponse<
+    GetAnsibleContentResponse
+  >({
+    apiUrl: foremanUrl('/api/v2/pulsible/ansible_content'),
+  });
 
   const { setParamsAndAPI, params } = useSetParamsAndApiAndSearch({
     defaultParams: { search: '' },
@@ -45,11 +43,14 @@ const AnsibleContentTableWrapper: React.FC = () => {
 
   if (contentRequest.status === 'RESOLVED') {
     return (
-      <AnsibleContentTable
-        apiResponse={contentRequest.response}
-        setAPIOptions={contentRequest.setAPIOptions}
-        onPagination={onPagination}
-      />
+      <>
+        <AnsibleContentTable
+          apiResponse={contentRequest.response}
+          setAPIOptions={contentRequest.setAPIOptions}
+          onPagination={onPagination}
+        />
+        <AnsibleContentWizard />
+      </>
     );
   } else if (contentRequest.status === 'ERROR') {
     return null; // TODO: Handle request error
