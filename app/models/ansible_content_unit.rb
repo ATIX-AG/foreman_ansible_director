@@ -3,6 +3,12 @@
 class AnsibleContentUnit < PulsibleModel
   self.abstract_class = true
 
+  has_many :execution_environment_versions, dependent: :destroy
+  has_many :execution_environments, through: :execution_environment_versions
+  def versions
+    AnsibleContentVersion.where(versionable_id: id)
+  end
+
   scoped_search on: %i[name namespace]
 
   scope :all_content_units, lambda {
@@ -23,5 +29,13 @@ class AnsibleContentUnit < PulsibleModel
 
   def role?
     is_a? AnsibleRole
+  end
+
+  def unit_type
+    if collection?
+      'collection'
+    elsif role?
+      'role'
+    end
   end
 end

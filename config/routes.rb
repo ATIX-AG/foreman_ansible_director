@@ -15,6 +15,16 @@ Rails.application.routes.draw do
             delete '/', action: :destroy_units
           end
         end
+        resources :execution_environments, only: [] do
+          collection do
+            get '/', action: :index
+            post '/', action: :create
+          end
+          member do
+            patch '/', action: :update
+            delete '/', action: :destroy
+          end
+        end
       end
     end
   end

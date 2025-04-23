@@ -3,4 +3,8 @@
 class PulsibleModel < ApplicationRecord
   self.abstract_class = true
   self.table_name_prefix = 'pulsible_'
+
+  def flatten_errors
+    errors.messages.map { |attribute, messages| messages.map { |msg| "#{attribute}: #{msg}" } }.flatten.join("\n")
+  end
 end
