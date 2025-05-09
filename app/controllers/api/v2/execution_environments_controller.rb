@@ -2,10 +2,11 @@
 
 module Api
   module V2
-    class ExecutionEnvironmentsController < ::Api::V2::BaseController
+    class ExecutionEnvironmentsController < PulsibleApiController
       include ::Api::Version2
 
       before_action :find_resource, only: %i[update destroy]
+      before_action :find_organization, only: %i[create]
 
       def index
         @execution_environments = resource_scope_for_index
@@ -15,6 +16,7 @@ module Api
         permitted_params = execution_environment_params
         content = permitted_params.delete(:content)
         @execution_environment = ExecutionEnvironment.new(permitted_params)
+        @execution_environment.organization = @organization
 
         begin
           ActiveRecord::Base.transaction do

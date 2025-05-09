@@ -6,33 +6,35 @@ module Actions
       class Import < ::Actions::ForemanPulsible::Base::PulsibleAction
         input_format do
           param :unit, Object, required: true # SimpleAnsibleContentUnit
+          param :organization_id, required: true
         end
 
         def plan(args)
           unit = args[:unit]
+          organization_id = args[:organization_id]
           op_type = operation_type unit
 
           case op_type
           when :import
-            plan_import(unit)
+            plan_import(unit, organization_id)
           when :update
-            plan_update(unit)
+            plan_update(unit, organization_id)
           end
         end
 
         private
 
-        def plan_import(unit)
+        def plan_import(unit, organization_id)
           sequence do
             repository_create_action = plan_action(
               ::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Create,
-              name: unit.name
+              name: "#{organization_id}-#{unit.name}"
             )
 
             distribution_create_action = plan_action(
               ::Actions::ForemanPulsible::Pulp3::Ansible::Distribution::Create,
               name: unit.name,
-              base_path: unit.name,
+              base_path: "#{organization_id}/#{unit.name}",
               repository_href: repository_create_action.output['repository_create_response']['pulp_href']
             )
 
@@ -44,7 +46,7 @@ module Actions
               else
                 collection_remote_create_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Create,
-                  name: unit.name,
+                  name: "#{organization_id}-#{unit.name}",
                   url: unit.source,
                   requirements: unit.collection_file
                 )
@@ -65,7 +67,7 @@ module Actions
               else
                 role_remote_create_action = plan_action(
                   ::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Role::Create,
-                  name: unit.name,
+                  name: "#{organization_id}-#{unit.name}",
                   url: unit.role_url
                 )
 
@@ -90,13 +92,15 @@ module Actions
               content_unit_type: unit.unit_type,
               content_unit_source: unit.source,
               unit_name: unit.unit_name,
-              unit_namespace: unit.unit_namespace
+              unit_namespace: unit.unit_namespace,
+              organization_id: organization_id
             )
           end
         end
 
-        def plan_update(scu)
-          existing_unit = AnsibleCollection.find_by(namespace: scu.unit_namespace, name: scu.unit_name)
+        def plan_update(scu, organization_id)
+          existing_unit = AnsibleCollection.find_by(namespace: scu.unit_namespace, name: scu.unit_name,
+            organization_id: organization_id)
 
           repository_href = existing_unit.pulp_repository_href
           remote_href = existing_unit.pulp_remote_href

@@ -34,6 +34,10 @@ module ForemanPulsible
       end
     end
 
+    config.to_prepare do
+      ::Organization.include ForemanPulsible::OrganizationExtensions
+    end
+
     # initializer "foreman_pulsible.register_actions", :before => :finisher_hook do |_app|
     #  ForemanTasks.dynflow.require!
     #

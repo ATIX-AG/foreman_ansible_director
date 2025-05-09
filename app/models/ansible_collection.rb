@@ -2,6 +2,7 @@
 
 class AnsibleCollection < AnsibleContentUnit
   has_many :ansible_content_versions, as: :versionable, dependent: :destroy
+  belongs_to :organization, inverse_of: :ansible_collections
 
   def requirements_file(simple_content_unit = nil, subtractive: false)
     units = []

@@ -9,6 +9,7 @@ module Actions
           param :content_unit_type, Symbol, required: true
           param :unit_name, String, required: true
           param :unit_namespace, String, required: true
+          param :organization_id, Integer, required: true
         end
 
         output_format do
@@ -70,6 +71,7 @@ module Actions
                   pulp_repository_href: input[:repository_href],
                   pulp_remote_href: input[:remote_href],
                   pulp_distribution_href: input[:distribution_href],
+                  organization_id: input[:organization_id],
                 }
               )
             else
@@ -82,6 +84,7 @@ module Actions
                   pulp_repository_href: input[:repository_href],
                   pulp_remote_href: input[:remote_href],
                   pulp_distribution_href: input[:distribution_href],
+                  organization_id: input[:organization_id],
                 }
               )
             end

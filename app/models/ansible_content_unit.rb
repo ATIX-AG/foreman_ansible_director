@@ -3,8 +3,8 @@
 class AnsibleContentUnit < PulsibleModel
   self.abstract_class = true
 
-  has_many :execution_environment_versions, dependent: :destroy
-  has_many :execution_environments, through: :execution_environment_versions
+  has_many :execution_environment_content_versions
+  has_many :execution_environments, through: :execution_environment_content_versions
   def versions
     AnsibleContentVersion.where(versionable_id: id)
   end

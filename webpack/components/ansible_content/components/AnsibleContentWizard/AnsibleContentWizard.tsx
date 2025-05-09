@@ -127,7 +127,7 @@ const AnsibleContentWizard: React.FC = () => {
       <Modal
         variant={ModalVariant.large}
         showClose={false}
-        isOpen
+        isOpen={false}
         aria-labelledby="modal-wizard-label"
         aria-describedby="modal-wizard-description"
         onClose={() => {}}
