@@ -55,6 +55,7 @@ module Api
         params.require(:execution_environment).permit(
           :name,
           :base_image_url,
+          :ansible_version,
           content: %i[
             content_unit_type
             content_unit_id

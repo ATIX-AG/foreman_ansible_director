@@ -2,7 +2,7 @@
 
 collection @execution_environments
 
-attributes :id, :name, :base_image_url, :image_hash, :image_url, :last_built
+attributes :id, :name, :base_image_url, :ansible_version, :image_hash, :image_url, :last_built
 child ansible_content_versions: :content do
   attributes :id
 
