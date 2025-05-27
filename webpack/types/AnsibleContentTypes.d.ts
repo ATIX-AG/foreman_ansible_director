@@ -1,7 +1,7 @@
 export interface AnsibleContentUnit {
   type: 'collection' | 'role';
   identifier: string;
-  source: string;
+  source?: string;
   versions: AnsibleContentVersion[];
 }
 

@@ -13,6 +13,9 @@ Foreman::Plugin.register :foreman_pulsible do
     menu :top_menu, :ansible_environments,
       url: '/ansible/environments',
       caption: 'Ansible Environments'
+    menu :top_menu, :ansible_execution_environments,
+      url: '/ansible/execution_environments',
+      caption: 'Ansible Execution Environments'
   end
 
   divider :top_menu, caption: N_('Ansible'), parent: :configure_menu

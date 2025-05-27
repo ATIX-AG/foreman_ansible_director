@@ -57,4 +57,5 @@ Rails.application.routes.draw do
 
   match '/ansible/content' => 'react#index', :via => [:get]
   match '/ansible/environments' => 'react#index', :via => [:get]
+  match '/ansible/execution_environments' => 'react#index', :via => [:get]
 end

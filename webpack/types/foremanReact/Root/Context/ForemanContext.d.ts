@@ -1,3 +1,4 @@
+
 interface Organization {
   id: number;
   title: string;
