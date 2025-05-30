@@ -36,7 +36,7 @@ module Api
         begin
           ActiveRecord::Base.transaction do
             @execution_environment.update!(permitted_params)
-            @execution_environment.ansible_content_versions.clear
+            @execution_environment.execution_environment_content_units.clear
             associate_content_units(@execution_environment, content)
           end
         rescue ActiveRecord::RecordInvalid
@@ -79,20 +79,22 @@ module Api
           unless unit
             @execution_environment.errors.add(:id,
               "Content unit of type #{content_unit_type} with id #{content_unit_id} does not exist")
-            raise ActiveRecord::RecordInvalid, unit
+            raise ActiveRecord::RecordInvalid, @execution_environment
           end
 
-          version_to_link = unit.ansible_content_versions.where(version: content_unit_version).first
+          version_to_link = unit.content_unit_versions.where(version: content_unit_version).first
 
           unless version_to_link
-            @execution_environment.errors.add(:ansible_content_version,
+            @execution_environment.errors.add(:content_unit_version,
               "#{unit.namespace}.#{unit.name} is not present in version #{content_unit_version}")
-            raise ActiveRecord::RecordInvalid, unit
+            raise ActiveRecord::RecordInvalid, @execution_environment
           end
 
-          unless execution_env.ansible_content_versions.include?(version_to_link)
-            execution_env.ansible_content_versions << version_to_link
-          end
+          ExecutionEnvironmentContentUnit.find_or_create_by!(
+            execution_environment: execution_env,
+            content_unit: unit,
+            content_unit_version: version_to_link
+          )
         end
       end
     end

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-class AnsibleRole < AnsibleContentUnit
-  has_many :ansible_content_versions, as: :versionable, dependent: :destroy
-  belongs_to :organization, inverse_of: :ansible_roles
+class AnsibleRole < ContentUnit
+  has_many :ansible_variables, dependent: :destroy
+  has_many :content_unit_versions, as: :versionable, dependent: :destroy
+
+  validates :name, presence: true
+  validates :namespace, presence: true
 end

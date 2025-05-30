@@ -31,7 +31,7 @@ module AnsibleContent
           end
 
           unit_namespace, unit_name = name.match(/^(.*)\.(.*)$/).captures
-          existing_unit = AnsibleContentUnit.find_any(namespace: unit_namespace, name: unit_name)
+          existing_unit = ContentUnit.find_by(namespace: unit_namespace, name: unit_name)
 
           raise "Unit not found: #{name}" unless existing_unit # TODO: Proper error code
 
@@ -41,10 +41,10 @@ module AnsibleContent
 
           if unit_type == :collection
             versions = unit[:unit_versions]&.select do |version|
-              existing_unit.ansible_content_versions.find_by(version: version)
+              existing_unit.content_unit_versions.find_by(version: version)
             end
 
-            if versions && versions.length == existing_unit.ansible_content_versions.count
+            if versions && versions.length == existing_unit.content_unit_versions.count
               versions = [] # In this case, we are deleting the complete unit
             end
           end

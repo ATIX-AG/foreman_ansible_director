@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+class AnsibleCollectionRole < PulsibleModel
+  belongs_to :ansible_collection_version,
+    class_name: 'ContentUnitVersion'
+
+  has_many :ansible_variables, dependent: :destroy
+
+  validates :name, presence: true
+  validates :name, uniqueness: { scope: :ansible_collection_version_id }
+
+  validate :ansible_collection_version_must_be_for_collection
+
+  private
+
+  def ansible_collection_version_must_be_for_collection
+    return unless ansible_collection_version
+    return if ansible_collection_version.versionable_type == 'AnsibleCollection'
+
+    errors.add(:ansible_collection_version, 'must be a version of an AnsibleCollection')
+  end
+end

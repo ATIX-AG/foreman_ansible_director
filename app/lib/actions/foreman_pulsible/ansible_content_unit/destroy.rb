@@ -6,30 +6,33 @@ module Actions
       class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
         input_format do
           param :unit
+          param :organization_id
         end
 
         def plan(args)
           unit = args[:unit]
+          organization_id = args[:organization_id]
 
           if !unit.versions.empty?
-            plan_partial_destroy(unit)
+            plan_partial_destroy(unit, organization_id)
           else
-            plan_full_destroy(unit)
+            plan_full_destroy(unit, organization_id)
           end
           plan_self(
+            organization_id: organization_id,
             unit_name: unit.unit_name,
             unit_namespace: unit.unit_namespace,
             unit_type: unit.unit_type,
-            unit_versions: unit.versions
+            unit_versions: unit.versions,
           )
         end
 
         def finalize
-          acu = find_unit(name: input[:unit_name], namespace: input[:unit_namespace])
+          acu = ContentUnit.find_by(name: input[:unit_name], namespace: input[:unit_namespace], organization_id: input[:organization_id])
           if input[:unit_type] == 'collection'
-            if !(versions = input[:unit_versions].empty?) # partial
-              versions.each do |version|
-                acu&.ansible_content_versions.&find_by(version: version).destroy
+            if !input[:unit_versions].empty? # partial
+              input[:unit_versions].each do |version|
+                acu&.content_unit_versions&.find_by(version: version)&.destroy
               end
             else
               acu&.destroy
@@ -41,8 +44,9 @@ module Actions
 
         private
 
-        def plan_full_destroy(unit)
-          acu = find_unit(name: unit.unit_name, namespace: unit.unit_namespace) # find_unit
+        # rubocop:disable Layout/LineLength
+        def plan_full_destroy(unit, organization_id)
+          acu = ContentUnit.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # find_unit
 
           concurrence do
             plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Repository::Destroy,
@@ -60,8 +64,8 @@ module Actions
           end
         end
 
-        def plan_partial_destroy(unit)
-          acu = ::AnsibleContentUnit.find_any(name: unit.unit_name, namespace: unit.unit_namespace) # Only collections
+        def plan_partial_destroy(unit, organization_id)
+          acu = ::AnsibleCollection.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # Only collections
 
           sequence do
             _remote_update_action = plan_action(::Actions::ForemanPulsible::Pulp3::Ansible::Remote::Collection::Update,
@@ -74,10 +78,7 @@ module Actions
             )
           end
         end
-
-        def find_unit(**args)
-          ::AnsibleContentUnit.find_any(args)
-        end
+        # rubocop:enable Layout/LineLength
       end
     end
   end

@@ -144,10 +144,10 @@ module Actions
         def operation_type(unit)
           force_override = false # TODO: Setting
 
-          existing_unit = ::AnsibleContentUnit.find_any(namespace: unit.unit_namespace, name: unit.unit_name)
+          existing_unit = ::ContentUnit.find_by(namespace: unit.unit_namespace, name: unit.unit_name)
           return :import unless existing_unit
 
-          if existing_unit.ansible_content_versions.select do |x|
+          if existing_unit.content_unit_versions.select do |x|
                unit.versions.include? x.version
              end.empty? && !force_override
             return :noop

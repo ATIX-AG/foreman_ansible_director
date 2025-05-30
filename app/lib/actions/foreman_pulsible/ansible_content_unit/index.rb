@@ -45,11 +45,18 @@ module Actions
 
         def run
           unit_versions = []
-          list_results = input.dig(:list_action_output, :repository_artifacts, :results)
+          imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
 
-          raise unless list_results
-          list_results.each do |result|
-            unit_versions.push(result.slice(:artifact, :version, :sha256))
+          raise unless imported_versions
+          imported_versions.each do |result|
+            sliced = result.slice(:artifact, :version, :sha256)
+            if input[:content_unit_type] == 'collection'
+              unit_contents = result.slice(:contents)
+              unit_contents = unit_contents[:contents].select { |cu| cu['content_type'] == 'role' }
+              unit_contents = unit_contents.map { |cu| cu['name'] }
+              sliced[:collection_roles] = unit_contents
+            end
+            unit_versions.push(sliced)
           end
 
           input.update(indexed_unit_versions: unit_versions)
@@ -63,10 +70,11 @@ module Actions
           when 'import'
 
             if input[:content_unit_type] == 'collection'
-              unit_record = AnsibleCollection.new(
+              unit_record = AnsibleCollection.create!(
                 {
                   name: input[:unit_name],
                   namespace: input[:unit_namespace],
+                  source: input[:content_unit_source],
                   latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                   pulp_repository_href: input[:repository_href],
                   pulp_remote_href: input[:remote_href],
@@ -89,19 +97,25 @@ module Actions
               )
             end
             unit_versions.each do |version|
-              unit_record.ansible_content_versions.new(
+              content_unit_version = ContentUnitVersion.create!(
+                versionable: unit_record,
                 version: version[:version],
-                artifact_href: version[:artifact],
-                sha256: version[:sha256],
-                source: input[:content_unit_source]
+                versionable_type: unit_record.class.to_s
               )
+
+              next unless unit_record.is_a?(AnsibleCollection)
+
+              version[:collection_roles].each do |collection_role|
+                content_unit_version.ansible_collection_roles.create!(
+                  name: collection_role
+                )
+              end
             end
-            unit_record.save
 
           when 'update'
 
             existing_unit = AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
-            existing_unit_versions = existing_unit.ansible_content_versions.pluck(:version)
+            existing_unit_versions = existing_unit.content_unit_versions.pluck(:version)
 
             existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
 
@@ -110,11 +124,10 @@ module Actions
             end
 
             new_unit_versions.each do |new_version|
-              existing_unit.ansible_content_versions << AnsibleContentVersion.new(
+              existing_unit.content_unit_versions << ContentUnitVersion.new(
+                versionable: existing_unit,
                 version: new_version[:version],
-                artifact_href: new_version[:artifact],
-                sha256: new_version[:sha256],
-                source: input[:content_unit_source]
+                versionable_type: unit_record.class.to_s
               )
             end
           end

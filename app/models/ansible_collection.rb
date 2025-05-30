@@ -1,16 +1,24 @@
 # frozen_string_literal: true
 
-class AnsibleCollection < AnsibleContentUnit
-  has_many :ansible_content_versions, as: :versionable, dependent: :destroy
-  belongs_to :organization, inverse_of: :ansible_collections
+class AnsibleCollection < ContentUnit
+  has_many :content_unit_versions, as: :versionable, dependent: :destroy
+  has_many :ansible_collection_roles, through: :content_unit_versions
+
+  validates :name, presence: true
+  validates :namespace, presence: true
+  validates :namespace, uniqueness: { scope: :name }
+
+  def full_name
+    "#{namespace}.#{name}"
+  end
 
   def requirements_file(simple_content_unit = nil, subtractive: false)
     units = []
-    ansible_content_versions.each do |content_version|
+    content_unit_versions.each do |content_version| # Fixed: was ansible_content_versions
       units.append(
         'name' => "#{namespace}.#{name}",
         'version' => content_version.version,
-        'source' => content_version.source
+        'source' => source
       )
     end
 

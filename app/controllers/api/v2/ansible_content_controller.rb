@@ -3,7 +3,7 @@
 module Api
   module V2
     class AnsibleContentController < PulsibleApiController
-      before_action :find_organization, only: %i[create_units]
+      before_action :find_organization, only: %i[create_units destroy_units]
       before_action :find_optional_organization, only: %i[index]
 
       # TODO: APIDOC
@@ -28,7 +28,7 @@ module Api
       def destroy_units
         resolved = ::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload params[:units]
         @bulk_destroy_task = ForemanTasks.sync_task(::Actions::ForemanPulsible::AnsibleContentUnit::Bulk::Destroy,
-          resolved_content_units: resolved)
+          resolved_content_units: resolved, organization_id: @organization.id)
       end
 
       private

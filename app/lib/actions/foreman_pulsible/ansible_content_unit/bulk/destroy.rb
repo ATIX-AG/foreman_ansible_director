@@ -7,13 +7,14 @@ module Actions
         class Destroy < ::Actions::ForemanPulsible::Base::PulsibleAction
           input_format do
             param :resolved_content_units, type: Array
+            param :organization_id, type: Integer
           end
 
           def plan(args)
             concurrence do
               args[:resolved_content_units].each do |unit|
                 plan_action(::Actions::ForemanPulsible::AnsibleContentUnit::Destroy,
-                  unit: unit)
+                  unit: unit, organization_id: args[:organization_id])
               end
             end
           end
