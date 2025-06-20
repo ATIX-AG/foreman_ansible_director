@@ -13,3 +13,4 @@ locale/*/*.pox
 node_modules
 Gemfile.lock
 coverage
+.idea
