@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ContentUnit < PulsibleModel
+  scoped_search on: %i[name namespace]
+
   belongs_to :organization, inverse_of: :content_units
 
   has_many :execution_environment_content_units, dependent: :destroy
@@ -16,6 +18,10 @@ class ContentUnit < PulsibleModel
 
   def role?
     type == 'AnsibleRole'
+  end
+
+  def full_name
+    "#{namespace}.#{name}"
   end
 
   def self.polymorphic_name

@@ -5,6 +5,12 @@ class ContentUnitVersion < PulsibleModel
   has_many :ansible_collection_roles, dependent: :destroy
   has_many :execution_environment_content_units, dependent: :destroy
 
+  has_many :lifecycle_environment_content_assignments, dependent: :destroy
+  has_many :assigned_lifecycle_environments,
+           through: :lifecycle_environment_content_assignments,
+           source: :lifecycle_environment
+
+
   validates :version, presence: true
   validates :version, uniqueness: { scope: %i[versionable_type versionable_id] }
 

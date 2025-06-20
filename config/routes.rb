@@ -25,6 +25,27 @@ Rails.application.routes.draw do
             delete '/', action: :destroy
           end
         end
+        resources :lifecycle_environments, only: [] do
+          collection do
+            post '/', action: :create
+            resources :lifecycle_environment_paths, path: 'paths', only: [] do
+              collection do
+                get '/', action: :index, to: 'lifecycle_environment_paths#index'
+                post '/', action: :create, to: 'lifecycle_environment_paths#create'
+              end
+              member do
+                put '/', action: :update
+                post '/promote', to: 'lifecycle_environment_paths#promote'
+                delete '/', action: :destroy
+              end
+            end
+          end
+          member do
+            get '/', action: :show
+            delete '/', action: :destroy
+            put '/', action: :update
+          end
+        end
       end
     end
   end

@@ -8,10 +8,6 @@ class AnsibleCollection < ContentUnit
   validates :namespace, presence: true
   validates :namespace, uniqueness: { scope: :name }
 
-  def full_name
-    "#{namespace}.#{name}"
-  end
-
   def requirements_file(simple_content_unit = nil, subtractive: false)
     units = []
     content_unit_versions.each do |content_version| # Fixed: was ansible_content_versions

@@ -38,8 +38,8 @@ module Api
         params.require(:requirements_file)
       end
 
-      def resource_scope
-        AnsibleContentUnit.all_content_units
+      def resource_class
+        ContentUnit
       end
 
       def index_relation

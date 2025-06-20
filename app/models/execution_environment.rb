@@ -8,6 +8,7 @@ class ExecutionEnvironment < PulsibleModel
   has_many :execution_environment_content_units, dependent: :destroy
   has_many :content_units, through: :execution_environment_content_units
   has_many :content_unit_versions, through: :execution_environment_content_units
+  has_many :lifecycle_environments, dependent: :nullify
 
   validates :name, presence: { message: 'Execution Environment name cannot be blank.' }, length: { maximum: 255 }
   validates :base_image_url, presence: { message: 'Execution Environment base image URL cannot be blank.' },
