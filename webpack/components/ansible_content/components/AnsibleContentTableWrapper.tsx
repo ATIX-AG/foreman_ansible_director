@@ -10,7 +10,7 @@ import {
   useSetParamsAndApiAndSearch,
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
-import { useForemanOrganization } from "foremanReact/Root/Context/ForemanContext";
+import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { AnsibleContentTable } from './AnsibleContentTable';
 import AnsibleContentWizard from './AnsibleContentWizard/AnsibleContentWizard';
 import { AnsibleContentVersion } from '../../../types/AnsibleContentTypes';
@@ -27,13 +27,16 @@ export interface AnsibleContentResult {
 }
 
 const AnsibleContentTableWrapper: React.FC = () => {
-
-  const organization = useForemanOrganization()
+  const organization = useForemanOrganization();
 
   const contentRequest: UseAPIReturn<GetAnsibleContentResponse> = useTableIndexAPIResponse<
     GetAnsibleContentResponse
   >({
-    apiUrl: foremanUrl(`/api/v2/pulsible/ansible_content${organization ? `?organization_id=${organization.id}&`: ''}`),
+    apiUrl: foremanUrl(
+      `/api/v2/pulsible/ansible_content${
+        organization ? `?organization_id=${organization.id}&` : ''
+      }`
+    ),
   });
 
   const { setParamsAndAPI, params } = useSetParamsAndApiAndSearch({
