@@ -1,0 +1,31 @@
+import { AnsibleContentUnit } from './AnsibleContentTypes';
+
+export interface AnsibleLcePath {
+  id: number;
+  name: string;
+  description: string;
+  // eslint-disable-next-line camelcase
+  lifecycle_environments: SparseAnsibleLce[];
+}
+
+export interface SparseAnsibleLce {
+  id: number;
+  name: string;
+  description: string;
+  position: number;
+  protected: boolean;
+  // eslint-disable-next-line camelcase
+  content_hash: string;
+}
+
+export interface AnsibleLce extends SparseAnsibleLce {
+  content: AnsibleContentUnit[];
+  // eslint-disable-next-line camelcase
+  execution_environment?: ExecutionEnvironment;
+}
+
+export interface ExecutionEnvironment {
+  // TODO: Replace this with the actual type
+  id: number;
+  name: string;
+}

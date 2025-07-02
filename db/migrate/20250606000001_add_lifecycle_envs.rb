@@ -60,7 +60,6 @@ class AddLifecycleEnvs < ActiveRecord::Migration[6.1]
       t.integer :lifecycle_environment_path_id, null: false
       t.integer :parent_id, null: true
       t.integer :position, null: false, default: 0
-      t.boolean :protected, null: false, default: false
       t.integer :execution_environment_id, null: true
       t.integer :organization_id, null: false
       t.integer :content_snapshot_id, null: true

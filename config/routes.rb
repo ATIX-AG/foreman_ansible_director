@@ -46,9 +46,15 @@ Rails.application.routes.draw do
             put '/', action: :update
           end
         end
+        resources :status, only: [] do
+          collection do
+            get '/content', action: :content
+          end
+        end
       end
     end
   end
 
   match '/ansible/content' => 'react#index', :via => [:get]
+  match '/ansible/environments' => 'react#index', :via => [:get]
 end

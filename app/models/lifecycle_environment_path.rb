@@ -27,11 +27,7 @@ class LifecycleEnvironmentPath < PulsibleModel
         insert_at_beginning(lifecycle_environment)
       when -1
         if old_lce
-          if old_lce.protected?
-            insert_at_position(lifecycle_environment, lifecycle_environments.count - 1) # Second to last
-          else
-            insert_at_end(lifecycle_environment)
-          end
+          insert_at_end(lifecycle_environment)
         else
           insert_at_beginning(lifecycle_environment) # Empty path
         end
@@ -80,6 +76,8 @@ class LifecycleEnvironmentPath < PulsibleModel
         target_env.content_snapshot&.decrement_references
         target_env.update!(content_snapshot: snapshot)
       end
+
+      target_env.update!(execution_environment_id: source_env.execution_environment.id)
 
       success = true
     end

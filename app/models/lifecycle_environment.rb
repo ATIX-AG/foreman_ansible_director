@@ -30,9 +30,6 @@ source: :content_unit_version
   # scope :ordered, -> { order(:position) }
   # scope :roots, -> { where(parent_id: nil) }
 
-  before_create :set_position
-  after_save :update_path_cache
-  after_destroy :update_path_cache
 
   def content_unit_versions
     if using_snapshot_content?

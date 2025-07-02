@@ -10,12 +10,19 @@ Foreman::Plugin.register :foreman_pulsible do
     menu :top_menu, :ansible_content,
       url: '/ansible/content',
       caption: 'Ansible Content'
+    menu :top_menu, :ansible_environments,
+      url: '/ansible/environments',
+      caption: 'Ansible Environments'
   end
 
   divider :top_menu, caption: N_('Ansible'), parent: :configure_menu
   menu :top_menu, :ansible_content,
     url: '/ansible/content',
     caption: 'Ansible Content',
+    parent: :configure_menu
+  menu :top_menu, :ansible_environments,
+    url: '/ansible/environments',
+    caption: 'Ansible Environments',
     parent: :configure_menu
 
   register_global_js_file 'global'

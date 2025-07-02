@@ -5,5 +5,5 @@ collection @lifecycle_environment_paths
 attributes :id, :name, :description
 
 child environments_ordered: :lifecycle_environments do
-  attributes :id, :name, :description, :position, :protected
+  attributes :id, :name, :description, :position, :protected, :content_hash
 end

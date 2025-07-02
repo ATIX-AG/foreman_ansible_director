@@ -2,7 +2,11 @@
 
 object @lifecycle_environment
 
-attributes :id, :name, :description
+attributes :id, :name, :description, :position, :content_hash
+
+child :execution_environment do
+  attributes :id, :name
+end
 
 child content_unit_versions: :content do
   attributes :id
