@@ -57,28 +57,22 @@ module Api
           :base_image_url,
           :ansible_version,
           content: %i[
-            content_unit_type
-            content_unit_id
-            content_unit_version
+            id
+            version
           ]
         )
       end
 
       def associate_content_units(execution_env, content_array)
         content_array.each do |content|
-          content_unit_type = content[:content_unit_type]
-          content_unit_id = content[:content_unit_id]
-          content_unit_version = content[:content_unit_version]
+          content_unit_id = content[:id]
+          content_unit_version = content[:version]
 
-          unit = if content_unit_type == 'collection'
-                   AnsibleCollection.find_by(id: content_unit_id)
-                 else
-                   AnsibleRole.find_by(id: content_unit_id)
-                 end
+          unit = ContentUnit.find_by(id: content_unit_id)
 
           unless unit
             @execution_environment.errors.add(:id,
-              "Content unit of type #{content_unit_type} with id #{content_unit_id} does not exist")
+              "Content with id #{content_unit_id} does not exist")
             raise ActiveRecord::RecordInvalid, @execution_environment
           end
 

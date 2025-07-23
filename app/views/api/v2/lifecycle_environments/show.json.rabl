@@ -9,21 +9,18 @@ child :execution_environment do
 end
 
 child content_unit_versions: :content do
-  attributes :id
 
-  node :content_unit_type do |lcecu|
-    lcecu.versionable.type
+  node :id do |lcecu|
+    lcecu.versionable.id
   end
 
-  node :content_unit_namespace do |lcecu|
-    lcecu.versionable.namespace
+  node :type do |lcecu|
+    lcecu.versionable.type == "AnsibleCollection" ? "collection" : "role"
   end
 
-  node :content_unit_name do |lcecu|
-    lcecu.versionable.name
+  node :identifier do |lcecu|
+    lcecu.versionable.full_name
   end
 
-  node :content_unit_version do |lcecu|
-    lcecu.version
-  end
+  node :version, &:version
 end
