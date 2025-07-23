@@ -3,7 +3,6 @@
 module Api
   module V2
     class StatusController < PulsibleApiController
-
       before_action :find_organization, only: %i[content]
 
       def content

@@ -10,7 +10,6 @@ module Api
       before_action :find_organization, only: %i[create update_content]
 
       def show
-        a = @lifecycle_environment.content_hash
       end
 
       def create

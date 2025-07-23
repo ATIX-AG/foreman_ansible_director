@@ -23,12 +23,16 @@ module Actions
             unit_name: unit.unit_name,
             unit_namespace: unit.unit_namespace,
             unit_type: unit.unit_type,
-            unit_versions: unit.versions,
+            unit_versions: unit.versions
           )
         end
 
         def finalize
-          acu = ContentUnit.find_by(name: input[:unit_name], namespace: input[:unit_namespace], organization_id: input[:organization_id])
+          acu = ContentUnit.find_by(
+            name: input[:unit_name],
+            namespace: input[:unit_namespace],
+            organization_id: input[:organization_id]
+          )
           if input[:unit_type] == 'collection'
             if !input[:unit_versions].empty? # partial
               input[:unit_versions].each do |version|

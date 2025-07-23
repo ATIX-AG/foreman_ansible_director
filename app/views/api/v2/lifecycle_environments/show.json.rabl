@@ -9,13 +9,12 @@ child :execution_environment do
 end
 
 child content_unit_versions: :content do
-
   node :id do |lcecu|
     lcecu.versionable.id
   end
 
   node :type do |lcecu|
-    lcecu.versionable.type == "AnsibleCollection" ? "collection" : "role"
+    lcecu.versionable.type == 'AnsibleCollection' ? 'collection' : 'role'
   end
 
   node :identifier do |lcecu|

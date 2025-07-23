@@ -1,12 +1,8 @@
-import {
-  AnsibleContentUnitAssignment,
-} from './AnsibleContentTypes';
+import { AnsibleContentUnitAssignment } from './AnsibleContentTypes';
 
 export interface Identifiable {
   id: string;
 }
-
-export interface Createable {}
 
 export interface AnsibleExecutionEnvBase {
   name: string;

@@ -5,10 +5,7 @@ import {
   APIOptions,
   PaginationProps,
 } from 'foremanReact/common/hooks/API/APIHooks';
-import {
-  AnsibleContentResult,
-  GetAnsibleContentResponse,
-} from './AnsibleContentTableWrapper';
+import { GetAnsibleContentResponse } from './AnsibleContentTableWrapper';
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
 import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';

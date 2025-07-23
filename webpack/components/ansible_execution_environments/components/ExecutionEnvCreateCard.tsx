@@ -4,24 +4,18 @@ import {
   CardTitle,
   CardBody,
   CardFooter,
-  Icon,
   Bullseye,
-  Avatar,
   CardHeader,
   TextInput,
   Form,
   FormGroup,
   Button,
-  ClipboardCopy,
-  TextContent,
-  Text,
-  TextVariants,
-  Timestamp,
-  TimestampFormat,
 } from '@patternfly/react-core';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
-import { ExecutionEnvCard } from './ExecutionEnvCard';
-import { AnsibleExecutionEnv, AnsibleExecutionEnvCreate } from '../../../types/AnsibleExecutionEnvTypes';
+import {
+  AnsibleExecutionEnv,
+  AnsibleExecutionEnvCreate,
+} from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
 import { TextInputEditable } from './components/TextInputEditable';
 import { DropdownEditable } from './components/DropdownEditable';
@@ -30,7 +24,9 @@ import { ANSIBLE_VERSIONS } from '../../../helpers/constants';
 interface ExecutionEnvCreateCardProps {
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
-  setSelectedEnv: Dispatch<SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>>;
+  setSelectedEnv: Dispatch<
+    SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
+  >;
 }
 
 export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
@@ -38,8 +34,6 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
   setIsContentUnitModalOpen,
   setSelectedEnv,
 }) => {
-  console.log('sus');
-
   const [createMode, setCreateMode] = React.useState<boolean>(false);
 
   const [executionEnvironment, setExecutionEnvironment] = React.useState<
@@ -87,7 +81,6 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
               handleEdit={() => {
                 createExecutionEnv();
               }}
-              handleBuild={() => {}}
               executionEnvironment={executionEnvironment}
             />
           ),
@@ -138,7 +131,6 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
               <Button
                 variant="control"
                 onClick={() => {
-                  console.log("amog");
                   setIsContentUnitModalOpen(true);
                   setSelectedEnv(executionEnvironment);
                 }}

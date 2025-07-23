@@ -33,6 +33,8 @@ class ContentUnit < PulsibleModel
   private
 
   def fix_version_types
-    content_unit_versions.update_all(versionable_type: self.class.name)
+    content_unit_versions.each do |version|
+      version.update(versionable_type: self.class.name)
+    end
   end
 end

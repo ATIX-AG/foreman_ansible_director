@@ -1,6 +1,6 @@
 import React, { JSX } from 'react';
 import { WrappedAnsibleContentPage } from '../components/ansible_content';
-import {WrappedAnsibleExecutionEnvPage} from "../components/ansible_execution_environments";
+import { WrappedAnsibleExecutionEnvPage } from '../components/ansible_execution_environments';
 import { WrappedAnsibleEnvironmentsPage } from '../components/ansible_environments';
 
 interface RouteConfig {

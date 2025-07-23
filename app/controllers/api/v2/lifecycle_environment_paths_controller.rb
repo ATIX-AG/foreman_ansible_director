@@ -49,7 +49,6 @@ module Api
           render_error('custom_error', status: :unprocessable_entity,
                        locals: { message: @lifecycle_environment_path.flatten_errors })
         end
-
       end
 
       private

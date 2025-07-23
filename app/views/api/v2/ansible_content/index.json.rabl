@@ -3,9 +3,7 @@
 collection @ansible_content_units
 
 attributes :id, :name, :namespace, :type
-node :identifier do |u|
-  u.full_name
-end
+node :identifier, &:full_name
 child content_unit_versions: :versions do
   attributes :version
 end

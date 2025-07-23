@@ -1,14 +1,12 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import {
-  DualListSelector,
-  DualListSelectorTreeItemData,
   EmptyState,
   EmptyStateHeader,
   EmptyStateIcon,
   Spinner,
 } from '@patternfly/react-core';
+import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 import { ContentUnitSelector } from './components/ContentUnitSelector';
-import { useAPI, UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 import { AnsibleContentUnit } from '../../../../types/AnsibleContentTypes';
 import {
   AnsibleExecutionEnv,
@@ -36,10 +34,6 @@ export const ContentUnitSelectorWrapper: React.FC<ContentUnitSelectorWrapperProp
   chosenUnits,
   setChosenUnits,
 }) => {
-  const [availableOptions, setAvailableOptions] = React.useState<
-    DualListSelectorTreeItemData[]
-  >([]);
-
   const contentUnitResponse = useAPI<GetContentUnitsResponse>(
     'get',
     '/api/v2/pulsible/ansible_content'

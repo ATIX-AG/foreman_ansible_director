@@ -1,4 +1,4 @@
-import React, { Dispatch } from 'react';
+import React from 'react';
 import { Modal, ModalVariant, Button } from '@patternfly/react-core';
 
 interface ConfirmationModalProps {

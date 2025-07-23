@@ -88,10 +88,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   };
 
   const updateEnvAction = async (): Promise<void> => {
-    console.log('update', selectedEnv);
-
     if (selectedEnv && 'id' in selectedEnv) {
-      console.log('h');
       try {
         await axios.patch(
           foremanUrl(

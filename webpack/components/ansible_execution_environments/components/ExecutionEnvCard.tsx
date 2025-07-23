@@ -3,19 +3,12 @@ import {
   Card,
   CardTitle,
   CardBody,
-  CardFooter,
   CardHeader,
   Form,
   FormGroup,
   TextInput,
-  TextVariants,
-  Text,
-  TextContent,
   Button,
   Bullseye,
-  Timestamp,
-  TimestampFormat,
-  ClipboardCopy,
 } from '@patternfly/react-core';
 
 import { DropdownEditable } from './components/DropdownEditable';
@@ -71,10 +64,6 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
     handleDestroy(executionEnv);
   };
 
-  const handleBuild = (): void => {
-    console.log('');
-  };
-
   if (!executionEnvironment) {
     return null;
   }
@@ -88,7 +77,6 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
               editMode={editMode}
               handleDestroy={askConfirmDestroy}
               handleEdit={askConfirmUpdate}
-              handleBuild={handleBuild}
               executionEnvironment={executionEnvironment}
             />
           ),

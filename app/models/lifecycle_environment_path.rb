@@ -177,9 +177,12 @@ class LifecycleEnvironmentPath < PulsibleModel
       raise ActiveRecord::Rollback
     elsif source_env.position > target_env.position
       errors.add(:source_env,
-        "Wrong promotion direction. Source environment position is greater than target environment position. (#{source_env.position} > #{target_env.position}).")
+        "Wrong promotion direction. Source environment position is greater than target
+         environment position. (#{source_env.position} > #{target_env.position}).")
       raise ActiveRecord::Rollback
+      # rubocop:disable Lint/LiteralAsCondition
     elsif target_env.position != (source_env.position + 1) && !false # TODO: Setting: Force incremental promotion
+      # rubocop:enable Lint/LiteralAsCondition
       errors.add(:source_env, 'Promotion spans more than two environments and $SETTING_NAME is set to false.')
       raise ActiveRecord::Rollback
     end

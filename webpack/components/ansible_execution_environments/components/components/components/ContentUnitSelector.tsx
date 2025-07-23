@@ -232,7 +232,6 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
   );
 
   const buildPane = (isChosen: boolean): React.ReactNode => {
-    console.log(availableUnits);
     const options: ContentUnitTreeItemData[] = buildACUOptions(
       isChosen,
       availableUnits,
@@ -246,6 +245,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
         listMinHeight="300px"
       >
         {true && options.length === 0 && paneEmptyState}
+        {/* This is for search support, which is not implemented yet. */}
         {options.length > 0 && (
           <DualListSelectorList>
             <DualListSelectorTree

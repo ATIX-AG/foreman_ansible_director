@@ -5,7 +5,7 @@ class LifecycleEnvironment < PulsibleModel
 
   belongs_to :execution_environment, optional: true
 
-  has_many :lifecycle_environment_content_unit_versions
+  has_many :lifecycle_environment_content_unit_versions, dependent: :destroy
   has_many :direct_content_unit_versions, through: :lifecycle_environment_content_unit_versions,
 source: :content_unit_version
 
@@ -20,7 +20,8 @@ source: :content_unit_version
   has_many :children,
     class_name: 'LifecycleEnvironment',
     foreign_key: 'parent_id',
-    dependent: :destroy
+    dependent: :destroy,
+    inverse_of: :parent
 
   validates :name, presence: true
   validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -29,7 +30,6 @@ source: :content_unit_version
   # scope :by_path, ->(path_id) { where(lifecycle_environment_path_id: path_id) }
   # scope :ordered, -> { order(:position) }
   # scope :roots, -> { where(parent_id: nil) }
-
 
   def content_unit_versions
     if using_snapshot_content?
@@ -50,8 +50,10 @@ source: :content_unit_version
     update(execution_environment_id: execution_env.id)
   end
 
-  def assign_content_unit_version!(content_unit_version) #TODO: This does not work. Add the content_unit_id to the join table for checking
-    existing_version = lifecycle_environment_content_unit_versions.find_by(content_unit_version_id: content_unit_version.id)
+  # TODO: This does not work. Add the content_unit_id to the join table for checking
+  def assign_content_unit_version!(content_unit_version)
+    existing_version = lifecycle_environment_content_unit_versions
+                       .find_by(content_unit_version_id: content_unit_version.id)
 
     replace = true # TODO: Setting
 

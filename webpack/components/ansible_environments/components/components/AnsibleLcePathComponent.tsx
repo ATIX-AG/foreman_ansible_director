@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { useDispatch } from 'react-redux';
 
 import {
   Bullseye,
@@ -18,6 +19,7 @@ import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import { addToast } from 'foremanReact/components/ToastsList';
 
 import {
   AnsibleLce,
@@ -39,7 +41,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
   lcePath,
   refreshRequest,
   setLifecycleEnv,
-  setIsContentUnitModalOpen
+  setIsContentUnitModalOpen,
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
 
@@ -51,6 +53,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
   const [loadingButton, setLoadingButton] = useState<number>();
 
   const organization = useForemanOrganization();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setLifecycleEnvironmentPath(lcePath);
@@ -62,7 +65,6 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
         JSON.stringify(lcePath) !== JSON.stringify(lifecycleEnvironmentPath)
       ) {
         // TODO: update
-        console.log(lifecycleEnvironmentPath);
       }
     }
     setEditMode(!editMode);
@@ -85,8 +87,17 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
           },
         }
       );
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `PROMOTE_${sourceEnvId}_ERR`,
+          message: `Promotion failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
     } finally {
       refreshRequest();
       setLoadingButton(undefined);
@@ -106,8 +117,19 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
         lifecycle_environment_path_id: lcePath.id,
         organization_id: organization?.id,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: 'INSERT_ENV_ERR',
+          message: `Insertion of environment ${pos} ${
+            lce.name
+          } failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
     } finally {
       refreshRequest();
     }
@@ -216,7 +238,8 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
             lce={env}
             pathEditMode={editMode}
             setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-            setLifecycleEnv={setLifecycleEnv} />
+            setLifecycleEnv={setLifecycleEnv}
+          />
           <div
             style={{
               display: 'flex',

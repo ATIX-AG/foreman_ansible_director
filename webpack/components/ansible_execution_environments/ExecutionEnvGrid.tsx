@@ -4,9 +4,7 @@ import {
   APIOptions,
   PaginationProps,
 } from 'foremanReact/common/hooks/API/APIHooks';
-import { foremanUrl } from 'foremanReact/common/helpers';
 import Pagination from 'foremanReact/components/Pagination';
-import axios from 'axios';
 
 import { ExecutionEnvCard } from './components/ExecutionEnvCard';
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';

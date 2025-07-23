@@ -39,7 +39,6 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     if (editMode) {
       if (JSON.stringify(lce) !== JSON.stringify(lifecycleEnvironment)) {
         // TODO: update
-        console.log(lifecycleEnvironment);
       }
     }
     setEditMode(!editMode);
