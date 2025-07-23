@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.0",
-    "@monaco-editor/react":"^4.7.0",
+    "@monaco-editor/react": "^4.7.0",
     "@patternfly/react-code-editor": "^5.4.14",
     "@patternfly/react-core": "^5.4.14",
     "@patternfly/react-table": "^5.4.14",
@@ -29,6 +29,8 @@
     "@types/node": "^22.13.10",
     "@types/react": "^16.14.0",
     "@types/react-dom": "^16.9.25",
+    "@types/react-router": "^5.1.20",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "axios": "^1.8.4",
@@ -38,6 +40,7 @@
     "eslint-plugin-import": "^2.31.0",
     "monaco-editor": "^0.52.2",
     "prettier": "^1.19.1",
+    "react-router": "^5.3.4",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.2",
     "webpack-cli": "^6.0.1"
