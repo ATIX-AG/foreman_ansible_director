@@ -2,7 +2,7 @@
 
 class AnsibleCollectionRole < PulsibleModel
   belongs_to :ansible_collection_version,
-    class_name: 'ContentUnitVersion'
+    class_name: 'ContentUnitVersion', inverse_of: :ansible_collection_roles
 
   has_many :ansible_variables, dependent: :destroy
 

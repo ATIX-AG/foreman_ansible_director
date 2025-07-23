@@ -77,7 +77,9 @@ class LifecycleEnvironmentPath < PulsibleModel
         target_env.update!(content_snapshot: snapshot)
       end
 
-      target_env.update!(execution_environment_id: source_env.execution_environment.id)
+      if (ee_id = source_env.execution_environment&.id)
+        target_env.update!(execution_environment_id: ee_id)
+      end
 
       success = true
     end

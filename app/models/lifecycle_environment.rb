@@ -50,8 +50,8 @@ source: :content_unit_version
     update(execution_environment_id: execution_env.id)
   end
 
-  def assign_content_unit_version!(content_unit_version)
-    existing_version = content_unit_versions.find_by(versionable_id: content_unit_version.versionable_id)
+  def assign_content_unit_version!(content_unit_version) #TODO: This does not work. Add the content_unit_id to the join table for checking
+    existing_version = lifecycle_environment_content_unit_versions.find_by(content_unit_version_id: content_unit_version.id)
 
     replace = true # TODO: Setting
 
