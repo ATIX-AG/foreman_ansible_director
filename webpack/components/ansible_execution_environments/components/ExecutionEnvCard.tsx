@@ -32,7 +32,10 @@ interface ExecutionEnvCardProps {
   executionEnv: AnsibleExecutionEnv;
   handleDestroy: (env: AnsibleExecutionEnv) => void;
   handleUpdate: (env: AnsibleExecutionEnv) => void;
-  setSelectedEnv: Dispatch<SetStateAction<AnsibleExecutionEnv | undefined>>;
+  setSelectedEnv: Dispatch<
+    SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
+  >;
+  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
@@ -40,6 +43,7 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
   handleDestroy,
   handleUpdate,
   setSelectedEnv,
+  setIsContentUnitModalOpen,
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const [executionEnvironment, setExecutionEnvironment] = React.useState<
@@ -133,7 +137,19 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
           </FormGroup>
           <FormGroup label="Baked content">
             <Bullseye>
-              <Button variant="control">420 content units</Button>
+              <Button
+                variant="control"
+                onClick={() => {
+                  setSelectedEnv(executionEnv);
+                  setIsContentUnitModalOpen(true);
+                }}
+              >
+                {`${executionEnvironment.content.length} ${
+                  executionEnvironment.content.length === 1
+                    ? 'content unit'
+                    : 'content units'
+                }`}
+              </Button>
             </Bullseye>
           </FormGroup>
         </Form>

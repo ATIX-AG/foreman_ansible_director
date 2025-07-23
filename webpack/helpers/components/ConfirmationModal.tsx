@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Dispatch } from 'react';
 import { Modal, ModalVariant, Button } from '@patternfly/react-core';
 
 interface ConfirmationModalProps {
-  isOpen: boolean;
+  isConfirmationModalOpen: boolean;
   title: string;
   body: string;
   onConfirm: () => void;
@@ -10,7 +10,7 @@ interface ConfirmationModalProps {
 }
 
 export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
-  isOpen,
+  isConfirmationModalOpen,
   title,
   body,
   onConfirm,
@@ -19,7 +19,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   <Modal
     variant={ModalVariant.small}
     title={title}
-    isOpen={isOpen}
+    isOpen={isConfirmationModalOpen}
     actions={[
       <Button key="confirm" variant="primary" onClick={onConfirm}>
         Confirm

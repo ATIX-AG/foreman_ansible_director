@@ -1,8 +1,12 @@
-import { AnsibleContentUnit } from './AnsibleContentTypes';
+import {
+  AnsibleContentUnitAssignment,
+} from './AnsibleContentTypes';
 
 export interface Identifiable {
-  id: number;
+  id: string;
 }
+
+export interface Createable {}
 
 export interface AnsibleExecutionEnvBase {
   name: string;
@@ -16,7 +20,13 @@ export interface AnsibleExecutionEnvBase {
   image_url?: string;
   // eslint-disable-next-line camelcase
   last_built?: string;
-  content: AnsibleContentUnit[];
+  content: AnsibleContentUnitAssignment[];
+}
+
+export interface ExecutionEnvContentUnit extends Identifiable {
+  type: string;
+  identifier: string;
+  version: string;
 }
 
 export interface AnsibleExecutionEnv

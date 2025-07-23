@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import axios from 'axios';
 
 import {
@@ -20,6 +20,7 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 
 import {
+  AnsibleLce,
   AnsibleLcePath,
   SparseAnsibleLce,
 } from '../../../../types/AnsibleEnvironmentsTypes';
@@ -30,11 +31,15 @@ import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
   refreshRequest: () => void;
+  setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
+  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
   lcePath,
   refreshRequest,
+  setLifecycleEnv,
+  setIsContentUnitModalOpen
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
 
@@ -207,7 +212,11 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     if (lcePath.lifecycle_environments.length > 0) {
       return lcePath.lifecycle_environments.map((env, index) => (
         <React.Fragment key={`${env.name}-${index}`}>
-          <AnsibleLceComponentWrapper lce={env} pathEditMode={editMode} />
+          <AnsibleLceComponentWrapper
+            lce={env}
+            pathEditMode={editMode}
+            setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+            setLifecycleEnv={setLifecycleEnv} />
           <div
             style={{
               display: 'flex',
@@ -241,7 +250,6 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
               editMode={editMode}
               handleEdit={askConfirmUpdate}
               handleDestroy={() => {}}
-              handlePromote={() => {}}
             />
           ),
           hasNoOffset: true,

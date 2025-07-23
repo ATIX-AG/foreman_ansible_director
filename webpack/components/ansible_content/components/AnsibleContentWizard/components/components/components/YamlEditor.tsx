@@ -51,7 +51,7 @@ export const YamlEditor: React.FC<YamlEditorProps> = ({
           <div>
             Upload a requirements.yml file.
             <br />
-            <a>Bla Bla Docs URL</a>
+            <a href="https://docs.orcarhino.com">Syntax documentation</a>
           </div>
         }
         height="400px"

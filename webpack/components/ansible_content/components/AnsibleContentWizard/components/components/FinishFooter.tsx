@@ -2,12 +2,12 @@ import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { WizardFooter, useWizardContext } from '@patternfly/react-core';
-import { AnsibleContentUnit } from '../../../../../../types/AnsibleContentTypes';
+import { AnsibleContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 
 interface FinishFooterProps {
   isFinishDisabled: boolean;
   provider: 'galaxy' | 'yaml';
-  contentUnits: AnsibleContentUnit[];
+  contentUnits: AnsibleContentUnitCreate[];
   yamlFile: string;
 }
 

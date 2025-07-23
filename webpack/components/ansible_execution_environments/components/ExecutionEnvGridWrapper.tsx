@@ -40,8 +40,12 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   >('');
 
   const [selectedEnv, setSelectedEnv] = React.useState<
-    AnsibleExecutionEnv | undefined
+    AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined
   >();
+
+  const [isContentUnitModalOpen, setIsIsContentUnitModalOpen] = React.useState<
+    boolean
+  >(false);
 
   const organization = useForemanOrganization();
 
@@ -69,7 +73,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   };
 
   const destroyEnvAction = async (): Promise<void> => {
-    if (selectedEnv) {
+    if (selectedEnv && 'id' in selectedEnv) {
       try {
         await axios.delete(
           `${foremanUrl('/api/v2/pulsible/execution_environments')}/${
@@ -86,7 +90,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   const updateEnvAction = async (): Promise<void> => {
     console.log('update', selectedEnv);
 
-    if (selectedEnv) {
+    if (selectedEnv && 'id' in selectedEnv) {
       console.log('h');
       try {
         await axios.patch(
@@ -154,9 +158,10 @@ const ExecutionEnvGridWrapper: React.FC = () => {
             selectedEnv={selectedEnv}
             setSelectedEnv={setSelectedEnv}
             createEnvAction={createEnvAction}
+            setIsContentUnitModalOpen={setIsIsContentUnitModalOpen}
           />
           <ConfirmationModal
-            isOpen={isConfirmationModalOpen}
+            isConfirmationModalOpen={isConfirmationModalOpen}
             title={confirmationModalTitle}
             body={confirmationModalBody}
             onConfirm={performAction}
@@ -164,7 +169,15 @@ const ExecutionEnvGridWrapper: React.FC = () => {
               setIsConfirmationModalOpen(false);
             }}
           />
-          <ContentUnitModal />
+          {selectedEnv && (
+            <ContentUnitModal
+              isContentUnitModalOpen={isContentUnitModalOpen}
+              setIsContentUnitModalOpen={setIsIsContentUnitModalOpen}
+              target={selectedEnv}
+              setTarget={setSelectedEnv}
+              refreshRequest={refreshRequest}
+            />
+          )}
         </>
       );
     }
@@ -182,7 +195,9 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   }
 
   return (
-    <EmptyPage message={{ type: 'loading', text: 'The impostor is sus' }} />
+    <EmptyPage
+      message={{ type: 'loading', text: 'Loading Execution Environments...' }}
+    />
   );
 };
 

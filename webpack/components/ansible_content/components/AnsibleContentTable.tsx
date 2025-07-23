@@ -11,6 +11,7 @@ import {
 } from './AnsibleContentTableWrapper';
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
+import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
 
 interface AnsibleContentTableProps {
   apiResponse: GetAnsibleContentResponse;
@@ -30,7 +31,7 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     expandedDetailsNodeNames,
     setExpandedDetailsNodeNames,
   ] = React.useState<string[]>([]);
-  const renderRows = (results: AnsibleContentResult[]): React.ReactNode[] => {
+  const renderRows = (results: AnsibleContentUnit[]): React.ReactNode[] => {
     const rows: React.ReactNode[] = [];
     let posInset = 0;
 

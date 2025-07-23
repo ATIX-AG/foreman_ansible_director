@@ -24,9 +24,12 @@ interface ExecutionEnvGridProps {
   setIsConfirmationModalOpen: Dispatch<SetStateAction<boolean>>;
   setConfirmationModalTitle: Dispatch<SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<SetStateAction<string>>;
-  selectedEnv: AnsibleExecutionEnv | undefined;
-  setSelectedEnv: Dispatch<SetStateAction<AnsibleExecutionEnv | undefined>>;
+  selectedEnv: AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined;
+  setSelectedEnv: Dispatch<
+    SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
+  >;
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
+  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
@@ -40,6 +43,7 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   selectedEnv,
   setSelectedEnv,
   createEnvAction,
+  setIsContentUnitModalOpen,
 }) => {
   const [executionEnvironments, setExecutionEnvironments] = React.useState<
     Array<AnsibleExecutionEnv>
@@ -83,14 +87,20 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
               xl: '1fr',
             }}
           >
-            <ExecutionEnvCreateCard createEnvAction={createEnvAction} />
+            <ExecutionEnvCreateCard
+              createEnvAction={createEnvAction}
+              setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+              setSelectedEnv={setSelectedEnv}
+            />
             {executionEnvironments.map(ee => (
               <GalleryItem>
                 <ExecutionEnvCard
+                  key={ee.id}
                   executionEnv={ee}
                   handleDestroy={destroyEnv}
                   handleUpdate={updateEnv}
                   setSelectedEnv={setSelectedEnv}
+                  setIsContentUnitModalOpen={setIsContentUnitModalOpen}
                 />
               </GalleryItem>
             ))}

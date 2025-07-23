@@ -18,12 +18,12 @@ import UndoIcon from '@patternfly/react-icons/dist/esm/icons/undo-icon';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
-import { AnsibleContentUnit } from '../../../../../../types/AnsibleContentTypes';
+import { AnsibleContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { VersionInput } from './components/VersionInput';
 
 interface ContentUnitInputProps {
-  contentUnits: Array<AnsibleContentUnit>;
-  setContentUnits: Dispatch<SetStateAction<Array<AnsibleContentUnit>>>;
+  contentUnits: Array<AnsibleContentUnitCreate>;
+  setContentUnits: Dispatch<SetStateAction<Array<AnsibleContentUnitCreate>>>;
 }
 
 export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = ({
@@ -80,10 +80,10 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
         unitType === 'collection' ? 'Collection' : 'Role'
       } identifier may not be empty!`;
       validationState = ValidatedOptions.error;
-    } else if (!new RegExp('^[a-z]+\\.[a-z]+$').test(name)) {
+    } else if (!new RegExp('^[a-z0-9]+\\.[a-z0-9]+$').test(name)) {
       helperText = `${
         unitType === 'collection' ? 'Collection' : 'Role'
-      } identifier does not match /^[a-z]+\\.[a-z]+$/!`;
+      } identifier does not match /^[a-z0-9]+\\.[a-z0-9]+$/!`;
       validationState = ValidatedOptions.error;
     } else if (
       contentUnits.some(
@@ -117,7 +117,7 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
   };
 
   const addToBatch = (_event: never): void => {
-    const unit: AnsibleContentUnit = {
+    const unit: AnsibleContentUnitCreate = {
       type: unitType,
       identifier: contentUnitName,
       source: contentUnitSource,

@@ -13,6 +13,7 @@ interface AnsibleLceComponentHeaderActionsProps {
   editMode: boolean;
   handleEdit: () => void;
   handleDestroy: () => void;
+  handleEditContent: () => void;
 }
 
 export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeaderActionsProps> = ({
@@ -21,6 +22,7 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
   editMode,
   handleEdit,
   handleDestroy,
+  handleEditContent,
 }) => (
   <>
     <Popover
@@ -37,7 +39,7 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
       <Button
         variant="plain"
         aria-label="Action"
-        onClick={() => handleDestroy()}
+        onClick={() => handleEditContent()}
         isDisabled={lce.position !== 0}
       >
         <Icon size="md">
@@ -51,7 +53,7 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
           triggerAction="hover"
           aria-label="delete popover"
           headerContent={<div>Delete</div>}
-          bodyContent={<div>Delete this Lifecycle Environment Path.</div>}
+          bodyContent={<div>Delete this Lifecycle Environment.</div>}
         >
           <Button
             variant="plain"
@@ -67,7 +69,7 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
           triggerAction="hover"
           aria-label="edit popover"
           headerContent={<div>Edit</div>}
-          bodyContent={<div>Edit this Lifecycle Environment Path.</div>}
+          bodyContent={<div>Edit this Lifecycle Environment.</div>}
         >
           <Button
             variant="plain"

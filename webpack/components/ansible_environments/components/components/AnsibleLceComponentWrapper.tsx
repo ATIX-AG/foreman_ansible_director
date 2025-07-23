@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import {
   EmptyState,
   EmptyStateHeader,
@@ -18,6 +18,8 @@ import {
 interface AnsibleLceComponentWrapperProps {
   lce: SparseAnsibleLce;
   pathEditMode: boolean;
+  setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
+  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 interface GetAnsibleLceResponse extends AnsibleLce {}
@@ -25,6 +27,8 @@ interface GetAnsibleLceResponse extends AnsibleLce {}
 export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProps> = ({
   lce,
   pathEditMode,
+  setLifecycleEnv,
+  setIsContentUnitModalOpen,
 }) => {
   const organization = useForemanOrganization();
 
@@ -44,6 +48,8 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
       <AnsibleLceComponent
         lce={contentRequest.response}
         pathEditMode={pathEditMode}
+        setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+        setLifecycleEnv={setLifecycleEnv}
       />
     );
   } else if (contentRequest.status === 'ERROR') {

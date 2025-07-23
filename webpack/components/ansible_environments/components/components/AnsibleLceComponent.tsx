@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import {
   Button,
   Card,
@@ -16,11 +16,15 @@ import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 interface AnsibleLceComponentProps {
   lce: AnsibleLce;
   pathEditMode: boolean;
+  setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
+  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   lce,
   pathEditMode,
+  setLifecycleEnv,
+  setIsContentUnitModalOpen,
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const [lifecycleEnvironment, setLifecycleEnvironment] = React.useState<
@@ -39,6 +43,11 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
       }
     }
     setEditMode(!editMode);
+  };
+
+  const handleEditContent = async (): Promise<void> => {
+    setLifecycleEnv(lce);
+    setIsContentUnitModalOpen(true);
   };
 
   return lifecycleEnvironment ? (
@@ -60,7 +69,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               editMode={editMode}
               handleEdit={askConfirmUpdate}
               handleDestroy={() => {}}
-              handlePromote={() => {}}
+              handleEditContent={handleEditContent}
             />
           ),
           hasNoOffset: true,

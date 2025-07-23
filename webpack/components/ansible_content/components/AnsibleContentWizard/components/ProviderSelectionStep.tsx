@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { Tile, Flex, FlexItem } from '@patternfly/react-core';
+import { Tile, Flex, FlexItem, ListItem, List } from '@patternfly/react-core';
 import FileIcon from '@patternfly/react-icons/dist/esm/icons/file-icon';
 import TopologyIcon from '@patternfly/react-icons/dist/esm/icons/topology-icon';
 
@@ -28,17 +28,32 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           isDisplayLarge
           isSelected={provider === 'galaxy'}
           onClick={() => setProvider('galaxy')}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', minHeight: '340px' }}
         >
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-          rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-          ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-          sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-          dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-          et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea
-          takimata sanctus est Lorem ipsum dolor sit amet.
+          Import Ansible collections and roles from any source that implements
+          the Ansible Galaxy API.
+          <br />
+          Supported sources include:
+          <List>
+            <ListItem>
+              {' '}
+              <strong>Ansible Galaxy</strong> -{' '}
+              <a href="https://galaxy.ansible.com">
+                https://galaxy.ansible.com
+              </a>{' '}
+              - The official community repository
+            </ListItem>
+            <ListItem>
+              <strong>Private Galaxy servers</strong> - Self-hosted instances
+              based on <a href="https://pulpproject.org/">Pulp</a>
+            </ListItem>
+            <ListItem>
+              {' '}
+              <strong>Content views</strong> -{' '}
+              <a href="/ContentViews">Content Views</a> - Repositories of type
+              &#34;ansible collection&#34; which are published in a CV
+            </ListItem>
+          </List>
         </Tile>
       </FlexItem>
       <FlexItem style={{ width: '45%' }}>
@@ -50,17 +65,22 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           isDisplayLarge
           isSelected={provider === 'yaml'}
           onClick={() => setProvider('yaml')}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', minHeight: '340px' }}
         >
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-          sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-          rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-          ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-          sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-          dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-          et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea
-          takimata sanctus est Lorem ipsum dolor sit amet.
+          <p>
+            <strong>Bulk Import Ansible Content</strong>
+            <br />
+            Import multiple Ansible collections and roles efficiently using a
+            Y(A)ML file. Supports a subset of the official ansible-galaxy
+            requirements format.
+          </p>
+          <p>
+            <strong>Supported sources:</strong>
+          </p>
+          <ul>
+            <li>Ansible Galaxy API-enabled servers</li>
+            <li>Git repositories</li>
+          </ul>
         </Tile>
       </FlexItem>
     </Flex>

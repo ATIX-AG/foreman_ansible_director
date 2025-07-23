@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import {
   Modal,
   ModalVariant,
@@ -10,7 +10,7 @@ import {
   TextContent,
   Text,
 } from '@patternfly/react-core';
-import { AnsibleContentUnit } from '../../../../types/AnsibleContentTypes';
+import { AnsibleContentUnitCreate } from '../../../../types/AnsibleContentTypes';
 import { ReviewStep } from './components/ReviewStep';
 import ProviderSelectionStep from './components/ProviderSelectionStep';
 import FinishFooter from './components/components/FinishFooter';
@@ -18,9 +18,17 @@ import { ContentUnitInput } from './components/components/ContentUnitInput';
 import { YamlEditor } from './components/components/components/YamlEditor';
 import { DefaultFooter } from './components/components/DefaultFooter';
 
-const AnsibleContentWizard: React.FC = () => {
+interface AnsibleContentWizardProps {
+  isContentWizardOpen: boolean;
+  setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
+  isContentWizardOpen,
+  setIsContentWizardOpen,
+}) => {
   const [contentUnits, setContentUnits] = React.useState<
-    Array<AnsibleContentUnit>
+    Array<AnsibleContentUnitCreate>
   >([]);
   const [yamlFile, setYamlFile] = React.useState<string>('');
 
@@ -127,10 +135,9 @@ const AnsibleContentWizard: React.FC = () => {
       <Modal
         variant={ModalVariant.large}
         showClose={false}
-        isOpen={false}
+        isOpen={isContentWizardOpen}
         aria-labelledby="modal-wizard-label"
         aria-describedby="modal-wizard-description"
-        onClose={() => {}}
         hasNoBodyWrapper
         width="60%"
         disableFocusTrap
@@ -141,11 +148,11 @@ const AnsibleContentWizard: React.FC = () => {
             <WizardHeader
               title="Import Ansible content"
               titleId="modal-wizard-label"
-              onClose={() => {}}
+              onClose={() => setIsContentWizardOpen(false)}
               closeButtonAriaLabel="Close wizard"
             />
           }
-          onClose={() => {}}
+          onClose={() => setIsContentWizardOpen(false)}
         >
           <WizardStep
             name="Provider Selection"

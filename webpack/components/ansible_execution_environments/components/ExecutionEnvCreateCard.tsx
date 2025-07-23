@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import {
   Card,
   CardTitle,
@@ -21,7 +21,7 @@ import {
 } from '@patternfly/react-core';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import { ExecutionEnvCard } from './ExecutionEnvCard';
-import { AnsibleExecutionEnvCreate } from '../../../types/AnsibleExecutionEnvTypes';
+import { AnsibleExecutionEnv, AnsibleExecutionEnvCreate } from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
 import { TextInputEditable } from './components/TextInputEditable';
 import { DropdownEditable } from './components/DropdownEditable';
@@ -29,10 +29,14 @@ import { ANSIBLE_VERSIONS } from '../../../helpers/constants';
 
 interface ExecutionEnvCreateCardProps {
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
+  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  setSelectedEnv: Dispatch<SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>>;
 }
 
 export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
   createEnvAction,
+  setIsContentUnitModalOpen,
+  setSelectedEnv,
 }) => {
   console.log('sus');
 
@@ -131,7 +135,16 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
           </FormGroup>
           <FormGroup label="Baked content">
             <Bullseye>
-              <Button variant="control">420 content units</Button>
+              <Button
+                variant="control"
+                onClick={() => {
+                  console.log("amog");
+                  setIsContentUnitModalOpen(true);
+                  setSelectedEnv(executionEnvironment);
+                }}
+              >
+                Assign content units
+              </Button>
             </Bullseye>
           </FormGroup>
         </Form>

@@ -10,11 +10,11 @@ import {
   ChipGroup,
   Chip,
 } from '@patternfly/react-core';
-import { AnsibleContentUnit } from '../../../../../types/AnsibleContentTypes';
+import { AnsibleContentUnitCreate } from '../../../../../types/AnsibleContentTypes';
 
 interface ReviewStepProps {
-  contentUnits: AnsibleContentUnit[];
-  setContentUnits: Dispatch<SetStateAction<Array<AnsibleContentUnit>>>;
+  contentUnits: AnsibleContentUnitCreate[];
+  setContentUnits: Dispatch<SetStateAction<Array<AnsibleContentUnitCreate>>>;
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
@@ -22,7 +22,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   setContentUnits,
 }) => {
   const deleteUnitVersion = (
-    unit: AnsibleContentUnit,
+    unit: AnsibleContentUnitCreate,
     version: string
   ): void => {
     unit.versions = unit.versions.filter(

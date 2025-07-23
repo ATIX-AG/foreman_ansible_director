@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import {
   IndexResponse,
   PaginationProps,
@@ -13,10 +13,18 @@ import {
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { AnsibleContentTable } from './AnsibleContentTable';
 import AnsibleContentWizard from './AnsibleContentWizard/AnsibleContentWizard';
-import { AnsibleContentVersion } from '../../../types/AnsibleContentTypes';
+import {
+  AnsibleContentUnit,
+  AnsibleContentVersion,
+} from '../../../types/AnsibleContentTypes';
+
+interface AnsibleContentTableWrapperProps {
+  isContentWizardOpen: boolean;
+  setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
+}
 
 export interface GetAnsibleContentResponse extends IndexResponse {
-  results: AnsibleContentResult[];
+  results: AnsibleContentUnit[];
 }
 
 export interface AnsibleContentResult {
@@ -26,7 +34,10 @@ export interface AnsibleContentResult {
   versions: AnsibleContentVersion[];
 }
 
-const AnsibleContentTableWrapper: React.FC = () => {
+const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
+  isContentWizardOpen,
+  setIsContentWizardOpen,
+}) => {
   const organization = useForemanOrganization();
 
   const contentRequest: UseAPIReturn<GetAnsibleContentResponse> = useTableIndexAPIResponse<
@@ -56,7 +67,10 @@ const AnsibleContentTableWrapper: React.FC = () => {
           setAPIOptions={contentRequest.setAPIOptions}
           onPagination={onPagination}
         />
-        <AnsibleContentWizard />
+        <AnsibleContentWizard
+          isContentWizardOpen={isContentWizardOpen}
+          setIsContentWizardOpen={setIsContentWizardOpen}
+        />
       </>
     );
   } else if (contentRequest.status === 'ERROR') {
@@ -64,7 +78,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
   }
 
   return (
-    <EmptyPage message={{ type: 'loading', text: 'The impostor is sus' }} />
+    <EmptyPage message={{ type: 'loading', text: 'Loading Ansible content' }} />
   );
 };
 
