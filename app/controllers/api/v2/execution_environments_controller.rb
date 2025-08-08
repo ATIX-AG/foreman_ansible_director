@@ -22,6 +22,7 @@ module Api
           ActiveRecord::Base.transaction do
             @execution_environment.save!
             associate_content_units(@execution_environment, content)
+            @execution_environment.update(content_hash: @execution_environment.generate_content_hash)
           end
         rescue ActiveRecord::RecordInvalid
           render_error('custom_error', status: :unprocessable_entity,
@@ -38,6 +39,7 @@ module Api
             @execution_environment.update!(permitted_params)
             @execution_environment.execution_environment_content_units.clear
             associate_content_units(@execution_environment, content)
+            @execution_environment.update(content_hash: @execution_environment.generate_content_hash)
           end
         rescue ActiveRecord::RecordInvalid
           render_error('custom_error', status: :unprocessable_entity,

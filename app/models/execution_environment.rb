@@ -19,6 +19,39 @@ class ExecutionEnvironment < PulsibleModel
     inclusion: { in: ::ForemanPulsible::Constants::ANSIBLE_VERSIONS,
                  message: 'Ansible version "%<value>s" is not supported.' }
 
+  after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
+
+  def rebuild_necessary?
+    saved_change_to_attribute?(:content_hash)
+  end
+
+  def generate_content_hash
+    content_string = content_unit_versions.pluck(:versionable_id, :version)
+    Digest::SHA2.new(256).hexdigest("#{content_string}:#{ansible_version}:#{base_image_url}")[0, 8]
+  end
+
+  def trigger_rebuild
+    ForemanTasks.async_task(
+      ::Actions::ForemanPulsible::Proxy::BuildExecutionEnvironment,
+      proxy_task_id: SecureRandom.uuid,
+      execution_environment_definition: {
+        id: id,
+        content: {
+          base_image: base_image_url,
+          ansible_core_version: '2.19.0', # TODO: Update ansible version management
+          content_units: content_unit_versions.map do |cuv|
+                           {
+                             type: cuv.versionable.type == 'AnsibleCollection' ? 'collection' : 'role',
+                             identifier: cuv.versionable.full_name,
+                             version: cuv.version,
+                             source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{Organization.current.id}/#{cuv.versionable.full_name}",
+                           }
+                         end,
+        },
+      }
+    )
+  end
+
   def add_content_unit(content_unit, version)
     execution_environment_content_units.find_or_create_by(
       content_unit: content_unit,
