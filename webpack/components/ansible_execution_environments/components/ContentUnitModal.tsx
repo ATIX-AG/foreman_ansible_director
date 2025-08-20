@@ -80,7 +80,7 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
           addToast({
             type: 'success',
             key: `UPDATE_${target.name}_CONTENT_SUCC`,
-            message: `Sucessfully updated content of "${target.name}"!`,
+            message: `Successfully updated content of "${target.name}"!`,
             sticky: false,
           })
         );
