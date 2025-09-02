@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {
   IndexResponse,
   PaginationProps,
@@ -11,8 +12,11 @@ import {
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import { Button } from '@patternfly/react-core';
+
 import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 import { AnsibleLcePathIndex } from './AnsibleLcePathIndex';
+import { Page } from '../../common/Page';
 
 export interface GetAnsibleLcePathsResponse extends IndexResponse {
   results: AnsibleLcePath[];
@@ -21,6 +25,30 @@ export interface GetAnsibleLcePathsResponse extends IndexResponse {
 const AnsibleContentTableWrapper: React.FC = () => {
   const organization = useForemanOrganization();
 
+  const [isCreateButtonLoading, setIsCreateButtonLoading] = React.useState<
+    boolean
+  >(false);
+
+  const createLcePath = async (): Promise<void> => {
+    setIsCreateButtonLoading(true);
+    try {
+      await axios.post(
+        foremanUrl('/api/v2/pulsible/lifecycle_environments/paths'),
+        {
+          lifecycle_environment_path: {
+            name: 'Unnamed LCE Path',
+            description: '',
+          },
+          organization_id: organization?.id,
+        }
+      );
+    } catch (e) {
+      console.log(e); // TODO: Handle error
+    } finally {
+      setIsCreateButtonLoading(false);
+      refreshRequest();
+    }
+  };
   const contentRequest: UseAPIReturn<GetAnsibleLcePathsResponse> = useTableIndexAPIResponse<
     GetAnsibleLcePathsResponse
   >({
@@ -48,10 +76,23 @@ const AnsibleContentTableWrapper: React.FC = () => {
   if (contentRequest.status === 'RESOLVED') {
     return (
       <>
-        <AnsibleLcePathIndex
-          lcePaths={contentRequest.response.results}
-          refreshRequest={refreshRequest}
-        />
+        <Page
+          header="Ansible Environments"
+          customToolbarItems={[
+            <Button
+              onClick={() => createLcePath()}
+              isLoading={isCreateButtonLoading}
+            >
+              Create LCE Path
+            </Button>,
+          ]}
+          hasDocumentation={false}
+        >
+          <AnsibleLcePathIndex
+            lcePaths={contentRequest.response.results}
+            refreshRequest={refreshRequest}
+          />
+        </Page>
       </>
     );
   } else if (contentRequest.status === 'ERROR') {

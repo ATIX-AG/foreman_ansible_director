@@ -11,7 +11,7 @@ interface AnsibleLcePathComponentHeaderActionsProps {
   lcePath: AnsibleLcePath;
   editMode: boolean;
   handleEdit: () => void;
-  handleDestroy: () => void;
+  handleDestroy: (lcePath: AnsibleLcePath) => void;
 }
 
 export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathComponentHeaderActionsProps> = ({
@@ -28,11 +28,7 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
         headerContent={<div>Description</div>}
         bodyContent={<div>{lcePath.description}</div>}
       >
-        <Button
-          variant="plain"
-          aria-label="Action"
-          onClick={() => handleDestroy()}
-        >
+        <Button variant="plain" aria-label="Action">
           <Icon size="lg">
             <InfoCircleIcon />
           </Icon>
@@ -48,7 +44,7 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
       <Button
         variant="plain"
         aria-label="Action"
-        onClick={() => handleDestroy()}
+        onClick={() => handleDestroy(lcePath)}
       >
         <Icon size="lg">
           <TrashIcon />

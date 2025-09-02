@@ -33,6 +33,8 @@ import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
   refreshRequest: () => void;
+  destroyLce: (env: AnsibleLce) => void;
+  destroyLcePath: (lcePath: AnsibleLcePath) => void;
   setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
@@ -40,6 +42,8 @@ interface AnsibleLcePathProps {
 export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
   lcePath,
   refreshRequest,
+  destroyLce,
+  destroyLcePath,
   setLifecycleEnv,
   setIsContentUnitModalOpen,
 }) => {
@@ -104,14 +108,39 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     }
   };
 
+  const handleDestroy = async (): Promise<void> => {
+    try {
+      await axios.delete(
+        foremanUrl(
+          `/api/v2/pulsible/lifecycle_environments/paths/${lcePath.id}`
+        )
+      );
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `DELETE_${lcePath.id}_ERR`,
+          message: `Promotion failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    } finally {
+      refreshRequest();
+      setLoadingButton(undefined);
+    }
+  };
+
   const insertEnv = async (
     pos: 'before' | 'after',
-    lce: SparseAnsibleLce
+    lce: SparseAnsibleLce,
+    name?: string
   ): Promise<void> => {
     try {
       await axios.post(foremanUrl('/api/v2/pulsible/lifecycle_environments/'), {
         lifecycle_environment: {
-          name: `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
+          name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
           position: pos === 'before' ? lce.position : lce.position + 1,
         },
         lifecycle_environment_path_id: lcePath.id,
@@ -125,6 +154,32 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
           message: `Insertion of environment ${pos} ${
             lce.name
           } failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    } finally {
+      refreshRequest();
+    }
+  };
+
+  const insertFirstEnv = async (name: string): Promise<void> => {
+    try {
+      await axios.post(foremanUrl('/api/v2/pulsible/lifecycle_environments/'), {
+        lifecycle_environment: {
+          name,
+          position: 0,
+        },
+        lifecycle_environment_path_id: lcePath.id,
+        organization_id: organization?.id,
+      });
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: 'INSERT_ENV_ERR',
+          message: `Insertion of environment ${name} failed with error code "${
             (e as { response: AxiosResponse }).response.status
           }".`,
           sticky: false,
@@ -254,7 +309,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
 
     return (
       <Bullseye style={{ margin: 'auto' }}>
-        <AnsibleLcePathEmptyState />
+        <AnsibleLcePathEmptyState insertFirstEnv={insertFirstEnv} />
       </Bullseye>
     );
   };
@@ -272,7 +327,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
               lcePath={lifecycleEnvironmentPath}
               editMode={editMode}
               handleEdit={askConfirmUpdate}
-              handleDestroy={() => {}}
+              handleDestroy={destroyLcePath}
             />
           ),
           hasNoOffset: true,

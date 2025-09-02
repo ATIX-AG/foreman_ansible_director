@@ -67,7 +67,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               pathEditMode={pathEditMode}
               editMode={editMode}
               handleEdit={askConfirmUpdate}
-              handleDestroy={() => {}}
+              handleDestroy={() => new Promise<void>(() => {})}
               handleEditContent={handleEditContent}
             />
           ),

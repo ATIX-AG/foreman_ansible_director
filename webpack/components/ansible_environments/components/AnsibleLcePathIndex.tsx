@@ -27,6 +27,14 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
     AnsibleLce | undefined
   >();
 
+  const destroyLce = (lce: AnsibleLce): void => {
+    console.log(lce);
+  };
+
+  const destroyLcePath = (lcePath: AnsibleLcePath): void => {
+    console.log(lcePath);
+  };
+
   return (
     <>
       <Stack>
@@ -47,6 +55,8 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
             <AnsibleLcePathComponent
               lcePath={lcePath}
               refreshRequest={refreshRequest}
+              destroyLce={destroyLce}
+              destroyLcePath={destroyLcePath}
               setIsContentUnitModalOpen={setIsContentUnitModalOpen}
               setLifecycleEnv={setLifecycleEnv}
             />
