@@ -1,0 +1,35 @@
+import React, { ReactElement } from 'react';
+import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import { foremanUrl } from 'foremanReact/common/helpers';
+import EmptyPage from 'foremanReact/routes/common/EmptyPage';
+import { AnsibleLce } from '../../../../../types/AnsibleEnvironmentsTypes';
+import { LceContentList } from './LceContentList';
+
+interface LceContentListWrapperProps {
+  lceId: number;
+}
+
+export const LceContentListWrapper = ({
+  lceId,
+}: LceContentListWrapperProps): ReactElement | null => {
+  const showLceResponse = useAPI<AnsibleLce>(
+    'get',
+    foremanUrl(`/api/v2/pulsible/lifecycle_environments/${lceId}`)
+  );
+
+  if (showLceResponse.status === 'RESOLVED') {
+    return <LceContentList lce={showLceResponse.response} />;
+  } else if (showLceResponse.status === 'ERROR') {
+    // TODO: Handle request error
+    return null;
+  }
+
+  return (
+    <EmptyPage
+      message={{
+        type: 'loading',
+        text: 'Loading Lifecycle Environment...',
+      }}
+    />
+  );
+};
