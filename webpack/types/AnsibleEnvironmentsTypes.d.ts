@@ -13,9 +13,10 @@ export interface SparseAnsibleLce {
   name: string;
   description: string;
   position: number;
-  protected: boolean;
   // eslint-disable-next-line camelcase
   content_hash: string;
+  // eslint-disable-next-line camelcase
+  execution_environment?: ExecutionEnvironment;
 }
 
 export interface AnsibleLce extends SparseAnsibleLce {

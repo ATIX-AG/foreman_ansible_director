@@ -1,19 +1,20 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
-import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
-import { AnsibleLcePath } from '../../../../../types/AnsibleEnvironmentsTypes';
-import { LcePathSelector } from './LcePathSelector';
+import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 
-interface LcePathsResponse extends IndexResponse {
-  results: AnsibleLcePath[];
+interface LifecycleEnvComponentWrapperProps {
+  children: React.ReactNode;
 }
 
-export const LifecycleEnvComponentWrapper = (): ReactElement | null => {
+export const LifecycleEnvComponentWrapper: React.FC<LifecycleEnvComponentWrapperProps> = ({
+  children,
+}) => {
   const organization = useForemanOrganization();
 
-  const getLcePathsResponse = useAPI<LcePathsResponse>(
+  const getLcePathsResponse = useAPI<AnsibleLcePath>(
     'get',
     foremanUrl(
       `/api/v2/pulsible/lifecycle_environments/paths?order=name&${
@@ -23,7 +24,7 @@ export const LifecycleEnvComponentWrapper = (): ReactElement | null => {
   );
 
   if (getLcePathsResponse.status === 'RESOLVED') {
-    return <LcePathSelector lcePaths={getLcePathsResponse.response.results} />;
+    return <>{children}</>;
   } else if (getLcePathsResponse.status === 'ERROR') {
     // TODO: Handle request error
     return null;

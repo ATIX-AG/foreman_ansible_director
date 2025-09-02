@@ -24,7 +24,6 @@ import DataProcessorIcon from '@patternfly/react-icons/dist/esm/icons/data-proce
 import { UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 
 import { InheritComponent } from '../../components/InheritComponent';
-import { LifecycleEnvComponentWrapper } from './components/LifecycleEnvComponentWrapper';
 import { AssignmentComponentWrapper } from './components/AssignmentComponentWrapper';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -54,8 +53,6 @@ export const HostDetailsTab = ({
         );
       case 'inherit':
         return <InheritComponent />;
-      case 'lce':
-        return <LifecycleEnvComponentWrapper />;
       default:
         return null;
     }

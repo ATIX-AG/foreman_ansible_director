@@ -22,7 +22,7 @@ export interface AnsibleContentVersion {
 }
 
 export interface AnsibleContentUnitAssignment extends Identifiable {
-  type: string;
+  type: 'collection' | 'role';
   identifier: string;
   version: string;
 }

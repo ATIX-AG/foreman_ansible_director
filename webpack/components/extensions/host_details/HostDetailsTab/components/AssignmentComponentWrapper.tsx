@@ -18,8 +18,6 @@ interface AssignmentComponentWrapperProps {
 export const AssignmentComponentWrapper = ({
   ansibleLifecycleEnvironmentId,
 }: AssignmentComponentWrapperProps): ReactElement | null => {
-  const a = 2;
-
   const [chosenUnits, setChosenUnits] = React.useState<{
     [unit: string]: string;
   }>({});
