@@ -43,7 +43,7 @@ export const ContentUnitSelectorWrapper: React.FC<ContentUnitSelectorWrapperProp
     return (
       <ContentUnitSelector
         contentUnits={contentUnitResponse.response.results}
-        target={executionEnvironment}
+        targetContentUnits={executionEnvironment.content}
         chosenUnits={chosenUnits}
         setChosenUnits={setChosenUnits}
       />

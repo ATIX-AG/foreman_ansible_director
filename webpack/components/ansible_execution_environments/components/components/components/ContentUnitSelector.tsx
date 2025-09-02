@@ -22,17 +22,13 @@ import SearchIcon from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import { Link, LinkProps } from 'react-router-dom';
 import {
   AnsibleContentUnit,
+  AnsibleContentUnitAssignment,
   AnsibleContentVersion,
 } from '../../../../../types/AnsibleContentTypes';
-import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
-} from '../../../../../types/AnsibleExecutionEnvTypes';
-import { AnsibleLce } from '../../../../../types/AnsibleEnvironmentsTypes';
 
 interface InnerContentUnitSelectorProps {
   data: AnsibleContentUnit[];
-  target: AnsibleExecutionEnv | AnsibleExecutionEnvCreate | AnsibleLce;
+  targetContentUnits: AnsibleContentUnitAssignment[];
   chosenUnits: {
     [unit: string]: string;
   };
@@ -41,7 +37,7 @@ interface InnerContentUnitSelectorProps {
 
 interface ContentUnitSelectorProps {
   contentUnits: AnsibleContentUnit[];
-  target: AnsibleExecutionEnv | AnsibleExecutionEnvCreate | AnsibleLce;
+  targetContentUnits: AnsibleContentUnitAssignment[];
   chosenUnits: {
     [unit: string]: string;
   };
@@ -54,7 +50,7 @@ interface ContentUnitTreeItemData extends DualListSelectorTreeItemData {
 
 export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> = ({
   data,
-  target,
+  targetContentUnits,
   chosenUnits,
   setChosenUnits,
 }) => {
@@ -70,7 +66,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
     const newChosenUnits: { [unit: string]: string } = {};
     const newAvailableUnits: AnsibleContentUnit[] = [];
 
-    target.content.forEach(targetUnit => {
+    targetContentUnits.forEach(targetUnit => {
       // TODO: This is not efficient for large content sets
       if (data.some(avUnit => avUnit.id === targetUnit.id)) {
         newChosenUnits[targetUnit.id] = targetUnit.version;
@@ -88,9 +84,11 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
         newChosenUnits[targetUnit.id] = targetUnit.version;
       }
     });
-    setChosenUnits(newChosenUnits);
+    if (Object.keys(newChosenUnits).length > 0) {
+      setChosenUnits(newChosenUnits);
+    }
     setAvailableUnits([...newAvailableUnits, ...data]);
-  }, [data, setChosenUnits, target]);
+  }, [data, setChosenUnits, targetContentUnits]);
 
   const moveChecked = (toChosen: boolean): void => {
     setChosenUnits(prevChosenUnits => {
@@ -286,13 +284,13 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
 
 export const ContentUnitSelector: React.FC<ContentUnitSelectorProps> = ({
   contentUnits,
-  target,
+  targetContentUnits,
   chosenUnits,
   setChosenUnits,
 }) => (
   <InnerContentUnitSelector
     data={contentUnits}
-    target={target}
+    targetContentUnits={targetContentUnits}
     chosenUnits={chosenUnits}
     setChosenUnits={setChosenUnits}
   />
