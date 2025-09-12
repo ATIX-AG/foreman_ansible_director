@@ -80,10 +80,10 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
         unitType === 'collection' ? 'Collection' : 'Role'
       } identifier may not be empty!`;
       validationState = ValidatedOptions.error;
-    } else if (!new RegExp('^[a-z0-9]+\\.[a-z0-9]+$').test(name)) {
+    } else if (!new RegExp('^[a-z0-9_]+\\.[a-z0-9_]+$').test(name)) {
       helperText = `${
         unitType === 'collection' ? 'Collection' : 'Role'
-      } identifier does not match /^[a-z0-9]+\\.[a-z0-9]+$/!`;
+      } identifier does not match /^[a-z0-9_]+\\.[a-z0-9_]+$/!`;
       validationState = ValidatedOptions.error;
     } else if (
       contentUnits.some(

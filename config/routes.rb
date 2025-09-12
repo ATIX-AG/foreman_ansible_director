@@ -13,6 +13,10 @@ Rails.application.routes.draw do
             post '/', action: :create_units
             get '/', action: :index
             delete '/', action: :destroy_units
+            post '/assign', action: :assign
+          end
+          member do
+            post '/:<version>/assign/<:target_type>/<:target_id>', action: :assign
           end
         end
         resources :execution_environments, only: [] do
@@ -41,7 +45,11 @@ Rails.application.routes.draw do
             end
           end
           member do
+            post '/assign', action: :assign
+          end
+          member do
             get '/', action: :show
+            get '/content', action: :content
             delete '/', action: :destroy
             put '/', action: :update
             patch '/', action: :update_content
@@ -50,6 +58,17 @@ Rails.application.routes.draw do
         resources :status, only: [] do
           collection do
             get '/content', action: :content
+          end
+        end
+        resources :ansible_runs, only: [] do
+          collection do
+            post '/run_all', action: :run_all
+          end
+        end
+        resources :assignments, only: [] do
+          collection do
+            get '/:target/:target_id', action: :get_assignments
+            post '/', action: :assign
           end
         end
       end

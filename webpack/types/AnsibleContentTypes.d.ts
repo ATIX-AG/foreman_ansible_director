@@ -17,8 +17,22 @@ export interface AnsibleContentUnit
   namespace: string;
 }
 
-export interface AnsibleContentVersion {
+export interface AnsibleContentUnitFull extends AnsibleContentUnit {
+  versions: AnsibleContentVersionFull[];
+}
+
+export interface AnsibleContentVersion extends Identifiable {
   version: string;
+}
+
+export interface AnsibleCollectionRole extends Identifiable {
+  name: string;
+}
+
+export interface AnsibleContentVersionFull
+  extends AnsibleContentVersion,
+    Identifiable {
+  roles: AnsibleCollectionRole[];
 }
 
 export interface AnsibleContentUnitAssignment extends Identifiable {

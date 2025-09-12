@@ -36,6 +36,17 @@ module ForemanPulsible
 
     config.to_prepare do
       ::Organization.include ForemanPulsible::OrganizationExtensions
+      ::Host.include ForemanPulsible::HostExtensions
+      ::Host::Base.include ForemanPulsible::HostExtensions
+      ::Host::Managed.include ForemanPulsible::HostExtensions
+      ::Hostgroup.include ForemanPulsible::HostgroupExtensions
+    end
+
+    initializer 'foreman_pulsible.apipie' do
+      Apipie.configuration.checksum_path += ['/foreman_pulsible/api/']
+      Rabl.configure do |config|
+        config.view_paths << ForemanPulsible::Engine.root.join('app', 'views', 'foreman_pulsible')
+      end
     end
 
     # initializer "foreman_pulsible.register_actions", :before => :finisher_hook do |_app|

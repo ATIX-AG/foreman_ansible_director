@@ -5,11 +5,15 @@ module Api
     class LifecycleEnvironmentsController < PulsibleApiController
       include ::Api::Version2
 
-      before_action :find_resource, only: %i[show update destroy update_content]
+      before_action :find_resource, only: %i[show update destroy update_content content]
       before_action :find_path, only: %i[create update]
       before_action :find_organization, only: %i[create update_content]
 
       def show
+      end
+
+      def content
+        @full_content = Foreman::Cast.to_bool params[:full]
       end
 
       def create
@@ -99,6 +103,13 @@ module Api
           render_error('custom_error', status: :unprocessable_entity,
                        locals: { message: @lifecycle_environment.flatten_errors })
         end
+      end
+
+      def assign
+        # TODO: This is shit
+
+        host = Host.find_by(id: params[:host_id])
+        host.update(ansible_lifecycle_environment_id: params[:id])
       end
 
       def destroy

@@ -9,28 +9,34 @@ import {
 import { useAPI, UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { AssignmentComponent } from './AssignmentComponent';
-import { AnsibleContentUnit } from '../../../../../types/AnsibleContentTypes';
+import {
+  AnsibleContentUnit,
+  AnsibleContentUnitFull,
+} from '../../../../../types/AnsibleContentTypes';
 
 interface AssignmentComponentWrapperProps {
   ansibleLifecycleEnvironmentId: number;
+}
+
+interface ShowLceResponse {
+  content: {
+    collections: AnsibleContentUnitFull[];
+    roles: AnsibleContentUnit[];
+  };
 }
 
 export const AssignmentComponentWrapper = ({
   ansibleLifecycleEnvironmentId,
 }: AssignmentComponentWrapperProps): ReactElement | null => {
   const [chosenUnits, setChosenUnits] = React.useState<{
-    [unit: string]: string;
+    [unit: string]: string[];
   }>({});
 
-  const showLceRequest: UseAPIReturn<{
-    content: AnsibleContentUnit[];
-  }> = useAPI<{
-    content: AnsibleContentUnit[];
-  }>(
+  const showLceRequest: UseAPIReturn<ShowLceResponse> = useAPI<ShowLceResponse>(
     'get',
     foremanUrl(
       // eslint-disable-next-line camelcase
-      `/api/v2/pulsible/lifecycle_environments/${ansibleLifecycleEnvironmentId}/content`
+      `/api/v2/pulsible/lifecycle_environments/${ansibleLifecycleEnvironmentId}/content?full=true`
     )
   );
 

@@ -12,6 +12,8 @@ class ContentUnitVersion < PulsibleModel
     through: :lifecycle_environment_content_assignments,
     source: :lifecycle_environment
 
+  has_many :ansible_content_assignments, as: :consumable, dependent: :destroy
+
   validates :version, presence: true
   validates :version, uniqueness: { scope: %i[versionable_type versionable_id] }
 

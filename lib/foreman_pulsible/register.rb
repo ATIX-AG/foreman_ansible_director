@@ -33,4 +33,7 @@ Foreman::Plugin.register :foreman_pulsible do
     parent: :configure_menu
 
   register_global_js_file 'global'
+
+  extend_rabl_template 'api/v2/hosts/main', '/api/v2/hosts/ansible_lifecycle_environment'
+  parameter_filter Host, :ansible_lifecycle_environment_id
 end

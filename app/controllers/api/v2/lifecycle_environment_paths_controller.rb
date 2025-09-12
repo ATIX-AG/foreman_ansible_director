@@ -39,7 +39,10 @@ module Api
       end
 
       def destroy
-        @lifecycle_environment_path.destroy!
+        ActiveRecord::Base.transaction do # TODO: Rollback if any LCE is used by host; Setting
+          @lifecycle_environment_path.update!(root_environment_id: nil)
+          @lifecycle_environment_path.destroy!
+        end
       end
 
       def promote
