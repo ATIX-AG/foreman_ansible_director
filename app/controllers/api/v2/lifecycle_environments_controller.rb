@@ -2,7 +2,7 @@
 
 module Api
   module V2
-    class LifecycleEnvironmentsController < PulsibleApiController
+    class LifecycleEnvironmentsController < AnsibleDirectorApiController
       include ::Api::Version2
 
       before_action :find_resource, only: %i[show update destroy update_content content]

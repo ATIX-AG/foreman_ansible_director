@@ -36,7 +36,7 @@ export const AssignmentComponentWrapper = ({
     'get',
     foremanUrl(
       // eslint-disable-next-line camelcase
-      `/api/v2/pulsible/lifecycle_environments/${ansibleLifecycleEnvironmentId}/content?full=true`
+      `/api/v2/ansible/lifecycle_environments/${ansibleLifecycleEnvironmentId}/content?full=true`
     )
   );
 

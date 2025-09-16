@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ContentSnapshot < PulsibleModel
+class ContentSnapshot < AnsibleDirectorModel
   has_many :content_snapshot_content_unit_versions, dependent: :destroy
   has_many :content_unit_versions, through: :content_snapshot_content_unit_versions
 

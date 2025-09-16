@@ -53,7 +53,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
     GetAnsibleExecutionEnvResponse
   >({
     apiUrl: foremanUrl(
-      `/api/v2/pulsible/execution_environments${
+      `/api/v2/ansible/execution_environments${
         organization ? `?organization_id=${organization.id}&` : ''
       }`
     ),
@@ -76,7 +76,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
     if (selectedEnv && 'id' in selectedEnv) {
       try {
         await axios.delete(
-          `${foremanUrl('/api/v2/pulsible/execution_environments')}/${
+          `${foremanUrl('/api/v2/ansible/execution_environments')}/${
             selectedEnv.id
           }`
         );
@@ -92,7 +92,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
       try {
         await axios.patch(
           foremanUrl(
-            `/api/v2/pulsible/execution_environments/${selectedEnv.id}`
+            `/api/v2/ansible/execution_environments/${selectedEnv.id}`
           ),
           {
             execution_environment: {
@@ -113,7 +113,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
     env: AnsibleExecutionEnvCreate
   ): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/pulsible/execution_environments/'), {
+      await axios.post(foremanUrl('/api/v2/ansible/execution_environments/'), {
         execution_environment: {
           name: env.name,
           base_image_url: env.base_image_url,

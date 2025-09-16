@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ContentUnit < PulsibleModel
+class ContentUnit < AnsibleDirectorModel
   scoped_search on: %i[name namespace]
 
   belongs_to :organization, inverse_of: :content_units

@@ -34,7 +34,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
   >(
     'get',
     foremanUrl(
-      `/api/v2/pulsible/status/content${
+      `/api/v2/ansible/status/content${
         organization ? `?organization_id=${organization.id}&` : ''
       }`
     )

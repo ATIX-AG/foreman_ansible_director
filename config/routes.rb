@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       defaults: { apiv: 'v2' },
       apiv: /v1|v2/,
       constraints: ApiConstraints.new(version: 2, default: true) do
-      scope '/pulsible' do
+      scope '/ansible' do
         resources :ansible_content, only: [] do
           collection do
             post '/', action: :create_units

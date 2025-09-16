@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ExecutionEnvironmentContentUnit < PulsibleModel
+class ExecutionEnvironmentContentUnit < AnsibleDirectorModel
   belongs_to :execution_environment
   belongs_to :content_unit
   belongs_to :content_unit_version

@@ -24,13 +24,13 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
     try {
       if (provider === 'yaml') {
         await axios.post(
-          foremanUrl('/api/v2/pulsible/ansible_content/from_yaml'),
+          foremanUrl('/api/v2/ansible/ansible_content/from_yaml'),
           {
             requirements_file: btoa(encodeURIComponent(yamlFile)),
           }
         );
       } else if (provider === 'galaxy') {
-        await axios.post(foremanUrl('/api/v2/pulsible/ansible_content'), {
+        await axios.post(foremanUrl('/api/v2/ansible/ansible_content'), {
           units: contentUnits.map(unit => ({
             unit_name: unit.identifier,
             unit_type: unit.type,

@@ -2,7 +2,7 @@
 
 module Api
   module V2
-    class AnsibleContentController < PulsibleApiController
+    class AnsibleContentController < AnsibleDirectorApiController
       before_action :find_organization, only: %i[create_units destroy_units]
       before_action :find_optional_organization, only: %i[index]
 
@@ -10,7 +10,7 @@ module Api
 
       def create_units
         resolved = ::AnsibleContent::AnsibleContentHelpers.resolve_import_payload params[:units]
-        @bulk_create_task = ForemanTasks.sync_task(::Actions::ForemanPulsible::AnsibleContentUnit::Bulk::Import,
+        @bulk_create_task = ForemanTasks.sync_task(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::Bulk::Import,
           resolved_content_units: resolved,
           organization_id: @organization.id)
       end
@@ -27,7 +27,7 @@ module Api
       # TODO: This needs to check and invalidate built EEs
       def destroy_units
         resolved = ::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload params[:units]
-        @bulk_destroy_task = ForemanTasks.sync_task(::Actions::ForemanPulsible::AnsibleContentUnit::Bulk::Destroy,
+        @bulk_destroy_task = ForemanTasks.sync_task(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::Bulk::Destroy,
           resolved_content_units: resolved, organization_id: @organization.id)
       end
 

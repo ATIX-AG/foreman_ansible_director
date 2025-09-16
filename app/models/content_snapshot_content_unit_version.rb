@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ContentSnapshotContentUnitVersion < PulsibleModel
+class ContentSnapshotContentUnitVersion < AnsibleDirectorModel
   belongs_to :content_snapshot
   belongs_to :content_unit_version
 

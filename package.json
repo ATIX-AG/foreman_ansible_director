@@ -1,5 +1,5 @@
 {
-  "name": "foreman_pulsible",
+  "name": "foreman_ansible_director",
   "version": "0.1.0",
   "description": "DESCRIPTION",
   "scripts": {

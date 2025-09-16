@@ -14,7 +14,7 @@ export const LceContentListWrapper = ({
 }: LceContentListWrapperProps): ReactElement | null => {
   const showLceResponse = useAPI<AnsibleLce>(
     'get',
-    foremanUrl(`/api/v2/pulsible/lifecycle_environments/${lceId}`)
+    foremanUrl(`/api/v2/ansible/lifecycle_environments/${lceId}`)
   );
 
   if (showLceResponse.status === 'RESOLVED') {

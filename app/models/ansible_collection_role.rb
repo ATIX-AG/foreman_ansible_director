@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AnsibleCollectionRole < PulsibleModel
+class AnsibleCollectionRole < AnsibleDirectorModel
   belongs_to :ansible_collection_version,
     class_name: 'ContentUnitVersion', inverse_of: :ansible_collection_roles
 

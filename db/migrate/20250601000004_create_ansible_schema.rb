@@ -2,7 +2,7 @@
 
 class CreateAnsibleSchema < ActiveRecord::Migration[6.1]
   def change
-    create_table :pulsible_content_units do |t|
+    create_table :ad_content_units do |t|
       t.string :name, null: false
       t.string :type, null: false
       t.string :namespace, null: false
@@ -16,40 +16,40 @@ class CreateAnsibleSchema < ActiveRecord::Migration[6.1]
       t.timestamps
     end
 
-    add_foreign_key :pulsible_content_units, :taxonomies, column: :organization_id
-    add_index :pulsible_content_units, :organization_id
-    add_index :pulsible_content_units, %i[namespace name], unique: true
-    add_index :pulsible_content_units, :type
+    add_foreign_key :ad_content_units, :taxonomies, column: :organization_id
+    add_index :ad_content_units, :organization_id
+    add_index :ad_content_units, %i[namespace name], unique: true
+    add_index :ad_content_units, :type
 
-    create_table :pulsible_content_unit_versions do |t|
+    create_table :ad_content_unit_versions do |t|
       t.string :version, null: false
       t.references :versionable, polymorphic: true, null: false
       t.timestamps
     end
 
-    add_index :pulsible_content_unit_versions,
+    add_index :ad_content_unit_versions,
       %i[versionable_type versionable_id version],
       unique: true,
-      name: 'idx_pulsible_cuv_on_versionable_and_version'
+      name: 'idx_ad_cuv_on_versionable_and_version'
 
-    create_table :pulsible_ansible_collection_roles do |t|
+    create_table :ad_ansible_collection_roles do |t|
       t.string :name, null: false
       t.integer :ansible_collection_version_id, null: false
       t.text :description
       t.timestamps
     end
 
-    add_foreign_key :pulsible_ansible_collection_roles,
-      :pulsible_content_unit_versions,
+    add_foreign_key :ad_ansible_collection_roles,
+      :ad_content_unit_versions,
       column: :ansible_collection_version_id,
       name: 'fk_p_acr_on_acv_id'
 
-    add_index :pulsible_ansible_collection_roles,
+    add_index :ad_ansible_collection_roles,
       %i[ansible_collection_version_id name],
       unique: true,
       name: 'idx_p_acr_on_acv_id_and_name'
 
-    create_table :pulsible_execution_environments do |t|
+    create_table :ad_execution_environments do |t|
       t.string :name, null: false
       t.string :base_image_url, null: false
       t.string :ansible_version, null: false
@@ -57,38 +57,38 @@ class CreateAnsibleSchema < ActiveRecord::Migration[6.1]
       t.timestamps
     end
 
-    add_foreign_key :pulsible_execution_environments, :taxonomies, column: :organization_id
-    add_index :pulsible_execution_environments, :organization_id
-    add_index :pulsible_execution_environments, :name
+    add_foreign_key :ad_execution_environments, :taxonomies, column: :organization_id
+    add_index :ad_execution_environments, :organization_id
+    add_index :ad_execution_environments, :name
 
-    create_table :pulsible_execution_environment_content_units do |t|
+    create_table :ad_execution_environment_content_units do |t|
       t.integer :execution_environment_id, null: false
       t.integer :content_unit_id, null: false
       t.integer :content_unit_version_id, null: false
       t.timestamps
     end
 
-    add_foreign_key :pulsible_execution_environment_content_units,
-      :pulsible_execution_environments,
+    add_foreign_key :ad_execution_environment_content_units,
+      :ad_execution_environments,
       column: :execution_environment_id,
       name: 'fk_p_eecu_on_ee_id'
 
-    add_foreign_key :pulsible_execution_environment_content_units,
-      :pulsible_content_units,
+    add_foreign_key :ad_execution_environment_content_units,
+      :ad_content_units,
       column: :content_unit_id,
       name: 'fk_p_eecu_on_cu_id'
 
-    add_foreign_key :pulsible_execution_environment_content_units,
-      :pulsible_content_unit_versions,
+    add_foreign_key :ad_execution_environment_content_units,
+      :ad_content_unit_versions,
       column: :content_unit_version_id,
       name: 'fk_p_eecu_on_cuv_id'
 
-    add_index :pulsible_execution_environment_content_units,
+    add_index :ad_execution_environment_content_units,
       %i[execution_environment_id content_unit_id],
       unique: true,
       name: 'idx_p_eecu_on_ee_id_and_cu_id'
 
-    create_table :pulsible_ansible_variables do |t|
+    create_table :ad_ansible_variables do |t|
       t.string :name, null: false
       t.text :default_value
       t.string :variable_type
@@ -98,23 +98,23 @@ class CreateAnsibleSchema < ActiveRecord::Migration[6.1]
       t.timestamps
     end
 
-    # Foreign key references pulsible_content_units because AnsibleRole is STI
-    add_foreign_key :pulsible_ansible_variables,
-      :pulsible_content_units,
+    # Foreign key references ad_content_units because AnsibleRole is STI
+    add_foreign_key :ad_ansible_variables,
+      :ad_content_units,
       column: :ansible_role_id,
       name: 'fk_p_av_on_ar_id'
 
-    add_foreign_key :pulsible_ansible_variables,
-      :pulsible_ansible_collection_roles,
+    add_foreign_key :ad_ansible_variables,
+      :ad_ansible_collection_roles,
       column: :ansible_collection_role_id,
       name: 'fk_p_av_on_acr_id'
 
-    add_index :pulsible_ansible_variables,
+    add_index :ad_ansible_variables,
       %i[name ansible_role_id],
       name: 'idx_p_av_on_name_and_ar_id',
       where: 'ansible_role_id IS NOT NULL'
 
-    add_index :pulsible_ansible_variables,
+    add_index :ad_ansible_variables,
       %i[name ansible_collection_role_id],
       name: 'idx_p_av_on_name_and_acr_id',
       where: 'ansible_collection_role_id IS NOT NULL'

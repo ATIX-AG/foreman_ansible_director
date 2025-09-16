@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LifecycleEnvironment < PulsibleModel
+class LifecycleEnvironment < AnsibleDirectorModel
   belongs_to :organization, inverse_of: :lifecycle_environments
 
   belongs_to :execution_environment, optional: true

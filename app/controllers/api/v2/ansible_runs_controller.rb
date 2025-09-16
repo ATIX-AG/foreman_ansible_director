@@ -3,7 +3,7 @@ require 'securerandom'
 
 module Api
   module V2
-    class AnsibleRunsController < PulsibleApiController
+    class AnsibleRunsController < AnsibleDirectorApiController
 
       before_action :find_target_host, only: %i[run_all]
 
@@ -18,7 +18,7 @@ module Api
 
 
         ForemanTasks.async_task(
-          ::Actions::ForemanPulsible::Proxy::RunPlaybook,
+          ::Actions::ForemanAnsibleDirector::Proxy::RunPlaybook,
           proxy_task_id: SecureRandom.uuid,
           playbook: playbook,
           inventory: inventory,

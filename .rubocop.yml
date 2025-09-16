@@ -11,7 +11,7 @@ AllCops:
     - 'node_modules/**/*'
     - 'vendor/**/*'
     - 'app/lib/ansible_content/parsed_ansible_content_unit.rb'
-    - 'app/lib/actions/foreman_pulsible/pulp3/ansible/remote/git/**' # TODO: Git support
+    - 'app/lib/actions/foreman_ansible_director/pulp3/ansible/remote/git/**' # TODO: Git support
     - 'test/**/*'
 
 Rails/CreateTableWithTimestamps:

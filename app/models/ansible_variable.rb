@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AnsibleVariable < PulsibleModel
+class AnsibleVariable < AnsibleDirectorModel
   belongs_to :ansible_role, optional: true
   belongs_to :ansible_collection_role, optional: true
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LifecycleEnvironmentContentUnitVersion < PulsibleModel
+class LifecycleEnvironmentContentUnitVersion < AnsibleDirectorModel
   belongs_to :lifecycle_environment
   belongs_to :content_unit_version
 

@@ -82,7 +82,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     try {
       await axios.post(
         foremanUrl(
-          `/api/v2/pulsible/lifecycle_environments/paths/${lcePath.id}/promote`
+          `/api/v2/ansible/lifecycle_environments/paths/${lcePath.id}/promote`
         ),
         {
           promote: {
@@ -112,7 +112,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     try {
       await axios.delete(
         foremanUrl(
-          `/api/v2/pulsible/lifecycle_environments/paths/${lcePath.id}`
+          `/api/v2/ansible/lifecycle_environments/paths/${lcePath.id}`
         )
       );
     } catch (e) {
@@ -138,7 +138,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     name?: string
   ): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/pulsible/lifecycle_environments/'), {
+      await axios.post(foremanUrl('/api/v2/ansible/lifecycle_environments/'), {
         lifecycle_environment: {
           name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
           position: pos === 'before' ? lce.position : lce.position + 1,
@@ -166,7 +166,7 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
 
   const insertFirstEnv = async (name: string): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/pulsible/lifecycle_environments/'), {
+      await axios.post(foremanUrl('/api/v2/ansible/lifecycle_environments/'), {
         lifecycle_environment: {
           name,
           position: 0,

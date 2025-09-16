@@ -2,7 +2,7 @@
 
 module Api
   module V2
-    class AssignmentsController < PulsibleApiController
+    class AssignmentsController < AnsibleDirectorApiController
       before_action :find_resources, only: %i[assign]
       before_action :find_target, only: %i[get_assignments]
 

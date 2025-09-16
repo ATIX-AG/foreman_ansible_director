@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LifecycleEnvironmentPath < PulsibleModel
+class LifecycleEnvironmentPath < AnsibleDirectorModel
   scoped_search on: %i[name]
 
   belongs_to :organization, inverse_of: :lifecycle_environment_paths

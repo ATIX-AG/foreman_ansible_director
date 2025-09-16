@@ -37,7 +37,7 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
   >(
     'get',
     foremanUrl(
-      `/api/v2/pulsible/lifecycle_environments/${lce.id}/${
+      `/api/v2/ansible/lifecycle_environments/${lce.id}/${
         organization ? `?organization_id=${organization.id}&` : ''
       }`
     )

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ContentUnitVersion < PulsibleModel
+class ContentUnitVersion < AnsibleDirectorModel
   belongs_to :versionable, polymorphic: true
   has_many :ansible_collection_roles, dependent: :destroy, foreign_key: 'ansible_collection_version_id',
            inverse_of: :ansible_collection_version

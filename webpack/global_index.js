@@ -36,5 +36,5 @@ export const registerFills = () => {
   );
 };
 
-registerRoutes('foreman_pulsible', routes);
+registerRoutes('foreman_ansible_director', routes);
 registerFills();

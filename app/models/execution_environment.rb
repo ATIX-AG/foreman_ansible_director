@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ExecutionEnvironment < PulsibleModel
+class ExecutionEnvironment < AnsibleDirectorModel
   scoped_search on: %i[name]
 
   belongs_to :organization, inverse_of: :execution_environments
@@ -16,7 +16,7 @@ class ExecutionEnvironment < PulsibleModel
 
   validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
   validates :ansible_version,
-    inclusion: { in: ::ForemanPulsible::Constants::ANSIBLE_VERSIONS,
+    inclusion: { in: ::ForemanAnsibleDirector::Constants::ANSIBLE_VERSIONS,
                  message: 'Ansible version "%<value>s" is not supported.' }
 
   after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
@@ -32,7 +32,7 @@ class ExecutionEnvironment < PulsibleModel
 
   def trigger_rebuild
     ForemanTasks.async_task(
-      ::Actions::ForemanPulsible::Proxy::BuildExecutionEnvironment,
+      ::Actions::ForemanAnsibleDirector::Proxy::BuildExecutionEnvironment,
       proxy_task_id: SecureRandom.uuid,
       execution_environment_definition: {
         id: id,
