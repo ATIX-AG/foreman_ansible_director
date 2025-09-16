@@ -3,7 +3,7 @@
 module ForemanAnsibleDirector
   module Constants
     PLUGIN_NAME = 'foreman_ansible_director'
-    PLUGIN_VERSION = '0.1.0'
+    PLUGIN_VERSION = '0.2.0'
 
     ANSIBLE_VERSIONS = %w[
       v10.0.0
