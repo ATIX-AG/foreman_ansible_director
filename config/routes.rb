@@ -65,6 +65,14 @@ Rails.application.routes.draw do
             post '/run_all', action: :run_all
           end
         end
+        resources :tasks, only: [] do
+          collection do
+            get '/', to: 'ansible_tasks#index'
+          end
+          member do
+            get '/details', to: 'ansible_tasks#show'
+          end
+        end
         resources :assignments, only: [] do
           collection do
             get '/:target/:target_id', action: :find_assignments
@@ -78,4 +86,7 @@ Rails.application.routes.draw do
   match '/ansible/content' => 'react#index', :via => [:get]
   match '/ansible/environments' => 'react#index', :via => [:get]
   match '/ansible/execution_environments' => 'react#index', :via => [:get]
+  match '/ansible/tasks' => 'react#index', :via => [:get]
+
+  mount ActionCable.server => '/ansible/sock'
 end

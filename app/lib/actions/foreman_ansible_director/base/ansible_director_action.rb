@@ -15,7 +15,7 @@ module Actions
         end
 
         def humanized_name
-          "#{::ForemanAnsibleDirector::Constants::PLUGIN_NAME.camelize}: #{self.class.name}"
+          "Ansible - #{::ForemanAnsibleDirector::Constants::PLUGIN_NAME.camelize}: #{self.class.name}"
         end
       end
     end
