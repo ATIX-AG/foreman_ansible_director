@@ -67,7 +67,7 @@ Rails.application.routes.draw do
         end
         resources :assignments, only: [] do
           collection do
-            get '/:target/:target_id', action: :get_assignments
+            get '/:target/:target_id', action: :find_assignments
             post '/', action: :assign
           end
         end

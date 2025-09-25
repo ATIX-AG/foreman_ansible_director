@@ -10,6 +10,5 @@ class AddAssignments < ActiveRecord::Migration[6.1]
     end
 
     add_reference :hosts, :ansible_lifecycle_environment, foreign_key: { to_table: :ad_lifecycle_environments }
-
   end
 end

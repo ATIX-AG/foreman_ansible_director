@@ -22,9 +22,8 @@ node :content do |object|
         id: lcecu.versionable.id,
         type: lcecu.versionable.type == 'AnsibleCollection' ? 'collection' : 'role',
         identifier: lcecu.versionable.full_name,
-        version: lcecu.version
+        version: lcecu.version,
       }
     end
   end
 end
-

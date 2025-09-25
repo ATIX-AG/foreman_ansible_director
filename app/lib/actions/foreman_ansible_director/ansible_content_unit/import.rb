@@ -107,9 +107,11 @@ module Actions
           distribution_href = existing_unit.pulp_distribution_href
 
           sequence do
-            _remote_update_action = plan_action(::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Update,
+            _remote_update_action = plan_action(
+              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Update,
               collection_remote_href: remote_href,
-              requirements: existing_unit.requirements_file(scu))
+              requirements: existing_unit.requirements_file(scu)
+            )
 
             _snyc_action = plan_action(
               ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Sync,

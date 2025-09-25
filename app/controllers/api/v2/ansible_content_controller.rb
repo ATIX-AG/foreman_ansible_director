@@ -27,8 +27,9 @@ module Api
       # TODO: This needs to check and invalidate built EEs
       def destroy_units
         resolved = ::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload params[:units]
-        @bulk_destroy_task = ForemanTasks.sync_task(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::Bulk::Destroy,
-          resolved_content_units: resolved, organization_id: @organization.id)
+        @bulk_destroy_task =
+          ForemanTasks.sync_task(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::Bulk::Destroy,
+            resolved_content_units: resolved, organization_id: @organization.id)
       end
 
       private

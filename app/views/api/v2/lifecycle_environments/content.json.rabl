@@ -30,7 +30,7 @@ node :content do |object|
                               {
                                 id: lcecu.id,
                                 version: lcecu.version,
-                                roles: c_roles
+                                roles: c_roles,
                               },
                             ]
                           else
@@ -55,7 +55,6 @@ node :content do |object|
       else
         roles << unit
       end
-
     end
     {
       collections: collections,

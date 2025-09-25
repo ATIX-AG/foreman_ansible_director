@@ -25,7 +25,8 @@ module Actions
                     requirements_file: input[:requirements],
                   }
                 )
-                response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
+                response =
+                  ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
                 output.update(collection_remote_create_response: response)
               end
 

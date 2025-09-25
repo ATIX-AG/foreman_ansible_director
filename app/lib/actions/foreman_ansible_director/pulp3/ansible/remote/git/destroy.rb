@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanAnsibleDirector
     module Pulp3
@@ -6,7 +7,6 @@ module Actions
         module Remote
           module Git
             class Destroy < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
-
               input_format do
                 param :git_remote_href, String, required: true
               end
@@ -16,7 +16,9 @@ module Actions
               end
 
               def run
-                response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Git::Destroy.new(input[:git_remote_href]).request
+                response =
+                  ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Git::Destroy
+                  .new(input[:git_remote_href]).request
                 output.update(git_remote_destroy_response: response)
               end
 

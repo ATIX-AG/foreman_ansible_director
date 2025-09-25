@@ -17,7 +17,8 @@ module Actions
             end
 
             def invoke_external_task
-              response = ::ForemanAnsibleDirector::Pulp3::Ansible::Distribution::Destroy.new(input[:distribution_href]).request
+              response =
+                ::ForemanAnsibleDirector::Pulp3::Ansible::Distribution::Destroy.new(input[:distribution_href]).request
               output.update(distribution_destroy_response: response)
               nil
             end

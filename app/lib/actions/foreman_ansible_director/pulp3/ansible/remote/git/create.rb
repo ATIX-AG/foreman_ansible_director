@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Actions
   module ForemanAnsibleDirector
     module Pulp3
@@ -6,7 +7,6 @@ module Actions
         module Remote
           module Git
             class Create < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
-
               input_format do
                 param :name, String, required: true
                 param :url, String, required: true
@@ -19,10 +19,10 @@ module Actions
 
               def run
                 git_remote = PulpAnsibleClient::AnsibleGitRemote.new({
-                  :name => input[:name],
-                  :url => input[:url],
-                  :git_ref => input[:git_ref],
-                                                                     })
+                  name: input[:name],
+                  url: input[:url],
+                  git_ref: input[:git_ref],
+                })
                 response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
                 output.update(git_remote_create_response: response)
               end

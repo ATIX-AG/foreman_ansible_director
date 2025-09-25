@@ -8,20 +8,17 @@ module Generators
         roles = []
 
         host_content.each do |content_assignment|
-          if content_assignment.consumable.is_a? AnsibleCollectionRole
+          next unless content_assignment.consumable.is_a? AnsibleCollectionRole
 
-            collection_role = content_assignment.consumable
-            collection_version = collection_role.ansible_collection_version
-            collection = collection_version.versionable
+          collection_role = content_assignment.consumable
+          collection_version = collection_role.ansible_collection_version
+          collection = collection_version.versionable
 
-            roles << "#{collection.namespace}.#{collection.name}.#{collection_role.name}"
+          roles << "#{collection.namespace}.#{collection.name}.#{collection_role.name}"
 
-          else # content_assignment.consumable.is_a? AnsibleRole
-
-          end
+          # else # content_assignment.consumable.is_a? AnsibleRole
         end
 
-        l = 'ansible.builtin.ping'
         [{
 
           name: 'Playbook',

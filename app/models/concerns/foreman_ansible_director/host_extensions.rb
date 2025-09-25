@@ -8,9 +8,9 @@ module ForemanAnsibleDirector
       belongs_to :lifecycle_environment, optional: true
     end
 
-    #def ansible_lifecycle_environment_id
+    # def ansible_lifecycle_environment_id
     #  lifecycle_environment&.id
-    #end
+    # end
 
     def resolved_ansible_content
       content = []
@@ -24,7 +24,5 @@ module ForemanAnsibleDirector
       end
       content.concat additions
     end
-
-
   end
 end
