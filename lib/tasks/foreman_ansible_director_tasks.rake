@@ -2,19 +2,9 @@
 
 require 'rake/testtask'
 
-# Tasks
-namespace :foreman_ansible_director do
-  namespace :example do
-    desc 'Example Task'
-    task task: :environment do
-      # Task goes here
-    end
-  end
-end
-
 # Tests
 namespace :test do
-  desc 'Test ForemanPluginTemplate'
+  desc 'Test ForemanAnsibleDirector'
   Rake::TestTask.new(:foreman_ansible_director) do |t|
     test_dir = File.expand_path('../../test', __dir__)
     t.libs << 'test'
