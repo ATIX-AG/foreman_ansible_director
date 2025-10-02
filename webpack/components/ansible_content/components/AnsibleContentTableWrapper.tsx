@@ -23,15 +23,16 @@ interface AnsibleContentTableWrapperProps {
   setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export interface GetAnsibleContentResponse extends IndexResponse {
-  results: AnsibleContentUnit[];
+export interface AnsibleContentVersionWithCount extends AnsibleContentVersion {
+  // eslint-disable-next-line camelcase
+  roles_count: number;
+}
+export interface AnsibleContentUnitWithCounts extends AnsibleContentUnit {
+  versions: AnsibleContentVersionWithCount[];
 }
 
-export interface AnsibleContentResult {
-  name: string;
-  namespace: string;
-  type: 'collection' | 'role';
-  versions: AnsibleContentVersion[];
+export interface GetAnsibleContentResponse extends IndexResponse {
+  results: AnsibleContentUnitWithCounts[];
 }
 
 const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({

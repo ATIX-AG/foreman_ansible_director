@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@patternfly/react-core';
-import TableIndexPage from 'foremanReact/components/PF4/TableIndexPage/TableIndexPage';
 import AnsibleContentTableWrapper from './components/AnsibleContentTableWrapper';
+import { Page } from '../common/Page';
 
 const AnsibleContentPage: React.FC = () => {
   const [isContentWizardOpen, setIsContentWizardOpen] = React.useState<boolean>(
@@ -9,24 +9,20 @@ const AnsibleContentPage: React.FC = () => {
   );
 
   return (
-    <TableIndexPage
-      apiUrl="/api/v2/version"
+    <Page
       header="Ansible Content"
-      apiOptions={{ key: 'ANSIBLE_CONTENT_API_REQUEST_KEY' }}
-      hasHelpPage
-      creatable={false}
-      columns={{}}
       customToolbarItems={[
         <Button onClick={() => setIsContentWizardOpen(true)}>
           Import Ansible content
         </Button>,
       ]}
+      hasDocumentation={false}
     >
       <AnsibleContentTableWrapper
         isContentWizardOpen={isContentWizardOpen}
         setIsContentWizardOpen={setIsContentWizardOpen}
       />
-    </TableIndexPage>
+    </Page>
   );
 };
 

@@ -34,10 +34,18 @@ module Actions
               )
             end
 
+            extract_variables_action = plan_action(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::ExtractVariables,
+                                                    repository_show_action_output: repository_show_action.output,
+                                                    list_action_output: list_action.output,
+                                                    organization_id: args[:organization_id],
+                                                    unit_name: args[:unit_name],
+                                                    unit_namespace: args[:unit_namespace])
+
             plan_self(
               args.merge(
                 list_action_output: list_action.output,
-                repository_show_action_output: repository_show_action.output
+                repository_show_action_output: repository_show_action.output,
+                extract_variables_action_output: extract_variables_action.output,
               )
             )
           end
@@ -60,11 +68,13 @@ module Actions
           end
 
           input.update(indexed_unit_versions: unit_versions)
+          output.update(indexed_unit_versions: unit_versions)
         end
 
         def finalize
           # rubocop:disable Layout/LineLength
           unit_versions = input[:indexed_unit_versions]
+          unit_variables = input[:extract_variables_action_output][:extract_variables_response]
 
           case input[:index_mode]
           when 'import'
@@ -106,9 +116,20 @@ module Actions
               next unless unit_record.is_a?(AnsibleCollection)
 
               version[:collection_roles].each do |collection_role|
-                content_unit_version.ansible_collection_roles.create!(
+                collection_role_record = content_unit_version.ansible_collection_roles.create!(
                   name: collection_role
                 )
+
+                cr_variables = unit_variables[version[:version]][collection_role]
+                unless cr_variables.nil?
+
+                  ActiveRecord::Base.transaction do
+                    cr_variables.each do |variable_name, variable_value|
+                      create = Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
+                      ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
+                    end
+                  end
+                end
               end
             end
 

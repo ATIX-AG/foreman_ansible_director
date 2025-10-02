@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class AnsibleCollectionRole < AnsibleDirectorModel
+
+  include ForemanAnsibleDirector::VariableOwner
+
   belongs_to :ansible_collection_version,
     class_name: 'ContentUnitVersion', inverse_of: :ansible_collection_roles
-
-  has_many :ansible_variables, dependent: :destroy
 
   validates :name, presence: true
   validates :name, uniqueness: { scope: :ansible_collection_version_id }

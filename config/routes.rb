@@ -14,9 +14,7 @@ Rails.application.routes.draw do
             get '/', action: :index
             delete '/', action: :destroy_units
             post '/assign', action: :assign
-          end
-          member do
-            post '/:<version>/assign/<:target_type>/<:target_id>', action: :assign
+            get '/:version', action: :version_detail
           end
         end
         resources :execution_environments, only: [] do
@@ -77,6 +75,13 @@ Rails.application.routes.draw do
           collection do
             get '/:target/:target_id', action: :find_assignments
             post '/', action: :assign
+          end
+        end
+        resources :ansible_variables, only: [] do
+          collection do
+            get '/', action: :index
+          end
+          member do
           end
         end
       end

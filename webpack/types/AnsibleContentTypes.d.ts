@@ -1,4 +1,5 @@
 import { Identifiable } from './AnsibleExecutionEnvTypes';
+import { AnsibleVariable } from './AnsibleVariableTypes';
 
 export interface AnsibleContentUnitBase {
   type: 'collection' | 'role';
@@ -27,6 +28,11 @@ export interface AnsibleContentVersion extends Identifiable {
 
 export interface AnsibleCollectionRole extends Identifiable {
   name: string;
+}
+
+export interface AnsibleRole {
+  name: string;
+  variables: AnsibleVariable[];
 }
 
 export interface AnsibleContentVersionFull

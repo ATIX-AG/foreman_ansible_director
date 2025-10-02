@@ -24,6 +24,10 @@ module Api
                                  end
       end
 
+      def version_detail
+        @content_unit_version = ContentUnitVersion.find_by(id: params[:version])
+      end
+
       # TODO: This needs to check and invalidate built EEs
       def destroy_units
         resolved = ::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload params[:units]

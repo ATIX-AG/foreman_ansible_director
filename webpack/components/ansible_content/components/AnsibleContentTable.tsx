@@ -5,10 +5,13 @@ import {
   APIOptions,
   PaginationProps,
 } from 'foremanReact/common/hooks/API/APIHooks';
-import { GetAnsibleContentResponse } from './AnsibleContentTableWrapper';
+import {
+  AnsibleContentUnitWithCounts,
+  GetAnsibleContentResponse,
+} from './AnsibleContentTableWrapper';
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
-import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
+import { AnsibleVariablesDetail } from './AnsibleVariablesDetail/AnsibleVariablesDetail';
 
 interface AnsibleContentTableProps {
   apiResponse: GetAnsibleContentResponse;
@@ -28,7 +31,16 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     expandedDetailsNodeNames,
     setExpandedDetailsNodeNames,
   ] = React.useState<string[]>([]);
-  const renderRows = (results: AnsibleContentUnit[]): React.ReactNode[] => {
+
+  const [selectedVersionId, setSelectedVersionId] = React.useState<string>('');
+  const [selectedIdentifier, setSelectedIdentifier] = React.useState<string>(
+    ''
+  );
+  const [selectedVersion, setSelectedVersion] = React.useState<string>('');
+
+  const renderRows = (
+    results: AnsibleContentUnitWithCounts[]
+  ): React.ReactNode[] => {
     const rows: React.ReactNode[] = [];
     let posInset = 0;
 
@@ -51,6 +63,10 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           identifier={identifier}
           nodeVersions={result.versions}
           isExpanded={isExpanded}
+          setSelectedVersionId={setSelectedVersionId}
+          setSelectedIdentifier={setSelectedIdentifier}
+          setSelectedVersion={setSelectedVersion}
+          key={`${identifier}:secondary`}
         />
       );
       posInset++;
@@ -65,13 +81,22 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
         <Thead>
           <Tr>
             <Th>Identifier</Th>
-            <Th>Name</Th>
+            <Th>Type</Th>
             <Th>Namespace</Th>
+            <Th>Name</Th>
           </Tr>
         </Thead>
         <Tbody>{renderRows(apiResponse.results)}</Tbody>
       </Table>
       <Pagination itemCount={apiResponse.total} onChange={onPagination} />
+      {selectedVersionId !== '' && (
+        <AnsibleVariablesDetail
+          selectedVersionId={selectedVersionId}
+          selectedIdentifier={selectedIdentifier}
+          selectedVersion={selectedVersion}
+          onClose={() => setSelectedVersionId('')}
+        />
+      )}
     </>
   );
 };

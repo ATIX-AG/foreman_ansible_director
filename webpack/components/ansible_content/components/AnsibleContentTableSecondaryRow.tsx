@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import {
   Table,
   Thead,
@@ -7,26 +7,57 @@ import {
   Tr,
   Td,
   ExpandableRowContent,
+  IAction,
+  ActionsColumn,
 } from '@patternfly/react-table';
-import { AnsibleContentVersion } from '../../../types/AnsibleContentTypes';
+import { Button } from '@patternfly/react-core';
+import { AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
 
 interface AnsibleContentTableSecondaryRowProps {
   identifier: string; // Needed for keys
-  nodeVersions: AnsibleContentVersion[];
+  nodeVersions: AnsibleContentVersionWithCount[];
   isExpanded: boolean;
+  setSelectedVersionId: Dispatch<SetStateAction<string>>;
+  setSelectedIdentifier: Dispatch<SetStateAction<string>>;
+  setSelectedVersion: Dispatch<SetStateAction<string>>;
 }
 
 const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowProps> = ({
   identifier,
   nodeVersions,
   isExpanded,
+  setSelectedVersionId,
+  setSelectedIdentifier,
+  setSelectedVersion,
 }) => {
-  const versionRows = (versions: AnsibleContentVersion[]): React.ReactNode =>
+  const versionRows = (
+    versions: AnsibleContentVersionWithCount[]
+  ): React.ReactNode =>
     versions.map(version => (
       <Tr key={`${identifier}:${version.version}`}>
         <Td dataLabel="Version">{version.version}</Td>
+        <Td dataLabel="Roles">
+          <Button
+            variant="link"
+            isInline
+            onClick={() => {
+              setSelectedVersionId(version.id);
+              setSelectedIdentifier(identifier);
+              setSelectedVersion(version.version);
+            }}
+          >
+            {version.roles_count === 1
+              ? `${version.roles_count} role`
+              : `${version.roles_count} roles`}
+          </Button>
+        </Td>
+        <Td isActionCell>
+          <ActionsColumn items={rowActions} />
+        </Td>
       </Tr>
     ));
+
+  const rowActions: IAction[] = [{ title: 'Action 1', onClick: () => {} }];
 
   return (
     <Tr isExpanded={isExpanded}>
@@ -36,6 +67,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             <Thead>
               <Tr>
                 <Th>Version</Th>
+                <Th>Roles</Th>
               </Tr>
             </Thead>
             <Tbody>{versionRows(nodeVersions)}</Tbody>

@@ -1,9 +1,9 @@
 import React, { Dispatch } from 'react';
-import { Td, Tr } from '@patternfly/react-table';
-import { AnsibleContentResult } from './AnsibleContentTableWrapper';
+import { ActionsColumn, IAction, Td, Tr } from '@patternfly/react-table';
+import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
 
 interface AnsibleContentTablePrimaryRowProps {
-  node: AnsibleContentResult;
+  node: AnsibleContentUnit;
   setExpandedNodeNames: Dispatch<React.SetStateAction<string[]>>;
   isExpanded: boolean;
   isDetailsExpanded: boolean;
@@ -49,13 +49,19 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
     },
   };
 
+  const rowActions: IAction[] = [{ title: 'Action 1', onClick: () => {} }];
+
   return (
     <Tr>
       <Td dataLabel="Identifier" treeRow={treeRow}>
         {identifier}
       </Td>
-      <Td dataLabel="Name">{node.name}</Td>
+      <Td dataLabel="Type">{node.type}</Td>
       <Td dataLabel="Namespace">{node.namespace}</Td>
+      <Td dataLabel="Name">{node.name}</Td>
+      <Td isActionCell>
+        <ActionsColumn items={rowActions} />
+      </Td>
     </Tr>
   );
 };

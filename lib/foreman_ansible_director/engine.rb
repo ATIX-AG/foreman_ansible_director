@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "action_cable/engine"
+require "foreman_ansible_director/remote_execution"
 
 module ForemanAnsibleDirector
   DYNFLOW_QUEUE = :foreman_ansible_director
@@ -41,6 +42,7 @@ module ForemanAnsibleDirector
       ::Host::Base.include ForemanAnsibleDirector::HostExtensions
       ::Host::Managed.include ForemanAnsibleDirector::HostExtensions
       ::Hostgroup.include ForemanAnsibleDirector::HostgroupExtensions
+      ::LookupKey.include ForemanAnsibleDirector::LookupKeysExtensions
     end
 
     initializer 'foreman_ansible_director.apipie' do
