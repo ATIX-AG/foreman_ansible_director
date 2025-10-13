@@ -22,80 +22,72 @@ import SearchIcon from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import { Link, LinkProps } from 'react-router-dom';
 import {
   AnsibleCollectionRole,
-  AnsibleContentUnit,
-  AnsibleContentUnitAssignment,
-  AnsibleContentUnitFull,
-  AnsibleContentVersion,
-  AnsibleContentVersionFull,
+  FullAnsibleContentUnitAssignment,
 } from '../../../../../types/AnsibleContentTypes';
+import { unnamedAssignmentType } from './AssignmentComponentWrapper';
 
-interface InnerContentUnitSelectorProps {
-  data: AnsibleContentUnitFull[];
-  targetContentUnits: AnsibleContentUnitAssignment[];
+// TODO: Refactor this component. It's a mess
+interface InnerLceAssignmentSelectorProps {
+  data: FullAnsibleContentUnitAssignment[];
+  assignedContent: unnamedAssignmentType;
   chosenUnits: {
-    [unit: string]: string[];
+    [unit: string]: { type: string; id: number }[];
   };
-  setChosenUnits: Dispatch<SetStateAction<{ [unit: string]: string[] }>>;
+  setChosenUnits: Dispatch<
+    SetStateAction<{ [unit: string]: { type: string; id: number }[] }>
+  >;
 }
 
-interface ContentUnitSelectorProps {
-  contentUnits: AnsibleContentUnitFull[];
-  targetContentUnits: AnsibleContentUnitAssignment[];
+interface LceAssignmentSelectorProps {
+  contentUnits: FullAnsibleContentUnitAssignment[];
+  assignedContent: unnamedAssignmentType;
   chosenUnits: {
-    [unit: string]: string[];
+    [unit: string]: { type: string; id: number }[];
   };
-  setChosenUnits: Dispatch<SetStateAction<{ [unit: string]: string[] }>>;
+  setChosenUnits: Dispatch<
+    SetStateAction<{ [unit: string]: { type: string; id: number }[] }>
+  >;
 }
 
 interface ContentUnitTreeItemData extends DualListSelectorTreeItemData {
-  parent: undefined | AnsibleContentUnitFull;
+  parent: undefined | FullAnsibleContentUnitAssignment;
 }
 
-export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> = ({
+export const InnerLceAssignmentSelector = ({
   data,
-  targetContentUnits,
+  assignedContent,
   chosenUnits,
   setChosenUnits,
-}) => {
+}: InnerLceAssignmentSelectorProps): React.ReactElement => {
   const [selectedRoles, setSelectedRoles] = React.useState<{
-    [unit: string]: string[];
+    [unit: string]: { type: string; id: number }[];
   }>({});
 
   const [availableUnits, setAvailableUnits] = React.useState<
-    AnsibleContentUnitFull[]
+    FullAnsibleContentUnitAssignment[]
   >([]);
 
   useEffect(() => {
-    setAvailableUnits(data);
-  }, [data]);
+    const initialChosenUnits: {
+      [unit: string]: { type: string; id: number }[];
+    } = {};
 
-  // useEffect(() => {
-  //  const newChosenUnits: { [unit: string]: string } = {};
-  //  const newAvailableUnits: AnsibleContentUnitFull[] = [];
-  //
-  //  targetContentUnits.forEach(targetUnit => {
-  //    // TODO: This is not efficient for large content sets
-  //    if (data.some(avUnit => avUnit.id === targetUnit.id)) {
-  //      newChosenUnits[targetUnit.id] = targetUnit.version;
-  //    } else {
-  //      const newUnit = {
-  //        type: targetUnit.type,
-  //        identifier: targetUnit.identifier,
-  //        versions: [
-  //          {
-  //            version: targetUnit.version,
-  //          } as AnsibleContentVersionFull,
-  //        ],
-  //      } as AnsibleContentUnitFull;
-  //      newAvailableUnits.push(newUnit);
-  //      newChosenUnits[targetUnit.id] = targetUnit.version;
-  //    }
-  //  });
-  //  if (Object.keys(newChosenUnits).length > 0) {
-  //    setChosenUnits(newChosenUnits);
-  //  }
-  //  setAvailableUnits([...newAvailableUnits, ...data]);
-  // }, [data, setChosenUnits, targetContentUnits]);
+    assignedContent.forEach(assignedContentUnit => {
+      if (initialChosenUnits[assignedContentUnit.source_id] === undefined) {
+        initialChosenUnits[assignedContentUnit.source_id] = [];
+      }
+      initialChosenUnits[assignedContentUnit.source_id].push({
+        type: assignedContentUnit.source_type,
+        id: assignedContentUnit.consumable_id,
+      });
+    });
+    setChosenUnits({ ...initialChosenUnits });
+    setAvailableUnits(data);
+    // This is intentional. setChosenUnits is also stable.
+    // It will only change when the other two deps change.
+    // If added, it causes an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignedContent, data]);
 
   const moveChecked = (toChosen: boolean): void => {
     setChosenUnits(prevChosenUnits => {
@@ -122,19 +114,21 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
     isChecked: boolean,
     node: ContentUnitTreeItemData
   ): void => {
-    console.log(isChecked, node);
     const roles = selectedRoles || {};
     if (node.parent) {
       if (isChecked) {
         const checkedRolesForVersion = roles[node.parent.id] || [];
 
-        checkedRolesForVersion.push(node.text);
+        checkedRolesForVersion.push({
+          type: node.parent.type,
+          id: Number(node.id),
+        });
         roles[node.parent.id] = checkedRolesForVersion;
       } else {
         const checkedRolesForVersion = roles[node.parent.id] || [];
 
         roles[node.parent.id] = checkedRolesForVersion.filter(
-          role => role !== node.text
+          role => role.id !== Number(node.id)
         );
       }
     }
@@ -143,7 +137,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
 
   const buildACUOptions = (
     isChosen: boolean,
-    [node, ...remainingNodes]: AnsibleContentUnitFull[],
+    [node, ...remainingNodes]: FullAnsibleContentUnitAssignment[],
     hasParentMatch: boolean
   ): ContentUnitTreeItemData[] => {
     if (!node) {
@@ -160,19 +154,16 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
 
     const treeNode = {
       id: node.identifier,
-      text: `${node.identifier} ${node.versions[0].version}`,
+      text: `${node.identifier}@${node.version}`,
       isChecked,
       parent: undefined,
       checkProps: { 'aria-label': `Select ${node.identifier}` },
       hasBadge: true,
       badgeProps: { isRead: true },
       defaultExpanded: false,
-      children: buildACROptions(
-        isChosen,
-        node,
-        node.versions[0].roles, // TODO: Although only a single version can exist, this is not enforced yet
-        hasParentMatch
-      ),
+      ...(node.roles.length > 0 && {
+        children: buildACROptions(isChosen, node, node.roles, hasParentMatch),
+      }),
     };
 
     return [
@@ -185,7 +176,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
 
   const buildACROptions = (
     isChosen: boolean,
-    parent: AnsibleContentUnitFull,
+    parent: FullAnsibleContentUnitAssignment,
     [node, ...remainingNodes]: AnsibleCollectionRole[],
     hasParentMatch: boolean
   ): ContentUnitTreeItemData[] => {
@@ -196,14 +187,18 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
     const isChecked =
       selectedRoles &&
       selectedRoles[parent.id] &&
-      selectedRoles[parent.id].some(selectedRole => selectedRole === node.name);
+      selectedRoles[parent.id].some(
+        selectedRole => selectedRole.id === Number(node.id)
+      );
 
     const isDisplayed: boolean = isChosen
       ? chosenUnits[parent.id] &&
-        chosenUnits[parent.id].some(chosenRole => chosenRole === node.name)
+        chosenUnits[parent.id].some(
+          chosenRole => chosenRole.id === Number(node.id)
+        )
       : true;
 
-    const treeNode = {
+    const treeNode: ContentUnitTreeItemData = {
       id: node.id,
       text: node.name,
       isChecked,
@@ -213,7 +208,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
     };
 
     return [
-      ...(isDisplayed ? [treeNode as ContentUnitTreeItemData] : []),
+      ...(isDisplayed ? [treeNode] : []),
       ...(remainingNodes
         ? buildACROptions(isChosen, parent, remainingNodes, hasParentMatch)
         : []),
@@ -301,15 +296,15 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
   );
 };
 
-export const LceAssignmentSelector: React.FC<ContentUnitSelectorProps> = ({
+export const LceAssignmentSelector = ({
   contentUnits,
-  targetContentUnits,
+  assignedContent,
   chosenUnits,
   setChosenUnits,
-}) => (
-  <InnerContentUnitSelector
+}: LceAssignmentSelectorProps): React.ReactElement => (
+  <InnerLceAssignmentSelector
     data={contentUnits}
-    targetContentUnits={targetContentUnits}
+    assignedContent={assignedContent}
     chosenUnits={chosenUnits}
     setChosenUnits={setChosenUnits}
   />

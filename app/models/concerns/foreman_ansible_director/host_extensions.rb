@@ -17,9 +17,13 @@ module ForemanAnsibleDirector
       additions = ansible_content_assignments.where(subtractive: false)
       if hostgroup
         hostgroup_content = hostgroup.ansible_content_assignments
-        subtractions = ansible_content_assignments.where(subtractive: true).pluck(:content_unit_version_id)
-        hostgroup_content.each do |content_assignment|
-          content << content_assignment unless subtractions.include? content_assignment.content_unit_version.id
+        subtractions = ansible_content_assignments.where(subtractive: true).map {|assignment| assignment.consumable.id}
+        if subtractions.empty?
+          hostgroup_content.each do |content_assignment|
+            content << content_assignment unless subtractions.include? content_assignment.consumable.id
+          end
+        else
+          content.concat hostgroup_content
         end
       end
       content.concat additions

@@ -1,114 +1,146 @@
-import React, { Dispatch, ReactElement, SetStateAction } from 'react';
-import { ContentUnitSelector } from '../../../../ansible_execution_environments/components/components/components/ContentUnitSelector';
+import React, { ReactElement } from 'react';
+import axios, { AxiosResponse } from 'axios';
+
 import {
-  AnsibleContentUnit,
-  AnsibleContentUnitFull,
-} from '../../../../../types/AnsibleContentTypes';
-import { AssignmentSelector } from './AssignmentSelector';
-import {
+  Button,
   Card,
   CardBody,
-  ExpandableSection,
-  Grid,
-  GridItem,
-  TreeView,
-  TreeViewDataItem,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  EmptyStateHeader,
+  Icon,
 } from '@patternfly/react-core';
 
+import { foremanUrl } from 'foremanReact/common/helpers';
+import { useDispatch } from 'react-redux';
+import { addToast } from 'foremanReact/components/ToastsList';
+import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
+import { LceAssignmentSelector } from './LceAssignmentSelector';
+import {
+  AvailableContentResponse,
+  isAnsibleLce,
+  unnamedAssignmentType,
+} from './AssignmentComponentWrapper';
+
 interface AssignmentComponentProps {
-  lceUnits: {
-    collections: AnsibleContentUnitFull[];
-    roles: AnsibleContentUnit[];
-  };
-  chosenUnits: { [unit: string]: string[] };
-  setChosenUnits: Dispatch<SetStateAction<{ [unit: string]: string[] }>>;
+  contentResponse: AvailableContentResponse;
+  assignedContent: unnamedAssignmentType;
+  hostId: number;
 }
 
 export const AssignmentComponent = ({
-  lceUnits,
-  chosenUnits,
-  setChosenUnits,
+  contentResponse,
+  assignedContent,
+  hostId,
 }: AssignmentComponentProps): ReactElement => {
-  // const [target, setTarget] = React.useState<{content: []}>({content: []});
+  const [isSaveLoading, setIsSaveLoading] = React.useState<boolean>(false);
+  const [chosenUnits, setChosenUnits] = React.useState<{
+    [unit: string]: { type: string; id: number }[];
+  }>({});
 
-  const [activeItems, setActiveItems] = React.useState<TreeViewDataItem[]>();
+  const dispatch = useDispatch();
 
-  const onSelect = (
-    _event: React.MouseEvent,
-    treeViewItem: TreeViewDataItem
-  ): void => {
-    // Ignore folders for selection
-    if (treeViewItem && !treeViewItem.children) {
-      setActiveItems([treeViewItem]);
+  const bulkAssignContent = async (): Promise<void> => {
+    const formattedUnits: {
+      source: {
+        type: 'ACR' | 'AR';
+        id: number;
+      };
+      target: {
+        type: 'HOST';
+        id: number;
+      };
+    }[] = [];
+
+    Object.keys(chosenUnits).forEach(unitKey => {
+      const units = chosenUnits[unitKey];
+
+      units.forEach(unit => {
+        formattedUnits.push({
+          source: {
+            type: unit.type === 'collection' ? 'ACR' : 'AR',
+            id: unit.id,
+          },
+          target: {
+            type: 'HOST',
+            id: hostId,
+          },
+        });
+      });
+    });
+
+    try {
+      await axios.post(foremanUrl('/api/v2/ansible/assignments/bulk'), {
+        assignments: formattedUnits,
+      });
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `UPDATE_HOST_${hostId}_ANSIBLE_CONTENT_SUCC`,
+          message: 'Successfully updated Ansible content assignments!',
+          sticky: false,
+        })
+      );
+      // refreshRequest();
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `UPDATE_HOST_${hostId}_ANSIBLE_CONTENT_ERR`,
+          message: `Updating of Ansible content assignments failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
     }
   };
 
-  const [isRolesExpanded, setIsRolesExpanded] = React.useState(false);
-  const [isCollectionsExpanded, setIsCollectionsExpanded] = React.useState(
-    false
-  );
-
-  const options = [
-    {
-      name: 'Execution environment',
-      id: 'ee-item',
-      customBadgeContent: 'EE-10.4.2',
-    },
-    {
-      name: 'Inherited',
-      id: 'inherited-root-item',
-      customBadgeContent: '2 CUs',
-      children: [
-        {
-          name: 'Collections',
-          id: 'inherited-collections-item',
-        },
-        {
-          name: 'Roles',
-          id: 'inherited-roles-item',
-        },
-      ],
-      defaultExpanded: true,
-    },
-    {
-      name: 'Collections',
-      id: 'collections-item',
-      customBadgeContent: 'EE-10.4.2',
-    },
-    {
-      name: 'Roles',
-      id: 'roles-item',
-      customBadgeContent: 'EE-10.4.2',
-    },
-    {
-      name: 'Sources',
-      id: 'example6-Sources',
-      customBadgeContent: '1 source',
-    },
-  ];
   return (
     <>
-      <Grid hasGutter>
-        <GridItem span={3}>
-          <Card>
-            <CardBody>
-              <TreeView data={options} hasBadges onSelect={onSelect} />
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem span={9}>
-          <Card>
-            <CardBody>
-              <AssignmentSelector
-                contentUnits={lceUnits.collections}
-                targetContentUnits={[]}
-                chosenUnits={chosenUnits}
-                setChosenUnits={setChosenUnits}
+      <Card ouiaId="BasicCard" isLarge>
+        <CardHeader
+          actions={{
+            actions: (
+              <>
+                <Button
+                  variant="plain"
+                  aria-label="Action"
+                  onClick={async () => {
+                    setIsSaveLoading(true);
+                    await bulkAssignContent();
+                    setIsSaveLoading(false);
+                  }}
+                  isLoading={isSaveLoading}
+                >
+                  <Icon size="lg">
+                    <SaveIcon />
+                  </Icon>
+                </Button>
+              </>
+            ),
+          }}
+        />
+        <CardTitle>Using content from Lifecycle Environment</CardTitle>
+        <CardBody>
+          {isAnsibleLce(contentResponse) ? (
+            <LceAssignmentSelector
+              assignedContent={assignedContent}
+              contentUnits={contentResponse.content}
+              chosenUnits={chosenUnits}
+              setChosenUnits={setChosenUnits}
+            />
+          ) : (
+            <EmptyState>
+              <EmptyStateHeader
+                titleText="As of now, only content from Lifecycle Environments can be assigned to hosts."
+                headingLevel="h4"
               />
-            </CardBody>
-          </Card>
-        </GridItem>
-      </Grid>
+            </EmptyState>
+          )}
+        </CardBody>
+      </Card>
     </>
   );
 };

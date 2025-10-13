@@ -43,7 +43,7 @@ Rails.application.routes.draw do
             end
           end
           member do
-            post '/assign', action: :assign
+            patch '/assign/:target_type/:target_id', action: :assign
           end
           member do
             get '/', action: :show
@@ -75,6 +75,10 @@ Rails.application.routes.draw do
           collection do
             get '/:target/:target_id', action: :find_assignments
             post '/', action: :assign
+            post '/bulk', action: :assign_bulk
+          end
+          member do
+            delete '/', action: :destroy
           end
         end
         resources :ansible_variables, only: [] do
