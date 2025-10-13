@@ -68,7 +68,6 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   const updateLce = async (env: AnsibleLce): Promise<void> => {
     try {
       await axios.put(
-        // TODO: Should probably be PUT
         `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${env.id}`,
         {
           lifecycle_environment: lifecycleEnvironment,
