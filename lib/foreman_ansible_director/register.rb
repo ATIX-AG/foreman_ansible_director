@@ -16,28 +16,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     menu :top_menu, :ansible_environments,
       url: '/ansible/environments',
       caption: 'Ansible Environments'
-    menu :top_menu, :ansible_tasks,
-         url: '/ansible/tasks',
-         caption: 'Ansible Tasks'
   end
-
-  divider :top_menu, caption: N_('Ansible'), parent: :configure_menu
-  menu :top_menu, :ansible_content,
-    url: '/ansible/content',
-    caption: 'Ansible Content',
-    parent: :configure_menu
-  menu :top_menu, :ansible_execution_environments,
-    url: '/ansible/execution_environments',
-    caption: 'Ansible Execution Environments',
-    parent: :configure_menu
-  menu :top_menu, :ansible_environments,
-    url: '/ansible/environments',
-    caption: 'Ansible Environments',
-    parent: :configure_menu
-  menu :top_menu, :ansible_tasks,
-     url: '/ansible/tasks',
-     caption: 'Ansible Tasks',
-     parent: :configure_menu
 
   register_global_js_file 'global'
 
