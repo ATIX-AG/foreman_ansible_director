@@ -23,11 +23,15 @@ if defined? ForemanRemoteExecution
               inventory = Generators::InventoryGenerator.generate host
 
               content = Generators::ContentGenerator.generate host
+
+              unless host.lifecycle_environment.execution_environment
+                raise "Host #{host.name} is not in any Lifecycle environment"
+              end
               super(template_invocation, host).merge(
                 inventory: inventory,
                 playbook: playbook,
                 content: content,
-                execution_environment: "centos9-katello-devel-stable.example.com:4321/ansibleng/13"
+                execution_environment: host.lifecycle_environment.execution_environment.registry_url
               )
             end
 

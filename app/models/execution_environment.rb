@@ -21,6 +21,11 @@ class ExecutionEnvironment < AnsibleDirectorModel
 
   after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
 
+  def registry_url
+    registry_port = 4321
+    "http://#{SETTINGS[:fqdn]}:#{registry_port}/ansibleng/#{id}"
+  end
+
   def rebuild_necessary?
     saved_change_to_attribute?(:content_hash)
   end
