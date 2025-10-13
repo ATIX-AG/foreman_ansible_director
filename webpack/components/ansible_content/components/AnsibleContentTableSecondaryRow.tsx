@@ -11,6 +11,11 @@ import {
   ActionsColumn,
 } from '@patternfly/react-table';
 import { Button } from '@patternfly/react-core';
+import axios, { AxiosResponse } from 'axios';
+import { foremanUrl } from 'foremanReact/common/helpers';
+import { addToast } from 'foremanReact/components/ToastsList';
+import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import { useDispatch } from 'react-redux';
 import { AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
 
 interface AnsibleContentTableSecondaryRowProps {
@@ -20,6 +25,11 @@ interface AnsibleContentTableSecondaryRowProps {
   setSelectedVersionId: Dispatch<SetStateAction<string>>;
   setSelectedIdentifier: Dispatch<SetStateAction<string>>;
   setSelectedVersion: Dispatch<SetStateAction<string>>;
+  setIsConfirmationModalOpen: Dispatch<React.SetStateAction<boolean>>;
+  setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
+  refreshRequest: () => void;
 }
 
 const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowProps> = ({
@@ -29,6 +39,11 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
   setSelectedVersionId,
   setSelectedIdentifier,
   setSelectedVersion,
+  setIsConfirmationModalOpen,
+  setConfirmationModalTitle,
+  setConfirmationModalBody,
+  setConfirmationModalOnConfirm,
+  refreshRequest,
 }) => {
   const versionRows = (
     versions: AnsibleContentVersionWithCount[]
@@ -52,12 +67,65 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
           </Button>
         </Td>
         <Td isActionCell>
-          <ActionsColumn items={rowActions} />
+          <ActionsColumn items={rowActions(version)} />
         </Td>
       </Tr>
     ));
 
-  const rowActions: IAction[] = [{ title: 'Action 1', onClick: () => {} }];
+  const organization = useForemanOrganization();
+  const dispatch = useDispatch();
+
+  const rowActions = (version: AnsibleContentVersionWithCount): IAction[] => [
+    {
+      title: 'Destroy',
+      onClick: () => {
+        setIsConfirmationModalOpen(true);
+        setConfirmationModalTitle(`Destroy ${identifier}:${version.version}?`);
+        setConfirmationModalBody(
+          `This will destroy only version ${version.version} of ${identifier}.\nAre you sure you want to destroy ${identifier}:${version.version}?`
+        );
+        setConfirmationModalOnConfirm(async () => {
+          try {
+            await axios.delete(foremanUrl('/api/v2/ansible/ansible_content'), {
+              data: {
+                organization_id: organization?.id,
+                units: [
+                  {
+                    unit_name: identifier,
+                    unit_versions: [version.version],
+                  },
+                ],
+              },
+            });
+            dispatch(
+              addToast({
+                type: 'success',
+                key: `DESTROY_CUV_${identifier}_${version.version}_SUCC`,
+                message: `Sucessfully destroyed Ansible content unit version "${identifier}:${version.version}"!`,
+                sticky: false,
+              })
+            );
+          } catch (e) {
+            dispatch(
+              addToast({
+                type: 'danger',
+                key: `DESTROY_CUV_${identifier}_${version.version}_ERR`,
+                message: `Destroying Ansible content unit version "${identifier}:${
+                  version.version
+                }" failed with error code "${
+                  (e as { response: AxiosResponse }).response.status
+                }".`,
+                sticky: false,
+              })
+            );
+          } finally {
+            setIsConfirmationModalOpen(false);
+            refreshRequest();
+          }
+        });
+      },
+    },
+  ];
 
   return (
     <Tr isExpanded={isExpanded}>

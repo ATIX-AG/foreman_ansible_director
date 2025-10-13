@@ -21,11 +21,13 @@ import { DefaultFooter } from './components/components/DefaultFooter';
 interface AnsibleContentWizardProps {
   isContentWizardOpen: boolean;
   setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
+  refreshRequest: () => void;
 }
 
 const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
   isContentWizardOpen,
   setIsContentWizardOpen,
+  refreshRequest,
 }) => {
   const [contentUnits, setContentUnits] = React.useState<
     Array<AnsibleContentUnitCreate>
@@ -35,6 +37,12 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
   const [provider, setProvider] = React.useState<'galaxy' | 'yaml' | undefined>(
     undefined
   );
+
+  const resetWizard = (): void => {
+    setContentUnits([]);
+    setYamlFile('');
+    setProvider(undefined);
+  };
 
   const wizardSteps = (): React.ReactNode => {
     switch (provider) {
@@ -81,6 +89,9 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                   provider="galaxy"
                   contentUnits={contentUnits}
                   yamlFile={yamlFile}
+                  setIsContentWizardOpen={setIsContentWizardOpen}
+                  refreshRequest={refreshRequest}
+                  resetWizard={resetWizard}
                 />
               }
             >
@@ -110,6 +121,9 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 provider="yaml"
                 contentUnits={contentUnits}
                 yamlFile={yamlFile}
+                setIsContentWizardOpen={setIsContentWizardOpen}
+                refreshRequest={refreshRequest}
+                resetWizard={resetWizard}
               />
             }
           >
@@ -148,11 +162,17 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
             <WizardHeader
               title="Import Ansible content"
               titleId="modal-wizard-label"
-              onClose={() => setIsContentWizardOpen(false)}
+              onClose={() => {
+                setIsContentWizardOpen(false);
+                resetWizard();
+              }}
               closeButtonAriaLabel="Close wizard"
             />
           }
-          onClose={() => setIsContentWizardOpen(false)}
+          onClose={() => {
+            setIsContentWizardOpen(false);
+            resetWizard();
+          }}
         >
           <WizardStep
             name="Provider Selection"

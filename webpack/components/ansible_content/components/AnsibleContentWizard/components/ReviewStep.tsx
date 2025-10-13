@@ -9,6 +9,9 @@ import {
   DataListAction,
   ChipGroup,
   Chip,
+  TextContent,
+  Text,
+  TextVariants
 } from '@patternfly/react-core';
 import { AnsibleContentUnitCreate } from '../../../../../types/AnsibleContentTypes';
 
@@ -43,20 +46,34 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <DataListItemCells
             dataListCells={[
               <DataListCell key="primary content">
-                <span id="single-action-item1">{unit.identifier}</span>
+                <span id="single-action-item1">
+                  <TextContent>
+                    <Text component={TextVariants.h3}>{unit.identifier}</Text>
+                  </TextContent>
+                </span>
               </DataListCell>,
               <DataListCell key="secondary content">
                 <ChipGroup>
-                  {unit.versions.map(version => (
+                  {unit.versions.length > 0 ? (
+                    unit.versions.map(version => (
+                      <Chip
+                        key={`${unit.identifier}_${version.version}`}
+                        onClick={() => {
+                          deleteUnitVersion(unit, version.version);
+                        }}
+                      >
+                        {version.version}
+                      </Chip>
+                    ))
+                  ) : (
                     <Chip
-                      key={`${unit.identifier}_${version.version}`}
-                      onClick={() => {
-                        deleteUnitVersion(unit, version.version);
-                      }}
+                      key={`${unit.identifier}_all`}
+                      onClick={() => {}}
+                      isReadOnly
                     >
-                      {version.version}
+                      All existing versions
                     </Chip>
-                  ))}
+                  )}
                 </ChipGroup>
               </DataListCell>,
             ]}
@@ -82,7 +99,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
   return (
     <React.Fragment>
-      <DataList aria-label="single action data list example " isCompact>
+      <DataList aria-label="single action data list example">
         {listItems()}
       </DataList>
     </React.Fragment>

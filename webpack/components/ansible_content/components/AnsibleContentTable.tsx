@@ -12,17 +12,20 @@ import {
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
 import { AnsibleVariablesDetail } from './AnsibleVariablesDetail/AnsibleVariablesDetail';
+import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
 
 interface AnsibleContentTableProps {
   apiResponse: GetAnsibleContentResponse;
   setAPIOptions: Dispatch<SetStateAction<APIOptions>>;
   onPagination: (newPagination: PaginationProps) => void;
+  refreshRequest: () => void;
 }
 
 export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
   apiResponse,
   setAPIOptions,
   onPagination,
+  refreshRequest,
 }) => {
   const [expandedNodeNames, setExpandedNodeNames] = React.useState<string[]>(
     []
@@ -37,6 +40,20 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     ''
   );
   const [selectedVersion, setSelectedVersion] = React.useState<string>('');
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = React.useState<
+    boolean
+  >(false);
+  const [confirmationModalTitle, setConfirmationModalTitle] = React.useState<
+    string
+  >('');
+  const [confirmationModalBody, setConfirmationModalBody] = React.useState<
+    string
+  >('');
+  const [
+    confirmationModalOnConfirm,
+    setConfirmationModalOnConfirm,
+  ] = React.useState<() => void>(() => () => {});
 
   const renderRows = (
     results: AnsibleContentUnitWithCounts[]
@@ -58,6 +75,11 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           posInset={posInset}
           identifier={identifier}
           key={identifier}
+          setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+          setConfirmationModalTitle={setConfirmationModalTitle}
+          setConfirmationModalBody={setConfirmationModalBody}
+          setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
+          refreshRequest={refreshRequest}
         />,
         <AnsibleContentTableSecondaryRow
           identifier={identifier}
@@ -67,6 +89,11 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           setSelectedIdentifier={setSelectedIdentifier}
           setSelectedVersion={setSelectedVersion}
           key={`${identifier}:secondary`}
+          setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+          setConfirmationModalTitle={setConfirmationModalTitle}
+          setConfirmationModalBody={setConfirmationModalBody}
+          setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
+          refreshRequest={refreshRequest}
         />
       );
       posInset++;
@@ -97,6 +124,14 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           onClose={() => setSelectedVersionId('')}
         />
       )}
+      <ConfirmationModal
+        isConfirmationModalOpen={isConfirmationModalOpen}
+        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+        title={confirmationModalTitle}
+        body={confirmationModalBody}
+        onConfirm={confirmationModalOnConfirm}
+        onAbort={() => setIsConfirmationModalOpen(false)}
+      />
     </>
   );
 };

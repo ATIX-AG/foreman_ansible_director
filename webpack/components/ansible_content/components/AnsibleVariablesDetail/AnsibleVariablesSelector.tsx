@@ -132,7 +132,7 @@ export const AnsibleVariablesSelector = ({
                                     }
                                   >
                                     <span id="simple-item1">
-                                      {variable.default_value}
+                                      {JSON.stringify(variable.default_value)}
                                     </span>
                                   </DataListCell>,
                                   <DataListCell

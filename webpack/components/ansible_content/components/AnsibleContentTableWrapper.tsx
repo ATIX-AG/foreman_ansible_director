@@ -1,4 +1,17 @@
 import React, { Dispatch, SetStateAction } from 'react';
+
+import {
+  Button,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
+  EmptyStateIcon,
+  EmptyStateVariant,
+} from '@patternfly/react-core';
+import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
+
 import {
   IndexResponse,
   PaginationProps,
@@ -56,6 +69,9 @@ const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
     setAPIOptions: contentRequest.setAPIOptions,
   });
 
+  const refreshRequest = (): void => {
+    contentRequest.setAPIOptions(options => ({ ...options }));
+  };
   const onPagination = (newPagination: PaginationProps): void => {
     setParamsAndAPI({ ...params, ...newPagination });
   };
@@ -63,14 +79,41 @@ const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
   if (contentRequest.status === 'RESOLVED') {
     return (
       <>
-        <AnsibleContentTable
-          apiResponse={contentRequest.response}
-          setAPIOptions={contentRequest.setAPIOptions}
-          onPagination={onPagination}
-        />
+        {contentRequest.response.results.length > 0 ? (
+          <AnsibleContentTable
+            apiResponse={contentRequest.response}
+            setAPIOptions={contentRequest.setAPIOptions}
+            onPagination={onPagination}
+            refreshRequest={refreshRequest}
+          />
+        ) : (
+          <EmptyState variant={EmptyStateVariant.xl}>
+            <EmptyStateHeader
+              headingLevel="h4"
+              titleText="No Ansible content in this organization"
+              icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
+            />
+            <EmptyStateBody>
+              This organization does not have any Ansible content.
+            </EmptyStateBody>
+            <EmptyStateFooter>
+              <EmptyStateActions>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setIsContentWizardOpen(true);
+                  }}
+                >
+                  Import Ansible content
+                </Button>
+              </EmptyStateActions>
+            </EmptyStateFooter>
+          </EmptyState>
+        )}
         <AnsibleContentWizard
           isContentWizardOpen={isContentWizardOpen}
           setIsContentWizardOpen={setIsContentWizardOpen}
+          refreshRequest={refreshRequest}
         />
       </>
     );

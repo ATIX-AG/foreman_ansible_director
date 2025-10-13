@@ -301,7 +301,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
   );
 };
 
-export const AssignmentSelector: React.FC<ContentUnitSelectorProps> = ({
+export const LceAssignmentSelector: React.FC<ContentUnitSelectorProps> = ({
   contentUnits,
   targetContentUnits,
   chosenUnits,

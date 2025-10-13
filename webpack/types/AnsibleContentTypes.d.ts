@@ -9,6 +9,7 @@ export interface AnsibleContentUnitBase {
 
 export interface AnsibleContentUnitCreate extends AnsibleContentUnitBase {
   source: string;
+  versions: AnsibleContentVersionCreate[];
 }
 
 export interface AnsibleContentUnit
@@ -23,6 +24,9 @@ export interface AnsibleContentUnitFull extends AnsibleContentUnit {
 }
 
 export interface AnsibleContentVersion extends Identifiable {
+  version: string;
+}
+export interface AnsibleContentVersionCreate {
   version: string;
 }
 
@@ -45,4 +49,9 @@ export interface AnsibleContentUnitAssignment extends Identifiable {
   type: 'collection' | 'role';
   identifier: string;
   version: string;
+}
+
+export interface FullAnsibleContentUnitAssignment
+  extends AnsibleContentUnitAssignment {
+  roles: AnsibleCollectionRole[];
 }
