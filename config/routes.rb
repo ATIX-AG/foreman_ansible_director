@@ -43,7 +43,7 @@ Rails.application.routes.draw do
             end
           end
           member do
-            patch '/assign/:target_type/:target_id', action: :assign
+            post '/assign/:target_type/:target_id', action: :assign
           end
           member do
             get '/', action: :show
@@ -73,7 +73,7 @@ Rails.application.routes.draw do
         end
         resources :assignments, only: [] do
           collection do
-            get '/:target/:target_id', action: :find_assignments
+            get '/:target/:target_id', action: :get_assignments
             post '/', action: :assign
             post '/bulk', action: :assign_bulk
           end
