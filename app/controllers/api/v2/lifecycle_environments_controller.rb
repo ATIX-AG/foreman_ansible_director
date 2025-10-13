@@ -106,6 +106,7 @@ module Api
         params.require(:lifecycle_environment).permit(
           :name,
           :description,
+          :position,
           content: [
             :execution_environment_id,
             { content_assignments: %i[id version] },
