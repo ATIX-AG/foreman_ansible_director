@@ -126,7 +126,10 @@ module Actions
               remote_href: remote_href,
               distribution_href: distribution_href,
               content_unit_type: scu.unit_type,
-              content_unit_source: scu.source
+              content_unit_source: scu.source,
+              unit_name: scu.unit_name,
+              unit_namespace: scu.unit_namespace,
+              organization_id: organization_id
             )
           end
         end
@@ -149,9 +152,12 @@ module Actions
           existing_unit = ::ContentUnit.find_by(namespace: unit.unit_namespace, name: unit.unit_name)
           return :import unless existing_unit
 
-          if existing_unit.content_unit_versions.select do |x|
-               unit.versions.include? x.version
-             end.empty? && !force_override
+
+          existing_unit_versions = existing_unit.content_unit_versions.select do |x|
+            unit.versions.include? x.version
+          end
+
+          if !existing_unit_versions.empty? && !force_override
             return :noop
           end
           :update

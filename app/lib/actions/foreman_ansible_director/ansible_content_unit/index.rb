@@ -145,11 +145,31 @@ module Actions
             end
 
             new_unit_versions.each do |new_version|
-              existing_unit.content_unit_versions << ContentUnitVersion.new(
+
+
+              content_unit_version = ContentUnitVersion.create!(
                 versionable: existing_unit,
                 version: new_version[:version],
-                versionable_type: unit_record.class.to_s
+                versionable_type: existing_unit.class.to_s
               )
+
+              new_version[:collection_roles].each do |collection_role|
+                collection_role_record = content_unit_version.ansible_collection_roles.create!(
+                  name: collection_role
+                )
+
+                cr_variables = unit_variables[new_version[:version]][collection_role]
+                unless cr_variables.nil?
+
+                  ActiveRecord::Base.transaction do
+                    cr_variables.each do |variable_name, variable_value|
+                      create = Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
+                      ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
+                    end
+                  end
+                end
+              end
+
             end
           end
           # rubocop:enable Layout/LineLength
