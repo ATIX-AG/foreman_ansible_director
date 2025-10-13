@@ -9,6 +9,11 @@ import { AnsibleLcePathComponent } from './components/AnsibleLcePathComponent';
 
 import { AnsibleLibraryOverview } from './components/AnsibleLibraryOverview';
 import { ContentUnitModal } from '../../ansible_execution_environments/components/ContentUnitModal';
+import axios, { AxiosResponse } from 'axios';
+import { foremanUrl } from 'foremanReact/common/helpers';
+import { addToast } from 'foremanReact/components/ToastsList';
+import { useDispatch } from 'react-redux';
+import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
 
 interface AnsibleLcePathIndexProps {
   lcePaths: AnsibleLcePath[];
@@ -27,13 +32,19 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
     AnsibleLce | undefined
   >();
 
-  const destroyLce = (lce: AnsibleLce): void => {
-    console.log(lce);
-  };
-
-  const destroyLcePath = (lcePath: AnsibleLcePath): void => {
-    console.log(lcePath);
-  };
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = React.useState<
+    boolean
+  >(false);
+  const [confirmationModalTitle, setConfirmationModalTitle] = React.useState<
+    string
+  >('');
+  const [confirmationModalBody, setConfirmationModalBody] = React.useState<
+    string
+  >('');
+  const [
+    confirmationModalOnConfirm,
+    setConfirmationModalOnConfirm,
+  ] = React.useState<() => void>(() => () => {});
 
   return (
     <>
@@ -55,10 +66,12 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
             <AnsibleLcePathComponent
               lcePath={lcePath}
               refreshRequest={refreshRequest}
-              destroyLce={destroyLce}
-              destroyLcePath={destroyLcePath}
               setIsContentUnitModalOpen={setIsContentUnitModalOpen}
               setLifecycleEnv={setLifecycleEnv}
+              setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+              setConfirmationModalTitle={setConfirmationModalTitle}
+              setConfirmationModalBody={setConfirmationModalBody}
+              setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
             />
           </StackItem>
         ))}
@@ -72,6 +85,14 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
           refreshRequest={refreshRequest}
         />
       )}
+      <ConfirmationModal
+        isConfirmationModalOpen={isConfirmationModalOpen}
+        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+        title={confirmationModalTitle}
+        body={confirmationModalBody}
+        onConfirm={confirmationModalOnConfirm}
+        onAbort={() => {}}
+      />
     </>
   );
 };

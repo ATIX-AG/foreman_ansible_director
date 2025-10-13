@@ -12,19 +12,33 @@ import {
 import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
 import { AnsibleLceComponentHeaderActions } from './AnsibleLceComponentHeaderActions';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
+import axios, { AxiosResponse } from 'axios';
+import { useDispatch } from 'react-redux';
+import { foremanUrl } from 'foremanReact/common/helpers';
+import { addToast } from 'foremanReact/components/ToastsList';
 
 interface AnsibleLceComponentProps {
   lce: AnsibleLce;
   pathEditMode: boolean;
+  refreshRequest: () => void;
   setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsConfirmationModalOpen: Dispatch<React.SetStateAction<boolean>>;
+  setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
 }
 
 export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   lce,
   pathEditMode,
+  refreshRequest,
   setLifecycleEnv,
   setIsContentUnitModalOpen,
+  setIsConfirmationModalOpen,
+  setConfirmationModalTitle,
+  setConfirmationModalBody,
+  setConfirmationModalOnConfirm,
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const [lifecycleEnvironment, setLifecycleEnvironment] = React.useState<
@@ -35,13 +49,84 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     setLifecycleEnvironment(lce);
   }, [lce]);
 
-  const askConfirmUpdate = async (): Promise<void> => {
+  const dispatch = useDispatch();
+
+  const handleLceUpdate = (): void => {
     if (editMode) {
       if (JSON.stringify(lce) !== JSON.stringify(lifecycleEnvironment)) {
-        // TODO: update
+        setIsConfirmationModalOpen(true);
+        setConfirmationModalTitle(`Update "${lce.name}"?`);
+        setConfirmationModalBody('');
+        setConfirmationModalOnConfirm(() => async () => {
+          await updateLce(lce);
+        });
       }
     }
     setEditMode(!editMode);
+  };
+
+  const updateLce = async (env: AnsibleLce): Promise<void> => {
+    try {
+      await axios.put(
+        // TODO: Should probably be PUT
+        `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${env.id}`,
+        {
+          lifecycle_environment: lifecycleEnvironment,
+        }
+      );
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `UPDATE_LCE_${env.name}_SUCC`,
+          message: `Successfully updated Ansible environment "${env.name}"!`,
+          sticky: false,
+        })
+      );
+      refreshRequest();
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `UPDATE_LCE_${env.name}_ERR`,
+          message: `Updating of Ansible environment "${
+            env.name
+          }" failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    }
+  };
+
+  const destroyLce = async (lce: AnsibleLce): Promise<void> => {
+    try {
+      await axios.delete(
+        `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${lce.id}`
+      );
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `DESTROY_LCE_${lce.name}_SUCC`,
+          message: `Successfully destroyed Ansible environment "${lce.name}"!`,
+          sticky: false,
+        })
+      );
+      refreshRequest();
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `DESTROY_LCE_${lce.name}_ERR`,
+          message: `Destruction of Ansible environment "${
+            lce.name
+          }" failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    }
   };
 
   const handleEditContent = async (): Promise<void> => {
@@ -66,7 +151,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               lce={lce}
               pathEditMode={pathEditMode}
               editMode={editMode}
-              handleEdit={askConfirmUpdate}
+              handleEdit={handleLceUpdate}
               handleDestroy={() => new Promise<void>(() => {})}
               handleEditContent={handleEditContent}
             />

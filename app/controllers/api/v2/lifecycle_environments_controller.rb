@@ -6,8 +6,9 @@ module Api
       include ::Api::Version2
 
       before_action :find_resource, only: %i[show update destroy update_content content]
-      before_action :find_path, only: %i[create update]
+      before_action :find_path, only: %i[create]
       before_action :find_organization, only: %i[create update_content]
+      before_action :find_assignment_target, only: %i[assign]
 
       def show
       end
@@ -81,6 +82,7 @@ module Api
 
           success = true
           ActiveRecord::Base.transaction do
+            @lifecycle_environment.direct_content_unit_versions.clear
             content_params[:content_assignments].each do |assignment|
               unit = ContentUnit.find(assignment[:id])
               unit_version = unit.content_unit_versions.find_by!(version: assignment[:version])
@@ -106,10 +108,7 @@ module Api
       end
 
       def assign
-        # TODO: This is shit
-
-        host = Host.find_by(id: params[:host_id])
-        host.update(ansible_lifecycle_environment_id: params[:id])
+        @target.update(ansible_lifecycle_environment_id: params[:id])
       end
 
       def destroy
@@ -120,6 +119,17 @@ module Api
       end
 
       private
+
+      def find_assignment_target
+        case params[:target_type]
+        when 'HOST'
+          @target = Host.find(params[:target_id])
+        when 'HOSTGROUP'
+          @target = Hostgroup.find(params[:target_id])
+        else
+          render_error('custom_error', status: :unprocessable_entity, locals: { message: "Unknown target type #{params[:target_type]}" })
+        end
+      end
 
       def lifecycle_environment_params
         params.require(:lifecycle_environment).permit(
@@ -132,7 +142,7 @@ module Api
             { content_assignments: %i[id version] },
           ]
         ).merge(
-          lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
+          #lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
           organization_id: params[:organization_id]
         )
       end

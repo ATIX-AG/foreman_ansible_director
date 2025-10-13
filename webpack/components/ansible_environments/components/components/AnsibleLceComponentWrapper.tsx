@@ -18,8 +18,13 @@ import {
 interface AnsibleLceComponentWrapperProps {
   lce: SparseAnsibleLce;
   pathEditMode: boolean;
+  refreshRequest: () => void;
   setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsConfirmationModalOpen: Dispatch<React.SetStateAction<boolean>>;
+  setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
 }
 
 interface GetAnsibleLceResponse extends AnsibleLce {}
@@ -27,8 +32,13 @@ interface GetAnsibleLceResponse extends AnsibleLce {}
 export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProps> = ({
   lce,
   pathEditMode,
+  refreshRequest,
   setLifecycleEnv,
   setIsContentUnitModalOpen,
+  setIsConfirmationModalOpen,
+  setConfirmationModalTitle,
+  setConfirmationModalBody,
+  setConfirmationModalOnConfirm,
 }) => {
   const organization = useForemanOrganization();
 
@@ -48,8 +58,13 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
       <AnsibleLceComponent
         lce={contentRequest.response}
         pathEditMode={pathEditMode}
+        refreshRequest={refreshRequest}
         setIsContentUnitModalOpen={setIsContentUnitModalOpen}
         setLifecycleEnv={setLifecycleEnv}
+        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+        setConfirmationModalTitle={setConfirmationModalTitle}
+        setConfirmationModalBody={setConfirmationModalBody}
+        setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
       />
     );
   } else if (contentRequest.status === 'ERROR') {

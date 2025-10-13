@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 
@@ -33,20 +39,24 @@ import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
   refreshRequest: () => void;
-  destroyLce: (env: AnsibleLce) => void;
-  destroyLcePath: (lcePath: AnsibleLcePath) => void;
   setLifecycleEnv: Dispatch<SetStateAction<AnsibleLce | undefined>>;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsConfirmationModalOpen: Dispatch<React.SetStateAction<boolean>>;
+  setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
+  setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
 }
 
-export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
+export const AnsibleLcePathComponent = ({
   lcePath,
   refreshRequest,
-  destroyLce,
-  destroyLcePath,
   setLifecycleEnv,
   setIsContentUnitModalOpen,
-}) => {
+  setIsConfirmationModalOpen,
+  setConfirmationModalTitle,
+  setConfirmationModalBody,
+  setConfirmationModalOnConfirm,
+}: AnsibleLcePathProps): ReactElement | null => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
 
   const [
@@ -63,12 +73,19 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     setLifecycleEnvironmentPath(lcePath);
   }, [lcePath]);
 
-  const askConfirmUpdate = async (): Promise<void> => {
+  const handleLcePathUpdate = async (): Promise<void> => {
     if (editMode) {
       if (
         JSON.stringify(lcePath) !== JSON.stringify(lifecycleEnvironmentPath)
       ) {
-        // TODO: update
+        if (lifecycleEnvironmentPath) {
+          setIsConfirmationModalOpen(true);
+          setConfirmationModalTitle(`Update "${lcePath.name}"?`);
+          setConfirmationModalBody('');
+          setConfirmationModalOnConfirm(() => async () => {
+            await updateLcePath(lifecycleEnvironmentPath);
+          });
+        }
       }
     }
     setEditMode(!editMode);
@@ -108,29 +125,116 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
     }
   };
 
-  const handleDestroy = async (): Promise<void> => {
+  const destroyLcePath = async (path: AnsibleLcePath): Promise<void> => {
+    // TODO: At some point I should refactor all these axios calls to a single function
     try {
       await axios.delete(
-        foremanUrl(
-          `/api/v2/ansible/lifecycle_environments/paths/${lcePath.id}`
-        )
+        `${foremanUrl('/api/v2/ansible/lifecycle_environments/paths')}/${
+          path.id
+        }`
       );
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `DESTROY_LCE_PATH_${path.name}_SUCC`,
+          message: `Successfully destroyed Ansible environment path "${path.name}"!`,
+          sticky: false,
+        })
+      );
+      refreshRequest();
     } catch (e) {
       dispatch(
         addToast({
           type: 'danger',
-          key: `DELETE_${lcePath.id}_ERR`,
-          message: `Promotion failed with error code "${
+          key: `DESTROY_LCE_${path.name}_ERR`,
+          message: `Destruction of Ansible environment path "${
+            path.name
+          }" failed with error code "${
             (e as { response: AxiosResponse }).response.status
           }".`,
           sticky: false,
         })
       );
-    } finally {
-      refreshRequest();
-      setLoadingButton(undefined);
     }
   };
+
+  const updateLcePath = async (path: AnsibleLcePath): Promise<void> => {
+    // TODO: At some point I should refactor all these axios calls to a single function
+    try {
+      await axios.put(
+        `${foremanUrl('/api/v2/ansible/lifecycle_environments/paths')}/${
+          path.id
+        }`,
+        {
+          lifecycle_environment_path: lifecycleEnvironmentPath,
+          organization_id: organization?.id,
+        }
+      );
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `UPDATE_LCE_PATH_${path.name}_SUCC`,
+          message: `Successfully updated Ansible environment path "${path.name}"!`,
+          sticky: false,
+        })
+      );
+      refreshRequest();
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `UPDATE_LCE_${path.name}_ERR`,
+          message: `Updating of Ansible environment path "${
+            path.name
+          }" failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    }
+  };
+
+  const handleDestroyLcePath = (path: AnsibleLcePath): void => {
+    setIsConfirmationModalOpen(true);
+    setConfirmationModalTitle(`Destroy "${path.name}"?`);
+    setConfirmationModalBody(
+      `This will destroy "${path.name}" and ${path.lifecycle_environments.length} lifecycle environments.\nAre you sure you want to destroy ${path.name}?`
+    );
+    setConfirmationModalOnConfirm(() => async () => {
+      await destroyLcePath(path);
+    });
+  };
+
+  // const destroyLce = async (lce: AnsibleLce): Promise<void> => {
+  //  try {
+  //    await axios.delete(
+  //      `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${lce.id}`
+  //    );
+  //    dispatch(
+  //      addToast({
+  //        type: 'success',
+  //        key: `DESTROY_LCE_${lce.name}_SUCC`,
+  //        message: `Successfully destroyed Ansible environment "${lce.name}"!`,
+  //        sticky: false,
+  //      })
+  //    );
+  //    refreshRequest();
+  //  } catch (e) {
+  //    dispatch(
+  //      addToast({
+  //        type: 'danger',
+  //        key: `DESTROY_LCE_${lce.name}_ERR`,
+  //        message: `Destruction of Ansible environment "${
+  //          lce.name
+  //        }" failed with error code "${
+  //          (e as { response: AxiosResponse }).response.status
+  //        }".`,
+  //        sticky: false,
+  //      })
+  //    );
+  //  }
+  // };
 
   const insertEnv = async (
     pos: 'before' | 'after',
@@ -292,8 +396,13 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
           <AnsibleLceComponentWrapper
             lce={env}
             pathEditMode={editMode}
+            refreshRequest={refreshRequest}
             setIsContentUnitModalOpen={setIsContentUnitModalOpen}
             setLifecycleEnv={setLifecycleEnv}
+            setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+            setConfirmationModalTitle={setConfirmationModalTitle}
+            setConfirmationModalBody={setConfirmationModalBody}
+            setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
           />
           <div
             style={{
@@ -326,8 +435,8 @@ export const AnsibleLcePathComponent: React.FC<AnsibleLcePathProps> = ({
             <AnsibleLcePathComponentHeaderActions
               lcePath={lifecycleEnvironmentPath}
               editMode={editMode}
-              handleEdit={askConfirmUpdate}
-              handleDestroy={destroyLcePath}
+              handleEdit={handleLcePathUpdate}
+              handleDestroy={handleDestroyLcePath}
             />
           ),
           hasNoOffset: true,

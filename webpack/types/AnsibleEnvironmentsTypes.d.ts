@@ -1,4 +1,4 @@
-import { AnsibleContentUnitAssignment } from './AnsibleContentTypes';
+import {AnsibleContentUnitAssignment, FullAnsibleContentUnitAssignment} from './AnsibleContentTypes';
 
 export interface AnsibleLcePath {
   id: number;
@@ -22,7 +22,10 @@ export interface SparseAnsibleLce {
 export interface AnsibleLce extends SparseAnsibleLce {
   content: AnsibleContentUnitAssignment[];
   // eslint-disable-next-line camelcase
-  execution_environment?: ExecutionEnvironment;
+}
+
+export interface DenseAnsibleLce extends SparseAnsibleLce {
+  content: FullAnsibleContentUnitAssignment[];
 }
 
 export interface ExecutionEnvironment {
