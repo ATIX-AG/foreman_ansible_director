@@ -9,9 +9,7 @@ import {
   Text,
 } from '@patternfly/react-core';
 
-import { Helmet as HelmetImport, HelmetProps } from 'react-helmet';
-
-const Helmet = (HelmetImport as unknown) as React.ComponentClass<HelmetProps>;
+import { Helmet } from 'react-helmet';
 
 interface PageProps {
   header: string;
