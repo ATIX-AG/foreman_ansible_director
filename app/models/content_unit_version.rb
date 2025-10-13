@@ -17,6 +17,8 @@ class ContentUnitVersion < AnsibleDirectorModel
   validates :version, presence: true
   validates :version, uniqueness: { scope: %i[versionable_type versionable_id] }
 
+  default_scope { order(version: :desc) }
+
   scope :collection_versions, -> { where(versionable_type: 'AnsibleCollection') }
   scope :role_versions, -> { where(versionable_type: 'AnsibleRole') }
 end
