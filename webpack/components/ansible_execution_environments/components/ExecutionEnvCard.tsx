@@ -7,13 +7,12 @@ import {
   Form,
   FormGroup,
   TextInput,
-  Button,
-  Bullseye,
+  Popover,
 } from '@patternfly/react-core';
+import styles from '@patternfly/react-styles/css/components/Form/form';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
-import { DropdownEditable } from './components/DropdownEditable';
 import { TextInputEditable } from './components/TextInputEditable';
-import { ANSIBLE_VERSIONS } from '../../../helpers/constants';
 
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
 import {
@@ -110,10 +109,40 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
               }}
             />
           </FormGroup>
-          <FormGroup label="Ansible version">
-            <DropdownEditable
+          <FormGroup
+            label="Ansible version"
+            labelIcon={
+              <Popover
+                headerContent={<div>ansible-core version</div>}
+                bodyContent={
+                  <div>
+                    The version of ansible-core to be used in this Execution
+                    environment. As ansible-core is installed from PyPi, the
+                    version must match one of{' '}
+                    <a
+                      href="https://pypi.org/project/ansible-core/#history"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      the available releases.
+                    </a>
+                  </div>
+                }
+              >
+                <button
+                  type="button"
+                  aria-label="More info for unit id field"
+                  onClick={e => e.preventDefault()}
+                  aria-describedby="content-unit-identifier-field-01"
+                  className={styles.formGroupLabelHelp}
+                >
+                  <HelpIcon />
+                </button>
+              </Popover>
+            }
+          >
+            <TextInputEditable
               isEditable={editMode}
-              options={ANSIBLE_VERSIONS}
               value={executionEnvironment.ansible_version}
               setValue={(_event, value) =>
                 setExecutionEnvironment({
@@ -123,7 +152,7 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
               }
             />
           </FormGroup>
-          <FormGroup label="Baked content">
+          {/* <FormGroup label="Baked content">
             <Bullseye>
               <Button
                 variant="control"
@@ -139,7 +168,7 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
                 }`}
               </Button>
             </Bullseye>
-          </FormGroup>
+          </FormGroup> */}
         </Form>
       </CardBody>
     </Card>

@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
   IndexResponse,
   PaginationProps,
@@ -10,6 +10,8 @@ import {
   useSetParamsAndApiAndSearch,
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
+import { addToast } from 'foremanReact/components/ToastsList';
+import { useDispatch } from 'react-redux';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { ExecutionEnvGrid } from '../ExecutionEnvGrid';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
@@ -48,6 +50,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   >(false);
 
   const organization = useForemanOrganization();
+  const dispatch = useDispatch();
 
   const executionEnvResponse = useTableIndexAPIResponse<
     GetAnsibleExecutionEnvResponse
@@ -80,9 +83,28 @@ const ExecutionEnvGridWrapper: React.FC = () => {
             selectedEnv.id
           }`
         );
+        dispatch(
+          addToast({
+            type: 'success',
+            key: `DESTROY_EE_${selectedEnv.name}_SUCC`,
+            message: `Successfully destroyed Ansible execution environment "${selectedEnv.name}"!`,
+            sticky: false,
+          })
+        );
         refreshRequest();
       } catch (e) {
-        // TODO: Error popup
+        dispatch(
+          addToast({
+            type: 'danger',
+            key: `DESTROY_EE_${selectedEnv.name}_ERR`,
+            message: `Destruction of Ansible execution environment "${
+              selectedEnv.name
+            }" failed with error code "${
+              (e as { response: AxiosResponse }).response.status
+            }".`,
+            sticky: false,
+          })
+        );
       }
     }
   };
@@ -103,8 +125,27 @@ const ExecutionEnvGridWrapper: React.FC = () => {
             },
           }
         );
+        dispatch(
+          addToast({
+            type: 'success',
+            key: `UPDATE_EE_${selectedEnv.name}_SUCC`,
+            message: `Successfully updated Ansible execution environment "${selectedEnv.name}"!`,
+            sticky: false,
+          })
+        );
       } catch (e) {
-        // TODO: Error popup
+        dispatch(
+          addToast({
+            type: 'danger',
+            key: `UPDATE_EE_${selectedEnv.name}_ERR`,
+            message: `Updating of Ansible execution environment "${
+              selectedEnv.name
+            }" failed with error code "${
+              (e as { response: AxiosResponse }).response.status
+            }".`,
+            sticky: false,
+          })
+        );
       }
     }
   };
@@ -121,9 +162,28 @@ const ExecutionEnvGridWrapper: React.FC = () => {
           content: env.content,
         },
       });
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `CREATE_EE_${env.name}_SUCC`,
+          message: `Successfully created Ansible execution environment "${env.name}"!`,
+          sticky: false,
+        })
+      );
       refreshRequest();
     } catch (e) {
-      // TODO: Error popup
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `CREATE_EE_${env.name}_ERR`,
+          message: `Creation of Ansible execution environment "${
+            env.name
+          }" failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
     }
   };
 
@@ -141,7 +201,7 @@ const ExecutionEnvGridWrapper: React.FC = () => {
   };
 
   if (executionEnvResponse.status === 'RESOLVED') {
-    if (executionEnvResponse.response.results.length > 0) {
+    if (executionEnvResponse.response.results.length > -1) {
       return (
         <>
           <ExecutionEnvGrid
@@ -159,12 +219,10 @@ const ExecutionEnvGridWrapper: React.FC = () => {
           />
           <ConfirmationModal
             isConfirmationModalOpen={isConfirmationModalOpen}
+            setIsConfirmationModalOpen={setIsConfirmationModalOpen}
             title={confirmationModalTitle}
             body={confirmationModalBody}
             onConfirm={performAction}
-            onAbort={() => {
-              setIsConfirmationModalOpen(false);
-            }}
           />
           {selectedEnv && (
             <ContentUnitModal
@@ -178,15 +236,6 @@ const ExecutionEnvGridWrapper: React.FC = () => {
         </>
       );
     }
-
-    return (
-      <EmptyPage
-        message={{
-          type: 'empty',
-          text: 'No execution environments found in this organization.',
-        }}
-      />
-    );
   } else if (executionEnvResponse.status === 'ERROR') {
     return null; // TODO: Handle request error
   }

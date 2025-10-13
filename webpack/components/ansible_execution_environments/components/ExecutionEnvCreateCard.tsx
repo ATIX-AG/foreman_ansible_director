@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import {
   Card,
   CardTitle,
@@ -9,8 +9,10 @@ import {
   TextInput,
   Form,
   FormGroup,
-  Button,
+  Popover,
 } from '@patternfly/react-core';
+import styles from '@patternfly/react-styles/css/components/Form/form';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import {
   AnsibleExecutionEnv,
@@ -18,8 +20,6 @@ import {
 } from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
 import { TextInputEditable } from './components/TextInputEditable';
-import { DropdownEditable } from './components/DropdownEditable';
-import { ANSIBLE_VERSIONS } from '../../../helpers/constants';
 
 interface ExecutionEnvCreateCardProps {
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
@@ -27,18 +27,24 @@ interface ExecutionEnvCreateCardProps {
   setSelectedEnv: Dispatch<
     SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
   >;
+  createModeOverride: boolean;
 }
 
 export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
   createEnvAction,
   setIsContentUnitModalOpen,
   setSelectedEnv,
+  createModeOverride,
 }) => {
   const [createMode, setCreateMode] = React.useState<boolean>(false);
 
   const [executionEnvironment, setExecutionEnvironment] = React.useState<
     AnsibleExecutionEnvCreate
-  >({ name: '', ansible_version: '', base_image_url: '', content: [] }); // TODO: defaults
+  >({ name: '', ansible_version: '2.19.3', base_image_url: '', content: [] }); // TODO: defaults
+
+  useEffect(() => {
+    setCreateMode(createModeOverride);
+  }, [createModeOverride]);
 
   const createExecutionEnv = async (): Promise<void> => {
     await createEnvAction(executionEnvironment);
@@ -113,10 +119,40 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
               }}
             />
           </FormGroup>
-          <FormGroup label="Ansible version">
-            <DropdownEditable
+          <FormGroup
+            label="Ansible version"
+            labelIcon={
+              <Popover
+                headerContent={<div>ansible-core version</div>}
+                bodyContent={
+                  <div>
+                    The version of ansible-core to be used in this Execution
+                    environment. As ansible-core is installed from PyPi, the
+                    version must match one of{' '}
+                    <a
+                      href="https://pypi.org/project/ansible-core/#history"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      the available releases.
+                    </a>
+                  </div>
+                }
+              >
+                <button
+                  type="button"
+                  aria-label="More info for unit id field"
+                  onClick={e => e.preventDefault()}
+                  aria-describedby="content-unit-identifier-field-01"
+                  className={styles.formGroupLabelHelp}
+                >
+                  <HelpIcon />
+                </button>
+              </Popover>
+            }
+          >
+            <TextInputEditable
               isEditable
-              options={ANSIBLE_VERSIONS}
               value={executionEnvironment.ansible_version}
               setValue={(_event, value) =>
                 setExecutionEnvironment({
@@ -126,7 +162,7 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
               }
             />
           </FormGroup>
-          <FormGroup label="Baked content">
+          {/*          <FormGroup label="Baked content"> TODO: evaluate whether this feature should be exposed to users
             <Bullseye>
               <Button
                 variant="control"
@@ -138,7 +174,7 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
                 Assign content units
               </Button>
             </Bullseye>
-          </FormGroup>
+          </FormGroup> */}
         </Form>
       </CardBody>
     </Card>

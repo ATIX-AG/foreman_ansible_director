@@ -1,18 +1,15 @@
 import React from 'react';
-import TableIndexPage from 'foremanReact/components/PF4/TableIndexPage/TableIndexPage';
 import ExecutionEnvGridWrapper from './components/ExecutionEnvGridWrapper';
+import { Page } from '../common/Page';
 
 const AnsibleExecutionEnvPage: React.FC = () => (
-  <TableIndexPage
-    apiUrl="/api/v2/version"
+  <Page
     header="Execution environments"
-    apiOptions={{ key: 'ANSIBLE_EXECUTION_ENV_API_REQUEST_KEY' }}
-    hasHelpPage
-    creatable={false}
-    columns={{}}
+    hasDocumentation={false}
+    customToolbarItems={[]}
   >
     <ExecutionEnvGridWrapper />
-  </TableIndexPage>
+  </Page>
 );
 
 export default AnsibleExecutionEnvPage;

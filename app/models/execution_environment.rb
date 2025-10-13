@@ -15,9 +15,9 @@ class ExecutionEnvironment < AnsibleDirectorModel
             length: { maximum: 255 }
 
   validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
-  validates :ansible_version,
-    inclusion: { in: ::ForemanAnsibleDirector::Constants::ANSIBLE_VERSIONS,
-                 message: 'Ansible version "%<value>s" is not supported.' }
+  #validates :ansible_version,
+  #  inclusion: { in: ::ForemanAnsibleDirector::Constants::ANSIBLE_VERSIONS,
+  #               message: 'Ansible version "%<value>s" is not supported.' }
 
   after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
 
@@ -38,7 +38,7 @@ class ExecutionEnvironment < AnsibleDirectorModel
         id: id,
         content: {
           base_image: base_image_url,
-          ansible_core_version: '2.19.0', # TODO: Update ansible version management
+          ansible_core_version: ansible_version, # TODO: Update ansible version management
           content_units: content_unit_versions.map do |cuv|
                            {
                              type: cuv.versionable.type == 'AnsibleCollection' ? 'collection' : 'role',

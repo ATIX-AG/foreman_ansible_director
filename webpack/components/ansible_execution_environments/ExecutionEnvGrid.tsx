@@ -1,5 +1,23 @@
-import { Gallery, GalleryItem } from '@patternfly/react-core';
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import {
+  Button,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
+  EmptyStateIcon,
+  EmptyStateVariant,
+  Gallery,
+  GalleryItem,
+} from '@patternfly/react-core';
+import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
+
+import React, {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+} from 'react';
 import {
   APIOptions,
   PaginationProps,
@@ -47,6 +65,7 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
     Array<AnsibleExecutionEnv>
   >();
   const [totalItemsCount, setTotalItemsCount] = React.useState<number>();
+  const [showCreateCard, setShowCreateCard] = React.useState<boolean>(false);
 
   useEffect(() => {
     setExecutionEnvironments(apiResponse.results);
@@ -69,43 +88,85 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
     setIsConfirmationModalOpen(true);
   };
 
+  const grid = (content: ReactElement | ReactElement[]): ReactElement => (
+    <div style={{ padding: '15px' }}>
+      <Gallery
+        hasGutter
+        minWidths={{
+          default: '100%',
+          md: '100px',
+          xl: '500px',
+        }}
+        maxWidths={{
+          md: '300px',
+          xl: '1fr',
+        }}
+      >
+        {content}
+      </Gallery>
+    </div>
+  );
+
+  const createCard = (createModeOverride: boolean = false): ReactElement => (
+    <ExecutionEnvCreateCard
+      createEnvAction={createEnvAction}
+      setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+      setSelectedEnv={setSelectedEnv}
+      createModeOverride={createModeOverride}
+    />
+  );
+  const gridContent = (): ReactElement | ReactElement[] | null => {
+    if (executionEnvironments && executionEnvironments.length > 0) {
+      return grid([
+        createCard(),
+        ...executionEnvironments.map(ee => (
+          <GalleryItem key={ee.id}>
+            <ExecutionEnvCard
+              executionEnv={ee}
+              handleDestroy={destroyEnv}
+              handleUpdate={updateEnv}
+              setSelectedEnv={setSelectedEnv}
+              setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+            />
+          </GalleryItem>
+        )),
+      ]);
+    }
+
+    if (showCreateCard) {
+      return grid([createCard(true)]);
+    }
+
+    return (
+      <EmptyState variant={EmptyStateVariant.xl}>
+        <EmptyStateHeader
+          headingLevel="h4"
+          titleText="No execution environments"
+          icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
+        />
+        <EmptyStateBody>
+          No execution environments found in this organization
+        </EmptyStateBody>
+        <EmptyStateFooter>
+          <EmptyStateActions>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setShowCreateCard(true);
+              }}
+            >
+              Create execution environment
+            </Button>
+          </EmptyStateActions>
+        </EmptyStateFooter>
+      </EmptyState>
+    );
+  };
+
   return (
     <>
-      {executionEnvironments && (
-        <div style={{ padding: '15px' }}>
-          <Gallery
-            hasGutter
-            minWidths={{
-              default: '100%',
-              md: '100px',
-              xl: '500px',
-            }}
-            maxWidths={{
-              md: '300px',
-              xl: '1fr',
-            }}
-          >
-            <ExecutionEnvCreateCard
-              createEnvAction={createEnvAction}
-              setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-              setSelectedEnv={setSelectedEnv}
-            />
-            {executionEnvironments.map(ee => (
-              <GalleryItem>
-                <ExecutionEnvCard
-                  key={ee.id}
-                  executionEnv={ee}
-                  handleDestroy={destroyEnv}
-                  handleUpdate={updateEnv}
-                  setSelectedEnv={setSelectedEnv}
-                  setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-                />
-              </GalleryItem>
-            ))}
-          </Gallery>
-        </div>
-      )}
-      {totalItemsCount && (
+      {gridContent()}
+      {totalItemsCount !== undefined && totalItemsCount > 0 && (
         <Pagination itemCount={totalItemsCount} onChange={onPagination} />
       )}
     </>
