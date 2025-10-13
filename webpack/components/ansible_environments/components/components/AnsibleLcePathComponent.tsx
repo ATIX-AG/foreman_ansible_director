@@ -45,6 +45,7 @@ interface AnsibleLcePathProps {
   setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
+  setIsExecutionEnvModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AnsibleLcePathComponent = ({
@@ -56,6 +57,7 @@ export const AnsibleLcePathComponent = ({
   setConfirmationModalTitle,
   setConfirmationModalBody,
   setConfirmationModalOnConfirm,
+  setIsExecutionEnvModalOpen,
 }: AnsibleLcePathProps): ReactElement | null => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
 
@@ -403,6 +405,7 @@ export const AnsibleLcePathComponent = ({
             setConfirmationModalTitle={setConfirmationModalTitle}
             setConfirmationModalBody={setConfirmationModalBody}
             setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
+            setIsExecutionEnvModalOpen={setIsExecutionEnvModalOpen}
           />
           <div
             style={{

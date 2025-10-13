@@ -9,10 +9,7 @@ import { AnsibleLcePathComponent } from './components/AnsibleLcePathComponent';
 
 import { AnsibleLibraryOverview } from './components/AnsibleLibraryOverview';
 import { ContentUnitModal } from '../../ansible_execution_environments/components/ContentUnitModal';
-import axios, { AxiosResponse } from 'axios';
-import { foremanUrl } from 'foremanReact/common/helpers';
-import { addToast } from 'foremanReact/components/ToastsList';
-import { useDispatch } from 'react-redux';
+import { AnsibleExecutionEnvSelectionModalWrapper } from './components/AnsibleExecutionEnvSelectionModalWrapper';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
 
 interface AnsibleLcePathIndexProps {
@@ -25,6 +22,10 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
   refreshRequest,
 }) => {
   const [isContentUnitModalOpen, setIsContentUnitModalOpen] = React.useState<
+    boolean
+  >(false);
+
+  const [isExecutionEnvModalOpen, setIsExecutionEnvModalOpen] = React.useState<
     boolean
   >(false);
 
@@ -72,18 +73,28 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
               setConfirmationModalTitle={setConfirmationModalTitle}
               setConfirmationModalBody={setConfirmationModalBody}
               setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
+              setIsExecutionEnvModalOpen={setIsExecutionEnvModalOpen}
             />
           </StackItem>
         ))}
       </Stack>
       {lifecycleEnv && (
-        <ContentUnitModal
-          isContentUnitModalOpen={isContentUnitModalOpen}
-          setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-          target={lifecycleEnv}
-          setTarget={setLifecycleEnv}
-          refreshRequest={refreshRequest}
-        />
+        <>
+          <ContentUnitModal
+            isContentUnitModalOpen={isContentUnitModalOpen}
+            setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+            target={lifecycleEnv}
+            setTarget={setLifecycleEnv}
+            refreshRequest={refreshRequest}
+          />
+          {isExecutionEnvModalOpen && (
+            <AnsibleExecutionEnvSelectionModalWrapper
+              setIsExecutionEnvModalOpen={setIsExecutionEnvModalOpen}
+              lifecycleEnv={lifecycleEnv}
+              refreshRequest={refreshRequest}
+            />
+          )}
+        </>
       )}
       <ConfirmationModal
         isConfirmationModalOpen={isConfirmationModalOpen}

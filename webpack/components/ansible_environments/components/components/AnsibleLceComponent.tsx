@@ -27,6 +27,7 @@ interface AnsibleLceComponentProps {
   setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
+  setIsExecutionEnvModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
@@ -39,6 +40,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   setConfirmationModalTitle,
   setConfirmationModalBody,
   setConfirmationModalOnConfirm,
+  setIsExecutionEnvModalOpen,
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const [lifecycleEnvironment, setLifecycleEnvironment] = React.useState<
@@ -133,6 +135,11 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     setIsContentUnitModalOpen(true);
   };
 
+  const handleEditExecutionEnv = async (): Promise<void> => {
+    setLifecycleEnv(lce);
+    setIsExecutionEnvModalOpen(true);
+  }
+
   return lifecycleEnvironment ? (
     <Card
       style={{
@@ -186,22 +193,18 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
                 color: 'var(--pf-global--Color--200)',
               }}
             >
-              EE:{' '}
-              {lifecycleEnvironment.execution_environment ? (
-                <Button
-                  onClick={(event: React.MouseEvent) => event.preventDefault()}
-                  component="a"
-                  isInline
-                  variant="link"
-                  href={`/ansible/execution_environments/${lifecycleEnvironment.execution_environment.id}/`}
-                  icon={<ExternalLinkSquareAltIcon />}
-                  iconPosition="end"
-                >
-                  {lifecycleEnvironment.execution_environment.name}
-                </Button>
-              ) : (
-                'None'
-              )}
+              Execution environment:{' '}
+              <Button
+                onClick={handleEditExecutionEnv}
+                component="a"
+                isInline
+                variant="link"
+                iconPosition="end"
+              >
+                {lifecycleEnvironment.execution_environment
+                  ? lifecycleEnvironment.execution_environment.name
+                  : 'None'}
+              </Button>
             </div>
           </SplitItem>
           <SplitItem isFilled />
@@ -212,6 +215,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               component="a"
               isInline
               variant="link"
+              isDisabled
             >
               {`${lifecycleEnvironment.content.length} content units`}
             </Button>

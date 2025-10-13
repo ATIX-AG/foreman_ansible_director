@@ -120,6 +120,7 @@ module Api
         params.require(:lifecycle_environment).permit(
           :name,
           :description,
+          :execution_environment_id,
         )
       end
 

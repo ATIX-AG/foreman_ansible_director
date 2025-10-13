@@ -25,6 +25,7 @@ interface AnsibleLceComponentWrapperProps {
   setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
+  setIsExecutionEnvModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 interface GetAnsibleLceResponse extends AnsibleLce {}
@@ -39,6 +40,7 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
   setConfirmationModalTitle,
   setConfirmationModalBody,
   setConfirmationModalOnConfirm,
+  setIsExecutionEnvModalOpen,
 }) => {
   const organization = useForemanOrganization();
 
@@ -65,6 +67,7 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
         setConfirmationModalTitle={setConfirmationModalTitle}
         setConfirmationModalBody={setConfirmationModalBody}
         setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
+        setIsExecutionEnvModalOpen={setIsExecutionEnvModalOpen}
       />
     );
   } else if (contentRequest.status === 'ERROR') {

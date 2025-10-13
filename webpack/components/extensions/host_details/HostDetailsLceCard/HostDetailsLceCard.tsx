@@ -95,11 +95,9 @@ export const HostDetailsLceCard = ({
         foremanUrl(
           `/api/v2/ansible/lifecycle_environments/${
             lceForName(selectedLce).id
-          }/assign`
+          }/assign/HOST/${hostDetails.id}`
         ),
-        {
-          host_id: hostDetails.id,
-        }
+        {}
       );
       dispatch(
         addToast({
