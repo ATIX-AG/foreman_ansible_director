@@ -86,6 +86,15 @@ Rails.application.routes.draw do
             get '/', action: :index
           end
           member do
+            get '/', action: :show
+          end
+          resources :ansible_variable_overrides, path: 'overrides', only: [] do
+            collection do
+              post '/', action: :create
+            end
+            member do
+              delete '/', action: :destroy
+            end
           end
         end
       end

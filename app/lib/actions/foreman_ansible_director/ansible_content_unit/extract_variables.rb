@@ -43,7 +43,7 @@ module Actions
           tar_reader = Gem::Package::TarReader.new(gzip_reader)
 
           variables_filter_list = %w[]
-          default_filter_list = %w[defaults/main.yml]
+          default_filter_list = %w[defaults/main.yml defaults/main.yaml]
 
           roles = Hash.new { |h, k| h[k] = {} }
 
