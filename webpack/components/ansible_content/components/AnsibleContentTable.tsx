@@ -11,7 +11,7 @@ import {
 } from './AnsibleContentTableWrapper';
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
-import { AnsibleVariablesDetail } from './AnsibleVariablesDetail/AnsibleVariablesDetail';
+import { AnsibleVariablesOverview } from '././AnsibleVariablesOverview/AnsibleVariablesOverview';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
 
 interface AnsibleContentTableProps {
@@ -117,7 +117,7 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
       </Table>
       <Pagination itemCount={apiResponse.total} onChange={onPagination} />
       {selectedVersionId !== '' && (
-        <AnsibleVariablesDetail
+        <AnsibleVariablesOverview
           selectedVersionId={selectedVersionId}
           selectedIdentifier={selectedIdentifier}
           selectedVersion={selectedVersion}

@@ -25,7 +25,7 @@ interface RolesRequest {
   roles: AnsibleRole[];
 }
 
-export const AnsibleVariablesDetail = ({
+export const AnsibleVariablesOverview = ({
   selectedVersionId,
   selectedVersion,
   selectedIdentifier,
