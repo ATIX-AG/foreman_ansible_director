@@ -20,7 +20,8 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "no-undef": "off"
   },
   "settings": {
     "import/resolver": {
