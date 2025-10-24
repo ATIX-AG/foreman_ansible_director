@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, {Dispatch, ReactElement, SetStateAction} from 'react';
 import {
   Bullseye,
   Button,
@@ -29,10 +29,12 @@ import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 
 interface AnsibleVariablesSelectorProps {
   ansibleRoles: AnsibleRole[];
+  setSelectedVariable: Dispatch<SetStateAction<AnsibleVariable | undefined>>;
 }
 
 export const AnsibleVariablesSelector = ({
   ansibleRoles,
+  setSelectedVariable,
 }: AnsibleVariablesSelectorProps): ReactElement => {
   const [selectedRole, setSelectedRole] = React.useState<string>('');
   const [availableVariables, setAvailableVariables] = React.useState<
@@ -153,11 +155,13 @@ export const AnsibleVariablesSelector = ({
                                     aria-label="Actions"
                                   >
                                     <Button
-                                      onClick={() => {}}
+                                      onClick={() => {
+                                        setSelectedVariable(variable);
+                                      }}
                                       variant="control"
                                       key="view-action"
                                     >
-                                      Edit
+                                      Manage
                                     </Button>
                                   </DataListAction>,
                                 ]}

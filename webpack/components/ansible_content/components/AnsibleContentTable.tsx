@@ -11,8 +11,10 @@ import {
 } from './AnsibleContentTableWrapper';
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
-import { AnsibleVariablesOverview } from '././AnsibleVariablesOverview/AnsibleVariablesOverview';
+import { AnsibleVariablesOverview } from './AnsibleVariablesOverview/AnsibleVariablesOverview';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
+import { AnsibleVariable } from '../../../types/AnsibleVariableTypes';
+import { VariableManagementModalWrapper } from './AnsibleVariablesOverview/VariableManagementModal/VariableManagementModalWrapper';
 
 interface AnsibleContentTableProps {
   apiResponse: GetAnsibleContentResponse;
@@ -54,6 +56,10 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     confirmationModalOnConfirm,
     setConfirmationModalOnConfirm,
   ] = React.useState<() => void>(() => () => {});
+
+  const [selectedVariable, setSelectedVariable] = React.useState<
+    AnsibleVariable | undefined
+  >(undefined);
 
   const renderRows = (
     results: AnsibleContentUnitWithCounts[]
@@ -102,6 +108,7 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     return rows;
   };
 
+  console.log(selectedVariable);
   return (
     <>
       <Table aria-label="Simple table" isTreeTable variant="compact">
@@ -117,12 +124,21 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
       </Table>
       <Pagination itemCount={apiResponse.total} onChange={onPagination} />
       {selectedVersionId !== '' && (
-        <AnsibleVariablesOverview
-          selectedVersionId={selectedVersionId}
-          selectedIdentifier={selectedIdentifier}
-          selectedVersion={selectedVersion}
-          onClose={() => setSelectedVersionId('')}
-        />
+        <>
+          <AnsibleVariablesOverview
+            selectedVersionId={selectedVersionId}
+            selectedIdentifier={selectedIdentifier}
+            selectedVersion={selectedVersion}
+            onClose={() => setSelectedVersionId('')}
+            setSelectedVariable={setSelectedVariable}
+          />
+          {selectedVariable && (
+            <VariableManagementModalWrapper
+              variable={selectedVariable}
+              setSelectedVariable={setSelectedVariable}
+            />
+          )}
+        </>
       )}
       <ConfirmationModal
         isConfirmationModalOpen={isConfirmationModalOpen}

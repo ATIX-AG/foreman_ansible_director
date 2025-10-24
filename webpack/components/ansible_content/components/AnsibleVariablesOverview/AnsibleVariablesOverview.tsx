@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import {
   Modal,
   Button,
@@ -13,12 +13,14 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
 import { AnsibleVariablesSelector } from './AnsibleVariablesSelector';
+import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 
 interface AnsibleVariablesDetailProps {
   selectedVersionId: string;
   selectedVersion: string;
   selectedIdentifier: string;
   onClose: () => void;
+  setSelectedVariable: Dispatch<SetStateAction<AnsibleVariable | undefined>>;
 }
 
 interface RolesRequest {
@@ -30,6 +32,7 @@ export const AnsibleVariablesOverview = ({
   selectedVersion,
   selectedIdentifier,
   onClose,
+  setSelectedVariable,
 }: AnsibleVariablesDetailProps): ReactElement | null => {
   const rolesRequest = useAPI<RolesRequest>(
     'get',
@@ -61,6 +64,7 @@ export const AnsibleVariablesOverview = ({
           actions={actions}
           ouiaId="BasicModal"
           variant={ModalVariant.large}
+          style={{ minHeight: '400px' }}
         >
           {modalContent}
         </Modal>
@@ -70,7 +74,10 @@ export const AnsibleVariablesOverview = ({
 
   if (rolesRequest.status === 'RESOLVED') {
     return modal(
-      <AnsibleVariablesSelector ansibleRoles={rolesRequest.response.roles} />,
+      <AnsibleVariablesSelector
+        ansibleRoles={rolesRequest.response.roles}
+        setSelectedVariable={setSelectedVariable}
+      />,
       false
     );
   } else if (rolesRequest.status === 'ERROR') {
@@ -80,7 +87,7 @@ export const AnsibleVariablesOverview = ({
     return modal(
       <EmptyState>
         <EmptyStateHeader
-          titleText="Loading Task steps..."
+          titleText="Loading Ansible roles..."
           headingLevel="h4"
           icon={<EmptyStateIcon icon={Spinner} />}
         />
