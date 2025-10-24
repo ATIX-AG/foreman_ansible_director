@@ -26,6 +26,17 @@ module ForemanAnsibleDirector
 
       end
 
+      def edit_override(variable_override, override)
+
+        ActiveRecord::Base.transaction do
+          override.update!(
+            match: "#{variable_override[:matcher]}=#{variable_override[:matcher_value]}",
+            value: variable_override[:value],
+          )
+        end
+
+      end
+
       def destroy_override(override)
 
         ActiveRecord::Base.transaction do

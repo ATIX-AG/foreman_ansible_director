@@ -4,13 +4,19 @@ module Api
   module V2
     class AnsibleVariableOverridesController < AnsibleDirectorApiController
       before_action :find_variable, only: %i[create]
-      before_action :find_override, only: %i[destroy]
+      before_action :find_override, only: %i[update destroy]
 
 
       def create
         override = override_params
         create = Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value], override[:matcher], override[:matcher_value])
         ::ForemanAnsibleDirector::VariableService.create_override(create, @ansible_variable)
+      end
+
+      def update
+        override = override_params
+        edit = Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value], override[:matcher], override[:matcher_value])
+        ::ForemanAnsibleDirector::VariableService.edit_override(edit, @override)
       end
 
       def destroy

@@ -1,7 +1,21 @@
 object @ansible_variable
 
-attributes :id, :name, :default_value, :key_type
+attributes :id, :default_value
+
+node :name do |ansible_variable|
+  ansible_variable.key
+end
+
+node :type do |ansible_variable|
+  ansible_variable.key_type
+end
 
 child :lookup_values => :overrides do
-  attributes :id, :value, :match
+  attributes :id, :value
+  node :matcher do |lookup_value|
+    lookup_value.match.split('=').first
+  end
+  node :matcher_value do |lookup_value|
+    lookup_value.match.split('=').last
+  end
 end

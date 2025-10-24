@@ -94,6 +94,7 @@ Rails.application.routes.draw do
             end
             member do
               delete '/', action: :destroy
+              put '/', action: :update
             end
           end
         end

@@ -8,6 +8,7 @@ node :roles do |acv|
       name: role.name,
       variables: role.ansible_variables.map do |var|
         {
+          id: var.id,
           name: var.key,
           default_value: var.default_value,
           type: var.key_type,
