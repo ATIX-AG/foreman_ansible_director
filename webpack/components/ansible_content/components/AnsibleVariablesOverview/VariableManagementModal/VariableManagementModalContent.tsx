@@ -12,9 +12,16 @@ import {
   CardBody,
   CardHeader,
   CardTitle,
+  Dropdown,
+  DropdownItem,
+  DropdownList,
   Form,
   FormGroup,
+  Grid,
+  GridItem,
   Icon,
+  MenuToggle,
+  MenuToggleElement,
   Popover,
   Tab,
   Tabs,
@@ -61,6 +68,10 @@ export const VariableManagementModalContent = ({
   const [ansibleVariable, setAnsibleVariable] = React.useState<
     AnsibleVariableDetail | undefined
   >(undefined);
+
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = React.useState<boolean>(
+    false
+  );
 
   const variableTypes: AnsibleVariable['type'][] = [
     'string',
@@ -198,63 +209,91 @@ export const VariableManagementModalContent = ({
           />
           {ansibleVariable !== undefined && (
             <CardBody>
-              <Form isHorizontal>
-                <FormGroup label="Variable name">
-                  <TextInputEditable
-                    isEditable={isEditMode}
-                    value={ansibleVariable.name}
-                    setValue={(_event, value) => {
-                      setAnsibleVariable({
-                        ...ansibleVariable,
-                        name: value,
-                      });
-                    }}
-                  />
-                </FormGroup>
-                <FormGroup
-                  label="Variable type"
-                  labelIcon={
-                    <Popover
-                      headerContent={<div>Variable type</div>}
-                      bodyContent={<div>Bla bla regarding type checking</div>}
-                    >
-                      <button
-                        type="button"
-                        aria-label="More info for unit id field"
-                        onClick={e => e.preventDefault()}
-                        aria-describedby="content-unit-identifier-field-01"
-                        className={styles.formGroupLabelHelp}
-                      >
-                        <HelpIcon />
-                      </button>
-                    </Popover>
-                  }
-                >
-                  <ToggleGroup
-                    aria-label="Default with single selectable"
-                    areAllGroupsDisabled={!isEditMode}
-                  >
-                    {variableTypes.map(variableType => (
-                      <ToggleGroupItem
-                        text={
-                          variableType.charAt(0).toUpperCase() +
-                          variableType.slice(1)
-                        }
-                        buttonId="toggle-group-single-1"
-                        isSelected={ansibleVariable.type === variableType}
-                        onChange={() =>
+              <Form>
+                <Grid hasGutter>
+                  <GridItem span={8}>
+                    <FormGroup label="Variable name">
+                      <TextInputEditable
+                        isEditable={isEditMode}
+                        value={ansibleVariable.name}
+                        setValue={(_event, value) => {
                           setAnsibleVariable({
                             ...ansibleVariable,
-                            type: variableType,
-                          })
-                        }
+                            name: value,
+                          });
+                        }}
                       />
-                    ))}
-                  </ToggleGroup>
-                </FormGroup>
-                <FormGroup label="Default value">
-                  {valueAdapter(ansibleVariable)}
-                </FormGroup>
+                    </FormGroup>
+                  </GridItem>
+                  <GridItem span={4}>
+                    <FormGroup
+                      label="Variable type"
+                      labelIcon={
+                        <Popover
+                          headerContent={<div>Variable type</div>}
+                          bodyContent={
+                            <div>Bla bla regarding type checking</div>
+                          }
+                        >
+                          <button
+                            type="button"
+                            aria-label="More info for unit id field"
+                            onClick={e => e.preventDefault()}
+                            aria-describedby="content-unit-identifier-field-01"
+                            className={styles.formGroupLabelHelp}
+                          >
+                            <HelpIcon />
+                          </button>
+                        </Popover>
+                      }
+                    >
+                      <Dropdown
+                        isOpen={isTypeDropdownOpen}
+                        onSelect={(_event, value) => {
+                          setAnsibleVariable({
+                            ...ansibleVariable,
+                            type: value as AnsibleVariable['type'],
+                          });
+                        }}
+                        onOpenChange={(isOpen: boolean) =>
+                          setIsTypeDropdownOpen(isOpen)
+                        }
+                        toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                          <MenuToggle
+                            isDisabled={!isEditMode}
+                            ref={toggleRef}
+                            isFullWidth
+                            onClick={() =>
+                              setIsTypeDropdownOpen(!isTypeDropdownOpen)
+                            }
+                            isExpanded={isTypeDropdownOpen}
+                          >
+                            {ansibleVariable?.type.charAt(0).toUpperCase() +
+                              ansibleVariable?.type.slice(1)}
+                          </MenuToggle>
+                        )}
+                        shouldFocusToggleOnSelect
+                      >
+                        <DropdownList>
+                          {variableTypes.map(variableType => (
+                            <DropdownItem
+                              value={variableType}
+                              key="disabled link"
+                            >
+                              {variableType.charAt(0).toUpperCase() +
+                                variableType.slice(1)}
+                            </DropdownItem>
+                          ))}
+                        </DropdownList>
+                      </Dropdown>
+                    </FormGroup>
+                  </GridItem>
+                  <GridItem span={12}>
+                    <FormGroup label="Default value">
+                      {valueAdapter(ansibleVariable)}
+                    </FormGroup>
+                  </GridItem>
+                </Grid>
               </Form>
             </CardBody>
           )}

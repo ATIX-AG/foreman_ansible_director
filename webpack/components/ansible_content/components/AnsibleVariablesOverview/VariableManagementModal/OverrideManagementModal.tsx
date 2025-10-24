@@ -5,7 +5,6 @@ import React, {
   useEffect,
 } from 'react';
 import {
-  Bullseye,
   Form,
   FormGroup,
   FormSelect,
@@ -15,12 +14,12 @@ import {
   Split,
   SplitItem,
   Switch,
-  TextContent,
-  Text,
-  TextVariants,
   TextInput,
   Button,
   Popover,
+  MenuToggleElement,
+  MenuToggle,
+  Dropdown,
 } from '@patternfly/react-core';
 import OutlinedQuestionCircleIcon from '@patternfly/react-icons/dist/esm/icons/outlined-question-circle-icon';
 import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
@@ -101,11 +100,6 @@ export const OverrideManagementModal = ({
   const [isSimpleMatcherCreation, setIsSimpleMatcherCreation] = React.useState<
     boolean
   >(true);
-
-  const [
-    isSimpleMatcherPopoverOpen,
-    setIsSimpleMatcherPopoverOpen,
-  ] = React.useState<boolean>(false);
 
   const matcherRequest = useAPI<ApiResponseMap[typeof overrideMatcher]>( // TODO: Ideally, this request should not fire if isSimpleMatcherCreation is false
     'get',
@@ -206,34 +200,63 @@ export const OverrideManagementModal = ({
         ouiaId="BasicModal"
         variant={ModalVariant.large}
       >
-        <Switch
-          label="Simple Matcher Creation"
-          labelOff="Custom Matcher Creation"
-          id="checked-with-label-switch-on"
-          isChecked={isSimpleMatcherCreation}
-          hasCheckIcon
-          onChange={() => setIsSimpleMatcherCreation(!isSimpleMatcherCreation)}
-        />
-
-        <Popover
-          aria-label="Basic popover"
-          headerContent={<div>Matcher creation type</div>}
-          bodyContent={
-            <div>
-              <strong>Simple matcher creation</strong> mode allows you to set a
-              matcher and its type from a dropdown, while{' '}
-              <strong>custom matcher creation</strong> mode allows you to set a
-              matcher and its type manually. Custom matcher creation mode is
-              useful when you want to set a matcher that uses advanced
-              functionality like regular expressions.
-            </div>
-          }
-        >
-          <Button variant="plain" aria-label="Action" isInline>
-            <OutlinedQuestionCircleIcon />
-          </Button>
-        </Popover>
         <Form isHorizontal>
+          <Split hasGutter>
+            <SplitItem>
+              <FormGroup fieldId="override-name" isRequired>
+                <Switch
+                  label="Custom Matcher Creation"
+                  labelOff="Simple Matcher Creation"
+                  id="checked-with-label-switch-on"
+                  isChecked={isSimpleMatcherCreation}
+                  hasCheckIcon
+                  onChange={() =>
+                    setIsSimpleMatcherCreation(!isSimpleMatcherCreation)
+                  }
+                />
+                <Popover
+                  aria-label="Basic popover"
+                  headerContent={<div>Matcher creation type</div>}
+                  bodyContent={
+                    <div>
+                      <strong>Simple matcher creation</strong> mode allows you
+                      to set a matcher and its type from a dropdown, while{' '}
+                      <strong>custom matcher creation</strong> mode allows you
+                      to set a matcher and its type manually. Custom matcher
+                      creation mode is useful when you want to set a matcher
+                      that uses advanced functionality like regular expressions.
+                    </div>
+                  }
+                >
+                  <Button variant="plain" aria-label="Action" isInline>
+                    <OutlinedQuestionCircleIcon />
+                  </Button>
+                </Popover>
+              </FormGroup>
+            </SplitItem>
+            <SplitItem isFilled />
+            <SplitItem span={4}>
+              <FormGroup label="Type" fieldId="override-name">
+                <Dropdown
+                  isOpen={false}
+                  onSelect={(_event, value) => {}}
+                  onOpenChange={(isOpen: boolean) => {}}
+                  toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                    <MenuToggle
+                      isDisabled
+                      ref={toggleRef}
+                      isFullWidth
+                      onClick={() => {}}
+                      isExpanded={false}
+                    >
+                      {variable.type.charAt(0).toUpperCase() +
+                        variable.type.slice(1)}
+                    </MenuToggle>
+                  )}
+                />
+              </FormGroup>
+            </SplitItem>
+          </Split>
           {isSimpleMatcherCreation ? (
             <>
               <FormGroup label="Matcher type">

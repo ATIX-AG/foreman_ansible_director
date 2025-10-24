@@ -28,7 +28,7 @@ export const VariableManagementModalWrapper = ({
   const modal = (modalContent: ReactElement): ReactElement => (
     <React.Fragment>
       <Modal
-        style={{ minHeight: '400px' }}
+        style={{ minHeight: '500px' }}
         title={variable.name}
         isOpen
         onClose={() => setSelectedVariable(undefined)}
