@@ -5,7 +5,7 @@ module ForemanAnsibleDirector
     extend ActiveSupport::Concern
     included do
       include ForemanAnsibleDirector::ContentConsumer
-      belongs_to :lifecycle_environment, optional: true
+      belongs_to :lifecycle_environment, optional: true, foreign_key: :ansible_lifecycle_environment_id
     end
 
     # def ansible_lifecycle_environment_id
