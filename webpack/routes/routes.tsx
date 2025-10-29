@@ -2,7 +2,6 @@ import React, { JSX } from 'react';
 import { WrappedAnsibleContentPage } from '../components/ansible_content';
 import { WrappedAnsibleExecutionEnvPage } from '../components/ansible_execution_environments';
 import { WrappedAnsibleEnvironmentsPage } from '../components/ansible_environments';
-import { WrappedAnsibleTasksPage } from '../components/ansible_tasks';
 
 interface RouteConfig {
   path: string;
@@ -25,11 +24,6 @@ const routes: RouteConfig[] = [
   {
     path: '/ansible/environments/',
     render: props => <WrappedAnsibleEnvironmentsPage {...props} />,
-    exact: true,
-  },
-  {
-    path: '/ansible/tasks',
-    render: props => <WrappedAnsibleTasksPage {...props} />,
     exact: true,
   },
 ];
