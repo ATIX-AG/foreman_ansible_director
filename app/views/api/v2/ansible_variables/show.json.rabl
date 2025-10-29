@@ -12,6 +12,9 @@ end
 
 child :lookup_values => :overrides do
   attributes :id, :value
+  node :value do |lookup_value|
+    lookup_value.value_before_type_cast
+  end
   node :matcher do |lookup_value|
     lookup_value.match.split('=').first
   end

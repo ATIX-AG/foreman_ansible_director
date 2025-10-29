@@ -20,7 +20,7 @@ export const YamlAdapter = ({
   ): void => {
     passedEditor.layout();
     passedEditor.focus();
-    monaco.editor.getModels()[0].updateOptions({ tabSize: 5 });
+    monaco.editor.getModels()[0].updateOptions({ tabSize: 2 });
   };
 
   return (
