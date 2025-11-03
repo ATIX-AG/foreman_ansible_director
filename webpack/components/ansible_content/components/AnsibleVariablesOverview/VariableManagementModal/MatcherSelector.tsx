@@ -1,7 +1,4 @@
-import React, {
-  ReactElement,
-  useEffect,
-} from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import {
   Button,
   MenuToggle,
@@ -196,7 +193,6 @@ export const MatcherSelector = ({
           !isOpen && closeMenu();
         }}
         toggle={toggle}
-        shouldFocusFirstItemOnOpen={false}
       >
         <SelectList id="select-typeahead-listbox">
           {selectOptions.map((option, index) => (

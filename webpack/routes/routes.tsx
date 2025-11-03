@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import React, { ReactElement } from 'react';
 import { WrappedAnsibleContentPage } from '../components/ansible_content';
 import { WrappedAnsibleExecutionEnvPage } from '../components/ansible_execution_environments';
 import { WrappedAnsibleEnvironmentsPage } from '../components/ansible_environments';
@@ -6,7 +6,7 @@ import { WrappedAnsibleEnvironmentsPage } from '../components/ansible_environmen
 interface RouteConfig {
   path: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (props: any) => JSX.Element;
+  render: (props: any) => ReactElement;
   exact?: boolean;
 }
 

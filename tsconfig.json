@@ -9,7 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "jsx": "react-jsx",
-    "paths": {"foremanReact/*" :  ["./types/foremanReact/*"]}
+    "paths": {"foremanReact/*" :  ["./types/foremanReact/*"]},
+    "types": ["node"]
   },
   "include": [
     "./webpack/**/*"
