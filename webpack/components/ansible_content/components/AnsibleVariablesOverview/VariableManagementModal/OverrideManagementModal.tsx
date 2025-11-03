@@ -156,7 +156,7 @@ export const OverrideManagementModal = ({
         return (
           <YamlAdapter
             isEditMode
-            value={overrideValue as string}
+            value={String(overrideValue) as string}
             onChange={onChange}
           />
         );

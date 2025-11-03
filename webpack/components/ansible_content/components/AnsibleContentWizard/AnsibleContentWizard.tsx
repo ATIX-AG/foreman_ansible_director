@@ -15,8 +15,8 @@ import { ReviewStep } from './components/ReviewStep';
 import ProviderSelectionStep from './components/ProviderSelectionStep';
 import FinishFooter from './components/components/FinishFooter';
 import { ContentUnitInput } from './components/components/ContentUnitInput';
-import { YamlEditor } from './components/components/components/YamlEditor';
 import { DefaultFooter } from './components/components/DefaultFooter';
+import { YamlEditor } from '../../../common/YamlEditor';
 
 interface AnsibleContentWizardProps {
   isContentWizardOpen: boolean;

@@ -16,6 +16,7 @@
   "dependencies": {
     "@types/react-helmet": "^6.1.11",
     "@xyflow/react": "^12.8.5",
+    "react-ace": "^9.5.0",
     "react-helmet": "^6.1.0",
     "react-intl": "^7.1.10",
     "react-use-websocket": "^3.0.0"
@@ -23,7 +24,6 @@
   "devDependencies": {
     "@babel/core": "^7.7.0",
     "@monaco-editor/react": "^4.7.0",
-    "@patternfly/react-code-editor": "^5.4.14",
     "@patternfly/react-core": "^5.4.14",
     "@patternfly/react-table": "^5.4.14",
     "@sheerun/mutationobserver-shim": "^0.3.3",
@@ -42,7 +42,6 @@
     "eslint": "^6.7.2",
     "eslint-import-resolver-typescript": "^4.2.3",
     "eslint-plugin-import": "^2.31.0",
-    "monaco-editor": "^0.52.2",
     "prettier": "^1.19.1",
     "react-router": "^5.3.4",
     "ts-loader": "^9.5.2",

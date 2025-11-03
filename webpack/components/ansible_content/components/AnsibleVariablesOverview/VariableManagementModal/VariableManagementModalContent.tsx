@@ -135,7 +135,7 @@ export const VariableManagementModalContent = ({
           return (
             <YamlAdapter
               isEditMode={isEditMode}
-              value={variable.default_value as string}
+              value={String(variable.default_value) as string}
               onChange={onChange}
             />
           );
