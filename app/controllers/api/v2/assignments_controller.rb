@@ -64,24 +64,6 @@ module Api
 
       end
 
-      def finder(type)
-        case type
-
-        when 'ACR'
-          #@assignment_class = AnsibleContentAssignmentCollectionRole
-          AnsibleCollectionRole
-        when 'CONTENT'
-          ContentUnitVersion
-        when 'HOST'
-          Host::Managed
-        when 'HOSTGROUP'
-          Hostgroup
-        else
-          render_error('custom_error', status: :unprocessable_entity,
-                       locals: { message: "#{type} is not supported." })
-        end
-      end
-
       def find_resources
         assignment = assignment_params
         source_finder = finder(assignment[:source][:type])
@@ -100,10 +82,6 @@ module Api
         @target = target
       end
 
-      def find_target
-        finder = finder params[:target]
-        @target = finder.find_by(id: params[:target_id])
-      end
     end
   end
 end

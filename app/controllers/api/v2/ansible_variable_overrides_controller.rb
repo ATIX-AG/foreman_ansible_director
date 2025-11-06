@@ -5,7 +5,12 @@ module Api
     class AnsibleVariableOverridesController < AnsibleDirectorApiController
       before_action :find_variable, only: %i[create]
       before_action :find_override, only: %i[update destroy]
+      before_action :find_target, only: %i[index_for_target]
 
+      def index_for_target
+        include_overridable = ::Foreman::Cast.to_bool(params[:include_overridable])
+        @target_overrides = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target @target, include_overridable
+      end
 
       def create
         override = override_params
@@ -26,7 +31,7 @@ module Api
       private
 
       def override_params
-        params.require(:override).permit(:value, :matcher, :matcher_value)
+        params.require(:override).permit(:value, :matcher, :matcher_value, :overridable)
       end
 
       def find_override

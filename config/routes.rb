@@ -76,6 +76,11 @@ Rails.application.routes.draw do
         resources :ansible_variables, only: [] do
           collection do
             get '/', action: :index
+            resources :ansible_variable_overrides, path: 'overrides', only: [] do
+              collection do
+                get '/:target/:target_id', action: :index_for_target
+              end
+            end
           end
           member do
             get '/', action: :show
@@ -83,6 +88,7 @@ Rails.application.routes.draw do
           resources :ansible_variable_overrides, path: 'overrides', only: [] do
             collection do
               post '/', action: :create
+              get '/:target/:target_id', action: :index
             end
             member do
               delete '/', action: :destroy

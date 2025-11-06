@@ -5,6 +5,7 @@ export interface AnsibleVariable extends Identifiable {
   // eslint-disable-next-line camelcase
   default_value: string | boolean | number;
   type: AnsibleVariableType;
+  overridable: boolean;
 }
 
 export type AnsibleVariableType =
@@ -28,3 +29,19 @@ export interface AnsibleVariableOverrideCreate {
 export interface AnsibleVariableOverride
   extends AnsibleVariableOverrideCreate,
     Identifiable {}
+
+export interface MergedVariableOverride {
+  // eslint-disable-next-line camelcase
+  variable_id: string;
+  key: string;
+  type: AnsibleVariableType;
+  // eslint-disable-next-line camelcase
+  default_value: string | boolean | number;
+  overridable: boolean;
+  // eslint-disable-next-line camelcase
+  override_id: string | null;
+  // eslint-disable-next-line camelcase
+  override_matcher: string | null;
+  // eslint-disable-next-line camelcase
+  override_value: string | boolean | number | null;
+}

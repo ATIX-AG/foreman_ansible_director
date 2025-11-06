@@ -72,16 +72,18 @@ export const InnerLceAssignmentSelector = ({
       [unit: string]: { type: string; id: number }[];
     } = {};
 
-    assignedContent.forEach(assignedContentUnit => {
-      if (initialChosenUnits[assignedContentUnit.source_id] === undefined) {
-        initialChosenUnits[assignedContentUnit.source_id] = [];
-      }
-      initialChosenUnits[assignedContentUnit.source_id].push({
-        type: assignedContentUnit.source_type,
-        id: assignedContentUnit.consumable_id,
+    if (assignedContent) {
+      assignedContent.forEach(assignedContentUnit => {
+        if (initialChosenUnits[assignedContentUnit.source_id] === undefined) {
+          initialChosenUnits[assignedContentUnit.source_id] = [];
+        }
+        initialChosenUnits[assignedContentUnit.source_id].push({
+          type: assignedContentUnit.source_type,
+          id: assignedContentUnit.consumable_id,
+        });
       });
-    });
-    setChosenUnits({ ...initialChosenUnits });
+      setChosenUnits({ ...initialChosenUnits });
+    }
     setAvailableUnits(data);
     // This is intentional. setChosenUnits is also stable.
     // It will only change when the other two deps change.

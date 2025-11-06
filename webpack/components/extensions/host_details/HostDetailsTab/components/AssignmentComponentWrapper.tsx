@@ -56,7 +56,6 @@ export const AssignmentComponentWrapper = ({
   const organization = useForemanOrganization();
 
   let requestUrl;
-  console.log(ansibleLifecycleEnvironmentId);
 
   if (ansibleLifecycleEnvironmentId !== null) {
     requestUrl = foremanUrl(
@@ -78,6 +77,7 @@ export const AssignmentComponentWrapper = ({
     unnamedAssignmentType
   >('get', foremanUrl(`/api/v2/ansible/assignments/HOST/${hostId}`));
 
+  // TODO: Even though the API correctly returns an empty array when no content is assigned, the hook returns an empty object
   if (
     availableContent.status === 'RESOLVED' &&
     assignedContent.status === 'RESOLVED'

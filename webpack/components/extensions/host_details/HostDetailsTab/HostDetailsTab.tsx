@@ -16,6 +16,7 @@ import DatabaseIcon from '@patternfly/react-icons/dist/esm/icons/database-icon';
 import { UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 
 import { AssignmentComponentWrapper } from './components/AssignmentComponentWrapper';
+import { OverrideGridWrapper } from './components/OverrideGridWrapper';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 
@@ -24,6 +25,7 @@ interface HostDetailsTabProps
     // eslint-disable-next-line camelcase
     ansible_lifecycle_environment_id: number;
     id: number;
+    name: string;
   }> {}
 
 export const HostDetailsTab = ({
@@ -71,7 +73,7 @@ export const HostDetailsTab = ({
             </>
           }
         >
-          TODO
+          <OverrideGridWrapper hostId={response.id} fqdn={response.name} />
         </Tab>
       </Tabs>
     );

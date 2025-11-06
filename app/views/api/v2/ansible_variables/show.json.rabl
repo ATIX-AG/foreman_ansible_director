@@ -10,6 +10,10 @@ node :type do |ansible_variable|
   ansible_variable.key_type
 end
 
+node :overriable do |ansible_variable|
+  ansible_variable.overridable?
+end
+
 child :lookup_values => :overrides do
   attributes :id, :value
   node :value do |lookup_value|

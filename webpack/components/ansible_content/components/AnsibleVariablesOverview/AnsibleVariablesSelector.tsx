@@ -1,4 +1,4 @@
-import React, {Dispatch, ReactElement, SetStateAction} from 'react';
+import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import {
   Bullseye,
   Button,
@@ -9,20 +9,29 @@ import {
   DataListItemCells,
   DataListItemRow,
   DataListWrapModifier,
+  Dropdown,
+  DropdownItem,
+  DropdownList,
   EmptyState,
   EmptyStateHeader,
   EmptyStateIcon,
   Grid,
   GridItem,
+  Label,
+  MenuToggle,
+  MenuToggleElement,
   Panel,
   PanelMain,
   PanelMainBody,
   SearchInput,
   Stack,
   StackItem,
+  Switch,
 } from '@patternfly/react-core';
 import DatabaseIcon from '@patternfly/react-icons/dist/esm/icons/database-icon';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
+import EllipsisVIcon from '@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon';
+import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-icon';
 
 import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
@@ -41,6 +50,12 @@ export const AnsibleVariablesSelector = ({
     AnsibleVariable[]
   >([]);
 
+  // TODO: Maybe it would be smarter to store the role name of the currently open dropdown item
+  const [dropdownOpen, setDropdownOpen] = React.useState<{
+    [key: string]: boolean;
+  }>({});
+
+  // TODO: As for the header, this should be a table instead of the useless datalist
   return (
     <Grid hasGutter>
       <GridItem span={4}>
@@ -82,6 +97,65 @@ export const AnsibleVariablesSelector = ({
                               </DataListCell>,
                             ]}
                           />
+                          <DataListAction
+                            aria-labelledby="check-action-item1 check-action-action1"
+                            id="check-action-action1"
+                            aria-label="Actions"
+                            isPlainButtonAction
+                          >
+                            <Dropdown
+                              popperProps={{ position: 'right' }}
+                              onSelect={() => {}}
+                              toggle={(
+                                toggleRef: React.Ref<MenuToggleElement>
+                              ) => (
+                                <MenuToggle
+                                  ref={toggleRef}
+                                  isExpanded={
+                                    dropdownOpen[role.name] !== undefined &&
+                                    dropdownOpen[role.name]
+                                  }
+                                  onClick={() => {
+                                    setDropdownOpen(oldDropdownOpen => {
+                                      // eslint-disable-next-line standard/computed-property-even-spacing
+                                      oldDropdownOpen[
+                                        role.name
+                                      ] = !oldDropdownOpen[role.name];
+                                      return { ...oldDropdownOpen };
+                                    });
+                                  }}
+                                  variant="plain"
+                                  aria-label="Data list with checkboxes, actions and additional cells example kebab toggle 1"
+                                >
+                                  <EllipsisVIcon aria-hidden="true" />
+                                </MenuToggle>
+                              )}
+                              isOpen={
+                                dropdownOpen[role.name] !== undefined &&
+                                dropdownOpen[role.name]
+                              }
+                              onOpenChange={(isOpen: boolean) => {
+                                setDropdownOpen(oldDropdownOpen => {
+                                  // eslint-disable-next-line standard/computed-property-even-spacing
+                                  oldDropdownOpen[role.name] = !oldDropdownOpen[
+                                    role.name
+                                  ];
+                                  return { ...oldDropdownOpen };
+                                });
+                              }}
+                            >
+                              <DropdownList>
+                                <DropdownItem
+                                  key="link"
+                                  onClick={(event: any) =>
+                                    event.preventDefault()
+                                  }
+                                >
+                                  Allow overriding for all variables
+                                </DropdownItem>
+                              </DropdownList>
+                            </Dropdown>
+                          </DataListAction>
                         </DataListItemRow>
                       </DataListItem>
                     ))}
@@ -118,7 +192,7 @@ export const AnsibleVariablesSelector = ({
                               <DataListItemCells
                                 dataListCells={[
                                   <DataListCell
-                                    key="primary content"
+                                    key={`${variable.name}-name`}
                                     wrapModifier={
                                       DataListWrapModifier.breakWord
                                     }
@@ -128,7 +202,7 @@ export const AnsibleVariablesSelector = ({
                                     </span>
                                   </DataListCell>,
                                   <DataListCell
-                                    key="primary content"
+                                    key={`${variable.name}-default-value`}
                                     wrapModifier={
                                       DataListWrapModifier.breakWord
                                     }
@@ -138,7 +212,7 @@ export const AnsibleVariablesSelector = ({
                                     </span>
                                   </DataListCell>,
                                   <DataListCell
-                                    key="primary content"
+                                    key={`${variable.name}-type`}
                                     wrapModifier={
                                       DataListWrapModifier.breakWord
                                     }
@@ -146,23 +220,32 @@ export const AnsibleVariablesSelector = ({
                                     isFilled={false}
                                   >
                                     <span id="simple-item1">
-                                      {variable.type}
+                                      <Label color="blue">
+                                        {variable.type}
+                                      </Label>
                                     </span>
+                                  </DataListCell>,
+                                  <DataListCell
+                                    key={`${variable.name}-override`}
+                                    alignRight
+                                    isFilled={false}
+                                  >
+                                    <Switch isChecked={variable.overridable} />
                                   </DataListCell>,
                                   <DataListAction
                                     aria-labelledby="single-action-item1 single-action-action1"
                                     id="single-action-action1"
                                     aria-label="Actions"
+                                    isPlainButtonAction
                                   >
                                     <Button
                                       onClick={() => {
                                         setSelectedVariable(variable);
                                       }}
-                                      variant="control"
-                                      key="view-action"
-                                    >
-                                      Manage
-                                    </Button>
+                                      icon={<PencilAltIcon />}
+                                      variant="plain"
+                                      key={`${variable.name}-action`}
+                                    />
                                   </DataListAction>,
                                 ]}
                               />
