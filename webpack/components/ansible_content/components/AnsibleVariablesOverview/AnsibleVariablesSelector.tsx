@@ -24,6 +24,7 @@ import {
   PanelMain,
   PanelMainBody,
   SearchInput,
+  Spinner,
   Stack,
   StackItem,
   Switch,
@@ -33,6 +34,10 @@ import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources
 import EllipsisVIcon from '@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon';
 import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-icon';
 
+import axios, { AxiosResponse } from 'axios';
+import { foremanUrl } from 'foremanReact/common/helpers';
+import { addToast } from 'foremanReact/components/ToastsList';
+import { useDispatch } from 'react-redux';
 import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 
@@ -50,10 +55,66 @@ export const AnsibleVariablesSelector = ({
     AnsibleVariable[]
   >([]);
 
+  const [overridableOverrides, setOverridableOverrides] = React.useState<{
+    [key: string]: boolean;
+  }>({});
+
   // TODO: Maybe it would be smarter to store the role name of the currently open dropdown item
   const [dropdownOpen, setDropdownOpen] = React.useState<{
     [key: string]: boolean;
   }>({});
+
+  const [variableUpdating, setVariableUpdating] = React.useState<string>('');
+
+  const dispatch = useDispatch();
+
+  const onOverrideToggle = async (
+    variable: AnsibleVariable,
+    checked: boolean
+  ): Promise<void> => {
+    try {
+      setVariableUpdating(variable.id);
+      await axios.put(
+        `${foremanUrl('/api/v2/ansible/ansible_variables/')}/${variable.id}`,
+        {
+          ansible_variable: {
+            key: variable.name,
+            type: variable.type,
+            default_value: variable.default_value,
+            overridable: checked,
+          },
+        }
+      );
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `UPDATE_ANSIBLE_VARIABLE_${variable.id}_SUCC`,
+          message: `Successfully edited override for "${variable.name}"!`,
+          sticky: false,
+        })
+      );
+
+      setOverridableOverrides(prevState => {
+        prevState[variable.id] = checked;
+        return { ...prevState };
+      });
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `UPDATE_ANSIBLE_VARIABLE_${variable.id}_ERR`,
+          message: `Updating of Ansible variable "${
+            variable.name
+          }" failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    } finally {
+      setVariableUpdating('');
+    }
+  };
 
   // TODO: As for the header, this should be a table instead of the useless datalist
   return (
@@ -97,7 +158,7 @@ export const AnsibleVariablesSelector = ({
                               </DataListCell>,
                             ]}
                           />
-                          <DataListAction
+                          {/* <DataListAction
                             aria-labelledby="check-action-item1 check-action-action1"
                             id="check-action-action1"
                             aria-label="Actions"
@@ -155,7 +216,7 @@ export const AnsibleVariablesSelector = ({
                                 </DropdownItem>
                               </DropdownList>
                             </Dropdown>
-                          </DataListAction>
+                          </DataListAction> */}
                         </DataListItemRow>
                       </DataListItem>
                     ))}
@@ -230,7 +291,22 @@ export const AnsibleVariablesSelector = ({
                                     alignRight
                                     isFilled={false}
                                   >
-                                    <Switch isChecked={variable.overridable} />
+                                    {variableUpdating === variable.id ? (
+                                      <Spinner
+                                        size="md"
+                                        aria-label="Contents of the medium example"
+                                      />
+                                    ) : (
+                                      <Switch
+                                        isChecked={
+                                          overridableOverrides[variable.id] ||
+                                          variable.overridable
+                                        }
+                                        onChange={(event, checked) =>
+                                          onOverrideToggle(variable, checked)
+                                        }
+                                      />
+                                    )}
                                   </DataListCell>,
                                   <DataListAction
                                     aria-labelledby="single-action-item1 single-action-action1"

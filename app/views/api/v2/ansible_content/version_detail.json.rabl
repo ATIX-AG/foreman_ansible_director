@@ -11,6 +11,7 @@ node :roles do |acv|
           id: var.id,
           name: var.key,
           default_value: var.default_value,
+          overridable: var.overridable?,
           type: var.key_type,
         }
       end

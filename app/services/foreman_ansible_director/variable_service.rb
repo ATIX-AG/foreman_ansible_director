@@ -14,6 +14,19 @@ module ForemanAnsibleDirector
 
       end
 
+      def edit_variable(variable_update, variable)
+
+        ActiveRecord::Base.transaction do
+          variable.update!(
+            key: variable_update[:key],
+            key_type: variable_update[:type],
+            default_value: variable_update[:default_value],
+            override: variable_update[:overridable]
+          )
+        end
+
+      end
+
       def create_override(variable_override, variable)
 
         ActiveRecord::Base.transaction do
