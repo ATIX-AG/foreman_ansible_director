@@ -6,3 +6,10 @@ require 'test_helper'
 # Add plugin to FactoryBot's paths
 FactoryBot.definition_file_paths << File.join(File.dirname(__FILE__), 'factories')
 FactoryBot.reload
+
+
+class ForemanAnsibleDirectorTestCase < ActiveSupport::TestCase
+  setup do
+    User.current = User.find_by login: 'admin'
+  end
+end
