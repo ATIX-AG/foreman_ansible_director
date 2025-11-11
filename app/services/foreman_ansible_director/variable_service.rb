@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ForemanAnsibleDirector
   class VariableService
     class << self
@@ -51,7 +49,9 @@ module ForemanAnsibleDirector
       end
 
       def get_overrides_for_target(target, include_overridable: false)
+        matcher_value = matcher(target)
         ids = target.ansible_content_assignments.pluck(:consumable_id)
+        return [] unless ids.length.positive?
         sql = if include_overridable
                 <<-SQL
             SELECT lookup_keys.id,
@@ -64,7 +64,7 @@ module ForemanAnsibleDirector
                    lv.value
             FROM lookup_keys
             LEFT OUTER JOIN lookup_values lv ON lookup_keys.id = lv.lookup_key_id
-            WHERE (lv.match = '#{ActiveRecord::Base.sanitize_sql(matcher(target))}'#{' '}
+            WHERE (lv.match = '#{ActiveRecord::Base.sanitize_sql(matcher_value)}'
                    OR lookup_keys.override = true)
               AND lookup_keys.ownable_id IN (#{ids.join(',')})
                 SQL
@@ -81,7 +81,7 @@ module ForemanAnsibleDirector
                    lv.value
             FROM lookup_keys
             LEFT OUTER JOIN lookup_values lv ON lookup_keys.id = lv.lookup_key_id
-            WHERE lv.match = '#{ActiveRecord::Base.sanitize_sql(matcher(target))}'
+            WHERE lv.match = '#{ActiveRecord::Base.sanitize_sql(matcher_value)}'
               AND lookup_keys.ownable_id IN (#{ids.join(',')})
                 SQL
 
