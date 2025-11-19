@@ -43,6 +43,8 @@ module ForemanAnsibleDirector
       ::Host::Managed.include ForemanAnsibleDirector::HostExtensions
       ::Hostgroup.include ForemanAnsibleDirector::HostgroupExtensions
       ::LookupKey.include ForemanAnsibleDirector::LookupKeysExtensions
+      ::ConfigReportImporter.include ForemanAnsibleDirector::AnsibleReportImporter
+      ReportImporter.register_smart_proxy_feature('Ansible')
     end
 
     initializer 'foreman_ansible_director.apipie' do

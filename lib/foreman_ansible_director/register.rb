@@ -20,6 +20,9 @@ Foreman::Plugin.register :foreman_ansible_director do
 
   register_global_js_file 'global'
 
+  register_report_origin 'Ansible', 'ConfigReport'
+  register_report_scanner ForemanAnsibleDirector::AnsibleReportScanner
+
   extend_rabl_template 'api/v2/hosts/main', '/api/v2/hosts/ansible_lifecycle_environment'
   parameter_filter Host, :ansible_lifecycle_environment_id
 end
