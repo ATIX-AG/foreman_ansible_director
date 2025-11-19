@@ -13,7 +13,6 @@ Rails.application.routes.draw do
             post '/', action: :create_units
             get '/', action: :index
             delete '/', action: :destroy_units
-            post '/assign', action: :assign
             get '/:version', action: :version_detail
           end
         end
@@ -58,11 +57,6 @@ Rails.application.routes.draw do
             get '/content', action: :content
           end
         end
-        resources :ansible_runs, only: [] do
-          collection do
-            post '/run_all', action: :run_all
-          end
-        end
         resources :assignments, only: [] do
           collection do
             get '/:target/:target_id', action: :get_assignments
@@ -76,11 +70,6 @@ Rails.application.routes.draw do
         resources :ansible_variables, only: [] do
           collection do
             get '/', action: :index
-            resources :ansible_variable_overrides, path: 'overrides', only: [] do
-              collection do
-                get '/:target/:target_id', action: :index_for_target
-              end
-            end
           end
           member do
             get '/', action: :show
@@ -89,7 +78,7 @@ Rails.application.routes.draw do
           resources :ansible_variable_overrides, path: 'overrides', only: [] do
             collection do
               post '/', action: :create
-              get '/:target/:target_id', action: :index
+              get '/:target/:target_id', action: :index_for_target
             end
             member do
               delete '/', action: :destroy
