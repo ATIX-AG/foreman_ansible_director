@@ -39,7 +39,7 @@ module Actions
               def poll_external_task
                 remote_update_task = output&.[](:collection_remote_update_response)&.[](:task) # TODO: Error handling
                 task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(remote_update_task).request
-                task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
+                task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
                 { progress: task_status.progress }
               end

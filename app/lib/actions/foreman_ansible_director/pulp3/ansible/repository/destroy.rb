@@ -30,7 +30,7 @@ module Actions
             def poll_external_task
               repository_destroy_task = output&.[](:repository_destroy_response)&.[](:task)
               task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(repository_destroy_task).request
-              task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
+              task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
               { progress: task_status.progress }
             end

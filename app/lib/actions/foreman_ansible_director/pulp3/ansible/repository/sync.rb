@@ -35,7 +35,7 @@ module Actions
             def poll_external_task
               sync_task_href = output&.[](:repository_sync_response)&.[](:task) # TODO: Error handling
               task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(sync_task_href).request
-              task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
+              task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
               { progress: task_status.progress }
             end

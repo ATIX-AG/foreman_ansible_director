@@ -38,7 +38,7 @@ module Actions
             def poll_external_task
               distribution_create_task_href = output&.[](:distribution_create_response)&.[](:task) # TODO: Handle Error
               task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(distribution_create_task_href).request
-              task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
+              task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
               if task_status.task_completed?
                 output.update(

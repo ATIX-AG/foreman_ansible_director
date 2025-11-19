@@ -32,7 +32,7 @@ module Actions
               def poll_external_task
                 collection_remote_destroy_task = output&.[](:collection_remote_destroy_response)&.[](:task)
                 task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(collection_remote_destroy_task).request
-                task_status = ::Parsers::Pulp3::Core::Task::Status.new(task)
+                task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
                 { progress: task_status.progress }
               end

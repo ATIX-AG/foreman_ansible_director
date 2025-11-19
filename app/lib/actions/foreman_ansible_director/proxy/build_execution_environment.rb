@@ -26,7 +26,7 @@ module Actions
 
         def poll_external_task
           task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(input[:proxy_task_id]).request
-          task_status = ::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
+          task_status = ::ForemanAnsibleDirector::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
 
           { progress: task_status.progress }
         end
