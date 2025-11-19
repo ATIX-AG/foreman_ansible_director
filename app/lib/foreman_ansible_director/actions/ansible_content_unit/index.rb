@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module AnsibleContentUnit
-      class Index < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+      class Index < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         input_format do
           param :repository_href, String, required: true
           param :content_unit_type, Symbol, required: true
@@ -19,22 +19,22 @@ module Actions
         def plan(args)
           sequence do
             repository_show_action = plan_action(
-              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Show,
+              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Show,
               repository_href: args[:repository_href]
             )
             if args[:content_unit_type] == :collection
               list_action = plan_action(
-                ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Content::Collection::List,
+                ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Collection::List,
                 repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
               )
             else
               list_action = plan_action(
-                ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Content::Role::List,
+                ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Role::List,
                 repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
               )
             end
 
-            extract_variables_action = plan_action(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::ExtractVariables,
+            extract_variables_action = plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ExtractVariables,
                                                     repository_show_action_output: repository_show_action.output,
                                                     list_action_output: list_action.output,
                                                     organization_id: args[:organization_id],

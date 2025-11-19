@@ -2,10 +2,10 @@
 
 require 'securerandom'
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module Proxy
-      class BuildExecutionEnvironment < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+      class BuildExecutionEnvironment < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         include Dynflow::Action::Polling
 
         input_format do

@@ -15,7 +15,7 @@ module ForemanAnsibleDirector
           content = ForemanAnsibleDirector::Generators::ContentGenerator.generate @target_host
 
           ForemanTasks.async_task(
-            ::Actions::ForemanAnsibleDirector::Proxy::RunPlaybook,
+            ::ForemanAnsibleDirector::Actions::Proxy::RunPlaybook,
             proxy_task_id: SecureRandom.uuid,
             playbook: playbook,
             inventory: inventory,

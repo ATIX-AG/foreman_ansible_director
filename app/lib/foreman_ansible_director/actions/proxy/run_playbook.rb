@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module Proxy
-      class RunPlaybook < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+      class RunPlaybook < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         include Dynflow::Action::Polling
 
         input_format do

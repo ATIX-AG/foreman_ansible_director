@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module Base
-      class AnsibleDirectorAction < Actions::EntryAction
+      class AnsibleDirectorAction < ::Actions::EntryAction
         def queue
           ::ForemanAnsibleDirector::DYNFLOW_QUEUE
         end

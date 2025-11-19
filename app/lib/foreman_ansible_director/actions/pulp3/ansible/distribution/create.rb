@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module Pulp3
       module Ansible
         module Distribution
-          class Create < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+          class Create < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
             include Dynflow::Action::Polling
 
             input_format do

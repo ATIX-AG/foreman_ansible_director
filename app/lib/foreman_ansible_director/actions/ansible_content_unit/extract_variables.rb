@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 require 'rubygems/package'
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module AnsibleContentUnit
-      class ExtractVariables < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+      class ExtractVariables < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         input_format do
           param :list_action_output, Object, required: true
           param :repository_show_action_output, Object, required: true

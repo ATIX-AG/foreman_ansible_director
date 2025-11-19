@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module AnsibleContentUnit
-      class Import < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+      class Import < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         input_format do
           param :unit, Object, required: true # SimpleAnsibleContentUnit
           param :organization_id, required: true
@@ -27,12 +27,12 @@ module Actions
         def plan_import(unit, organization_id)
           sequence do
             repository_create_action = plan_action(
-              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Create,
+              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
               name: "#{organization_id}-#{unit.name}"
             )
 
             distribution_create_action = plan_action(
-              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Distribution::Create,
+              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
               name: unit.name,
               base_path: "#{organization_id}/#{unit.name}",
               repository_href: repository_create_action.output['repository_create_response']['pulp_href']
@@ -45,7 +45,7 @@ module Actions
                 # TODO: OR-5511 - Git support
               else
                 collection_remote_create_action = plan_action(
-                  ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Create,
+                  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Create,
                   name: "#{organization_id}-#{unit.name}",
                   url: unit.source,
                   requirements: unit.collection_file
@@ -55,7 +55,7 @@ module Actions
               end
 
               _snyc_action = plan_action(
-                ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Sync,
+                ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                 remote_href: remote_href
               )
@@ -66,7 +66,7 @@ module Actions
                 # TODO: Git support: OR-5511
               else
                 role_remote_create_action = plan_action(
-                  ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Role::Create,
+                  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Role::Create,
                   name: "#{organization_id}-#{unit.name}",
                   url: unit.role_url
                 )
@@ -74,7 +74,7 @@ module Actions
                 remote_href = role_remote_create_action.output['role_remote_create_response']['pulp_href']
 
                 _snyc_action = plan_action(
-                  ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Sync,
+                  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
                   repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                   remote_href: remote_href
                 )
@@ -108,13 +108,13 @@ module Actions
 
           sequence do
             _remote_update_action = plan_action(
-              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Update,
+              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Update,
               collection_remote_href: remote_href,
               requirements: existing_unit.requirements_file(scu)
             )
 
             _snyc_action = plan_action(
-              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Sync,
+              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
               repository_href: repository_href,
               remote_href: remote_href
             )

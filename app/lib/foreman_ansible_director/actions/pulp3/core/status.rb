@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module Pulp3
       module Core
-        class Status < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+        class Status < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
           def queue
             ::ForemanAnsibleDirector::DYNFLOW_QUEUE
           end

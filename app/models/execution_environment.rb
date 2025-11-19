@@ -37,7 +37,7 @@ class ExecutionEnvironment < AnsibleDirectorModel
 
   def trigger_rebuild
     ForemanTasks.async_task(
-      ::Actions::ForemanAnsibleDirector::Proxy::BuildExecutionEnvironment,
+      ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
       proxy_task_id: SecureRandom.uuid,
       execution_environment_definition: {
         id: id,

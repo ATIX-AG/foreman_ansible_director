@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 if defined? ForemanRemoteExecution
-  module Actions
-    module ForemanAnsibleDirector
+  module ForemanAnsibleDirector
+    module Actions
       module RemoteExecution
         class AnsibleProvider < RemoteExecutionProvider
           class << self

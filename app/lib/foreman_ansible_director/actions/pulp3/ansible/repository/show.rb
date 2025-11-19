@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module Pulp3
       module Ansible
         module Repository
-          class Show < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+          class Show < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
             input_format do
               param :repository_href, String, required: true
             end

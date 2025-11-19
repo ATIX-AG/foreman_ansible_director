@@ -7,7 +7,7 @@ module ForemanAnsibleDirector
     config.to_prepare do
       RemoteExecutionProvider.register(
         :Ansible,
-        Actions::ForemanAnsibleDirector::RemoteExecution::AnsibleProvider,
+        ForemanAnsibleDirector::Actions::RemoteExecution::AnsibleProvider,
       )
 
       ForemanAnsibleDirector::Engine.register_rex_feature

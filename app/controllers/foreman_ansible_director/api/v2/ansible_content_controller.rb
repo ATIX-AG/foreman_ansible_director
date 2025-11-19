@@ -11,7 +11,7 @@ module ForemanAnsibleDirector
 
         def create_units
           resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_import_payload params[:units]
-          @bulk_create_task = ForemanTasks.sync_task(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::Bulk::Import,
+          @bulk_create_task = ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Import,
             resolved_content_units: resolved,
             organization_id: @organization.id)
         end
@@ -33,7 +33,7 @@ module ForemanAnsibleDirector
         def destroy_units
           resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload params[:units]
           @bulk_destroy_task =
-            ForemanTasks.sync_task(::Actions::ForemanAnsibleDirector::AnsibleContentUnit::Bulk::Destroy,
+            ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Destroy,
               resolved_content_units: resolved, organization_id: @organization.id)
         end
 

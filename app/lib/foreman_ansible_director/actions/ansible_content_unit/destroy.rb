@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Actions
-  module ForemanAnsibleDirector
+module ForemanAnsibleDirector
+  module Actions
     module AnsibleContentUnit
-      class Destroy < ::Actions::ForemanAnsibleDirector::Base::AnsibleDirectorAction
+      class Destroy < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         input_format do
           param :unit
           param :organization_id
@@ -53,16 +53,16 @@ module Actions
           acu = ContentUnit.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # find_unit
 
           concurrence do
-            plan_action(::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Destroy,
+            plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
               repository_href: acu.pulp_repository_href)
-            plan_action(::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Distribution::Destroy,
+            plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
               distribution_href: acu.pulp_distribution_href)
 
             if acu.collection?
-              plan_action(::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Destroy,
+              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Destroy,
                 collection_remote_href: acu.pulp_remote_href)
             else
-              plan_action(::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Role::Destroy,
+              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Role::Destroy,
                 role_remote_href: acu.pulp_remote_href)
             end
           end
@@ -72,11 +72,11 @@ module Actions
           acu = ::AnsibleCollection.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # Only collections
 
           sequence do
-            _remote_update_action = plan_action(::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Update,
+            _remote_update_action = plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Update,
               collection_remote_href: acu.pulp_remote_href,
               requirements: acu.requirements_file(unit, subtractive: true))
             _snyc_action = plan_action(
-              ::Actions::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Sync,
+              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
               repository_href: acu.pulp_repository_href,
               remote_href: acu.pulp_remote_href
             )
