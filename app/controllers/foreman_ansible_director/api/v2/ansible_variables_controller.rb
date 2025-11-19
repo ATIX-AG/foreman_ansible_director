@@ -11,7 +11,7 @@ module ForemanAnsibleDirector
 
         def update
           variable = variable_params
-          variable_update = Structs::AnsibleVariable::AnsibleVariableEdit.new(
+          variable_update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableEdit.new(
             variable[:key],
             variable[:type],
             variable[:default_value],

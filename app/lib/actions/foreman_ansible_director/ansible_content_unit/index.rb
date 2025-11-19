@@ -125,7 +125,7 @@ module Actions
 
                   ActiveRecord::Base.transaction do
                     cr_variables.each do |variable_name, variable_value|
-                      create = Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
+                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
                       ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
                     end
                   end
@@ -163,7 +163,7 @@ module Actions
 
                   ActiveRecord::Base.transaction do
                     cr_variables.each do |variable_name, variable_value|
-                      create = Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
+                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
                       ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
                     end
                   end
