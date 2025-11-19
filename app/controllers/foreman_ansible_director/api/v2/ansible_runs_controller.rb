@@ -9,10 +9,10 @@ module ForemanAnsibleDirector
         before_action :find_target_host, only: %i[run_all]
 
         def run_all
-          playbook = Generators::PlaybookGenerator.generate @target_host
-          inventory = Generators::InventoryGenerator.generate @target_host
+          playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate @target_host
+          inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate @target_host
 
-          content = Generators::ContentGenerator.generate @target_host
+          content = ForemanAnsibleDirector::Generators::ContentGenerator.generate @target_host
 
           ForemanTasks.async_task(
             ::Actions::ForemanAnsibleDirector::Proxy::RunPlaybook,

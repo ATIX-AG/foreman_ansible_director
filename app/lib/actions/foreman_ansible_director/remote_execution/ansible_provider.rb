@@ -17,11 +17,11 @@ if defined? ForemanRemoteExecution
 
             def proxy_command_options(template_invocation, host)
 
-              playbook = Generators::PlaybookGenerator.generate host
-              inventory = Generators::InventoryGenerator.generate host
+              playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate host
+              inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
 
-              content = Generators::ContentGenerator.generate host
-              variables = Generators::VariableGenerator.generate host
+              content = ForemanAnsibleDirector::Generators::ContentGenerator.generate host
+              variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate host
 
               unless host.lifecycle_environment.execution_environment
                 raise "Host #{host.name} is not in any Lifecycle environment"
