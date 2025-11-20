@@ -34,3 +34,7 @@ Metrics/ClassLength:
 
 Metrics/BlockLength:
   Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - db/seeds.d/*
