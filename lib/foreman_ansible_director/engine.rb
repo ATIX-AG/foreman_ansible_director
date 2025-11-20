@@ -37,12 +37,12 @@ module ForemanAnsibleDirector
     end
 
     config.to_prepare do
-      ::Organization.include ForemanAnsibleDirector::OrganizationExtensions
-      ::Host.include ForemanAnsibleDirector::HostExtensions
-      ::Host::Base.include ForemanAnsibleDirector::HostExtensions
-      ::Host::Managed.include ForemanAnsibleDirector::HostExtensions
-      ::Hostgroup.include ForemanAnsibleDirector::HostgroupExtensions
-      ::LookupKey.include ForemanAnsibleDirector::LookupKeysExtensions
+      ::Organization.include ::ForemanAnsibleDirector::Concerns::OrganizationExtensions
+      ::Host.include ::ForemanAnsibleDirector::Concerns::HostExtensions
+      ::Host::Base.include ::ForemanAnsibleDirector::Concerns::HostExtensions
+      ::Host::Managed.include ::ForemanAnsibleDirector::Concerns::HostExtensions
+      ::Hostgroup.include ::ForemanAnsibleDirector::Concerns::HostgroupExtensions
+      ::LookupKey.include ::ForemanAnsibleDirector::Concerns::LookupKeysExtensions
       ::ConfigReportImporter.include ForemanAnsibleDirector::AnsibleReportImporter
       ReportImporter.register_smart_proxy_feature('Ansible')
     end

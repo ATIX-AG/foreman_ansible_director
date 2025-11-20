@@ -3,7 +3,7 @@
 module ForemanAnsibleDirector
   class AnsibleCollectionRole < ::ForemanAnsibleDirector::AnsibleDirectorModel
 
-    include ForemanAnsibleDirector::VariableOwner
+    include ::ForemanAnsibleDirector::Concerns::VariableOwner
 
     belongs_to :ansible_collection_version,
       class_name: 'ContentUnitVersion', inverse_of: :ansible_collection_roles
