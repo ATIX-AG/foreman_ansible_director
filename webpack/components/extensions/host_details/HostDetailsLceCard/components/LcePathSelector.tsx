@@ -8,10 +8,7 @@ import {
   SelectOption,
   MenuToggleElement,
 } from '@patternfly/react-core';
-import {
-  AnsibleLcePath,
-  SparseAnsibleLce,
-} from '../../../../../types/AnsibleEnvironmentsTypes';
+import { AnsibleLcePath } from '../../../../../types/AnsibleEnvironmentsTypes';
 
 interface LcePathSelectorProps {
   lcePaths: AnsibleLcePath[];

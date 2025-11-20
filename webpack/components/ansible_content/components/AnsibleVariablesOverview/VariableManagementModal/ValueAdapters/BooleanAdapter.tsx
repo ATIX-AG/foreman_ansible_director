@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { Bullseye, ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
+import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 
 interface BooleanAdapterProps {
   isEditMode: boolean;

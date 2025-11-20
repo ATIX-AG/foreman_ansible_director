@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, {
   Dispatch,
   ReactElement,
@@ -131,9 +132,9 @@ export const AnsibleLcePathComponent = ({
     // TODO: At some point I should refactor all these axios calls to a single function
     try {
       await axios.delete(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments/paths')}/${
-          path.id
-        }`
+        `${foremanUrl(
+          '/api/v2/ansible_director/lifecycle_environments/paths'
+        )}/${path.id}`
       );
       dispatch(
         addToast({
@@ -164,9 +165,9 @@ export const AnsibleLcePathComponent = ({
     // TODO: At some point I should refactor all these axios calls to a single function
     try {
       await axios.put(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments/paths')}/${
-          path.id
-        }`,
+        `${foremanUrl(
+          '/api/v2/ansible_director/lifecycle_environments/paths'
+        )}/${path.id}`,
         {
           lifecycle_environment_path: lifecycleEnvironmentPath,
           organization_id: organization?.id,
@@ -244,14 +245,17 @@ export const AnsibleLcePathComponent = ({
     name?: string
   ): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/ansible_director/lifecycle_environments/'), {
-        lifecycle_environment: {
-          name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
-          position: pos === 'before' ? lce.position : lce.position + 1,
-        },
-        lifecycle_environment_path_id: lcePath.id,
-        organization_id: organization?.id,
-      });
+      await axios.post(
+        foremanUrl('/api/v2/ansible_director/lifecycle_environments/'),
+        {
+          lifecycle_environment: {
+            name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
+            position: pos === 'before' ? lce.position : lce.position + 1,
+          },
+          lifecycle_environment_path_id: lcePath.id,
+          organization_id: organization?.id,
+        }
+      );
     } catch (e) {
       dispatch(
         addToast({
@@ -272,14 +276,17 @@ export const AnsibleLcePathComponent = ({
 
   const insertFirstEnv = async (name: string): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/ansible_director/lifecycle_environments/'), {
-        lifecycle_environment: {
-          name,
-          position: 0,
-        },
-        lifecycle_environment_path_id: lcePath.id,
-        organization_id: organization?.id,
-      });
+      await axios.post(
+        foremanUrl('/api/v2/ansible_director/lifecycle_environments/'),
+        {
+          lifecycle_environment: {
+            name,
+            position: 0,
+          },
+          lifecycle_environment_path_id: lcePath.id,
+          organization_id: organization?.id,
+        }
+      );
     } catch (e) {
       dispatch(
         addToast({

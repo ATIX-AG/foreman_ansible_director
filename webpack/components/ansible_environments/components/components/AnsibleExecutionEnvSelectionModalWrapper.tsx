@@ -20,8 +20,6 @@ export const AnsibleExecutionEnvSelectionModalWrapper = ({
   lifecycleEnv,
   refreshRequest,
 }: AnsibleExecutionEnvSelectionModalWrapperProps): ReactElement => {
-  const a = 2;
-
   const organization = useForemanOrganization();
 
   const executionEnvResponse = useTableIndexAPIResponse<

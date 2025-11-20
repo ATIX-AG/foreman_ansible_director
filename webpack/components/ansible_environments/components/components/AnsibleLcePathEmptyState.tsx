@@ -6,9 +6,6 @@ import {
   EmptyStateActions,
   EmptyStateFooter,
 } from '@patternfly/react-core';
-import axios from 'axios';
-import { foremanUrl } from 'foremanReact/common/helpers';
-import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 
 interface AnsibleLcePathEmptyStateProps {
   insertFirstEnv: (name: string) => Promise<void>;

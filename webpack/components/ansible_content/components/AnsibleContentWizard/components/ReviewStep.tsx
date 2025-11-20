@@ -11,7 +11,7 @@ import {
   Chip,
   TextContent,
   Text,
-  TextVariants
+  TextVariants,
 } from '@patternfly/react-core';
 import { AnsibleContentUnitCreate } from '../../../../../types/AnsibleContentTypes';
 

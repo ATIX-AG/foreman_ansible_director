@@ -154,14 +154,17 @@ const ExecutionEnvGridWrapper: React.FC = () => {
     env: AnsibleExecutionEnvCreate
   ): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/ansible_director/execution_environments/'), {
-        execution_environment: {
-          name: env.name,
-          base_image_url: env.base_image_url,
-          ansible_version: env.ansible_version,
-          content: env.content,
-        },
-      });
+      await axios.post(
+        foremanUrl('/api/v2/ansible_director/execution_environments/'),
+        {
+          execution_environment: {
+            name: env.name,
+            base_image_url: env.base_image_url,
+            ansible_version: env.ansible_version,
+            content: env.content,
+          },
+        }
+      );
       dispatch(
         addToast({
           type: 'success',

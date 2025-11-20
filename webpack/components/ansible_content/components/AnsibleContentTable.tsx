@@ -108,7 +108,6 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     return rows;
   };
 
-  console.log(selectedVariable);
   return (
     <>
       <Table aria-label="Simple table" isTreeTable variant="compact">

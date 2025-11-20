@@ -1,5 +1,4 @@
 import {
-  Button,
   EmptyState,
   EmptyStateHeader,
   EmptyStateIcon,

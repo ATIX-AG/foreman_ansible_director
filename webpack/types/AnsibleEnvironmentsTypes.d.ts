@@ -1,4 +1,7 @@
-import {AnsibleContentUnitAssignment, FullAnsibleContentUnitAssignment} from './AnsibleContentTypes';
+import {
+  AnsibleContentUnitAssignment,
+  FullAnsibleContentUnitAssignment,
+} from './AnsibleContentTypes';
 
 export interface AnsibleLcePath {
   id: number;

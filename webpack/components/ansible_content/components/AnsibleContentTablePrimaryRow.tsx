@@ -78,16 +78,19 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
         );
         setConfirmationModalOnConfirm(() => async () => {
           try {
-            await axios.delete(foremanUrl('/api/v2/ansible_director/ansible_content'), {
-              data: {
-                organization_id: organization?.id,
-                units: [
-                  {
-                    unit_name: identifier,
-                  },
-                ],
-              },
-            });
+            await axios.delete(
+              foremanUrl('/api/v2/ansible_director/ansible_content'),
+              {
+                data: {
+                  organization_id: organization?.id,
+                  units: [
+                    {
+                      unit_name: identifier,
+                    },
+                  ],
+                },
+              }
+            );
             dispatch(
               addToast({
                 type: 'success',

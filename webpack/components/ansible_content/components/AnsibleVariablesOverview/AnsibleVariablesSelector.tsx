@@ -9,17 +9,12 @@ import {
   DataListItemCells,
   DataListItemRow,
   DataListWrapModifier,
-  Dropdown,
-  DropdownItem,
-  DropdownList,
   EmptyState,
   EmptyStateHeader,
   EmptyStateIcon,
   Grid,
   GridItem,
   Label,
-  MenuToggle,
-  MenuToggleElement,
   Panel,
   PanelMain,
   PanelMainBody,
@@ -31,7 +26,6 @@ import {
 } from '@patternfly/react-core';
 import DatabaseIcon from '@patternfly/react-icons/dist/esm/icons/database-icon';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
-import EllipsisVIcon from '@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon';
 import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-icon';
 
 import axios, { AxiosResponse } from 'axios';
@@ -60,6 +54,7 @@ export const AnsibleVariablesSelector = ({
   }>({});
 
   // TODO: Maybe it would be smarter to store the role name of the currently open dropdown item
+  // eslint-disable-next-line no-unused-vars
   const [dropdownOpen, setDropdownOpen] = React.useState<{
     [key: string]: boolean;
   }>({});
@@ -75,7 +70,9 @@ export const AnsibleVariablesSelector = ({
     try {
       setVariableUpdating(variable.id);
       await axios.put(
-        `${foremanUrl('/api/v2/ansible_director/ansible_variables/')}/${variable.id}`,
+        `${foremanUrl('/api/v2/ansible_director/ansible_variables/')}/${
+          variable.id
+        }`,
         {
           ansible_variable: {
             key: variable.name,

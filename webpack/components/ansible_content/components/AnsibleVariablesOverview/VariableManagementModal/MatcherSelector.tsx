@@ -73,7 +73,7 @@ export const MatcherSelector = ({
     }
 
     setSelectOptions(newSelectOptions);
-  }, [filterValue]);
+  }, [filterValue, isMatcherValueSelectOpen, matcherOptions]);
 
   const closeMenu = (): void => {
     setIsMatcherValueSelectOpen(false);

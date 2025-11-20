@@ -10,7 +10,6 @@ import {
   InputGroup,
   InputGroupItem,
   Popover,
-  Radio,
   TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
@@ -58,6 +57,8 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
     'collection'
   );
 
+  // TODO: Do I still need this
+  // eslint-disable-next-line no-unused-vars
   const handleUnitTypeChange = (
     _event: React.FormEvent<HTMLInputElement>
   ): void => {
@@ -134,27 +135,27 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
 
   return (
     <Form>
-      {/*<FormGroup*/}
-      {/*  role="radiogroup"*/}
-      {/*  fieldId="basic-form-radio-group"*/}
-      {/*  label="Unit type"*/}
-      {/*  isInline*/}
-      {/*>*/}
-      {/*  <Radio*/}
-      {/*    isChecked={unitType === 'collection'}*/}
-      {/*    name="collection-radio"*/}
-      {/*    onChange={handleUnitTypeChange}*/}
-      {/*    label="Collection"*/}
-      {/*    id="collection-radio-01"*/}
-      {/*  />*/}
-      {/*  <Radio*/}
-      {/*    isChecked={unitType === 'role'}*/}
-      {/*    name="role-radio"*/}
-      {/*    onChange={handleUnitTypeChange}*/}
-      {/*    label="Role"*/}
-      {/*    id="role-radio-01"*/}
-      {/*  />*/}
-      {/*</FormGroup>*/}
+      {/* <FormGroup */}
+      {/*  role="radiogroup" */}
+      {/*  fieldId="basic-form-radio-group" */}
+      {/*  label="Unit type" */}
+      {/*  isInline */}
+      {/* > */}
+      {/*  <Radio */}
+      {/*    isChecked={unitType === 'collection'} */}
+      {/*    name="collection-radio" */}
+      {/*    onChange={handleUnitTypeChange} */}
+      {/*    label="Collection" */}
+      {/*    id="collection-radio-01" */}
+      {/*  /> */}
+      {/*  <Radio */}
+      {/*    isChecked={unitType === 'role'} */}
+      {/*    name="role-radio" */}
+      {/*    onChange={handleUnitTypeChange} */}
+      {/*    label="Role" */}
+      {/*    id="role-radio-01" */}
+      {/*  /> */}
+      {/* </FormGroup> */}
       <FormGroup
         label={`${
           unitType === 'collection' ? 'Collection' : 'Role'

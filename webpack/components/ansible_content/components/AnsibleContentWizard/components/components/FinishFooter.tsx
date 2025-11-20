@@ -51,15 +51,20 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
           })
         );
       } else if (provider === 'galaxy') {
-        await axios.post(foremanUrl('/api/v2/ansible_director/ansible_content'), {
-          organization_id: organization?.id,
-          units: contentUnits.map(unit => ({
-            unit_name: unit.identifier,
-            unit_type: unit.type,
-            unit_source: unit.source,
-            unit_versions: unit.versions.map(versionObj => versionObj.version),
-          })),
-        });
+        await axios.post(
+          foremanUrl('/api/v2/ansible_director/ansible_content'),
+          {
+            organization_id: organization?.id,
+            units: contentUnits.map(unit => ({
+              unit_name: unit.identifier,
+              unit_type: unit.type,
+              unit_source: unit.source,
+              unit_versions: unit.versions.map(
+                versionObj => versionObj.version
+              ),
+            })),
+          }
+        );
         dispatch(
           addToast({
             type: 'success',

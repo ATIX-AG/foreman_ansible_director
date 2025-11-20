@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, {
   Dispatch,
   ReactElement,
@@ -166,7 +167,7 @@ export const OverrideManagementModal = ({
   };
 
   if (matcherRequest.status === 'ERROR') {
-    console.log('error'); // TODO: Handle request error
+    // TODO: Handle request error
   }
 
   return (

@@ -43,7 +43,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
         }
       );
     } catch (e) {
-      console.log(e); // TODO: Handle error
+      // TODO: Handle error
     } finally {
       setIsCreateButtonLoading(false);
       refreshRequest();

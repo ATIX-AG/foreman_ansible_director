@@ -71,9 +71,12 @@ export const AssignmentComponent = ({
     });
 
     try {
-      await axios.post(foremanUrl('/api/v2/ansible_director/assignments/bulk'), {
-        assignments: formattedUnits,
-      });
+      await axios.post(
+        foremanUrl('/api/v2/ansible_director/assignments/bulk'),
+        {
+          assignments: formattedUnits,
+        }
+      );
       dispatch(
         addToast({
           type: 'success',

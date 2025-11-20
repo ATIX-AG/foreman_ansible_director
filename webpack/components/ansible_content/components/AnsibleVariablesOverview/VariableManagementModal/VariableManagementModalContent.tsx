@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, {
   Dispatch,
   ReactElement,
@@ -6,12 +7,10 @@ import React, {
 } from 'react';
 
 import {
-  Bullseye,
   Button,
   Card,
   CardBody,
   CardHeader,
-  CardTitle,
   Dropdown,
   DropdownItem,
   DropdownList,
@@ -27,14 +26,13 @@ import {
   Tabs,
   TabTitleIcon,
   TabTitleText,
-  ToggleGroup,
-  ToggleGroupItem,
 } from '@patternfly/react-core';
 import CodeIcon from '@patternfly/react-icons/dist/esm/icons/code-icon';
 import CodeBranchIcon from '@patternfly/react-icons/dist/esm/icons/code-branch-icon';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
+import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 
 import styles from '@patternfly/react-styles/css/components/Form/form';
 
@@ -50,7 +48,6 @@ import { BooleanAdapter } from './ValueAdapters/BooleanAdapter';
 import { IntegerAdapter } from './ValueAdapters/IntegerAdapter';
 import { RealAdapter } from './ValueAdapters/RealAdapter';
 import { OverridesTabContent } from './OverridesTabContent';
-import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 
 interface VariableManagementModalProps {
   originalVariable: AnsibleVariableDetail;

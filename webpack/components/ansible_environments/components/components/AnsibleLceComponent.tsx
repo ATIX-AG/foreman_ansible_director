@@ -9,13 +9,13 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 
-import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-square-alt-icon';
-import { AnsibleLceComponentHeaderActions } from './AnsibleLceComponentHeaderActions';
-import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
+
+import { AnsibleLceComponentHeaderActions } from './AnsibleLceComponentHeaderActions';
+import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 
 interface AnsibleLceComponentProps {
   lce: AnsibleLce;
@@ -70,7 +70,9 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   const updateLce = async (env: AnsibleLce): Promise<void> => {
     try {
       await axios.put(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${env.id}`,
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${
+          env.id
+        }`,
         {
           lifecycle_environment: lifecycleEnvironment,
         }
@@ -100,16 +102,20 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     }
   };
 
-  const destroyLce = async (lce: AnsibleLce): Promise<void> => {
+  // TODO: implement
+  // eslint-disable-next-line no-unused-vars
+  const destroyLce = async (lceRef: AnsibleLce): Promise<void> => {
     try {
       await axios.delete(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${lce.id}`
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${
+          lceRef.id
+        }`
       );
       dispatch(
         addToast({
           type: 'success',
-          key: `DESTROY_LCE_${lce.name}_SUCC`,
-          message: `Successfully destroyed Ansible environment "${lce.name}"!`,
+          key: `DESTROY_LCE_${lceRef.name}_SUCC`,
+          message: `Successfully destroyed Ansible environment "${lceRef.name}"!`,
           sticky: false,
         })
       );
@@ -118,9 +124,9 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
       dispatch(
         addToast({
           type: 'danger',
-          key: `DESTROY_LCE_${lce.name}_ERR`,
+          key: `DESTROY_LCE_${lceRef.name}_ERR`,
           message: `Destruction of Ansible environment "${
-            lce.name
+            lceRef.name
           }" failed with error code "${
             (e as { response: AxiosResponse }).response.status
           }".`,
@@ -138,7 +144,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   const handleEditExecutionEnv = async (): Promise<void> => {
     setLifecycleEnv(lce);
     setIsExecutionEnvModalOpen(true);
-  }
+  };
 
   return lifecycleEnvironment ? (
     <Card
