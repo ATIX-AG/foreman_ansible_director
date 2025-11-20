@@ -46,7 +46,7 @@ module ForemanAnsibleDirector
         end
 
         def find_variable
-          @ansible_variable = AnsibleVariable.find(params[:ansible_variable_id])
+          @ansible_variable = ::ForemanAnsibleDirector::AnsibleVariable.find(params[:ansible_variable_id])
           unless @ansible_variable
             render_error('custom_error', status: :unprocessable_entity,
                           locals: { message: "Couldn't find ansible variable #{params[:ansible_variable_id]}" })

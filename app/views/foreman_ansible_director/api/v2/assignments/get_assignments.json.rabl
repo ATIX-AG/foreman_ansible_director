@@ -13,7 +13,7 @@ node :consumable_name do |assignment|
 end
 
 node :source_type do |assignment|
-  assignment.content_unit_version.versionable.type == 'AnsibleCollection' ? 'collection' : 'role'
+  assignment.content_unit_version.content_unit_type
 end
 
 node :source_identifier do |assignment|

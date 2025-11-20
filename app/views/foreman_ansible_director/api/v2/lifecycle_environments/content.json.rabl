@@ -13,12 +13,12 @@ node :content do |object|
         id: lcecu.versionable.id,
         name: lcecu.versionable.name,
         namespace: lcecu.versionable.namespace,
-        type: lcecu.versionable.type == 'AnsibleCollection' ? 'collection' : 'role',
+        type: lcecu.content_unit_type,
         identifier: lcecu.versionable.full_name,
         versions: [],
       }
 
-      unit[:versions] = if lcecu.versionable.type == 'AnsibleCollection'
+      unit[:versions] = if lcecu.content_unit_type == 'collection'
                           if @full_content
                             c_roles = lcecu.ansible_collection_roles.map do |collection_role|
                               {

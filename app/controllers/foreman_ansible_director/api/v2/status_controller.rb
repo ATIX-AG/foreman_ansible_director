@@ -8,9 +8,9 @@ module ForemanAnsibleDirector
 
         def content
           @global_content = {
-            roles: AnsibleRole.count,
-            collections: AnsibleCollection.count,
-            execution_environments: ExecutionEnvironment.count,
+            roles: ::ForemanAnsibleDirector::AnsibleRole.count,
+            collections: ::ForemanAnsibleDirector::AnsibleCollection.count,
+            execution_environments: ::ForemanAnsibleDirector::ExecutionEnvironment.count,
           }
         end
       end

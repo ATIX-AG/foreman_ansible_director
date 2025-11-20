@@ -26,7 +26,7 @@ module ForemanAnsibleDirector
         end
 
         def version_detail
-          @content_unit_version = ContentUnitVersion.find_by(id: params[:version])
+          @content_unit_version = ::ForemanAnsibleDirector::ContentUnitVersion.find_by(id: params[:version])
         end
 
         # TODO: This needs to check and invalidate built EEs
@@ -45,7 +45,7 @@ module ForemanAnsibleDirector
         end
 
         def resource_class
-          ContentUnit
+          ::ForemanAnsibleDirector::ContentUnit
         end
 
         def index_relation

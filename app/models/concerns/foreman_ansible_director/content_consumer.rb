@@ -5,7 +5,7 @@ module ForemanAnsibleDirector
     extend ActiveSupport::Concern
 
     included do
-      has_many :ansible_content_assignments, as: :assignable, dependent: :destroy
+      has_many :ansible_content_assignments, as: :assignable, dependent: :destroy, class_name: '::ForemanAnsibleDirector::AnsibleContentAssignment'
     end
   end
 end

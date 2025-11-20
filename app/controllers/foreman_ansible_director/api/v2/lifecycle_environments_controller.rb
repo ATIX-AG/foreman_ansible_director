@@ -12,6 +12,7 @@ module ForemanAnsibleDirector
         before_action :find_assignment_target, only: %i[assign]
 
         def show
+          a = 2
         end
 
         def content
@@ -21,7 +22,7 @@ module ForemanAnsibleDirector
         def create
           permitted_params = lifecycle_environment_params
           position = permitted_params.delete(:position)
-          @lifecycle_environment = LifecycleEnvironment.new(permitted_params)
+          @lifecycle_environment = ::ForemanAnsibleDirector::LifecycleEnvironment.new(permitted_params)
           @lifecycle_environment.organization = @organization
           @lifecycle_environment_path.insert_at_position(@lifecycle_environment, position || 0)
         end
@@ -56,7 +57,7 @@ module ForemanAnsibleDirector
             ActiveRecord::Base.transaction do
               @lifecycle_environment.direct_content_unit_versions.clear
               content_params[:content_assignments].each do |assignment|
-                unit = ContentUnit.find(assignment[:id])
+                unit = ::ForemanAnsibleDirector::ContentUnit.find(assignment[:id])
                 unit_version = unit.content_unit_versions.find_by!(version: assignment[:version])
                 success &&= @lifecycle_environment.assign_content_unit_version!(unit_version)
               end
@@ -87,7 +88,7 @@ module ForemanAnsibleDirector
         end
 
         def resource_scope
-          LifecycleEnvironment.all
+          ::ForemanAnsibleDirector::LifecycleEnvironment.all
         end
 
         private
@@ -133,7 +134,7 @@ module ForemanAnsibleDirector
         end
 
         def find_path
-          @lifecycle_environment_path = LifecycleEnvironmentPath.find(params[:lifecycle_environment_path_id])
+          @lifecycle_environment_path = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.find(params[:lifecycle_environment_path_id])
         end
       end
     end

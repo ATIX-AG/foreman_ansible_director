@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-class LifecycleEnvironmentHost < AnsibleDirectorModel
-  belongs_to :lifecycle_environment
-  belongs_to :host
+module ForemanAnsibleDirector
+  class LifecycleEnvironmentHost < ::ForemanAnsibleDirector::AnsibleDirectorModel
+    belongs_to :lifecycle_environment
+    belongs_to :host
+  end
+  # TODO: Delete class - LCEs are assigned to hosts via fk in Hosts
 end

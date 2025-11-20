@@ -32,7 +32,7 @@ module ForemanAnsibleDirector
             end
 
             unit_namespace, unit_name = name.match(/^(.*)\.(.*)$/).captures
-            existing_unit = ContentUnit.find_by(namespace: unit_namespace, name: unit_name)
+            existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit_namespace, name: unit_name)
 
             raise "Unit not found: #{name}" unless existing_unit # TODO: Proper error code
 

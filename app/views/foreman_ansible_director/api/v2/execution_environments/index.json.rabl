@@ -10,7 +10,7 @@ child execution_environment_content_units: :content do
   end
 
   node :type do |eecu|
-    eecu.content_unit.type == 'AnsibleCollection' ? 'collection' : 'role'
+    eecu.content_unit.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role'
   end
 
   node :identifier do |eecu|

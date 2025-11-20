@@ -22,9 +22,9 @@ module ForemanAnsibleDirector
 
           when 'ACR'
             #@assignment_class = AnsibleContentAssignmentCollectionRole
-            AnsibleCollectionRole
+            ::ForemanAnsibleDirector::AnsibleCollectionRole
           when 'CONTENT'
-            ContentUnitVersion
+            ::ForemanAnsibleDirector::ContentUnitVersion
           when 'HOST'
             Host::Managed
           when 'HOSTGROUP'

@@ -16,7 +16,7 @@ module ForemanAnsibleDirector
         def create
           permitted_params = execution_environment_params
           content = permitted_params.delete(:content)
-          @execution_environment = ExecutionEnvironment.new(permitted_params)
+          @execution_environment = ::ForemanAnsibleDirector::ExecutionEnvironment.new(permitted_params)
           @execution_environment.organization = @organization
 
           begin
@@ -71,7 +71,7 @@ module ForemanAnsibleDirector
             content_unit_id = content[:id]
             content_unit_version = content[:version]
 
-            unit = ContentUnit.find_by(id: content_unit_id)
+            unit = ::ForemanAnsibleDirector::ContentUnit.find_by(id: content_unit_id)
 
             unless unit
               @execution_environment.errors.add(:id,
@@ -87,13 +87,18 @@ module ForemanAnsibleDirector
               raise ActiveRecord::RecordInvalid, @execution_environment
             end
 
-            ExecutionEnvironmentContentUnit.find_or_create_by!(
+            ::ForemanAnsibleDirector::ExecutionEnvironmentContentUnit.find_or_create_by!(
               execution_environment: execution_env,
               content_unit: unit,
               content_unit_version: version_to_link
             )
           end
         end
+
+        def resource_class
+          ::ForemanAnsibleDirector::ExecutionEnvironment
+        end
+
       end
     end
   end

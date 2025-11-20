@@ -26,6 +26,10 @@ module ForemanAnsibleDirector
           params.require(:ansible_variable).permit(:key, :type, :default_value, :overridable)
         end
 
+        def resource_class
+          ::ForemanAnsibleDirector::AnsibleVariable
+        end
+
       end
     end
   end

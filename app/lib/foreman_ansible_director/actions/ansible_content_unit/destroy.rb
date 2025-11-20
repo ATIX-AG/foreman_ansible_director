@@ -28,7 +28,7 @@ module ForemanAnsibleDirector
         end
 
         def finalize
-          acu = ContentUnit.find_by(
+          acu = ::ForemanAnsibleDirector::ContentUnit.find_by(
             name: input[:unit_name],
             namespace: input[:unit_namespace],
             organization_id: input[:organization_id]
@@ -50,7 +50,7 @@ module ForemanAnsibleDirector
 
         # rubocop:disable Layout/LineLength
         def plan_full_destroy(unit, organization_id)
-          acu = ContentUnit.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # find_unit
+          acu = ::ForemanAnsibleDirector::ContentUnit.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # find_unit
 
           concurrence do
             plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
@@ -69,7 +69,7 @@ module ForemanAnsibleDirector
         end
 
         def plan_partial_destroy(unit, organization_id)
-          acu = ::AnsibleCollection.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # Only collections
+          acu = ::ForemanAnsibleDirector::AnsibleCollection.find_by(name: unit.unit_name, namespace: unit.unit_namespace, organization_id: organization_id) # Only collections
 
           sequence do
             _remote_update_action = plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Update,

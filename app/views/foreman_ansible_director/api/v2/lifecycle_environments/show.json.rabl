@@ -20,10 +20,10 @@ node :content do |object|
     object.content_unit_versions.map do |lcecu|
       {
         id: lcecu.versionable.id,
-        type: lcecu.versionable.type == 'AnsibleCollection' ? 'collection' : 'role',
+        type: lcecu.content_unit_type,
         identifier: lcecu.versionable.full_name,
         version: lcecu.version,
-        roles:  lcecu.versionable.type == 'AnsibleCollection' ? (lcecu.ansible_collection_roles.map { |role| { id: role.id, name: role.name } }) :[],
+        roles:  lcecu.content_unit_type == 'collection' ? (lcecu.ansible_collection_roles.map { |role| { id: role.id, name: role.name } }) :[],
       }
     end
   end

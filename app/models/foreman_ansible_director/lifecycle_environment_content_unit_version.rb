@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
-class LifecycleEnvironmentContentUnitVersion < AnsibleDirectorModel
-  belongs_to :lifecycle_environment
-  belongs_to :content_unit_version
+module ForemanAnsibleDirector
+  class LifecycleEnvironmentContentUnitVersion < ::ForemanAnsibleDirector::AnsibleDirectorModel
+    belongs_to :lifecycle_environment
+    belongs_to :content_unit_version
 
-  def cuv_id
-    content_unit_version.id
+    def cuv_id
+      content_unit_version.id
+    end
+    # TODO: Delete class - Assignments are handled via generic assignment model
   end
 end

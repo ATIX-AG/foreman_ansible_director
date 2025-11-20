@@ -80,7 +80,7 @@ module ForemanAnsibleDirector
           when 'import'
 
             if input[:content_unit_type] == 'collection'
-              unit_record = AnsibleCollection.create!(
+              unit_record = ::ForemanAnsibleDirector::AnsibleCollection.create!(
                 {
                   name: input[:unit_name],
                   namespace: input[:unit_namespace],
@@ -94,7 +94,7 @@ module ForemanAnsibleDirector
               )
             else
               # Make intellisense shut up - input[:content_unit_type] == 'role'
-              unit_record = AnsibleRole.new(
+              unit_record = ::ForemanAnsibleDirector::AnsibleRole.new(
                 {
                   name: input[:unit_name],
                   namespace: input[:unit_namespace],
@@ -107,13 +107,13 @@ module ForemanAnsibleDirector
               )
             end
             unit_versions.each do |version|
-              content_unit_version = ContentUnitVersion.create!(
+              content_unit_version = ::ForemanAnsibleDirector::ContentUnitVersion.create!(
                 versionable: unit_record,
                 version: version[:version],
                 versionable_type: unit_record.class.to_s
               )
 
-              next unless unit_record.is_a?(AnsibleCollection)
+              next unless unit_record.is_a?(::ForemanAnsibleDirector::AnsibleCollection)
 
               version[:collection_roles].each do |collection_role|
                 collection_role_record = content_unit_version.ansible_collection_roles.create!(
@@ -135,7 +135,7 @@ module ForemanAnsibleDirector
 
           when 'update'
 
-            existing_unit = AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
+            existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
             existing_unit_versions = existing_unit.content_unit_versions.pluck(:version)
 
             existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
@@ -147,7 +147,7 @@ module ForemanAnsibleDirector
             new_unit_versions.each do |new_version|
 
 
-              content_unit_version = ContentUnitVersion.create!(
+              content_unit_version = ::ForemanAnsibleDirector::ContentUnitVersion.create!(
                 versionable: existing_unit,
                 version: new_version[:version],
                 versionable_type: existing_unit.class.to_s

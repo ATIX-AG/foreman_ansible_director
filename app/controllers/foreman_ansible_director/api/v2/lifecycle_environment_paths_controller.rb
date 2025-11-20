@@ -17,7 +17,7 @@ module ForemanAnsibleDirector
           permitted_params = lifecycle_environment_path_params
           begin
             ActiveRecord::Base.transaction do
-              @lifecycle_environment_path = LifecycleEnvironmentPath.new(permitted_params)
+              @lifecycle_environment_path = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.new(permitted_params)
               @lifecycle_environment_path.organization = @organization
               @lifecycle_environment_path.save!
             end
@@ -69,6 +69,10 @@ module ForemanAnsibleDirector
             :source_environment_id,
             :target_environment_id
           )
+        end
+
+        def resource_class
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPath
         end
       end
     end

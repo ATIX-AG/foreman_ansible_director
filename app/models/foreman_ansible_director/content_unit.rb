@@ -1,40 +1,46 @@
 # frozen_string_literal: true
 
-class ContentUnit < AnsibleDirectorModel
-  scoped_search on: %i[name namespace]
+module ForemanAnsibleDirector
+  class ContentUnit < ::ForemanAnsibleDirector::AnsibleDirectorModel
+    scoped_search on: %i[name namespace]
 
-  belongs_to :organization, inverse_of: :content_units
+    def self.table_name
+      "ad_content_units"
+    end
 
-  has_many :execution_environment_content_units, dependent: :destroy
-  has_many :execution_environments, through: :execution_environment_content_units
-  has_many :content_unit_versions, as: :versionable, dependent: :destroy
+    belongs_to :organization, inverse_of: :content_units
 
-  validates :name, presence: true
-  validates :type, presence: true
+    has_many :execution_environment_content_units, dependent: :destroy
+    has_many :execution_environments, through: :execution_environment_content_units
+    has_many :content_unit_versions, as: :versionable, dependent: :destroy
 
-  def collection?
-    type == 'AnsibleCollection'
-  end
+    validates :name, presence: true
+    validates :type, presence: true
 
-  def role?
-    type == 'AnsibleRole'
-  end
+    def collection?
+      type == '::ForemanAnsibleDirector::AnsibleCollection'
+    end
 
-  def full_name
-    "#{namespace}.#{name}"
-  end
+    def role?
+      type == '::ForemanAnsibleDirector::AnsibleRole'
+    end
 
-  def self.polymorphic_name
-    name
-  end
+    def full_name
+      "#{namespace}.#{name}"
+    end
 
-  after_create :fix_version_types
+    def self.polymorphic_name
+      name
+    end
 
-  private
+    after_create :fix_version_types
 
-  def fix_version_types
-    content_unit_versions.each do |version|
-      version.update(versionable_type: self.class.name)
+    private
+
+    def fix_version_types
+      content_unit_versions.each do |version|
+        version.update(versionable_type: self.class.name)
+      end
     end
   end
 end

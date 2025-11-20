@@ -14,7 +14,7 @@ module ForemanAnsibleDirector
         end
 
         def assign
-          AnsibleContentAssignment.create!(consumable: @source, assignable: @target)
+          ::ForemanAnsibleDirector::AnsibleContentAssignment.create!(consumable: @source, assignable: @target)
         end
 
         def assign_bulk
@@ -28,10 +28,10 @@ module ForemanAnsibleDirector
               target = target_finder.find_by(id: assignment[:target][:id])
 
               unless target.id.in?(cleared_targets)
-                AnsibleContentAssignment.where(assignable: target).destroy_all
+                ::ForemanAnsibleDirector::AnsibleContentAssignment.where(assignable: target).destroy_all
                 cleared_targets.push(target.id)
               end
-              AnsibleContentAssignment.create!(consumable: source, assignable: target)
+              ::ForemanAnsibleDirector::AnsibleContentAssignment.create!(consumable: source, assignable: target)
             end
           end
         end
@@ -43,7 +43,7 @@ module ForemanAnsibleDirector
         private
 
         def resource_scope
-          AnsibleContentAssignment.all
+          ::ForemanAnsibleDirector::AnsibleContentAssignment.all
         end
 
         def assignment_params

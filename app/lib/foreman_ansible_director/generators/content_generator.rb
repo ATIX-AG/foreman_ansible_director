@@ -9,7 +9,7 @@ module ForemanAnsibleDirector
           content = []
 
           host_content.each do |content_assignment|
-            if content_assignment.consumable.is_a? AnsibleCollectionRole
+            if content_assignment.consumable.is_a? ::ForemanAnsibleDirector::AnsibleCollectionRole
 
               collection_role = content_assignment.consumable
               collection_version = collection_role.ansible_collection_version
