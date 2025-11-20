@@ -70,7 +70,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   const updateLce = async (env: AnsibleLce): Promise<void> => {
     try {
       await axios.put(
-        `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${env.id}`,
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${env.id}`,
         {
           lifecycle_environment: lifecycleEnvironment,
         }
@@ -103,7 +103,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   const destroyLce = async (lce: AnsibleLce): Promise<void> => {
     try {
       await axios.delete(
-        `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${lce.id}`
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${lce.id}`
       );
       dispatch(
         addToast({

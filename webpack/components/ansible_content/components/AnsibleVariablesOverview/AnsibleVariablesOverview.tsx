@@ -36,7 +36,7 @@ export const AnsibleVariablesOverview = ({
 }: AnsibleVariablesDetailProps): ReactElement | null => {
   const rolesRequest = useAPI<RolesRequest>(
     'get',
-    foremanUrl(`/api/v2/ansible/ansible_content/${selectedVersionId}`)
+    foremanUrl(`/api/v2/ansible_director/ansible_content/${selectedVersionId}`)
   );
 
   const modal = (

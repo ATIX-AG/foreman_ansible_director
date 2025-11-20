@@ -101,7 +101,7 @@ export const AnsibleLcePathComponent = ({
     try {
       await axios.post(
         foremanUrl(
-          `/api/v2/ansible/lifecycle_environments/paths/${lcePath.id}/promote`
+          `/api/v2/ansible_director/lifecycle_environments/paths/${lcePath.id}/promote`
         ),
         {
           promote: {
@@ -131,7 +131,7 @@ export const AnsibleLcePathComponent = ({
     // TODO: At some point I should refactor all these axios calls to a single function
     try {
       await axios.delete(
-        `${foremanUrl('/api/v2/ansible/lifecycle_environments/paths')}/${
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments/paths')}/${
           path.id
         }`
       );
@@ -164,7 +164,7 @@ export const AnsibleLcePathComponent = ({
     // TODO: At some point I should refactor all these axios calls to a single function
     try {
       await axios.put(
-        `${foremanUrl('/api/v2/ansible/lifecycle_environments/paths')}/${
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments/paths')}/${
           path.id
         }`,
         {
@@ -211,7 +211,7 @@ export const AnsibleLcePathComponent = ({
   // const destroyLce = async (lce: AnsibleLce): Promise<void> => {
   //  try {
   //    await axios.delete(
-  //      `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${lce.id}`
+  //      `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${lce.id}`
   //    );
   //    dispatch(
   //      addToast({
@@ -244,7 +244,7 @@ export const AnsibleLcePathComponent = ({
     name?: string
   ): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/ansible/lifecycle_environments/'), {
+      await axios.post(foremanUrl('/api/v2/ansible_director/lifecycle_environments/'), {
         lifecycle_environment: {
           name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
           position: pos === 'before' ? lce.position : lce.position + 1,
@@ -272,7 +272,7 @@ export const AnsibleLcePathComponent = ({
 
   const insertFirstEnv = async (name: string): Promise<void> => {
     try {
-      await axios.post(foremanUrl('/api/v2/ansible/lifecycle_environments/'), {
+      await axios.post(foremanUrl('/api/v2/ansible_director/lifecycle_environments/'), {
         lifecycle_environment: {
           name,
           position: 0,

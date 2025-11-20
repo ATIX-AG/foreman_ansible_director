@@ -58,7 +58,7 @@ const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
     GetAnsibleContentResponse
   >({
     apiUrl: foremanUrl(
-      `/api/v2/ansible/ansible_content${
+      `/api/v2/ansible_director/ansible_content${
         organization ? `?organization_id=${organization.id}&` : ''
       }`
     ),

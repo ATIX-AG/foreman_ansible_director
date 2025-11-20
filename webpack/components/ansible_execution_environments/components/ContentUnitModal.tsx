@@ -60,7 +60,7 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
         if ('position' in target) {
           // LCE
           await axios.patch(
-            foremanUrl(`/api/v2/ansible/lifecycle_environments/${target.id}`),
+            foremanUrl(`/api/v2/ansible_director/lifecycle_environments/${target.id}`),
             {
               content_assignments: contentAssignments,
               organization_id: organization?.id,
@@ -68,7 +68,7 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
           );
         } else {
           await axios.patch(
-            foremanUrl(`/api/v2/ansible/execution_environments/${target.id}`),
+            foremanUrl(`/api/v2/ansible_director/execution_environments/${target.id}`),
             {
               execution_environment: {
                 content: contentAssignments,

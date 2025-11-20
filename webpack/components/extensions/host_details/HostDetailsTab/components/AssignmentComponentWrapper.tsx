@@ -60,11 +60,11 @@ export const AssignmentComponentWrapper = ({
   if (ansibleLifecycleEnvironmentId !== null) {
     requestUrl = foremanUrl(
       // eslint-disable-next-line camelcase
-      `/api/v2/ansible/lifecycle_environments/${ansibleLifecycleEnvironmentId}/`
+      `/api/v2/ansible_director/lifecycle_environments/${ansibleLifecycleEnvironmentId}/`
     );
   } else {
     requestUrl = foremanUrl(
-      `/api/v2/ansible/ansible_content${
+      `/api/v2/ansible_director/ansible_content${
         organization ? `?organization_id=${organization.id}&` : ''
       }`
     );
@@ -75,7 +75,7 @@ export const AssignmentComponentWrapper = ({
   >('get', requestUrl);
   const assignedContent: UseAPIReturn<unnamedAssignmentType> = useAPI<
     unnamedAssignmentType
-  >('get', foremanUrl(`/api/v2/ansible/assignments/HOST/${hostId}`));
+  >('get', foremanUrl(`/api/v2/ansible_director/assignments/HOST/${hostId}`));
 
   // TODO: Even though the API correctly returns an empty array when no content is assigned, the hook returns an empty object
   if (

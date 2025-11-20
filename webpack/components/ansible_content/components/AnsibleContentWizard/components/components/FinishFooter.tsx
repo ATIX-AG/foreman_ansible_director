@@ -36,7 +36,7 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
     try {
       if (provider === 'yaml') {
         await axios.post(
-          foremanUrl('/api/v2/ansible/ansible_content/from_yaml'),
+          foremanUrl('/api/v2/ansible_director/ansible_content/from_yaml'),
           {
             requirements_file: btoa(encodeURIComponent(yamlFile)),
           }
@@ -51,7 +51,7 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
           })
         );
       } else if (provider === 'galaxy') {
-        await axios.post(foremanUrl('/api/v2/ansible/ansible_content'), {
+        await axios.post(foremanUrl('/api/v2/ansible_director/ansible_content'), {
           organization_id: organization?.id,
           units: contentUnits.map(unit => ({
             unit_name: unit.identifier,

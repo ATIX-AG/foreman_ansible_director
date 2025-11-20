@@ -36,7 +36,7 @@ export const ContentUnitSelectorWrapper: React.FC<ContentUnitSelectorWrapperProp
 }) => {
   const contentUnitResponse = useAPI<GetContentUnitsResponse>(
     'get',
-    '/api/v2/ansible/ansible_content'
+    '/api/v2/ansible_director/ansible_content'
   );
 
   if (contentUnitResponse.status === 'RESOLVED') {

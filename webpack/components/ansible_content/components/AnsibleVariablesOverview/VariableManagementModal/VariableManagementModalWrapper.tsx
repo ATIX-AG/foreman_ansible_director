@@ -42,7 +42,7 @@ export const VariableManagementModalWrapper = ({
 
   const variableRequest: UseAPIReturn<AnsibleVariableDetail> = useAPI<
     AnsibleVariableDetail
-  >('get', `/api/v2/ansible/ansible_variables/${variable.id}`);
+  >('get', `/api/v2/ansible_director/ansible_variables/${variable.id}`);
 
   const refreshRequest = (): void => {
     variableRequest.setAPIOptions(options => ({ ...options }));

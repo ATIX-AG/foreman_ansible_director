@@ -33,7 +33,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
     setIsCreateButtonLoading(true);
     try {
       await axios.post(
-        foremanUrl('/api/v2/ansible/lifecycle_environments/paths'),
+        foremanUrl('/api/v2/ansible_director/lifecycle_environments/paths'),
         {
           lifecycle_environment_path: {
             name: 'Unnamed LCE Path',
@@ -53,7 +53,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
     GetAnsibleLcePathsResponse
   >({
     apiUrl: foremanUrl(
-      `/api/v2/ansible/lifecycle_environments/paths?order=name&${
+      `/api/v2/ansible_director/lifecycle_environments/paths?order=name&${
         organization ? `organization_id=${organization.id}&` : ''
       }`
     ),

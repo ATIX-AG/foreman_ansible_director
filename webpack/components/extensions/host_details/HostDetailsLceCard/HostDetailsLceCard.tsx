@@ -93,7 +93,7 @@ export const HostDetailsLceCard = ({
     try {
       await axios.post(
         foremanUrl(
-          `/api/v2/ansible/lifecycle_environments/${
+          `/api/v2/ansible_director/lifecycle_environments/${
             lceForName(selectedLce).id
           }/assign/HOST/${hostDetails.id}`
         ),

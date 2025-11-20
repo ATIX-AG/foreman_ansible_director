@@ -86,7 +86,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
         );
         setConfirmationModalOnConfirm(async () => {
           try {
-            await axios.delete(foremanUrl('/api/v2/ansible/ansible_content'), {
+            await axios.delete(foremanUrl('/api/v2/ansible_director/ansible_content'), {
               data: {
                 organization_id: organization?.id,
                 units: [

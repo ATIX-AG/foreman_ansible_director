@@ -45,7 +45,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
   ): Promise<void> => {
     try {
       await axios.put(
-        `${foremanUrl('/api/v2/ansible/lifecycle_environments')}/${env.id}`,
+        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${env.id}`,
         {
           lifecycle_environment: {
             description: env.description,

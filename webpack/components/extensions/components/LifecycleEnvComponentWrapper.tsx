@@ -17,7 +17,7 @@ export const LifecycleEnvComponentWrapper: React.FC<LifecycleEnvComponentWrapper
   const getLcePathsResponse = useAPI<AnsibleLcePath>(
     'get',
     foremanUrl(
-      `/api/v2/ansible/lifecycle_environments/paths?order=name&${
+      `/api/v2/ansible_director/lifecycle_environments/paths?order=name&${
         organization ? `organization_id=${organization.id}&` : ''
       }`
     )

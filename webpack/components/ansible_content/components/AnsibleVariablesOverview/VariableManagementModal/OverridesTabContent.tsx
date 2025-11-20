@@ -58,7 +58,7 @@ export const OverridesTabContent = ({
         try {
           await axios.put(
             foremanUrl(
-              `/api/v2/ansible/ansible_variables/${variable.id}/overrides/${selectedOverride.id}`
+              `/api/v2/ansible_director/ansible_variables/${variable.id}/overrides/${selectedOverride.id}`
             ),
             {
               override: {
@@ -93,7 +93,7 @@ export const OverridesTabContent = ({
         try {
           await axios.post(
             foremanUrl(
-              `/api/v2/ansible/ansible_variables/${variable.id}/overrides/`
+              `/api/v2/ansible_director/ansible_variables/${variable.id}/overrides/`
             ),
             {
               override: {

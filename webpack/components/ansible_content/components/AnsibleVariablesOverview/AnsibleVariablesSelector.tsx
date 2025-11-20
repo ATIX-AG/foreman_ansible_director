@@ -75,7 +75,7 @@ export const AnsibleVariablesSelector = ({
     try {
       setVariableUpdating(variable.id);
       await axios.put(
-        `${foremanUrl('/api/v2/ansible/ansible_variables/')}/${variable.id}`,
+        `${foremanUrl('/api/v2/ansible_director/ansible_variables/')}/${variable.id}`,
         {
           ansible_variable: {
             key: variable.name,

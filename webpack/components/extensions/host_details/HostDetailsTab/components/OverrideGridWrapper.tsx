@@ -27,7 +27,7 @@ export const OverrideGridWrapper = ({
   const overridesRequest = useAPI<MergedVariableOverride[]>(
     'get',
     foremanUrl(
-      `/api/v2/ansible/ansible_variables/overrides/HOST/${hostId}?include_overridable=1`
+      `/api/v2/ansible_director/ansible_variables/overrides/HOST/${hostId}?include_overridable=1`
     )
   );
 

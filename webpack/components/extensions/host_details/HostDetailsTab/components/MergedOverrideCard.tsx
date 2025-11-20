@@ -111,7 +111,7 @@ export const MergedOverrideCard = ({
           // @ts-ignore TS18047 If override_id is not null, neither is this
           const splitMatcher = mergedOverride.override_matcher.split('=');
           await axios.put(
-            `${foremanUrl('/api/v2/ansible/ansible_variables/')}/${
+            `${foremanUrl('/api/v2/ansible_director/ansible_variables/')}/${
               mergedOverride.variable_id
             }/overrides/${mergedOverride.override_id}`,
             {
@@ -151,7 +151,7 @@ export const MergedOverrideCard = ({
           setIsCardLoading(true);
           await axios.post(
             foremanUrl(
-              `/api/v2/ansible/ansible_variables/${mergedOverride.variable_id}/overrides/`
+              `/api/v2/ansible_director/ansible_variables/${mergedOverride.variable_id}/overrides/`
             ),
             {
               override: {

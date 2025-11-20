@@ -28,7 +28,7 @@ export const AnsibleExecutionEnvSelectionModalWrapper = ({
     GetAnsibleExecutionEnvResponse
   >({
     apiUrl: foremanUrl(
-      `/api/v2/ansible/execution_environments${
+      `/api/v2/ansible_director/execution_environments${
         organization ? `?organization_id=${organization.id}&` : ''
       }`
     ),
