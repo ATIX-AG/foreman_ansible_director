@@ -14,7 +14,7 @@ node :roles do |acv|
           overridable: var.overridable?,
           type: var.key_type,
         }
-      end
+      end,
     }
   end
 end

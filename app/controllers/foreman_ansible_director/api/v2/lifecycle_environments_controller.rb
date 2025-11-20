@@ -12,7 +12,6 @@ module ForemanAnsibleDirector
         before_action :find_assignment_target, only: %i[assign]
 
         def show
-          a = 2
         end
 
         def content
@@ -100,7 +99,11 @@ module ForemanAnsibleDirector
           when 'HOSTGROUP'
             @target = Hostgroup.find(params[:target_id])
           else
-            render_error('custom_error', status: :unprocessable_entity, locals: { message: "Unknown target type #{params[:target_type]}" })
+            render_error(
+              'custom_error',
+              status: :unprocessable_entity,
+              locals: { message: "Unknown target type #{params[:target_type]}" }
+            )
           end
         end
 
@@ -114,7 +117,7 @@ module ForemanAnsibleDirector
               { content_assignments: %i[id version] },
             ]
           ).merge(
-            #lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
+            # lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
             organization_id: params[:organization_id]
           )
         end
@@ -123,7 +126,7 @@ module ForemanAnsibleDirector
           params.require(:lifecycle_environment).permit(
             :name,
             :description,
-            :execution_environment_id,
+            :execution_environment_id
           )
         end
 
@@ -134,7 +137,9 @@ module ForemanAnsibleDirector
         end
 
         def find_path
-          @lifecycle_environment_path = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.find(params[:lifecycle_environment_path_id])
+          @lifecycle_environment_path = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.find(
+            params[:lifecycle_environment_path_id]
+          )
         end
       end
     end

@@ -34,18 +34,20 @@ module ForemanAnsibleDirector
               )
             end
 
-            extract_variables_action = plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ExtractVariables,
-                                                    repository_show_action_output: repository_show_action.output,
-                                                    list_action_output: list_action.output,
-                                                    organization_id: args[:organization_id],
-                                                    unit_name: args[:unit_name],
-                                                    unit_namespace: args[:unit_namespace])
+            extract_variables_action = plan_action(
+              ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ExtractVariables,
+              repository_show_action_output: repository_show_action.output,
+              list_action_output: list_action.output,
+              organization_id: args[:organization_id],
+              unit_name: args[:unit_name],
+              unit_namespace: args[:unit_namespace]
+            )
 
             plan_self(
               args.merge(
                 list_action_output: list_action.output,
                 repository_show_action_output: repository_show_action.output,
-                extract_variables_action_output: extract_variables_action.output,
+                extract_variables_action_output: extract_variables_action.output
               )
             )
           end
@@ -121,13 +123,12 @@ module ForemanAnsibleDirector
                 )
 
                 cr_variables = unit_variables[version[:version]][collection_role]
-                unless cr_variables.nil?
+                next if cr_variables.nil?
 
-                  ActiveRecord::Base.transaction do
-                    cr_variables.each do |variable_name, variable_value|
-                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
-                      ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
-                    end
+                ActiveRecord::Base.transaction do
+                  cr_variables.each do |variable_name, variable_value|
+                    create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, 'yaml', variable_value) # TODO: Guess data-type
+                    ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
                   end
                 end
               end
@@ -145,8 +146,6 @@ module ForemanAnsibleDirector
             end
 
             new_unit_versions.each do |new_version|
-
-
               content_unit_version = ::ForemanAnsibleDirector::ContentUnitVersion.create!(
                 versionable: existing_unit,
                 version: new_version[:version],
@@ -159,17 +158,15 @@ module ForemanAnsibleDirector
                 )
 
                 cr_variables = unit_variables[new_version[:version]][collection_role]
-                unless cr_variables.nil?
+                next if cr_variables.nil?
 
-                  ActiveRecord::Base.transaction do
-                    cr_variables.each do |variable_name, variable_value|
-                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, "yaml", variable_value) # TODO: Guess data-type
-                      ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
-                    end
+                ActiveRecord::Base.transaction do
+                  cr_variables.each do |variable_name, variable_value|
+                    create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, 'yaml', variable_value) # TODO: Guess data-type
+                    ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
                   end
                 end
               end
-
             end
           end
           # rubocop:enable Layout/LineLength

@@ -10,18 +10,21 @@ module ForemanAnsibleDirector
 
         def index_for_target
           include_overridable = ::Foreman::Cast.to_bool(params[:include_overridable])
-          @target_overrides = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target @target, include_overridable
+          @target_overrides = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target @target,
+            include_overridable: include_overridable
         end
 
         def create
           override = override_params
-          create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value], override[:matcher], override[:matcher_value])
+          create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value],
+            override[:matcher], override[:matcher_value])
           ::ForemanAnsibleDirector::VariableService.create_override(create, @ansible_variable)
         end
 
         def update
           override = override_params
-          edit = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value], override[:matcher], override[:matcher_value])
+          edit = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value],
+            override[:matcher], override[:matcher_value])
           ::ForemanAnsibleDirector::VariableService.edit_override(edit, @override)
         end
 
@@ -38,21 +41,27 @@ module ForemanAnsibleDirector
         def find_override
           find_variable
           @override = @ansible_variable.lookup_values.find(params[:id])
-          unless @override
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: "Couldn't find ansible variable override #{params[:id]}" })
-          end
-
+          return if @override
+          render_error(
+            'custom_error',
+            status: :unprocessable_entity,
+            locals: {
+              message: "Couldn't find ansible variable override #{params[:id]}",
+            }
+          )
         end
 
         def find_variable
           @ansible_variable = ::ForemanAnsibleDirector::AnsibleVariable.find(params[:ansible_variable_id])
-          unless @ansible_variable
-            render_error('custom_error', status: :unprocessable_entity,
-                          locals: { message: "Couldn't find ansible variable #{params[:ansible_variable_id]}" })
-          end
+          return if @ansible_variable
+          render_error(
+            'custom_error',
+            status: :unprocessable_entity,
+            locals: {
+              message: "Couldn't find ansible variable #{params[:ansible_variable_id]}",
+            }
+          )
         end
-
       end
     end
   end

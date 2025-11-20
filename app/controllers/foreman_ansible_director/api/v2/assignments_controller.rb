@@ -6,11 +6,10 @@ module ForemanAnsibleDirector
       class AssignmentsController < AnsibleDirectorApiController
         before_action :find_resource, only: %i[destroy]
         before_action :find_resources, only: %i[assign]
-        before_action :find_target, only: %i[get_assignments]
+        before_action :find_target, only: %i[assignments]
 
-        def get_assignments
+        def assignments
           @assignments = @target.resolved_ansible_content
-          a = 2
         end
 
         def assign
@@ -58,11 +57,10 @@ module ForemanAnsibleDirector
 
           params.require(:assignments).map do |assignment|
             assignment.permit(
-              source: [:type, :id],
-              target: [:type, :id]
+              source: %i[type id],
+              target: %i[type id]
             )
           end
-
         end
 
         def find_resources
@@ -72,17 +70,28 @@ module ForemanAnsibleDirector
           source = source_finder.find_by(id: assignment[:source][:id])
           target = target_finder.find_by(id: assignment[:target][:id])
           if source.nil?
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: "Source object of type #{assignment[:source][:type]} with id #{assignment[:source][:id]} does not exist." })
+            render_error(
+              'custom_error',
+              status: :unprocessable_entity,
+              locals: {
+                message: "Source object of type #{assignment[:source][:type]} with \
+                          id #{assignment[:source][:id]} does not exist.",
+              }
+            )
           end
           if target.nil?
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: "Target object of type #{assignment[:target][:type]} with id #{assignment[:target][:id]} does not exist." })
+            render_error(
+              'custom_error',
+              status: :unprocessable_entity,
+              locals: {
+                message: "Target object of type #{assignment[:target][:type]} \
+                with id #{assignment[:target][:id]} does not exist.",
+              }
+            )
           end
           @source = source
           @target = target
         end
-
       end
     end
   end

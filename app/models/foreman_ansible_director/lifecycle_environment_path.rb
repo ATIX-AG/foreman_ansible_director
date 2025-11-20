@@ -88,7 +88,8 @@ module ForemanAnsibleDirector
     end
 
     def create_snapshot(environment)
-      snapshot = ::ForemanAnsibleDirector::ContentSnapshot.create!(references: 1, content_hash: environment.content_hash)
+      snapshot = ::ForemanAnsibleDirector::ContentSnapshot.create!(references: 1,
+        content_hash: environment.content_hash)
       content_unit_version_ids = environment.content_unit_versions.pluck(:id)
       content_unit_version_ids.each do |content_unit_version_id|
         ::ForemanAnsibleDirector::ContentSnapshotContentUnitVersion.create!(

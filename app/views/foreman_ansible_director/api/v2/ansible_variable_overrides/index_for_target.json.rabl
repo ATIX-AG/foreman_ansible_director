@@ -2,7 +2,6 @@
 
 collection @target_overrides
 
-
 node :variable_id do |override|
   override[:variable_id]
 end

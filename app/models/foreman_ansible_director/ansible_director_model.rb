@@ -7,7 +7,7 @@ module ForemanAnsibleDirector
 
     def self.table_name
       table_name = model_name.route_key
-      "#{self.table_name_prefix}#{table_name}"
+      "#{table_name_prefix}#{table_name}"
     end
 
     def flatten_errors

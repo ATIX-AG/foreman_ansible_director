@@ -21,23 +21,23 @@ module ForemanAnsibleDirector
               name: "Load variables for #{collection.namespace}.#{collection.name}.#{collection_role.name}",
               "ansible.builtin.include_vars": {
                 file: "#{fqcn}_vars.yaml",
-              }
+              },
             }
-            debug_block = {
-              name: "Display all variables for host",
-              debug: {
-                var: "hostvars[inventory_hostname]"
-              }
-            }
+            # debug_block = {
+            #  name: 'Display all variables for host',
+            #  debug: {
+            #    var: 'hostvars[inventory_hostname]',
+            #  },
+            # }
             load_role_block = {
               name: "Run role #{collection.namespace}.#{collection.name}.#{collection_role.name}",
               "ansible.builtin.include_role": {
                 name: fqcn,
-              }
+              },
             }
 
             tasks << load_vars_block
-            #tasks << debug_block
+            # tasks << debug_block
             tasks << load_role_block
 
             # else # content_assignment.consumable.is_a? AnsibleRole

@@ -2,9 +2,6 @@
 
 module ForemanAnsibleDirector
   class AnsibleCollection < ::ForemanAnsibleDirector::ContentUnit
-
-    
-
     has_many :content_unit_versions, as: :versionable, dependent: :destroy
     has_many :ansible_collection_roles, through: :content_unit_versions
 

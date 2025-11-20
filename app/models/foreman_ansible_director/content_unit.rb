@@ -5,7 +5,7 @@ module ForemanAnsibleDirector
     scoped_search on: %i[name namespace]
 
     def self.table_name
-      "ad_content_units"
+      'ad_content_units'
     end
 
     belongs_to :organization, inverse_of: :content_units

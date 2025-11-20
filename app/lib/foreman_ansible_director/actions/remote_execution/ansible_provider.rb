@@ -6,7 +6,6 @@ if defined? ForemanRemoteExecution
       module RemoteExecution
         class AnsibleProvider < RemoteExecutionProvider
           class << self
-
             def humanized_name
               'AnsibleDirector'
             end
@@ -16,7 +15,6 @@ if defined? ForemanRemoteExecution
             end
 
             def proxy_command_options(template_invocation, host)
-
               playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate host
               inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
 
@@ -42,7 +40,6 @@ if defined? ForemanRemoteExecution
             def proxy_action_class
               'Proxy::AnsibleDirector::Actions::Meta::RunPlaybook'
             end
-
           end
         end
       end

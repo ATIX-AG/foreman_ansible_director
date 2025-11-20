@@ -23,7 +23,13 @@ node :content do |object|
         type: lcecu.content_unit_type,
         identifier: lcecu.versionable.full_name,
         version: lcecu.version,
-        roles:  lcecu.content_unit_type == 'collection' ? (lcecu.ansible_collection_roles.map { |role| { id: role.id, name: role.name } }) :[],
+        roles: if lcecu.content_unit_type == 'collection'
+                 (lcecu.ansible_collection_roles.map do |role|
+                    { id: role.id, name: role.name }
+                  end)
+               else
+                 []
+               end,
       }
     end
   end

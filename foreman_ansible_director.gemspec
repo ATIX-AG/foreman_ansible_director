@@ -11,10 +11,10 @@ Gem::Specification.new do |s|
   s.email       = ['denzer@atix.de']
   s.homepage    = 'https://www.atix.de'
   s.summary     = 'Summary of AnsibleDirector.'
-  # also update locale/gemspec.rb
   s.description = 'Description of AnsibleDirector.'
 
-  s.files = Dir['{app,config,db,lib,locale,webpack}/**/*'] + ['LICENSE', 'Rakefile', 'README.md', 'package.json', 'tsconfig.json']
+  s.files = Dir['{app,config,db,lib,locale,webpack}/**/*'] +
+            %w[LICENSE Rakefile README.md package.json tsconfig.json]
   s.test_files = Dir['test/**/*'] + Dir['webpack/**/__tests__/*.js']
 
   s.required_ruby_version = '>= 3.0', '< 4'

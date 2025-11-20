@@ -98,7 +98,6 @@ module ForemanAnsibleDirector
         def resource_class
           ::ForemanAnsibleDirector::ExecutionEnvironment
         end
-
       end
     end
   end

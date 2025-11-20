@@ -1,24 +1,18 @@
+# frozen_string_literal: true
+
 object @ansible_variable
 
 attributes :id, :default_value
 
-node :name do |ansible_variable|
-  ansible_variable.key
-end
+node :name, &:key
 
-node :type do |ansible_variable|
-  ansible_variable.key_type
-end
+node :type, &:key_type
 
-node :overriable do |ansible_variable|
-  ansible_variable.overridable?
-end
+node :overriable, &:overridable?
 
-child :lookup_values => :overrides do
+child lookup_values: :overrides do
   attributes :id, :value
-  node :value do |lookup_value|
-    lookup_value.value_before_type_cast
-  end
+  node :value, &:value_before_type_cast
   node :matcher do |lookup_value|
     lookup_value.match.split('=').first
   end

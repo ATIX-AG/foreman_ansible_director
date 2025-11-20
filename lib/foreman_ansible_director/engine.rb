@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-require "action_cable/engine"
-require "foreman_ansible_director/remote_execution"
+
+require 'action_cable/engine'
+require 'foreman_ansible_director/remote_execution'
 
 module ForemanAnsibleDirector
   DYNFLOW_QUEUE = :foreman_ansible_director

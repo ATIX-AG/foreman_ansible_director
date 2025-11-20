@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rubygems/package'
 
 module ForemanAnsibleDirector
@@ -12,10 +13,10 @@ module ForemanAnsibleDirector
           param :unit_namespace, String, required: true
           param :organization_id, String, required: true
         end
-#
-        #output_format do
+
+        # output_format do
         #  param :extract_variables_response, Hash
-        #end
+        # end
 
         def run
           unit_identifier = "#{input[:unit_namespace]}.#{input[:unit_name]}"
@@ -23,7 +24,8 @@ module ForemanAnsibleDirector
 
           results = {}
           imported_versions.each do |version|
-            results[version[:version]] = extract_from_collection(unit_identifier, version[:version], input[:organization_id])
+            results[version[:version]] =
+              extract_from_collection(unit_identifier, version[:version], input[:organization_id])
           end
           output.update(extract_variables_response: results)
         end
@@ -31,7 +33,9 @@ module ForemanAnsibleDirector
         private
 
         def extract_from_collection(unit_identifier, unit_version, organization_id)
-          url = "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/default/api/v3/plugin/ansible/content/#{organization_id}/#{unit_identifier}/collections/artifacts/#{unit_identifier.gsub(/\./, "-")}-#{unit_version}.tar.gz"
+          url = "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/default/api/v3/plugin/ansible/content/#{organization_id}/#{unit_identifier}/collections/artifacts/#{unit_identifier.tr(
+            '.', '-'
+          )}-#{unit_version}.tar.gz"
           begin
             response = RestClient.get(url)
             raise "Failed to download (HTTP status: #{response.code})" if response.code != 200
@@ -80,7 +84,6 @@ module ForemanAnsibleDirector
             all_defaults
           end
         end
-
       end
     end
   end

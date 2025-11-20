@@ -8,11 +8,6 @@ module ForemanAnsibleDirector
 
     has_many :execution_environment_content_units, dependent: :destroy
 
-    #has_many :lifecycle_environment_content_assignments, dependent: :destroy
-    #has_many :assigned_lifecycle_environments,
-    #  through: :lifecycle_environment_content_assignments,
-    #  source: :lifecycle_environment
-
     has_many :ansible_content_assignments, as: :consumable, dependent: :destroy
 
     validates :version, presence: true

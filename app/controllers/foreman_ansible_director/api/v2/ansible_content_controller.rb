@@ -10,10 +10,14 @@ module ForemanAnsibleDirector
         # TODO: APIDOC
 
         def create_units
-          resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_import_payload params[:units]
-          @bulk_create_task = ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Import,
+          resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_import_payload(
+            params[:units]
+          )
+          @bulk_create_task = ForemanTasks.sync_task(
+            ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Import,
             resolved_content_units: resolved,
-            organization_id: @organization.id)
+            organization_id: @organization.id
+          )
         end
 
         def index
@@ -31,7 +35,9 @@ module ForemanAnsibleDirector
 
         # TODO: This needs to check and invalidate built EEs
         def destroy_units
-          resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload params[:units]
+          resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload(
+            params[:units]
+          )
           @bulk_destroy_task =
             ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Destroy,
               resolved_content_units: resolved, organization_id: @organization.id)

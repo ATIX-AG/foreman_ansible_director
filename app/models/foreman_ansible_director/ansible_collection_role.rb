@@ -2,7 +2,6 @@
 
 module ForemanAnsibleDirector
   class AnsibleCollectionRole < ::ForemanAnsibleDirector::AnsibleDirectorModel
-
     include ::ForemanAnsibleDirector::Concerns::VariableOwner
 
     belongs_to :ansible_collection_version,

@@ -4,10 +4,10 @@ module ForemanAnsibleDirector
   module Api
     module V2
       class AnsibleVariablesController < AnsibleDirectorApiController
+        before_action :find_resource, only: %i[show update]
 
-        before_action :find_resource, only: [ :show, :update ]
-
-        def show; end
+        def show
+        end
 
         def update
           variable = variable_params
@@ -29,7 +29,6 @@ module ForemanAnsibleDirector
         def resource_class
           ::ForemanAnsibleDirector::AnsibleVariable
         end
-
       end
     end
   end

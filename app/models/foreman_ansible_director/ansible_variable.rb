@@ -6,7 +6,7 @@ module ForemanAnsibleDirector
     belongs_to :ansible_collection_role, optional: true
 
     def overridable?
-      override || lookup_values.count > 0
+      override || lookup_values.count.positive?
     end
   end
 end

@@ -99,8 +99,11 @@ module ForemanAnsibleDirector
         end
 
         def plan_update(scu, organization_id)
-          existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(namespace: scu.unit_namespace, name: scu.unit_name,
-            organization_id: organization_id)
+          existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(
+            namespace: scu.unit_namespace,
+            name: scu.unit_name,
+            organization_id: organization_id
+          )
 
           repository_href = existing_unit.pulp_repository_href
           remote_href = existing_unit.pulp_remote_href
@@ -149,17 +152,15 @@ module ForemanAnsibleDirector
         def operation_type(unit)
           force_override = false # TODO: Setting
 
-          existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit.unit_namespace, name: unit.unit_name)
+          existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit.unit_namespace,
+            name: unit.unit_name)
           return :import unless existing_unit
-
 
           existing_unit_versions = existing_unit.content_unit_versions.select do |x|
             unit.versions.include? x.version
           end
 
-          if !existing_unit_versions.empty? && !force_override
-            return :noop
-          end
+          return :noop if !existing_unit_versions.empty? && !force_override
           :update
         end
       end

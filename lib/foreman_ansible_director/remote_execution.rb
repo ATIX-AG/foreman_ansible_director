@@ -7,7 +7,7 @@ module ForemanAnsibleDirector
     config.to_prepare do
       RemoteExecutionProvider.register(
         :Ansible,
-        ForemanAnsibleDirector::Actions::RemoteExecution::AnsibleProvider,
+        ForemanAnsibleDirector::Actions::RemoteExecution::AnsibleProvider
       )
 
       ForemanAnsibleDirector::Engine.register_rex_feature
@@ -17,9 +17,9 @@ module ForemanAnsibleDirector
       RemoteExecutionFeature.register(
         :ansible_run_host,
         N_('Run Ansible roles'),
-        :description => N_('Runs an Ansible playbook which contains all'\
+        description: N_('Runs an Ansible playbook which contains all'\
                              ' the roles defined for a host'),
-        :host_action_button => true
+        host_action_button: true
       )
     end
   end

@@ -9,8 +9,13 @@ module ForemanAnsibleDirector
         def find_organization
           @organization = Organization.current || find_optional_organization
           if @organization.nil?
-            render_error('custom_error', status: :unprocessable_entity,
-              locals: { message: "One of parameters [ #{organization_id_keys.join(', ')} ] required but not specified." })
+            render_error(
+              'custom_error',
+              status: :unprocessable_entity,
+              locals: {
+                message: "One of parameters [ #{organization_id_keys.join(', ')} ] required but not specified.",
+              }
+            )
           end
           @organization
         end
@@ -21,7 +26,6 @@ module ForemanAnsibleDirector
           case type
 
           when 'ACR'
-            #@assignment_class = AnsibleContentAssignmentCollectionRole
             ::ForemanAnsibleDirector::AnsibleCollectionRole
           when 'CONTENT'
             ::ForemanAnsibleDirector::ContentUnitVersion

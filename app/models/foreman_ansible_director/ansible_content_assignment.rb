@@ -5,11 +5,11 @@ module ForemanAnsibleDirector
     belongs_to :consumable, polymorphic: true
     belongs_to :assignable, polymorphic: true
 
-
     def content_unit_version
-      if consumable.is_a?(::ForemanAnsibleDirector::AnsibleCollectionRole)
+      case consumable
+      when ::ForemanAnsibleDirector::AnsibleCollectionRole
         consumable.ansible_collection_version # TODO: IMPORTANT! ACV should be referenced as content unit version!
-      elsif consumable.is_a?(::ForemanAnsibleDirector::AnsibleRole)
+      when ::ForemanAnsibleDirector::AnsibleRole
         consumable.content_unit_version
       end
     end

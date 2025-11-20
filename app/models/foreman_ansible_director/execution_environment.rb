@@ -16,9 +16,6 @@ module ForemanAnsibleDirector
               length: { maximum: 255 }
 
     validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
-    #validates :ansible_version,
-    #  inclusion: { in: ::ForemanAnsibleDirector::Constants::ANSIBLE_VERSIONS,
-    #               message: 'Ansible version "%<value>s" is not supported.' }
 
     after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
 
