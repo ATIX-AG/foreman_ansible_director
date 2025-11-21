@@ -4,7 +4,7 @@
   "description": "DESCRIPTION",
   "scripts": {
     "lint": "npx eslint -c .eslintrc 'webpack/**/'",
-    "test": "tfm-test --config jest.config.js",
+    "test": "tfm-test --config jest.config.js --passWithNoTests",
     "test:watch": "tfm-test --plugin --watchAll",
     "test:current": "tfm-test --plugin --watch",
     "publish-coverage": "tfm-publish-coverage",

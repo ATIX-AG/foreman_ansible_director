@@ -7,10 +7,10 @@ const foremanReactFull = foremanRelativePath(foremanReactRelative);
 module.exports = {
   testURL: 'http://localhost/',
   setupFiles: [
-    './webpack/test_setup.js',
+    // './webpack/test_setup.js',
   ],
   setupFilesAfterEnv: [
-    './webpack/global_test_setup.js',
+    // './webpack/global_test_setup.js',
     '@testing-library/jest-dom'
   ],
   testPathIgnorePatterns: [
@@ -21,7 +21,6 @@ module.exports = {
   ],
   moduleDirectories: [
     `${foremanFull}/node_modules`,
-    `${foremanFull}/node_modules/@theforeman/vendor-core/node_modules`,
     'node_modules',
     'webpack/test-utils',
   ],
