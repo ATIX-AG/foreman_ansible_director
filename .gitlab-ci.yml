@@ -7,4 +7,5 @@ include:
 variables:
   FOREMAN_VERSION:
     value: "foreman_with_ts"
+  JS_TEST_OPTIONS: "--ci --reporters=default --reporters=jest-junit --verbose --passWithNoTests"
 ...
