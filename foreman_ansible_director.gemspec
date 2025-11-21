@@ -22,6 +22,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'dynflow', '>= 1.0.2', '< 2.0.0'
   s.add_dependency 'foreman_remote_execution', '~> 16.0'
   s.add_dependency 'foreman-tasks', '>= 8.3.0'
+  s.add_dependency 'pulp_ansible_client', '>= 0.28.0', '< 0.29.0'
+  s.add_dependency 'pulpcore_client', '>= 3.85.0', '< 3.86.0'
+
 
   s.add_development_dependency 'rdoc'
 end
