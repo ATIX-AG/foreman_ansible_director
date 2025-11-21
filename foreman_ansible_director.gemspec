@@ -20,8 +20,8 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.0', '< 4'
 
   s.add_dependency 'dynflow', '>= 1.0.2', '< 2.0.0'
+  s.add_dependency 'foreman_remote_execution', '~> 16.0'
   s.add_dependency 'foreman-tasks', '>= 8.3.0'
-  s.add_dependency 'foreman_remote_execution', '>= 14.0', '< 17'
 
   s.add_development_dependency 'rdoc'
 end
