@@ -6,5 +6,5 @@ include:
 
 variables:
   FOREMAN_VERSION:
-    value: "develop_with_ts"
+    value: "foreman_with_ts"
 ...
