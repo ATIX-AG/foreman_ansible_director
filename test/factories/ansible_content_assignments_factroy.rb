@@ -1,6 +1,6 @@
 FactoryBot.define do
 
-  factory :ansible_content_assignment do
+  factory :ansible_content_assignment, class: 'ForemanAnsibleDirector::AnsibleContentAssignment' do
     association :consumable, factory: :ansible_collection_role
     association :assignable, factory: :lifecycle_environment
 

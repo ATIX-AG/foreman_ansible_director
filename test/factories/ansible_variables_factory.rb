@@ -1,6 +1,6 @@
 FactoryBot.define do
 
-  factory :ansible_variable, parent: :lookup_key, class: 'AnsibleVariable' do
+  factory :ansible_variable, parent: :lookup_key, class: '::ForemanAnsibleDirector::AnsibleVariable' do
     sequence(:key) { |n| "variable_#{n}" }
 
     trait :for_ansible_role do

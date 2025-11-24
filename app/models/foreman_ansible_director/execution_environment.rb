@@ -34,25 +34,7 @@ module ForemanAnsibleDirector
     end
 
     def trigger_rebuild
-      ForemanTasks.async_task(
-        ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
-        proxy_task_id: SecureRandom.uuid,
-        execution_environment_definition: {
-          id: id,
-          content: {
-            base_image: base_image_url,
-            ansible_core_version: ansible_version, # TODO: Update ansible version management
-            content_units: content_unit_versions.map do |cuv|
-                             {
-                               type: cuv.versionable.type == 'AnsibleCollection' ? 'collection' : 'role',
-                               identifier: cuv.versionable.full_name,
-                               version: cuv.version,
-                               source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{Organization.current.id}/#{cuv.versionable.full_name}",
-                             }
-                           end,
-          },
-        }
-      )
+      ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment self
     end
 
     def add_content_unit(content_unit, version)

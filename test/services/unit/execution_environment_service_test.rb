@@ -15,7 +15,7 @@ module ForemanAnsibleDirectorTests
         describe '#create_execution_environment' do
           test 'creates an execution environment with valid params' do
 
-            ee_create = ::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new("test_ee", "quay.io/ansible/base-ee:latest", "2.20.0", @organization.id
+            ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new("test_ee", "quay.io/ansible/base-ee:latest", "2.20.0", @organization.id
             )
 
             ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(ee_create)
@@ -28,7 +28,7 @@ module ForemanAnsibleDirectorTests
 
           test 'triggers execution environment build' do
 
-            ee_create = ::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
+            ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
               "test_ee",
               "quay.io/ansible/base-ee:latest",
               "2.20.0",
@@ -47,25 +47,25 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "Actions::ForemanAnsibleDirector::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
             assert_not_nil env_def
           end
 
           test 'creates execution environment within transaction' do
-            ee_create = ::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
+            ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
               nil,
               "quay.io/ansible/base-ee:latest",
               "2.20.0",
               @organization.id
             )
 
-            initial_count = ExecutionEnvironment.count
+            initial_count = ::ForemanAnsibleDirector::ExecutionEnvironment.count
 
             assert_raises(ActiveRecord::RecordInvalid) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(ee_create)
             end
 
-            assert_equal initial_count, ExecutionEnvironment.count
+            assert_equal initial_count, ::ForemanAnsibleDirector::ExecutionEnvironment.count
           end
         end
 
@@ -75,7 +75,7 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'updates execution environment with valid params' do
-            ee_update = ::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
+            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
               "updated_ee",
               "quay.io/ansible/updated-ee:latest",
               "2.19.0"
@@ -95,7 +95,7 @@ module ForemanAnsibleDirectorTests
             action_name = nil
             env_def = nil
 
-            ee_update = ::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
+            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
               "edited_name",
               @execution_environment.base_image_url,
               @execution_environment.ansible_version
@@ -114,7 +114,7 @@ module ForemanAnsibleDirectorTests
             assert_nil action_name
             assert_nil env_def
 
-            ee_update = ::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
+            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
               @execution_environment.name,
               "quay.io/fedora/fedora:42",
               @execution_environment.ansible_version
@@ -128,14 +128,14 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "Actions::ForemanAnsibleDirector::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
             assert_not_nil env_def
 
             task_called = false
             action_name = nil
             env_def = nil
 
-            ee_update = ::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
+            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
               @execution_environment.name,
               @execution_environment.base_image_url,
               "2.19.3"
@@ -149,7 +149,7 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "Actions::ForemanAnsibleDirector::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
             assert_not_nil env_def
 
           end
@@ -157,7 +157,7 @@ module ForemanAnsibleDirectorTests
           test 'updates execution environment within transaction' do
             original_name = @execution_environment.name
 
-            ee_update = ::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
+            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
               nil,
               'quay.io/ansible/base-ee:latest',
               '2.19.0'
@@ -183,7 +183,7 @@ module ForemanAnsibleDirectorTests
 
             ::ForemanAnsibleDirector::ExecutionEnvironmentService.destroy_execution_environment(@execution_environment)
 
-            assert_nil ExecutionEnvironment.find_by(id: ee_id)
+            assert_nil ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(id: ee_id)
           end
 
           test 'destroys execution environment within transaction' do
@@ -193,7 +193,7 @@ module ForemanAnsibleDirectorTests
               end
             end
 
-            assert_not_nil ExecutionEnvironment.find_by(id: @execution_environment.id)
+            assert_not_nil ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(id: @execution_environment.id)
           end
         end
 
@@ -217,7 +217,7 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "Actions::ForemanAnsibleDirector::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
             assert_not_nil env_def
             assert_equal @execution_environment.base_image_url, env_def[:content][:base_image]
             assert_equal @execution_environment.ansible_version, env_def[:content][:ansible_core_version]
@@ -228,7 +228,7 @@ module ForemanAnsibleDirectorTests
             @role = FactoryBot.create(:ansible_role, organization: @organization)
             @role_version = FactoryBot.create(:content_unit_version, versionable: @role)
 
-            k = FactoryBot.create(
+            FactoryBot.create(
               :execution_environment_content_unit,
               execution_environment: @execution_environment,
               content_unit: @role,
@@ -240,9 +240,7 @@ module ForemanAnsibleDirectorTests
               content_unit: @collection,
               content_unit_version: @collection_version
             )
-
             @execution_environment.reload
-
             task_called = false
             env_def = nil
 

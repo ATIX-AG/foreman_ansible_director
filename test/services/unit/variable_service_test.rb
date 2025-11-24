@@ -19,7 +19,7 @@ module ForemanAnsibleDirectorTests
         describe '#create_variable' do
           test 'creates a variable with valid params for collection role' do
 
-            create = Structs::AnsibleVariable::AnsibleVariableCreate.new("test_variable", "string", "test_value")
+            create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new("test_variable", "string", "test_value")
             variable = ::ForemanAnsibleDirector::VariableService.create_variable(create, @collection_role)
 
             assert_not_nil variable
@@ -41,7 +41,7 @@ module ForemanAnsibleDirectorTests
 
           test 'updates variable with valid params' do
 
-            update = Structs::AnsibleVariable::AnsibleVariableEdit.new("updated_key", "boolean", true, true)
+            update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableEdit.new("updated_key", "boolean", true, true)
 
             ::ForemanAnsibleDirector::VariableService.edit_variable(update, @variable)
             @variable.reload
@@ -67,13 +67,13 @@ module ForemanAnsibleDirectorTests
             assert_not variable1.overridable?
             assert_not variable2.overridable?
 
-            update = Structs::AnsibleVariable::AnsibleVariableEdit.new(variable1.key, variable1.key_type, variable1.default_value, true)
+            update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableEdit.new(variable1.key, variable1.key_type, variable1.default_value, true)
             ::ForemanAnsibleDirector::VariableService.edit_variable(update, variable1)
             variable1.reload
 
             assert variable1.overridable?
 
-            override = Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
+            override = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
             ::ForemanAnsibleDirector::VariableService.create_override override, variable2
             variable2.reload
 
@@ -90,7 +90,7 @@ module ForemanAnsibleDirectorTests
 
           test 'creates an override with valid params' do
 
-            override_create = Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
+            override_create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
             override = ::ForemanAnsibleDirector::VariableService.create_override override_create, @variable
 
             assert_not_nil override
@@ -110,7 +110,7 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'updates override with valid params' do
-            override_update = Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
+            override_update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
 
             ::ForemanAnsibleDirector::VariableService.edit_override(override_update, @override)
             @override.reload
@@ -176,7 +176,7 @@ module ForemanAnsibleDirectorTests
               @variables = [*vars1, *vars2]
             end
 
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, true)
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, include_overridable: true)
 
             assert_equal 2, results.length
             assert results[0][:overridable]
@@ -184,7 +184,7 @@ module ForemanAnsibleDirectorTests
 
             _override1 = FactoryBot.create(:lookup_value, lookup_key: @variables[0], match: "fqdn=#{@host.fqdn}")
             _override2 = FactoryBot.create(:lookup_value, lookup_key: @variables[1], match: "fqdn=#{@host.fqdn}")
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, true)
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, include_overridable: true)
 
             assert_equal 4, results.length
 
