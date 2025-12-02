@@ -15,44 +15,43 @@ module ForemanAnsibleDirector
 
         def create
           permitted_params = lifecycle_environment_path_params
-          begin
-            ActiveRecord::Base.transaction do
-              @lifecycle_environment_path = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.new(permitted_params)
-              @lifecycle_environment_path.organization = @organization
-              @lifecycle_environment_path.save!
-            end
-          rescue ActiveRecord::RecordInvalid
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: @lifecycle_environment_path.flatten_errors })
-          end
+
+          path_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathCreate.new(
+            permitted_params[:name],
+            permitted_params[:description],
+            @organization.id
+          )
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(path_create)
         end
 
         def update
           permitted_params = lifecycle_environment_path_params
-          begin
-            ActiveRecord::Base.transaction do
-              @lifecycle_environment_path.update!(permitted_params)
-            end
-          rescue ActiveRecord::RecordInvalid
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: @lifecycle_environment_path.flatten_errors })
-          end
+          path_update = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathEdit.new(
+            permitted_params[:name],
+            permitted_params[:description]
+          )
+
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(@lifecycle_environment_path, path_update)
         end
 
         def destroy
-          ActiveRecord::Base.transaction do # TODO: Rollback if any LCE is used by host; Setting
-            @lifecycle_environment_path.update!(root_environment_id: nil)
-            @lifecycle_environment_path.destroy!
-          end
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.destroy_path(
+            @lifecycle_environment_path
+          )
         end
 
         def promote
           permitted_params = promote_params
-          unless @lifecycle_environment_path.promote(permitted_params[:source_environment_id],
-            permitted_params[:target_environment_id])
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: @lifecycle_environment_path.flatten_errors })
-          end
+
+          path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
+            permitted_params[:source_environment_id],
+            permitted_params[:target_environment_id]
+          )
+
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+            @lifecycle_environment_path,
+            path_promote
+          )
         end
 
         private

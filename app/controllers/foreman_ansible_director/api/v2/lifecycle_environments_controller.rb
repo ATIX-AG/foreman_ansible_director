@@ -6,7 +6,7 @@ module ForemanAnsibleDirector
       class LifecycleEnvironmentsController < AnsibleDirectorApiController
         include ::Api::Version2
 
-        before_action :find_resource, only: %i[show update destroy update_content content]
+        before_action :find_resource, only: %i[show update destroy update_content content assign]
         before_action :find_path, only: %i[create]
         before_action :find_organization, only: %i[create update_content]
         before_action :find_assignment_target, only: %i[assign]
@@ -20,70 +20,64 @@ module ForemanAnsibleDirector
 
         def create
           permitted_params = lifecycle_environment_params
-          position = permitted_params.delete(:position)
-          @lifecycle_environment = ::ForemanAnsibleDirector::LifecycleEnvironment.new(permitted_params)
-          @lifecycle_environment.organization = @organization
-          @lifecycle_environment_path.insert_at_position(@lifecycle_environment, position || 0)
+          position = permitted_params.delete(:position) || 0
+
+          lce_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentCreate.new(
+            permitted_params[:name],
+            permitted_params[:description],
+            position,
+            @organization.id
+          )
+
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(@lifecycle_environment_path,
+            lce_create)
         end
 
         def update
           permitted_params = lifecycle_environment_update_params
 
-          if @lifecycle_environment.update(permitted_params)
-            # render success response
-          else
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: @lifecycle_environment.flatten_errors })
-          end
+          lce_edit = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentEdit.new(
+            permitted_params[:name],
+            permitted_params[:description],
+            permitted_params[:execution_environment_id]
+          )
+
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
+            @lifecycle_environment,
+            lce_edit
+          )
         end
 
         def update_content
           content_params = content_assignments_params
 
-          if content_params
-            unless @lifecycle_environment.root?
-              ancestor_names = @lifecycle_environment.ancestors.pluck(:name).join(', ')
-              error_message = "LCE #{@lifecycle_environment.name} is not the head link in path " \
-                "#{@lifecycle_environment_path.name}. It is preceded by #{ancestor_names}."
+          unless @lifecycle_environment.root?
+            ancestor_names = @lifecycle_environment.ancestors.pluck(:name).join(', ')
+            error_message = "LCE #{@lifecycle_environment.name} is not the head link in path " \
+              "#{@lifecycle_environment_path.name}. It is preceded by #{ancestor_names}."
 
-              render_error('custom_error',
-                status: :unprocessable_entity,
-                locals: { message: error_message })
-              return
-            end
-
-            success = true
-            ActiveRecord::Base.transaction do
-              @lifecycle_environment.direct_content_unit_versions.clear
-              content_params[:content_assignments].each do |assignment|
-                unit = ::ForemanAnsibleDirector::ContentUnit.find(assignment[:id])
-                unit_version = unit.content_unit_versions.find_by!(version: assignment[:version])
-                success &&= @lifecycle_environment.assign_content_unit_version!(unit_version)
-              end
-              if (ee_id = content_params[:execution_environment_id])
-                success &&= @lifecycle_environment.assign_execution_environment!(ee_id)
-              end
-              # success &&= @lifecycle_environment.update(permitted_params) if success
-
-              raise ActiveRecord::Rollback unless success
-            end
-          else
-            success = false
+            render_error('custom_error',
+              status: :unprocessable_entity,
+              locals: { message: error_message })
+            return
           end
 
-          if success
-            # render success response
-          else
-            render_error('custom_error', status: :unprocessable_entity,
-                         locals: { message: @lifecycle_environment.flatten_errors })
-          end
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_content(
+            @lifecycle_environment,
+            content_params[:content_assignments],
+            content_params[:execution_environment_id]
+          )
         end
 
         def assign
-          @target.update(ansible_lifecycle_environment_id: params[:id])
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign(
+            @lifecycle_environment,
+            @target
+          )
         end
 
         def destroy
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.destroy_environment @lifecycle_environment
         end
 
         def resource_scope
@@ -111,11 +105,11 @@ module ForemanAnsibleDirector
           params.require(:lifecycle_environment).permit(
             :name,
             :description,
-            :position,
-            content: [
-              :execution_environment_id,
-              { content_assignments: %i[id version] },
-            ]
+            :position
+            # content: [
+            #  :execution_environment_id,
+            #  { content_assignments: %i[id version] },
+            # ]
           ).merge(
             # lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
             organization_id: params[:organization_id]

@@ -18,11 +18,8 @@ module ForemanAnsibleDirector
     belongs_to :parent,
       class_name: 'LifecycleEnvironment',
       optional: true
-    has_many :children,
-      class_name: 'LifecycleEnvironment',
-      foreign_key: 'parent_id',
-      dependent: :destroy,
-      inverse_of: :parent
+    belongs_to :child,
+      class_name: 'LifecycleEnvironment'
 
     validates :name, presence: true
     validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -95,7 +92,7 @@ module ForemanAnsibleDirector
     end
 
     def leaf?
-      children.empty?
+      child.nil?
     end
 
     def ancestors
