@@ -37,7 +37,8 @@ module ForemanAnsibleDirector
             @organization.id
           )
 
-          ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment ee_update, @execution_environment
+          ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment ee_update,
+            @execution_environment
         end
 
         def destroy
@@ -51,15 +52,15 @@ module ForemanAnsibleDirector
           params.require(:execution_environment).permit(
             :name,
             :base_image_url,
-            :ansible_version,
-          #content: %i[
-          #  id
-          #  version
-          #]
-            )
+            :ansible_version
+            # content: %i[
+            #  id
+            #  version
+            # ]
+          )
         end
 
-        #def associate_content_units(execution_env, content_array) TODO: OR-6580
+        # def associate_content_units(execution_env, content_array) TODO: OR-6580
         #  content_array.each do |content|
         #    content_unit_id = content[:id]
         #    content_unit_version = content[:version]
@@ -86,7 +87,7 @@ module ForemanAnsibleDirector
         #      content_unit_version: version_to_link
         #    )
         #  end
-        #end
+        # end
 
         def resource_class
           ::ForemanAnsibleDirector::ExecutionEnvironment

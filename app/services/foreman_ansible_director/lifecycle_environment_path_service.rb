@@ -143,6 +143,8 @@ module ForemanAnsibleDirector
       end
 
       def valid_promotion?(source_env, target_env)
+        # Disabling linter rule for this because this will be needed once explicit error handling is implemented
+        # rubocop:disable Style/GuardClause
         if source_env.leaf?
           # errors.add(:source_env, 'Source environment is the final link in chain.')
           raise ActiveRecord::Rollback
@@ -157,6 +159,7 @@ module ForemanAnsibleDirector
           # errors.add(:source_env, 'Promotion spans more than two environments and $SETTING_NAME is set to false.')
           raise ActiveRecord::Rollback
         end
+        # rubocop:enable Style/GuardClause
       end
 
       def create_snapshot(environment)

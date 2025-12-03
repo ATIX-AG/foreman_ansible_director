@@ -17,7 +17,6 @@ module ForemanAnsibleDirector
     scope :by_name, ->(name) { where(name: name) }
     scope :with_root, -> { where.not(root_environment_id: nil) }
 
-
     # TODO: Unused. Does this bring advantages anywhere?
     def swap_environments(env1_id, env2_id)
       ::ForemanAnsibleDirector::LifecycleEnvironment.transaction do

@@ -43,10 +43,11 @@ module ForemanAnsibleDirector
         def promote
           permitted_params = promote_params
 
-          path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-            permitted_params[:source_environment_id],
-            permitted_params[:target_environment_id]
-          )
+          path_promote =
+            ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
+              permitted_params[:source_environment_id],
+              permitted_params[:target_environment_id]
+            )
 
           ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
             @lifecycle_environment_path,
