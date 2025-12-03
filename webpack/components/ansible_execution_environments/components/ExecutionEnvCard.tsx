@@ -12,6 +12,8 @@ import {
 import styles from '@patternfly/react-styles/css/components/Form/form';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+
 import { TextInputEditable } from './components/TextInputEditable';
 
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
@@ -19,6 +21,7 @@ import {
   AnsibleExecutionEnv,
   AnsibleExecutionEnvCreate,
 } from '../../../types/AnsibleExecutionEnvTypes';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 
 interface ExecutionEnvCardProps {
   executionEnv: AnsibleExecutionEnv;
@@ -41,6 +44,13 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
   const [executionEnvironment, setExecutionEnvironment] = React.useState<
     AnsibleExecutionEnv
   >();
+
+  const userCanDestroy: boolean = usePermissions([
+    AdPermissions.executionEnvironments.destroy,
+  ]);
+  const userCanEdit: boolean = usePermissions([
+    AdPermissions.executionEnvironments.edit,
+  ]);
 
   useEffect(() => {
     setExecutionEnvironment(executionEnv);
@@ -77,6 +87,8 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
               handleDestroy={askConfirmDestroy}
               handleEdit={askConfirmUpdate}
               executionEnvironment={executionEnvironment}
+              canDestroy={userCanDestroy}
+              canEdit={userCanEdit}
             />
           ),
         }}

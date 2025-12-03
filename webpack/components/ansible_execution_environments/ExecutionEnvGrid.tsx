@@ -23,6 +23,7 @@ import {
   PaginationProps,
 } from 'foremanReact/common/hooks/API/APIHooks';
 import Pagination from 'foremanReact/components/Pagination';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 
 import { ExecutionEnvCard } from './components/ExecutionEnvCard';
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';
@@ -31,6 +32,7 @@ import {
   AnsibleExecutionEnv,
   AnsibleExecutionEnvCreate,
 } from '../../types/AnsibleExecutionEnvTypes';
+import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
 
 interface ExecutionEnvGridProps {
   apiResponse: GetAnsibleExecutionEnvResponse;
@@ -66,6 +68,10 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   >();
   const [totalItemsCount, setTotalItemsCount] = React.useState<number>();
   const [showCreateCard, setShowCreateCard] = React.useState<boolean>(false);
+
+  const userCanCreate = usePermissions([
+    AdPermissions.executionEnvironments.create,
+  ]);
 
   useEffect(() => {
     setExecutionEnvironments(apiResponse.results);
@@ -118,7 +124,7 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   const gridContent = (): ReactElement | ReactElement[] | null => {
     if (executionEnvironments && executionEnvironments.length > 0) {
       return grid([
-        createCard(),
+        ...(userCanCreate ? [createCard()] : []),
         ...executionEnvironments.map(ee => (
           <GalleryItem key={ee.id}>
             <ExecutionEnvCard

@@ -15,6 +15,8 @@ interface ExecutionEnvCardHeaderActionsProps {
     executionEnvironment: AnsibleExecutionEnv | AnsibleExecutionEnvCreate
   ) => void;
   executionEnvironment: AnsibleExecutionEnv | AnsibleExecutionEnvCreate;
+  canEdit: boolean;
+  canDestroy: boolean;
 }
 
 export const ExecutionEnvCardHeaderActions: React.FC<ExecutionEnvCardHeaderActionsProps> = ({
@@ -22,46 +24,52 @@ export const ExecutionEnvCardHeaderActions: React.FC<ExecutionEnvCardHeaderActio
   handleEdit,
   handleDestroy,
   executionEnvironment,
+  canEdit,
+  canDestroy,
 }) => (
   <>
-    <Popover
-      triggerAction="hover"
-      aria-label="delete popover"
-      headerContent={<div>Delete</div>}
-      bodyContent={<div>Delete this Execution Environment definition.</div>}
-    >
-      <Button
-        variant="plain"
-        aria-label="Action"
-        onClick={() => handleDestroy(executionEnvironment)}
+    {canDestroy && (
+      <Popover
+        triggerAction="hover"
+        aria-label="delete popover"
+        headerContent={<div>Delete</div>}
+        bodyContent={<div>Delete this Execution Environment definition.</div>}
       >
-        <Icon size="lg">
-          <TrashIcon />
-        </Icon>
-      </Button>
-    </Popover>
-    <Popover
-      triggerAction="hover"
-      aria-label="edit popover"
-      headerContent={<div>Edit</div>}
-      bodyContent={
-        <div>
-          Edit this Execution Environment definition. This will require the
-          image to be rebuilt.
-        </div>
-      }
-    >
-      <Button variant="plain" aria-label="Action" onClick={handleEdit}>
-        {editMode ? (
+        <Button
+          variant="plain"
+          aria-label="Action"
+          onClick={() => handleDestroy(executionEnvironment)}
+        >
           <Icon size="lg">
-            <SaveIcon />
+            <TrashIcon />
           </Icon>
-        ) : (
-          <Icon size="lg">
-            <EditIcon />
-          </Icon>
-        )}
-      </Button>
-    </Popover>
+        </Button>
+      </Popover>
+    )}
+    {canEdit && (
+      <Popover
+        triggerAction="hover"
+        aria-label="edit popover"
+        headerContent={<div>Edit</div>}
+        bodyContent={
+          <div>
+            Edit this Execution Environment definition. This will require the
+            image to be rebuilt.
+          </div>
+        }
+      >
+        <Button variant="plain" aria-label="Action" onClick={handleEdit}>
+          {editMode ? (
+            <Icon size="lg">
+              <SaveIcon />
+            </Icon>
+          ) : (
+            <Icon size="lg">
+              <EditIcon />
+            </Icon>
+          )}
+        </Button>
+      </Popover>
+    )}
   </>
 );

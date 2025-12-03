@@ -88,6 +88,8 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
                 createExecutionEnv();
               }}
               executionEnvironment={executionEnvironment}
+              canDestroy
+              canEdit
             />
           ),
         }}
