@@ -12,6 +12,8 @@ interface AnsibleLcePathComponentHeaderActionsProps {
   editMode: boolean;
   handleEdit: () => void;
   handleDestroy: (lcePath: AnsibleLcePath) => void;
+  canEdit: boolean;
+  canDestroy: boolean;
 }
 
 export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathComponentHeaderActionsProps> = ({
@@ -19,6 +21,8 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
   editMode,
   handleEdit,
   handleDestroy,
+  canEdit,
+  canDestroy,
 }) => (
   <>
     {lcePath.description !== '' && (
@@ -35,39 +39,43 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
         </Button>
       </Popover>
     )}
-    <Popover
-      triggerAction="hover"
-      aria-label="delete popover"
-      headerContent={<div>Delete</div>}
-      bodyContent={<div>Delete this Lifecycle Environment Path.</div>}
-    >
-      <Button
-        variant="plain"
-        aria-label="Action"
-        onClick={() => handleDestroy(lcePath)}
+    {canDestroy && (
+      <Popover
+        triggerAction="hover"
+        aria-label="delete popover"
+        headerContent={<div>Delete</div>}
+        bodyContent={<div>Delete this Lifecycle Environment Path.</div>}
       >
-        <Icon size="lg">
-          <TrashIcon />
-        </Icon>
-      </Button>
-    </Popover>
-    <Popover
-      triggerAction="hover"
-      aria-label="edit popover"
-      headerContent={<div>Edit</div>}
-      bodyContent={<div>Edit this Lifecycle Environment Path.</div>}
-    >
-      <Button variant="plain" aria-label="Action" onClick={handleEdit}>
-        {editMode ? (
+        <Button
+          variant="plain"
+          aria-label="Action"
+          onClick={() => handleDestroy(lcePath)}
+        >
           <Icon size="lg">
-            <SaveIcon />
+            <TrashIcon />
           </Icon>
-        ) : (
-          <Icon size="lg">
-            <EditIcon />
-          </Icon>
-        )}
-      </Button>
-    </Popover>
+        </Button>
+      </Popover>
+    )}
+    {canEdit && (
+      <Popover
+        triggerAction="hover"
+        aria-label="edit popover"
+        headerContent={<div>Edit</div>}
+        bodyContent={<div>Edit this Lifecycle Environment Path.</div>}
+      >
+        <Button variant="plain" aria-label="Action" onClick={handleEdit}>
+          {editMode ? (
+            <Icon size="lg">
+              <SaveIcon />
+            </Icon>
+          ) : (
+            <Icon size="lg">
+              <EditIcon />
+            </Icon>
+          )}
+        </Button>
+      </Popover>
+    )}
   </>
 );

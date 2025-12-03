@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import axios from 'axios';
 import {
   IndexResponse,
   PaginationProps,
   UseAPIReturn,
 } from 'foremanReact/common/hooks/API/APIHooks';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
 import {
@@ -17,6 +18,7 @@ import { Button } from '@patternfly/react-core';
 import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 import { AnsibleLcePathIndex } from './AnsibleLcePathIndex';
 import { Page } from '../../common/Page';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 
 export interface GetAnsibleLcePathsResponse extends IndexResponse {
   results: AnsibleLcePath[];
@@ -28,6 +30,10 @@ const AnsibleContentTableWrapper: React.FC = () => {
   const [isCreateButtonLoading, setIsCreateButtonLoading] = React.useState<
     boolean
   >(false);
+
+  const canCreatePath: boolean = usePermissions([
+    AdPermissions.ansibleLcePaths.create,
+  ]);
 
   const createLcePath = async (): Promise<void> => {
     setIsCreateButtonLoading(true);
@@ -73,19 +79,26 @@ const AnsibleContentTableWrapper: React.FC = () => {
     contentRequest.setAPIOptions(options => ({ ...options }));
   };
 
+  const toolbarItems = (): ReactElement[] => {
+    if (canCreatePath) {
+      return [
+        <Button
+          onClick={() => createLcePath()}
+          isLoading={isCreateButtonLoading}
+        >
+          Create LCE Path
+        </Button>,
+      ];
+    }
+    return [];
+  };
+
   if (contentRequest.status === 'RESOLVED') {
     return (
       <>
         <Page
           header="Ansible Environments"
-          customToolbarItems={[
-            <Button
-              onClick={() => createLcePath()}
-              isLoading={isCreateButtonLoading}
-            >
-              Create LCE Path
-            </Button>,
-          ]}
+          customToolbarItems={toolbarItems()}
           hasDocumentation={false}
         >
           <AnsibleLcePathIndex

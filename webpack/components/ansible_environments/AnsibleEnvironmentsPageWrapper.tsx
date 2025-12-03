@@ -1,9 +1,13 @@
 import React from 'react';
-import AnsibleEnvironmentsPage from './AnsibleEnvironmentsPage';
+import Permitted from 'foremanReact/components/Permitted';
 
-// TODO: This wrapper will be used for permission management
+import AnsibleEnvironmentsPage from './AnsibleEnvironmentsPage';
+import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
+
 const AnsibleEnvironmentsPageWrapper: React.FC = () => (
-  <AnsibleEnvironmentsPage />
+  <Permitted requiredPermissions={[AdPermissions.ansibleLcePaths.view]}>
+    <AnsibleEnvironmentsPage />
+  </Permitted>
 );
 
 export default AnsibleEnvironmentsPageWrapper;

@@ -36,6 +36,8 @@ import {
 import { AnsibleLcePathComponentHeaderActions } from './AnsibleLcePathComponentHeaderActions';
 import { AnsibleLcePathEmptyState } from './AnsibleLcePathEmptyState';
 import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
@@ -71,6 +73,17 @@ export const AnsibleLcePathComponent = ({
 
   const organization = useForemanOrganization();
   const dispatch = useDispatch();
+
+  const userCanEditPath: boolean = usePermissions([
+    AdPermissions.ansibleLcePaths.edit,
+  ]);
+  const userCanDestroyPath: boolean = usePermissions([
+    AdPermissions.ansibleLcePaths.destroy,
+  ]);
+
+  const userCanPromotePath: boolean = usePermissions([
+    AdPermissions.ansibleLcePaths.promote,
+  ]);
 
   useEffect(() => {
     setLifecycleEnvironmentPath(lcePath);
@@ -352,7 +365,11 @@ export const AnsibleLcePathComponent = ({
               </div>
             }
           >
-            <Button variant="plain" style={{ padding: '10px' }}>
+            <Button
+              variant="plain"
+              style={{ padding: '10px' }}
+              isDisabled={!userCanPromotePath}
+            >
               <Icon iconSize="lg" style={{ verticalAlign: 'middle' }}>
                 <BarsIcon />
               </Icon>
@@ -386,6 +403,7 @@ export const AnsibleLcePathComponent = ({
             isLoading={env.id === loadingButton}
             // @ts-ignore: TS18048 - env.env is checked for undefined above
             onClick={() => handlePromote(env.id, nextEnv.id)}
+            isDisabled={!userCanPromotePath}
           >
             <Icon iconSize="lg" style={{ verticalAlign: 'middle' }}>
               <ArrowRightIcon />
@@ -447,6 +465,8 @@ export const AnsibleLcePathComponent = ({
               editMode={editMode}
               handleEdit={handleLcePathUpdate}
               handleDestroy={handleDestroyLcePath}
+              canEdit={userCanEditPath}
+              canDestroy={userCanDestroyPath}
             />
           ),
           hasNoOffset: true,
