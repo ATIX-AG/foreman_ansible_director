@@ -107,7 +107,7 @@ Foreman::Plugin.register :foreman_ansible_director do
       { 'foreman_ansible_director/api/v2/execution_environments': [:create] },
       resource_type: 'ExecutionEnvironment'
     # Edit
-    permission :view_ansible_execution_environments,
+    permission :edit_ansible_execution_environments,
       { 'foreman_ansible_director/api/v2/execution_environments': [:update] },
       resource_type: 'ExecutionEnvironment'
     # Destroy

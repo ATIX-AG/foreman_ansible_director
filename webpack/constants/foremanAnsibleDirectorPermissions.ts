@@ -17,20 +17,20 @@ export const AdPermissions = {
   ansibleLce: {
     view: 'view_ansible_lifecycle_environments',
     create: 'create_ansible_lifecycle_environments',
-    edit: 'create_ansible_lifecycle_environments',
+    edit: 'edit_ansible_lifecycle_environments',
     destroy: 'destroy_ansible_lifecycle_environments',
   },
   ansibleLcePaths: {
     view: 'view_ansible_lifecycle_environment_paths',
     create: 'create_ansible_lifecycle_environment_paths',
-    edit: 'create_ansible_lifecycle_environment_paths',
+    edit: 'edit_ansible_lifecycle_environment_paths',
     destroy: 'destroy_ansible_lifecycle_environment_paths',
     promote: 'promote_ansible_lifecycle_environment_paths',
   },
   executionEnvironments: {
     view: 'view_ansible_execution_environments',
     create: 'create_ansible_execution_environments',
-    edit: 'create_ansible_execution_environments',
+    edit: 'edit_ansible_execution_environments',
     destroy: 'destroy_ansible_execution_environments',
   },
   assignments: {
