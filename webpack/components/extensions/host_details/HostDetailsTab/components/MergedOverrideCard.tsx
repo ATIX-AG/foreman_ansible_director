@@ -21,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
 import { StringAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/StringAdapter';
@@ -29,6 +30,7 @@ import { IntegerAdapter } from '../../../../ansible_content/components/AnsibleVa
 import { RealAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/RealAdapter';
 
 import { YamlEditor } from '../../../../common/YamlEditor';
+import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface MergedOverrideCardProps {
   mergedOverride: MergedVariableOverride;
@@ -56,6 +58,10 @@ export const MergedOverrideCard = ({
     }
     setOverrideValue(v);
   }, [mergedOverride]);
+
+  const userCanEditOverrides: boolean = usePermissions([
+    AdPermissions.ansibleVariableOverrides.edit,
+  ]);
 
   const dispatch = useDispatch();
 
@@ -190,6 +196,25 @@ export const MergedOverrideCard = ({
     setIsEditMode(!isEditMode);
   };
 
+  const editAction = (): ReactElement => (
+    <Button
+      variant="plain"
+      aria-label="Action"
+      onClick={() => onAction()}
+      isInline
+    >
+      {isEditMode ? (
+        <Icon size="md">
+          <SaveIcon />
+        </Icon>
+      ) : (
+        <Icon size="md">
+          <EditIcon />
+        </Icon>
+      )}
+    </Button>
+  );
+
   return (
     <>
       {override !== undefined && (
@@ -198,24 +223,7 @@ export const MergedOverrideCard = ({
             <>
               <CardHeader
                 actions={{
-                  actions: [
-                    <Button
-                      variant="plain"
-                      aria-label="Action"
-                      onClick={() => onAction()}
-                      isInline
-                    >
-                      {isEditMode ? (
-                        <Icon size="md">
-                          <SaveIcon />
-                        </Icon>
-                      ) : (
-                        <Icon size="md">
-                          <EditIcon />
-                        </Icon>
-                      )}
-                    </Button>,
-                  ],
+                  actions: [...(userCanEditOverrides ? [editAction()] : [])],
                 }}
               >
                 <Label color="blue" isCompact>

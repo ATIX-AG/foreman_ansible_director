@@ -77,7 +77,11 @@ export const HostDetailsTab = ({
             </>
           }
         >
-          <OverrideGridWrapper hostId={response.id} fqdn={response.name} />
+          <Permitted
+            requiredPermissions={[AdPermissions.ansibleVariableOverrides.view]}
+          >
+            <OverrideGridWrapper hostId={response.id} fqdn={response.name} />
+          </Permitted>
         </Tab>
       </Tabs>
     );
