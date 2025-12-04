@@ -36,6 +36,7 @@ interface InnerLceAssignmentSelectorProps {
   setChosenUnits: Dispatch<
     SetStateAction<{ [unit: string]: { type: string; id: number }[] }>
   >;
+  userCanManageAssignments: boolean;
 }
 
 interface LceAssignmentSelectorProps {
@@ -47,6 +48,7 @@ interface LceAssignmentSelectorProps {
   setChosenUnits: Dispatch<
     SetStateAction<{ [unit: string]: { type: string; id: number }[] }>
   >;
+  userCanManageAssignments: boolean;
 }
 
 interface ContentUnitTreeItemData extends DualListSelectorTreeItemData {
@@ -58,6 +60,7 @@ export const InnerLceAssignmentSelector = ({
   assignedContent,
   chosenUnits,
   setChosenUnits,
+  userCanManageAssignments,
 }: InnerLceAssignmentSelectorProps): React.ReactElement => {
   const [selectedRoles, setSelectedRoles] = React.useState<{
     [unit: string]: { type: string; id: number }[];
@@ -279,7 +282,9 @@ export const InnerLceAssignmentSelector = ({
       {buildPane(false)}
       <DualListSelectorControlsWrapper>
         <DualListSelectorControl
-          isDisabled={Object.keys(selectedRoles).length === 0}
+          isDisabled={
+            Object.keys(selectedRoles).length === 0 || !userCanManageAssignments
+          }
           onClick={() => moveChecked(true)}
           aria-label="Add selected"
         >
@@ -287,7 +292,9 @@ export const InnerLceAssignmentSelector = ({
         </DualListSelectorControl>
         <DualListSelectorControl
           onClick={() => moveChecked(false)}
-          isDisabled={Object.keys(selectedRoles).length === 0}
+          isDisabled={
+            Object.keys(selectedRoles).length === 0 || !userCanManageAssignments
+          }
           aria-label="Remove selected"
         >
           <AngleLeftIcon />
@@ -303,11 +310,13 @@ export const LceAssignmentSelector = ({
   assignedContent,
   chosenUnits,
   setChosenUnits,
+  userCanManageAssignments,
 }: LceAssignmentSelectorProps): React.ReactElement => (
   <InnerLceAssignmentSelector
     data={contentUnits}
     assignedContent={assignedContent}
     chosenUnits={chosenUnits}
     setChosenUnits={setChosenUnits}
+    userCanManageAssignments={userCanManageAssignments}
   />
 );

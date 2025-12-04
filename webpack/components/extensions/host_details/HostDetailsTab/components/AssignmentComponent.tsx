@@ -15,6 +15,7 @@ import {
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useDispatch } from 'react-redux';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import { LceAssignmentSelector } from './LceAssignmentSelector';
 import {
@@ -22,6 +23,7 @@ import {
   isAnsibleLce,
   unnamedAssignmentType,
 } from './AssignmentComponentWrapper';
+import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AssignmentComponentProps {
   contentResponse: AvailableContentResponse;
@@ -40,6 +42,11 @@ export const AssignmentComponent = ({
   }>({});
 
   const dispatch = useDispatch();
+
+  const userCanManageAssignments: boolean = usePermissions([
+    AdPermissions.assignments.create,
+    AdPermissions.assignments.destroy,
+  ]);
 
   const bulkAssignContent = async (): Promise<void> => {
     const formattedUnits: {
@@ -116,6 +123,7 @@ export const AssignmentComponent = ({
                     setIsSaveLoading(false);
                   }}
                   isLoading={isSaveLoading}
+                  isDisabled={!userCanManageAssignments}
                 >
                   <Icon size="lg">
                     <SaveIcon />
@@ -133,6 +141,7 @@ export const AssignmentComponent = ({
               contentUnits={contentResponse.content}
               chosenUnits={chosenUnits}
               setChosenUnits={setChosenUnits}
+              userCanManageAssignments={userCanManageAssignments}
             />
           ) : (
             <EmptyState>

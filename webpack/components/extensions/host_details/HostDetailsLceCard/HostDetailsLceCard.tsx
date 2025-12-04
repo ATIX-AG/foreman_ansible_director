@@ -15,12 +15,15 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+
 import { HostDetailsLceCardHeaderActions } from './components/HostDetailsLceCardHeaderActions';
 import { LcePathSelectorWrapper } from './components/LcePathSelectorWrapper';
 import {
   AnsibleLcePath,
   SparseAnsibleLce,
 } from '../../../../types/AnsibleEnvironmentsTypes';
+import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface HostDetailsLceCardProps {
   status: 'RESOLVED' | 'PENDING' | 'ERROR';
@@ -54,6 +57,10 @@ export const HostDetailsLceCard = ({
   );
 
   const dispatch = useDispatch();
+
+  const userCanCreateAssignments: boolean = usePermissions([
+    AdPermissions.assignments.create,
+  ]);
 
   useEffect(() => {
     let lcePath: string = LCE_PATH_SELECTOR_PLACEHOLDER;
@@ -133,6 +140,7 @@ export const HostDetailsLceCard = ({
                 <HostDetailsLceCardHeaderActions
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
+                  canEdit={userCanCreateAssignments}
                 />
               ),
             }}

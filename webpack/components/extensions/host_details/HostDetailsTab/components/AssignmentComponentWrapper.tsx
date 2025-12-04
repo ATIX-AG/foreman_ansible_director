@@ -86,7 +86,11 @@ export const AssignmentComponentWrapper = ({
       <Bullseye>
         <AssignmentComponent
           contentResponse={availableContent.response}
-          assignedContent={assignedContent.response}
+          assignedContent={
+            Object.keys(assignedContent.response).length === 0
+              ? []
+              : assignedContent.response
+          }
           hostId={hostId}
         />
       </Bullseye>

@@ -14,9 +14,11 @@ import IntegrationIcon from '@patternfly/react-icons/dist/esm/icons/integration-
 import DatabaseIcon from '@patternfly/react-icons/dist/esm/icons/database-icon';
 
 import { UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
+import Permitted from 'foremanReact/components/Permitted';
 
 import { AssignmentComponentWrapper } from './components/AssignmentComponentWrapper';
 import { OverrideGridWrapper } from './components/OverrideGridWrapper';
+import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 
@@ -55,12 +57,14 @@ export const HostDetailsTab = ({
             </>
           }
         >
-          <AssignmentComponentWrapper
-            ansibleLifecycleEnvironmentId={
-              response.ansible_lifecycle_environment_id
-            }
-            hostId={response.id}
-          />
+          <Permitted requiredPermissions={[AdPermissions.assignments.view]}>
+            <AssignmentComponentWrapper
+              ansibleLifecycleEnvironmentId={
+                response.ansible_lifecycle_environment_id
+              }
+              hostId={response.id}
+            />
+          </Permitted>
         </Tab>
         <Tab
           eventKey={1}
