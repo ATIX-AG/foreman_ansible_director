@@ -15,8 +15,10 @@ import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { useDispatch } from 'react-redux';
 import { AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleContentTableSecondaryRowProps {
   identifier: string; // Needed for keys
@@ -75,59 +77,65 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
   const organization = useForemanOrganization();
   const dispatch = useDispatch();
 
-  const rowActions = (version: AnsibleContentVersionWithCount): IAction[] => [
-    {
-      title: 'Destroy',
-      onClick: () => {
-        setIsConfirmationModalOpen(true);
-        setConfirmationModalTitle(`Destroy ${identifier}:${version.version}?`);
-        setConfirmationModalBody(
-          `This will destroy only version ${version.version} of ${identifier}.\nAre you sure you want to destroy ${identifier}:${version.version}?`
-        );
-        setConfirmationModalOnConfirm(async () => {
-          try {
-            await axios.delete(
-              foremanUrl('/api/v2/ansible_director/ansible_content'),
-              {
-                data: {
-                  organization_id: organization?.id,
-                  units: [
-                    {
-                      unit_name: identifier,
-                      unit_versions: [version.version],
-                    },
-                  ],
-                },
-              }
-            );
-            dispatch(
-              addToast({
-                type: 'success',
-                key: `DESTROY_CUV_${identifier}_${version.version}_SUCC`,
-                message: `Sucessfully destroyed Ansible content unit version "${identifier}:${version.version}"!`,
-                sticky: false,
-              })
-            );
-          } catch (e) {
-            dispatch(
-              addToast({
-                type: 'danger',
-                key: `DESTROY_CUV_${identifier}_${version.version}_ERR`,
-                message: `Destroying Ansible content unit version "${identifier}:${
-                  version.version
-                }" failed with error code "${
-                  (e as { response: AxiosResponse }).response.status
-                }".`,
-                sticky: false,
-              })
-            );
-          } finally {
-            setIsConfirmationModalOpen(false);
-            refreshRequest();
-          }
-        });
-      },
+  const userCanDestroyContent: boolean = usePermissions([
+    AdPermissions.ansibleContent.destroy,
+  ]);
+
+  const destroyAction = (version: AnsibleContentVersionWithCount): IAction => ({
+    title: 'Destroy',
+    onClick: () => {
+      setIsConfirmationModalOpen(true);
+      setConfirmationModalTitle(`Destroy ${identifier}:${version.version}?`);
+      setConfirmationModalBody(
+        `This will destroy only version ${version.version} of ${identifier}.\nAre you sure you want to destroy ${identifier}:${version.version}?`
+      );
+      setConfirmationModalOnConfirm(async () => {
+        try {
+          await axios.delete(
+            foremanUrl('/api/v2/ansible_director/ansible_content'),
+            {
+              data: {
+                organization_id: organization?.id,
+                units: [
+                  {
+                    unit_name: identifier,
+                    unit_versions: [version.version],
+                  },
+                ],
+              },
+            }
+          );
+          dispatch(
+            addToast({
+              type: 'success',
+              key: `DESTROY_CUV_${identifier}_${version.version}_SUCC`,
+              message: `Sucessfully destroyed Ansible content unit version "${identifier}:${version.version}"!`,
+              sticky: false,
+            })
+          );
+        } catch (e) {
+          dispatch(
+            addToast({
+              type: 'danger',
+              key: `DESTROY_CUV_${identifier}_${version.version}_ERR`,
+              message: `Destroying Ansible content unit version "${identifier}:${
+                version.version
+              }" failed with error code "${
+                (e as { response: AxiosResponse }).response.status
+              }".`,
+              sticky: false,
+            })
+          );
+        } finally {
+          setIsConfirmationModalOpen(false);
+          refreshRequest();
+        }
+      });
     },
+  });
+
+  const rowActions = (version: AnsibleContentVersionWithCount): IAction[] => [
+    ...(userCanDestroyContent ? [destroyAction(version)] : []),
   ];
 
   return (

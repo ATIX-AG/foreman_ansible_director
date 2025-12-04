@@ -3,9 +3,11 @@ import { ActionsColumn, IAction, Td, Tr } from '@patternfly/react-table';
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { useDispatch } from 'react-redux';
 import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleContentTablePrimaryRowProps {
   node: AnsibleContentUnit;
@@ -67,55 +69,61 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
   const organization = useForemanOrganization();
   const dispatch = useDispatch();
 
-  const rowActions: IAction[] = [
-    {
-      title: 'Destroy',
-      onClick: () => {
-        setIsConfirmationModalOpen(true);
-        setConfirmationModalTitle(`Destroy ${identifier}?`);
-        setConfirmationModalBody(
-          `This will destroy all imported versions of ${identifier}.\nAre you sure you want to destroy ${identifier}?`
-        );
-        setConfirmationModalOnConfirm(() => async () => {
-          try {
-            await axios.delete(
-              foremanUrl('/api/v2/ansible_director/ansible_content'),
-              {
-                data: {
-                  organization_id: organization?.id,
-                  units: [
-                    {
-                      unit_name: identifier,
-                    },
-                  ],
-                },
-              }
-            );
-            dispatch(
-              addToast({
-                type: 'success',
-                key: `DESTROY_CU_${node.id}_SUCC`,
-                message: `Sucessfully destroyed Ansible content unit "${identifier}"!`,
-                sticky: false,
-              })
-            );
-          } catch (e) {
-            dispatch(
-              addToast({
-                type: 'danger',
-                key: `DESTROY_CU_${node.id}_ERR`,
-                message: `Destroying Ansible content unit "${identifier}" failed with error code "${
-                  (e as { response: AxiosResponse }).response.status
-                }".`,
-                sticky: false,
-              })
-            );
-          } finally {
-            refreshRequest();
-          }
-        });
-      },
+  const userCanDestroyContent: boolean = usePermissions([
+    AdPermissions.ansibleContent.destroy,
+  ]);
+
+  const destroyAction = (): IAction => ({
+    title: 'Destroy',
+    onClick: () => {
+      setIsConfirmationModalOpen(true);
+      setConfirmationModalTitle(`Destroy ${identifier}?`);
+      setConfirmationModalBody(
+        `This will destroy all imported versions of ${identifier}.\nAre you sure you want to destroy ${identifier}?`
+      );
+      setConfirmationModalOnConfirm(() => async () => {
+        try {
+          await axios.delete(
+            foremanUrl('/api/v2/ansible_director/ansible_content'),
+            {
+              data: {
+                organization_id: organization?.id,
+                units: [
+                  {
+                    unit_name: identifier,
+                  },
+                ],
+              },
+            }
+          );
+          dispatch(
+            addToast({
+              type: 'success',
+              key: `DESTROY_CU_${node.id}_SUCC`,
+              message: `Sucessfully destroyed Ansible content unit "${identifier}"!`,
+              sticky: false,
+            })
+          );
+        } catch (e) {
+          dispatch(
+            addToast({
+              type: 'danger',
+              key: `DESTROY_CU_${node.id}_ERR`,
+              message: `Destroying Ansible content unit "${identifier}" failed with error code "${
+                (e as { response: AxiosResponse }).response.status
+              }".`,
+              sticky: false,
+            })
+          );
+        } finally {
+          refreshRequest();
+        }
+      });
     },
+  });
+
+  const rowActions: IAction[] = [
+    ...(userCanDestroyContent ? [destroyAction()] : []),
   ];
 
   return (
