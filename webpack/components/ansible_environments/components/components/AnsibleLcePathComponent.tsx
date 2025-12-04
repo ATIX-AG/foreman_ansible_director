@@ -2,6 +2,7 @@
 import React, {
   Dispatch,
   ReactElement,
+  ReactNode,
   SetStateAction,
   useEffect,
   useState,
@@ -28,6 +29,9 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { addToast } from 'foremanReact/components/ToastsList';
 
+import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+import Permitted from 'foremanReact/components/Permitted';
+
 import {
   AnsibleLce,
   AnsibleLcePath,
@@ -36,7 +40,6 @@ import {
 import { AnsibleLcePathComponentHeaderActions } from './AnsibleLcePathComponentHeaderActions';
 import { AnsibleLcePathEmptyState } from './AnsibleLcePathEmptyState';
 import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleLcePathProps {
@@ -83,6 +86,10 @@ export const AnsibleLcePathComponent = ({
 
   const userCanPromotePath: boolean = usePermissions([
     AdPermissions.ansibleLcePaths.promote,
+  ]);
+
+  const userCanCreateLce: boolean = usePermissions([
+    AdPermissions.ansibleLce.create,
   ]);
 
   useEffect(() => {
@@ -338,6 +345,7 @@ export const AnsibleLcePathComponent = ({
             variant="plain"
             style={{ padding: '10px' }}
             onClick={() => insertEnv('after', env)}
+            isDisabled={!userCanCreateLce}
           >
             <Icon iconSize="lg" style={{ verticalAlign: 'middle' }}>
               <PlusIcon />
@@ -416,7 +424,7 @@ export const AnsibleLcePathComponent = ({
     return null;
   };
 
-  const lceComponents = (): React.ReactNode => {
+  const lceComponents = (): ReactNode => {
     if (lcePath.lifecycle_environments.length > 0) {
       return lcePath.lifecycle_environments.map((env, index) => (
         <React.Fragment key={`${env.name}-${index}`}>
@@ -502,7 +510,9 @@ export const AnsibleLcePathComponent = ({
             overflow: 'auto',
           }}
         >
-          {lceComponents()}
+          <Permitted requiredPermissions={[AdPermissions.ansibleLce.view]}>
+            {lceComponents()}
+          </Permitted>
         </div>
       </CardBody>
     </Card>

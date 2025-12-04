@@ -14,6 +14,8 @@ interface AnsibleLceComponentHeaderActionsProps {
   handleEdit: () => void;
   handleDestroy: () => Promise<void>;
   handleEditContent: () => void;
+  canEdit: boolean;
+  canDestroy: boolean;
 }
 
 export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeaderActionsProps> = ({
@@ -23,31 +25,35 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
   handleEdit,
   handleDestroy,
   handleEditContent,
+  canEdit,
+  canDestroy,
 }) => (
   <>
-    <Popover
-      triggerAction="hover"
-      aria-label="ansible content popover"
-      headerContent={<div>Manage Ansible content</div>}
-      bodyContent={
-        <div>
-          Manage Ansible content for Lifecycle Environment{' '}
-          <strong>{lce.name}</strong>.
-        </div>
-      }
-    >
-      <Button
-        variant="plain"
-        aria-label="Action"
-        onClick={() => handleEditContent()}
-        isDisabled={lce.position !== 0}
+    {canEdit && (
+      <Popover
+        triggerAction="hover"
+        aria-label="ansible content popover"
+        headerContent={<div>Manage Ansible content</div>}
+        bodyContent={
+          <div>
+            Manage Ansible content for Lifecycle Environment{' '}
+            <strong>{lce.name}</strong>.
+          </div>
+        }
       >
-        <Icon size="md">
-          <AnsibleTowerIcon />
-        </Icon>
-      </Button>
-    </Popover>
-    {pathEditMode && (
+        <Button
+          variant="plain"
+          aria-label="Action"
+          onClick={() => handleEditContent()}
+          isDisabled={lce.position !== 0}
+        >
+          <Icon size="md">
+            <AnsibleTowerIcon />
+          </Icon>
+        </Button>
+      </Popover>
+    )}
+    {pathEditMode && canDestroy && (
       <>
         <Popover
           triggerAction="hover"
