@@ -1,13 +1,15 @@
 declare module 'foremanReact/components/Permitted' {
   import { ReactElement } from 'react';
 
-  interface PermittedProps {
+  interface PermittedProps<TPermitted, TUnpermitted> {
     requiredPermissions: string[];
-    children?: ReactElement;
-    unpermittedComponent?: ReactElement;
+    children?: TPermitted;
+    unpermittedComponent?: TUnpermitted;
   }
 
-  const Permitted: (props: PermittedProps) => ReactElement;
+  const Permitted: <TPermitted = ReactElement, TUnpermitted = ReactElement>(
+    props: PermittedProps
+  ) => TPermitted | TUnpermitted;
 
   export default Permitted;
 }
