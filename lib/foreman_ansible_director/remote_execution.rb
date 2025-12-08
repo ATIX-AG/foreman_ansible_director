@@ -6,8 +6,8 @@ module ForemanAnsibleDirector
   class Engine < ::Rails::Engine
     config.to_prepare do
       RemoteExecutionProvider.register(
-        :Ansible,
-        ForemanAnsibleDirector::Actions::RemoteExecution::AnsibleProvider
+        :AnsibleNavigator,
+        ForemanAnsibleDirector::Actions::RemoteExecution::Provider::AnsibleNavigatorProvider
       )
 
       ForemanAnsibleDirector::Engine.register_rex_feature
