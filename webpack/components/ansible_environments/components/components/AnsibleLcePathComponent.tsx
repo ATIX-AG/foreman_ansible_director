@@ -12,12 +12,10 @@ import { useDispatch } from 'react-redux';
 
 import {
   Bullseye,
-  Button,
   Card,
   CardBody,
   CardHeader,
   Icon,
-  Popover,
   TextInput,
 } from '@patternfly/react-core';
 
@@ -29,7 +27,6 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { addToast } from 'foremanReact/components/ToastsList';
 
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import Permitted from 'foremanReact/components/Permitted';
 
 import {
@@ -41,6 +38,7 @@ import { AnsibleLcePathComponentHeaderActions } from './AnsibleLcePathComponentH
 import { AnsibleLcePathEmptyState } from './AnsibleLcePathEmptyState';
 import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
+import { PermittedButton } from '../../../common/PermittedButton';
 
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
@@ -76,21 +74,6 @@ export const AnsibleLcePathComponent = ({
 
   const organization = useForemanOrganization();
   const dispatch = useDispatch();
-
-  const userCanEditPath: boolean = usePermissions([
-    AdPermissions.ansibleLcePaths.edit,
-  ]);
-  const userCanDestroyPath: boolean = usePermissions([
-    AdPermissions.ansibleLcePaths.destroy,
-  ]);
-
-  const userCanPromotePath: boolean = usePermissions([
-    AdPermissions.ansibleLcePaths.promote,
-  ]);
-
-  const userCanCreateLce: boolean = usePermissions([
-    AdPermissions.ansibleLce.create,
-  ]);
 
   useEffect(() => {
     setLifecycleEnvironmentPath(lcePath);
@@ -330,94 +313,99 @@ export const AnsibleLcePathComponent = ({
     const nextEnv = lcePath.lifecycle_environments[index + 1];
     if (editMode) {
       return (
-        <Popover
-          triggerAction="hover"
-          aria-label="Hoverable popover"
-          headerContent={<div>New Lifecycle Environment</div>}
-          bodyContent={
-            <div>
-              Insert new Lifecycle environment after <strong>{env.name}</strong>
-              .
-            </div>
-          }
+        <PermittedButton
+          requiredPermissions={[AdPermissions.ansibleLce.create]}
+          style={{ padding: '10px' }}
+          hasPopover
+          popoverProps={{
+            triggerAction: 'hover',
+            'aria-label': 'destroy popover',
+            headerComponent: 'h1',
+            headerContent: 'New Lifecycle Environment',
+            bodyContent: (
+              <div>
+                Insert new Lifecycle environment after{' '}
+                <strong>{env.name}</strong>.
+              </div>
+            ),
+          }}
+          variant="plain"
+          aria-label="Action"
+          onClick={() => insertEnv('after', env)}
         >
-          <Button
-            variant="plain"
-            style={{ padding: '10px' }}
-            onClick={() => insertEnv('after', env)}
-            isDisabled={!userCanCreateLce}
-          >
-            <Icon iconSize="lg" style={{ verticalAlign: 'middle' }}>
-              <PlusIcon />
-            </Icon>
-          </Button>
-        </Popover>
+          <Icon size="lg">
+            <PlusIcon />
+          </Icon>
+        </PermittedButton>
       );
     }
 
     if (env !== undefined && nextEnv !== undefined) {
       if (env.content_hash === nextEnv?.content_hash) {
         return (
-          <Popover
-            triggerAction="hover"
-            aria-label="Hoverable popover"
-            headerContent={
-              <div>{`Environments ${env.name} and ${nextEnv.name} are equivalent.`}</div>
-            }
-            bodyContent={
-              <div>
-                These environments are using the same content.
-                <br />
-                {'Content hash: '}
-                <strong>{env.content_hash}</strong>
-              </div>
-            }
+          <PermittedButton
+            requiredPermissions={[AdPermissions.ansibleLcePaths.promote]}
+            hasPopover
+            style={{ padding: '10px' }}
+            popoverProps={{
+              triggerAction: 'hover',
+              'aria-label': 'promote equivalent popover',
+              headerComponent: 'h1',
+              headerContent: (
+                <div>{`Environments ${env.name} and ${nextEnv.name} are equivalent.`}</div>
+              ),
+              bodyContent: (
+                <div>
+                  These environments are using the same content.
+                  <br />
+                  {'Content hash: '}
+                  <strong>{env.content_hash}</strong>
+                </div>
+              ),
+            }}
+            variant="plain"
+            aria-label="Action"
           >
-            <Button
-              variant="plain"
-              style={{ padding: '10px' }}
-              isDisabled={!userCanPromotePath}
-            >
-              <Icon iconSize="lg" style={{ verticalAlign: 'middle' }}>
-                <BarsIcon />
-              </Icon>
-            </Button>
-          </Popover>
+            <Icon size="lg">
+              <BarsIcon />
+            </Icon>
+          </PermittedButton>
         );
       }
 
       return (
-        <Popover
-          triggerAction="hover"
-          aria-label="Hoverable popover"
-          headerContent={
-            <div>
-              {`Environments ${env.name} and ${nextEnv.name} are `}
-              <strong>not</strong>
-              {' equivalent.'}
-            </div>
-          }
-          bodyContent={
-            <div>
-              These environments are using different content.
-              <br />
-              {`Promotion will assign the content of ${env.name} to ${nextEnv.name}.`}
-            </div>
-          }
+        <PermittedButton
+          requiredPermissions={[AdPermissions.ansibleLcePaths.promote]}
+          isLoading={env.id === loadingButton}
+          hasPopover
+          style={{ padding: '10px' }}
+          popoverProps={{
+            triggerAction: 'hover',
+            'aria-label': 'promote popover',
+            headerComponent: 'h1',
+            headerContent: (
+              <div>
+                {`Environments ${env.name} and ${nextEnv.name} are `}
+                <strong>not</strong>
+                {' equivalent.'}
+              </div>
+            ),
+            bodyContent: (
+              <div>
+                These environments are using different content.
+                <br />
+                {`Promotion will assign the content of ${env.name} to ${nextEnv.name}.`}
+              </div>
+            ),
+          }}
+          variant="plain"
+          aria-label="Action"
+          onClick={() => handlePromote(env.id, nextEnv.id)}
         >
-          <Button
-            variant="plain"
-            style={{ padding: '10px' }}
-            isLoading={env.id === loadingButton}
-            // @ts-ignore: TS18048 - env.env is checked for undefined above
-            onClick={() => handlePromote(env.id, nextEnv.id)}
-            isDisabled={!userCanPromotePath}
-          >
-            <Icon iconSize="lg" style={{ verticalAlign: 'middle' }}>
-              <ArrowRightIcon />
-            </Icon>
-          </Button>
-        </Popover>
+          <Icon size="lg">
+            <ArrowRightIcon />
+          </Icon>
+        </PermittedButton>
       );
     }
 
@@ -473,8 +461,6 @@ export const AnsibleLcePathComponent = ({
               editMode={editMode}
               handleEdit={handleLcePathUpdate}
               handleDestroy={handleDestroyLcePath}
-              canEdit={userCanEditPath}
-              canDestroy={userCanDestroyPath}
             />
           ),
           hasNoOffset: true,

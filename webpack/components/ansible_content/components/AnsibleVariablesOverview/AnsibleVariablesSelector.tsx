@@ -2,7 +2,6 @@
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import {
   Bullseye,
-  Button,
   DataList,
   DataListAction,
   DataListCell,
@@ -39,6 +38,7 @@ import { useDispatch } from 'react-redux';
 import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
+import { PermittedButton } from '../../../common/PermittedButton';
 
 interface AnsibleVariablesSelectorProps {
   ansibleRoles: AnsibleRole[];
@@ -329,14 +329,23 @@ export const AnsibleVariablesSelector = ({
                                       aria-label="Actions"
                                       isPlainButtonAction
                                     >
-                                      <Button
+                                      <PermittedButton
                                         onClick={() => {
                                           setSelectedVariable(variable);
                                         }}
-                                        icon={<PencilAltIcon />}
-                                        variant="plain"
+                                        hasPopover={false}
                                         key={`${variable.name}-action`}
-                                        isDisabled={!userCanEditVariables}
+                                        variant="plain"
+                                        icon={<PencilAltIcon />}
+                                        requiredPermissions={[
+                                          AdPermissions.ansibleVariables.edit,
+                                          AdPermissions.ansibleVariableOverrides
+                                            .view,
+                                          AdPermissions.ansibleVariableOverrides
+                                            .destroy,
+                                          AdPermissions.ansibleVariableOverrides
+                                            .edit,
+                                        ]}
                                       />
                                     </DataListAction>,
                                   ]}

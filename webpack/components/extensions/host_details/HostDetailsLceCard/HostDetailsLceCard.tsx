@@ -15,7 +15,7 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+import Permitted from 'foremanReact/components/Permitted';
 
 import { HostDetailsLceCardHeaderActions } from './components/HostDetailsLceCardHeaderActions';
 import { LcePathSelectorWrapper } from './components/LcePathSelectorWrapper';
@@ -57,10 +57,6 @@ export const HostDetailsLceCard = ({
   );
 
   const dispatch = useDispatch();
-
-  const userCanCreateAssignments: boolean = usePermissions([
-    AdPermissions.assignments.create,
-  ]);
 
   useEffect(() => {
     let lcePath: string = LCE_PATH_SELECTOR_PLACEHOLDER;
@@ -140,7 +136,6 @@ export const HostDetailsLceCard = ({
                 <HostDetailsLceCardHeaderActions
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
-                  canEdit={userCanCreateAssignments}
                 />
               ),
             }}
@@ -163,15 +158,22 @@ export const HostDetailsLceCard = ({
             </Flex>
           </CardHeader>
           <CardBody>
-            <LcePathSelectorWrapper
-              isEditMode={isEditMode}
-              selectedLcePath={selectedLcePath}
-              setSelectedLcePath={setSelectedLcePath}
-              selectedLce={selectedLce}
-              setSelectedLce={setSelectedLce}
-              availableLcePaths={availableLcePaths}
-              setAvailableLcePaths={setAvailableLcePaths}
-            />
+            <Permitted
+              requiredPermissions={[
+                AdPermissions.ansibleLce.view,
+                AdPermissions.ansibleLcePaths.view,
+              ]}
+            >
+              <LcePathSelectorWrapper
+                isEditMode={isEditMode}
+                selectedLcePath={selectedLcePath}
+                setSelectedLcePath={setSelectedLcePath}
+                selectedLce={selectedLce}
+                setSelectedLce={setSelectedLce}
+                availableLcePaths={availableLcePaths}
+                setAvailableLcePaths={setAvailableLcePaths}
+              />
+            </Permitted>
           </CardBody>
         </Card>
       </GridItem>

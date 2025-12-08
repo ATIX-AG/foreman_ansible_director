@@ -1,19 +1,19 @@
 import React from 'react';
-import { Button, Icon, Popover } from '@patternfly/react-core';
+import { Icon } from '@patternfly/react-core';
 import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import InfoCircleIcon from '@patternfly/react-icons/dist/esm/icons/info-circle-icon';
 
 import { AnsibleLcePath } from '../../../../types/AnsibleEnvironmentsTypes';
+import { PermittedButton } from '../../../common/PermittedButton';
+import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleLcePathComponentHeaderActionsProps {
   lcePath: AnsibleLcePath;
   editMode: boolean;
   handleEdit: () => void;
   handleDestroy: (lcePath: AnsibleLcePath) => void;
-  canEdit: boolean;
-  canDestroy: boolean;
 }
 
 export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathComponentHeaderActionsProps> = ({
@@ -21,61 +21,68 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
   editMode,
   handleEdit,
   handleDestroy,
-  canEdit,
-  canDestroy,
 }) => (
   <>
     {lcePath.description !== '' && (
-      <Popover
-        triggerAction="hover"
-        aria-label="delete popover"
-        headerContent={<div>Description</div>}
-        bodyContent={<div>{lcePath.description}</div>}
+      <PermittedButton
+        requiredPermissions={[AdPermissions.ansibleLcePaths.edit]}
+        hasPopover
+        popoverProps={{
+          triggerAction: 'hover',
+          'aria-label': 'description popover',
+          headerComponent: 'h1',
+          headerContent: 'Description',
+          bodyContent: <div>{lcePath.description}</div>,
+        }}
+        variant="plain"
+        aria-label="Action"
       >
-        <Button variant="plain" aria-label="Action">
-          <Icon size="lg">
-            <InfoCircleIcon />
-          </Icon>
-        </Button>
-      </Popover>
+        <Icon size="lg">
+          <InfoCircleIcon />
+        </Icon>
+      </PermittedButton>
     )}
-    {canDestroy && (
-      <Popover
-        triggerAction="hover"
-        aria-label="delete popover"
-        headerContent={<div>Delete</div>}
-        bodyContent={<div>Delete this Lifecycle Environment Path.</div>}
-      >
-        <Button
-          variant="plain"
-          aria-label="Action"
-          onClick={() => handleDestroy(lcePath)}
-        >
-          <Icon size="lg">
-            <TrashIcon />
-          </Icon>
-        </Button>
-      </Popover>
-    )}
-    {canEdit && (
-      <Popover
-        triggerAction="hover"
-        aria-label="edit popover"
-        headerContent={<div>Edit</div>}
-        bodyContent={<div>Edit this Lifecycle Environment Path.</div>}
-      >
-        <Button variant="plain" aria-label="Action" onClick={handleEdit}>
-          {editMode ? (
-            <Icon size="lg">
-              <SaveIcon />
-            </Icon>
-          ) : (
-            <Icon size="lg">
-              <EditIcon />
-            </Icon>
-          )}
-        </Button>
-      </Popover>
-    )}
+    <PermittedButton
+      requiredPermissions={[AdPermissions.ansibleLcePaths.destroy]}
+      hasPopover
+      popoverProps={{
+        triggerAction: 'hover',
+        'aria-label': 'destroy popover',
+        headerComponent: 'h1',
+        headerContent: 'Destroy',
+        bodyContent: <div>Destroy this Lifecycle Environment Path.</div>,
+      }}
+      variant="plain"
+      aria-label="Action"
+      onClick={() => handleDestroy(lcePath)}
+    >
+      <Icon size="lg">
+        <TrashIcon />
+      </Icon>
+    </PermittedButton>
+    <PermittedButton
+      requiredPermissions={[AdPermissions.ansibleLcePaths.edit]}
+      hasPopover
+      popoverProps={{
+        triggerAction: 'hover',
+        'aria-label': 'edit popover',
+        headerComponent: 'h1',
+        headerContent: 'Edit',
+        bodyContent: <div>Edit this Lifecycle Environment Path.</div>,
+      }}
+      variant="plain"
+      aria-label="Action"
+      onClick={handleEdit}
+    >
+      {editMode ? (
+        <Icon size="lg">
+          <SaveIcon />
+        </Icon>
+      ) : (
+        <Icon size="lg">
+          <EditIcon />
+        </Icon>
+      )}
+    </PermittedButton>
   </>
 );

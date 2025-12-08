@@ -14,11 +14,8 @@ import { useDispatch } from 'react-redux';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
-
 import { AnsibleLceComponentHeaderActions } from './AnsibleLceComponentHeaderActions';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
-import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleLceComponentProps {
   lce: AnsibleLce;
@@ -53,13 +50,6 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   useEffect(() => {
     setLifecycleEnvironment(lce);
   }, [lce]);
-
-  const userCanEditLce: boolean = usePermissions([
-    AdPermissions.ansibleLce.edit,
-  ]);
-  const userCanDestroyLce: boolean = usePermissions([
-    AdPermissions.ansibleLce.destroy,
-  ]);
 
   const dispatch = useDispatch();
 
@@ -176,8 +166,6 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               handleEdit={handleLceUpdate}
               handleDestroy={() => new Promise<void>(() => {})}
               handleEditContent={handleEditContent}
-              canEdit={userCanEditLce}
-              canDestroy={userCanDestroyLce}
             />
           ),
           hasNoOffset: true,

@@ -21,7 +21,6 @@ import { useDispatch } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
 import { StringAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/StringAdapter';
@@ -31,6 +30,7 @@ import { RealAdapter } from '../../../../ansible_content/components/AnsibleVaria
 
 import { YamlEditor } from '../../../../common/YamlEditor';
 import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
+import { PermittedButton } from '../../../../common/PermittedButton';
 
 interface MergedOverrideCardProps {
   mergedOverride: MergedVariableOverride;
@@ -58,10 +58,6 @@ export const MergedOverrideCard = ({
     }
     setOverrideValue(v);
   }, [mergedOverride]);
-
-  const userCanEditOverrides: boolean = usePermissions([
-    AdPermissions.ansibleVariableOverrides.edit,
-  ]);
 
   const dispatch = useDispatch();
 
@@ -197,7 +193,18 @@ export const MergedOverrideCard = ({
   };
 
   const editAction = (): ReactElement => (
-    <Button
+    <PermittedButton
+      requiredPermissions={[AdPermissions.ansibleVariableOverrides.edit]}
+      hasPopover
+      popoverProps={{
+        triggerAction: 'hover',
+        'aria-label': 'destroy popover',
+        headerComponent: 'h1',
+        headerContent: 'Edit variable override',
+        bodyContent: (
+          <div>Edit the value of variable {override?.key} for this host</div>
+        ),
+      }}
       variant="plain"
       aria-label="Action"
       onClick={() => onAction()}
@@ -212,7 +219,7 @@ export const MergedOverrideCard = ({
           <EditIcon />
         </Icon>
       )}
-    </Button>
+    </PermittedButton>
   );
 
   return (
@@ -223,7 +230,7 @@ export const MergedOverrideCard = ({
             <>
               <CardHeader
                 actions={{
-                  actions: [...(userCanEditOverrides ? [editAction()] : [])],
+                  actions: [...[editAction()]],
                 }}
               >
                 <Label color="blue" isCompact>

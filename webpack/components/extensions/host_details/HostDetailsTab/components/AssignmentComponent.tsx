@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 import axios, { AxiosResponse } from 'axios';
 
 import {
-  Button,
   Card,
   CardBody,
   CardHeader,
@@ -15,7 +14,6 @@ import {
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useDispatch } from 'react-redux';
 import { addToast } from 'foremanReact/components/ToastsList';
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import { LceAssignmentSelector } from './LceAssignmentSelector';
 import {
@@ -24,6 +22,7 @@ import {
   unnamedAssignmentType,
 } from './AssignmentComponentWrapper';
 import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
+import { PermittedButton } from '../../../../common/PermittedButton';
 
 interface AssignmentComponentProps {
   contentResponse: AvailableContentResponse;
@@ -42,11 +41,6 @@ export const AssignmentComponent = ({
   }>({});
 
   const dispatch = useDispatch();
-
-  const userCanManageAssignments: boolean = usePermissions([
-    AdPermissions.assignments.create,
-    AdPermissions.assignments.destroy,
-  ]);
 
   const bulkAssignContent = async (): Promise<void> => {
     const formattedUnits: {
@@ -114,7 +108,21 @@ export const AssignmentComponent = ({
           actions={{
             actions: (
               <>
-                <Button
+                <PermittedButton
+                  requiredPermissions={[
+                    AdPermissions.assignments.create,
+                    AdPermissions.assignments.destroy,
+                  ]}
+                  hasPopover
+                  popoverProps={{
+                    triggerAction: 'hover',
+                    'aria-label': 'destroy popover',
+                    headerComponent: 'h1',
+                    headerContent: 'Edit content assignments',
+                    bodyContent: (
+                      <div>Edit the content assigned to this host.</div>
+                    ),
+                  }}
                   variant="plain"
                   aria-label="Action"
                   onClick={async () => {
@@ -123,12 +131,11 @@ export const AssignmentComponent = ({
                     setIsSaveLoading(false);
                   }}
                   isLoading={isSaveLoading}
-                  isDisabled={!userCanManageAssignments}
                 >
                   <Icon size="lg">
                     <SaveIcon />
                   </Icon>
-                </Button>
+                </PermittedButton>
               </>
             ),
           }}
@@ -141,7 +148,6 @@ export const AssignmentComponent = ({
               contentUnits={contentResponse.content}
               chosenUnits={chosenUnits}
               setChosenUnits={setChosenUnits}
-              userCanManageAssignments={userCanManageAssignments}
             />
           ) : (
             <EmptyState>

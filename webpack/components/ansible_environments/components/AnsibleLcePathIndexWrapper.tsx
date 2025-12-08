@@ -5,7 +5,6 @@ import {
   PaginationProps,
   UseAPIReturn,
 } from 'foremanReact/common/hooks/API/APIHooks';
-import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
 import {
@@ -13,12 +12,12 @@ import {
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
-import { Button } from '@patternfly/react-core';
 
 import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 import { AnsibleLcePathIndex } from './AnsibleLcePathIndex';
 import { Page } from '../../common/Page';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
+import { PermittedButton } from '../../common/PermittedButton';
 
 export interface GetAnsibleLcePathsResponse extends IndexResponse {
   results: AnsibleLcePath[];
@@ -30,10 +29,6 @@ const AnsibleContentTableWrapper: React.FC = () => {
   const [isCreateButtonLoading, setIsCreateButtonLoading] = React.useState<
     boolean
   >(false);
-
-  const canCreatePath: boolean = usePermissions([
-    AdPermissions.ansibleLcePaths.create,
-  ]);
 
   const createLcePath = async (): Promise<void> => {
     setIsCreateButtonLoading(true);
@@ -79,19 +74,15 @@ const AnsibleContentTableWrapper: React.FC = () => {
     contentRequest.setAPIOptions(options => ({ ...options }));
   };
 
-  const toolbarItems = (): ReactElement[] => {
-    if (canCreatePath) {
-      return [
-        <Button
-          onClick={() => createLcePath()}
-          isLoading={isCreateButtonLoading}
-        >
-          Create LCE Path
-        </Button>,
-      ];
-    }
-    return [];
-  };
+  const toolbarItems = (): ReactElement[] => [
+    <PermittedButton
+      onClick={() => createLcePath()}
+      requiredPermissions={[AdPermissions.ansibleLcePaths.create]}
+      isLoading={isCreateButtonLoading}
+    >
+      Create LCE Path
+    </PermittedButton>,
+  ];
 
   if (contentRequest.status === 'RESOLVED') {
     return (
