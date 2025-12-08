@@ -21,7 +21,7 @@ module ForemanAnsibleDirector
 
     def registry_url
       registry_port = 4321
-      "http://#{SETTINGS[:fqdn]}:#{registry_port}/ansibleng/#{id}"
+      "#{SETTINGS[:fqdn]}:#{registry_port}/ansibleng/#{id}"
     end
 
     def rebuild_necessary?
