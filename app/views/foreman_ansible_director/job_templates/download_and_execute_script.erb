@@ -1,0 +1,34 @@
+<%#
+name: Download and execute a script
+job_category: Ansible Commands
+description_format: Download script from %{url} and execute it
+snippet: false
+template_inputs:
+- name: url
+  required: true
+  input_type: user
+  description: "URL of the script to download e.g: http://example.com/unattended/anonymous/my_script"
+  advanced: false
+provider_type: AnsibleScript
+kind: job_template
+model: JobTemplate
+%>
+
+---
+- name: "Run script"
+  hosts: all
+  tasks:
+    - name: "Download script"
+      ansible.builtin.uri:
+        url: <%= input("url") %>
+        return_content: true
+      register: script_response
+    - name: "Run script"
+      ansible.builtin.shell:
+        cmd: |
+          {{ script_response.content }}
+      register: out
+      changed_when: true  # noqa: no-changed-when
+    - name: "Show output"
+      ansible.builtin.debug:
+        var: out

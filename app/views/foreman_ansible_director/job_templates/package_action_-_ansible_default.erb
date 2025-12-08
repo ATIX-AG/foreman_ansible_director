@@ -1,0 +1,78 @@
+<%#
+name: Package Action - Ansible Default
+job_category: Ansible Packages
+description_format: 'Package %{name}: %{state}'
+snippet: false
+template_inputs:
+- name: state
+  required: true
+  input_type: user
+  description: Whether to install (present, latest), or remove (absent) a package.
+  options: "present\r\nabsent\r\nlatest"
+  advanced: false
+- name: name
+  required: true
+  input_type: user
+  description: "Package name, or package specifier with version, like name-1.0.\r\nBe
+    aware that packages are not always named the same and this module will not 'translate'
+    them per distro."
+  advanced: false
+- name: pre_script
+  description: A script to run prior to the package action
+  input_type: user
+  required: false
+  advanced: true
+- name: post_script
+  description: A script to run after the package action
+  input_type: user
+  required: false
+  advanced: true
+provider_type: AnsibleScript
+kind: job_template
+model: JobTemplate
+-%>
+# For Windows targets use the win_package module instead.
+---
+- hosts: all
+  vars:
+    pkg_name: "<%= input('name') %>"
+    pkg_names_for_dnf: "<%= input('name').respond_to?(:join) ? input('name').join(' ') : input('name') %>"
+  <%- if input('pre_script').present? -%>
+  pre_tasks:
+    - shell: "<%= input('pre_script') %>"
+  <%- end -%>
+  tasks:
+    - name: Validate input
+      ansible.builtin.assert:
+        that:
+          - pkg_name is defined
+          - pkg_name | length > 0
+        fail_msg: "The 'name' input cannot be empty. A package name must be provided."
+        success_msg: "Valid 'name' input: '{{ pkg_name }}'"
+<%= indent(4) { snippet('check_bootc_status') } %>
+  <%- if input('state') == 'present' -%>
+    - name: Ensure package is present transiently for image mode machines
+      shell: "dnf --transient install -y {{ pkg_names_for_dnf }}"
+      when: is_bootc_host
+  <%- end -%>
+  <%- if input('state') == 'latest' -%>
+    - name: Ensure package is at the latest version transiently for image mode machines
+      shell: |
+        dnf --transient install -y {{ pkg_names_for_dnf }}
+        dnf --transient update -y {{ pkg_names_for_dnf }}
+      when: is_bootc_host
+  <%- end -%>
+  <%- if input('state') == 'absent' -%>
+    - name: Remove packages transiently for image mode machines
+      shell: "dnf --transient remove -y {{ pkg_names_for_dnf }}"
+      when: is_bootc_host
+  <%- end -%>
+    - name: Install or remove packages normally
+      package:
+<%= indent(8) { to_yaml({"name" => input('name')}).gsub(/---\n/, '') } -%>
+        state: <%= input('state') %>
+      when: not is_bootc_host
+<%- if input('post_script').present? -%>
+  post_tasks:
+    - shell: "<%= input('post_script') %>"
+<%- end -%>
