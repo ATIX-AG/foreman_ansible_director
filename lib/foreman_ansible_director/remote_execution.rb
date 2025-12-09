@@ -9,6 +9,10 @@ module ForemanAnsibleDirector
         :AnsibleNavigator,
         ForemanAnsibleDirector::Actions::RemoteExecution::Provider::AnsibleNavigatorProvider
       )
+      RemoteExecutionProvider.register(
+        :AnsibleScript,
+        ForemanAnsibleDirector::Actions::RemoteExecution::Provider::AnsibleScriptProvider
+      )
 
       ForemanAnsibleDirector::Engine.register_rex_feature
     end
@@ -19,6 +23,12 @@ module ForemanAnsibleDirector
         N_('Run Ansible roles'),
         description: N_('Runs an Ansible playbook which contains all'\
                              ' the roles defined for a host'),
+        host_action_button: true
+      )
+      RemoteExecutionFeature.register(
+        :ansible_run_playbook,
+        N_('Run Ansible Playbook'),
+        description: N_('Runs an Ansible playbook defined by the user.'),
         host_action_button: true
       )
     end

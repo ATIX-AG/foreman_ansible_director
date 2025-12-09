@@ -6,8 +6,12 @@ module ForemanAnsibleDirector
       extend ActiveSupport::Concern
       included do
         include ::ForemanAnsibleDirector::Concerns::ContentConsumer
+        # I am actually not sure what the correct inverse is here.
+        # It's not :hosts
+        # rubocop:disable Rails/InverseOf
         belongs_to :lifecycle_environment, optional: true, foreign_key: :ansible_lifecycle_environment_id,
-                   inverse_of: :hosts
+                   class_name: '::ForemanAnsibleDirector::LifecycleEnvironment'
+        # rubocop:enable Rails/InverseOf
       end
 
       def resolved_ansible_content
