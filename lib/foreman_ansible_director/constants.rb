@@ -5,6 +5,9 @@ module ForemanAnsibleDirector
     PLUGIN_NAME = 'foreman_ansible_director'
     PLUGIN_VERSION = '0.3.2'
 
+    DEFAULT_GALAXY_URL = 'https://galaxy.ansible.com/'
+    DEFAULT_ANSIBLE_VERSION = '2.19.3'
+
     ANSIBLE_VERSIONS = %w[
       v10.0.0
       v10.0.1

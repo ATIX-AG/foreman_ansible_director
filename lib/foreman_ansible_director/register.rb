@@ -130,6 +130,55 @@ Foreman::Plugin.register :foreman_ansible_director do
       resource_type: 'AnsibleContentAssignment'
   end
 
+  settings do
+    category :ansible_director, 'Ansible Director' do
+      setting 'ad_default_galaxy_url',
+        type: :string,
+        description: 'Default URL used when importing content from an Ansible Galaxy instance.',
+        default: ::ForemanAnsibleDirector::Constants::DEFAULT_GALAXY_URL,
+        full_name: 'Content - Default Ansible Galaxy URL'
+      setting 'ad_content_import_override',
+        type: :boolean,
+        description: 'When enabled, the content importer will override any existing content that matches the identifier
+                       of a content unit scheduled for import, ensuring the new content replaces the existing version
+                       rather than being skipped.',
+        default: false,
+        full_name: 'Content - Force override of existing content'
+      setting 'ad_default_ansible_core_version',
+        type: :string,
+        description: 'Default Ansible-Core version used for execution environments.
+                       Must match an available release from PyPI
+                       (check history: https://pypi.org/project/ansible-core/#history).',
+        default: ::ForemanAnsibleDirector::Constants::DEFAULT_ANSIBLE_VERSION,
+        full_name: 'Execution Environments - Default ansible-core version'
+      setting 'ad_default_ee_rex',
+        type: :integer,
+        description: 'Default Execution Environment used for execution of Remote Execution jobs.',
+        default: 0,
+        full_name: 'Execution Environments - Default Ansible Execution Environment for Remote Execution',
+        collection: proc { Hash[::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map { |ee| [ee.id, ee.name] }] }
+      setting 'ad_default_ee_internal',
+        type: :integer,
+        description: 'Default Execution Environment used for execution of default Ansible jobs.',
+        default: 0,
+        full_name: 'Execution Environments - Default Ansible Execution Environment for Ansible jobs',
+        collection: proc { Hash[::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map { |ee| [ee.id, ee.name] }] }
+      setting 'ad_lce_path_force_incremental',
+        type: :boolean,
+        description: 'When enabled, lifecycle environment promotions must follow the defined path incrementally
+                      (e.g., DEV → TEST → PROD). When disabled, promotions can skip intermediate environments
+                      (e.g., DEV → PROD directly, with implicit promotion of DEV → TEST).',
+        default: true,
+        full_name: 'Lifecycle Environments - Force incremental promotion of lifecycle environments'
+      setting 'ad_lce_path_prevent_destruction_if_used',
+        type: :boolean,
+        description: 'When enabled, lifecycle environment paths can only be destroyed if none of its lifecycle
+                            environments is referenced anywhere.',
+        default: true,
+        full_name: 'Lifecycle Environments - Prevent path destruction if lifecycle environment is in use.'
+    end
+  end
+
   register_global_js_file 'global'
 
   register_report_origin 'Ansible', 'ConfigReport'
