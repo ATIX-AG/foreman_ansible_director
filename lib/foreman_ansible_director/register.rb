@@ -21,7 +21,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     # View
     permission :view_ansible_content,
       { 'foreman_ansible_director/api/v2/ansible_content': %i[index version_detail],
-        'foreman_ansible_director/api/v2/status': [:content] },
+        'foreman_ansible_director/api/v2/status': %i[content context] },
       resource_type: 'ContentUnit'
     # Create
     permission :create_ansible_content,

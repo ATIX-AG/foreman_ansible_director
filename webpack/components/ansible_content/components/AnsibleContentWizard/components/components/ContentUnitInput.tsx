@@ -19,6 +19,7 @@ import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
 import { AnsibleContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { VersionInput } from './components/VersionInput';
+import { useAdContext } from '../../../../../common/AdContextWrapper';
 
 interface ContentUnitInputProps {
   contentUnits: Array<AnsibleContentUnitCreate>;
@@ -29,7 +30,9 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
   contentUnits,
   setContentUnits,
 }) => {
-  const defaultGalaxy: string = 'https://galaxy.ansible.com/'; // TODO: Extract this from context; Assume valid
+  const ctx = useAdContext();
+
+  const defaultGalaxy: string = ctx.settings.ad_default_galaxy_url; // TODO: Extract this from context; Assume valid
 
   const [contentUnitName, setContentUnitName] = React.useState<string>('');
   const [contentUnitValidation, setContentUnitValidation] = React.useState<

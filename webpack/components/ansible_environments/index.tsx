@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import AnsibleEnvironmentsPageWrapper from './AnsibleEnvironmentsPageWrapper';
+import { AdContextWrapper } from '../common/AdContextWrapper';
 
-export const WrappedAnsibleEnvironmentsPage: React.FC = () => (
-  <AnsibleEnvironmentsPageWrapper />
+export const WrappedAnsibleEnvironmentsPage = (): ReactElement => (
+  <AdContextWrapper>
+    <AnsibleEnvironmentsPageWrapper />
+  </AdContextWrapper>
 );

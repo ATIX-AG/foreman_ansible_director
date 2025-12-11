@@ -20,6 +20,7 @@ import {
 } from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
 import { TextInputEditable } from './components/TextInputEditable';
+import { useAdContext } from '../../common/AdContextWrapper';
 
 interface ExecutionEnvCreateCardProps {
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
@@ -36,11 +37,18 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
   setSelectedEnv,
   createModeOverride,
 }) => {
+  const ctx = useAdContext();
+
   const [createMode, setCreateMode] = React.useState<boolean>(false);
 
   const [executionEnvironment, setExecutionEnvironment] = React.useState<
     AnsibleExecutionEnvCreate
-  >({ name: '', ansible_version: '2.19.3', base_image_url: '', content: [] }); // TODO: defaults
+  >({
+    name: '',
+    ansible_version: ctx.settings.ad_default_ansible_core_version,
+    base_image_url: '',
+    content: [],
+  });
 
   useEffect(() => {
     setCreateMode(createModeOverride);

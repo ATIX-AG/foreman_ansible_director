@@ -13,6 +13,15 @@ module ForemanAnsibleDirector
             execution_environments: ::ForemanAnsibleDirector::ExecutionEnvironment.count,
           }
         end
+
+        def context
+          @context = {
+            settings: {
+              ad_default_galaxy_url: Setting[:ad_default_galaxy_url],
+              ad_default_ansible_core_version: Setting[:ad_default_ansible_core_version],
+            },
+          }
+        end
       end
     end
   end
