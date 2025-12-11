@@ -24,6 +24,7 @@ module ForemanAnsibleDirector
 
       def destroy_path(path)
         ActiveRecord::Base.transaction do # TODO: Rollback if any LCE is used by host; Setting
+          # raise ActiveRecord::Rollback if path.lifecycle_environments.any? { |lce| lce.hosts.positive? }
           path.update!(root_environment_id: nil)
           path.destroy!
         end

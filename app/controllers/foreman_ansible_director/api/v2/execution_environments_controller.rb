@@ -17,7 +17,7 @@ module ForemanAnsibleDirector
           permitted_params = execution_environment_params
           # content = permitted_params.delete(:content)
 
-          ee_create = ::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
+          ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
             permitted_params[:name],
             permitted_params[:base_image_url],
             permitted_params[:ansible_version],

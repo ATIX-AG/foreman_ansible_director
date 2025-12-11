@@ -150,7 +150,7 @@ module ForemanAnsibleDirector
         # | 1 | 1 | 1 | :update |
         # TODO: Unit test this
         def operation_type(unit)
-          force_override = false # TODO: Setting
+          force_override = Setting[:ad_content_import_override]
 
           existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit.unit_namespace,
             name: unit.unit_name)

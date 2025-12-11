@@ -12,7 +12,7 @@ module ForemanAnsibleDirector
         @unit_type = kwargs[:unit_type]
         @name = kwargs[:unit_name]
         @versions = kwargs[:unit_versions] || []
-        @source = kwargs[:unit_source] || 'https://galaxy.ansible.com/' # TODO: global param
+        @source = kwargs[:unit_source] || Setting[:ad_default_galaxy_url]
         @type = kwargs[:unit_type]
         @src = kwargs[:unit_src]
         @scm = kwargs[:unit_scm]

@@ -17,17 +17,22 @@ if defined? ForemanRemoteExecution
 
               def proxy_command_options(template_invocation, host)
                 inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
+                begin
+                  environment = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+                    id: Setting[:ad_default_ee_rex]
+                  )
+                  raise ActiveRecord::RecordNotFound if environment.nil?
+                end
 
                 raise "Host #{host.name} is not in any Lifecycle environment" unless host.lifecycle_environment
                 unless host.lifecycle_environment.execution_environment
                   raise "Lifecycle Environment #{host.lifecycle_environment.name}
                           does not provide an execution environment"
                 end
-                # TODO: Instead of failing, the global default EE should be used instead
+                # As the templates currently do not have an execution environment input, this suffices
                 super(template_invocation, host).merge(
                   inventory: inventory,
-                  execution_environment: ExecutionEnvironment.find_by(id: 1).registry_url
-                  # host.lifecycle_environment.execution_environment.registry_url
+                  execution_environment: environment
                 )
               end
 

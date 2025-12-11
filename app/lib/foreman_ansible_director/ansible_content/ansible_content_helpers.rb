@@ -101,7 +101,7 @@ module ForemanAnsibleDirector
         end
 
         def valid_unit_source!(unit_source)
-          unit_source || 'https://galaxy.ansible.com/' # TODO: global param
+          unit_source || Setting[:ad_default_galaxy_url]
         end
 
         def valid_unit_versions!(unit_versions)
