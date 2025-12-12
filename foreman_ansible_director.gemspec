@@ -10,8 +10,9 @@ Gem::Specification.new do |s|
   s.authors     = ['Thorben Denzer']
   s.email       = ['denzer@atix.de']
   s.homepage    = 'https://www.atix.de'
-  s.summary     = 'Summary of AnsibleDirector.'
-  s.description = 'Description of AnsibleDirector.'
+  s.summary     = 'Advanced Ansible integration with Foreman and Katello.'
+  s.description = 'Ansible support with Execution Environments, different Ansible/Python ' \
+                  'versions and traditional Ansible features.'
 
   s.files = Dir['{app,config,db,lib,locale,webpack}/**/*'] +
             %w[LICENSE Rakefile README.md package.json tsconfig.json]
