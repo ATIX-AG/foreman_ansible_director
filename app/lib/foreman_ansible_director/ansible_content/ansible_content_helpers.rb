@@ -67,8 +67,13 @@ module ForemanAnsibleDirector
           payload.each do |unit|
             unit_type = valid_unit_type! unit[:unit_type]
             unit_name = valid_unit_name! unit[:unit_name]
+            unit_source_type = valid_unit_source_type! unit[:unit_source_type] || 'galaxy'
             unit_source = valid_unit_source! unit[:unit_source]
-            unit_versions = valid_unit_versions! unit[:unit_versions]
+            unit_versions = if unit_source_type != :git
+                              valid_unit_versions! unit[:unit_versions]
+                            else
+                              unit[:unit_versions]
+                            end
             unit_id = "#{unit_name}_#{Base64.encode64(unit_source)}" # Uniquely identifiable by name and source
 
             if (existing_unit = units[unit_id])
@@ -77,6 +82,7 @@ module ForemanAnsibleDirector
               sacu = SimpleAnsibleContentUnit.new(
                 unit_type: unit_type,
                 unit_name: unit_name,
+                unit_source_type: unit_source_type,
                 unit_source: unit_source,
                 unit_versions: unit_versions
               )
@@ -95,6 +101,13 @@ module ForemanAnsibleDirector
 
         def valid_unit_type!(unit_type)
           if (type = { 'collection' => :collection, 'role' => :role }[unit_type])
+            return type
+          end
+          raise # TODO: Exception
+        end
+
+        def valid_unit_source_type!(unit_source_type)
+          if (type = { 'galaxy' => :galaxy, 'git' => :git }[unit_source_type])
             return type
           end
           raise # TODO: Exception

@@ -6,12 +6,13 @@ module ForemanAnsibleDirector
     # To be used in cases where AnsibleContentUnit is too heavy, i.e. Actions
     class SimpleAnsibleContentUnit
       attr_accessor :versions
-      attr_reader :unit_type, :name, :source, :type, :src, :scm
+      attr_reader :unit_type, :name, :source, :type, :src, :scm, :source_type
 
       def initialize(**kwargs)
         @unit_type = kwargs[:unit_type]
         @name = kwargs[:unit_name]
         @versions = kwargs[:unit_versions] || []
+        @source_type = kwargs[:unit_source_type]
         @source = kwargs[:unit_source] || Setting[:ad_default_galaxy_url]
         @type = kwargs[:unit_type]
         @src = kwargs[:unit_src]
