@@ -17,16 +17,19 @@ import UndoIcon from '@patternfly/react-icons/dist/esm/icons/undo-icon';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
-import { AnsibleContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
+import { AnsibleGalaxyContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { VersionInput } from './components/VersionInput';
+import { AnsibleContentUnitCreateType } from '../../AnsibleContentWizard';
 import { useAdContext } from '../../../../../common/AdContextWrapper';
 
-interface ContentUnitInputProps {
-  contentUnits: Array<AnsibleContentUnitCreate>;
-  setContentUnits: Dispatch<SetStateAction<Array<AnsibleContentUnitCreate>>>;
+interface GalaxyContentUnitInputProps {
+  contentUnits: Array<AnsibleContentUnitCreateType>;
+  setContentUnits: Dispatch<
+    SetStateAction<Array<AnsibleContentUnitCreateType>>
+  >;
 }
 
-export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = ({
+export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitInputProps> = ({
   contentUnits,
   setContentUnits,
 }) => {
@@ -121,7 +124,7 @@ export const ContentUnitInput: React.FunctionComponent<ContentUnitInputProps> = 
   };
 
   const addToBatch = (_event: never): void => {
-    const unit: AnsibleContentUnitCreate = {
+    const unit: AnsibleGalaxyContentUnitCreate = {
       type: unitType,
       identifier: contentUnitName,
       source: contentUnitSource,

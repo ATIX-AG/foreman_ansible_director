@@ -1,15 +1,23 @@
 import { Identifiable } from './AnsibleExecutionEnvTypes';
 import { AnsibleVariable } from './AnsibleVariableTypes';
 
-export interface AnsibleContentUnitBase {
+export interface AnsibleContentUnitCreateBase {
   type: 'collection' | 'role';
   identifier: string;
+}
+export interface AnsibleContentUnitBase extends AnsibleContentUnitCreateBase {
   versions: AnsibleContentVersion[];
 }
 
-export interface AnsibleContentUnitCreate extends AnsibleContentUnitBase {
+export interface AnsibleGalaxyContentUnitCreate extends AnsibleContentUnitBase {
   source: string;
-  versions: AnsibleContentVersionCreate[];
+  versions: AnsibleGalaxyContentVersionCreate[];
+}
+
+export interface AnsibleGitContentUnitCreate
+  extends AnsibleContentUnitCreateBase {
+  gitUrl: string;
+  gitRefs: string[];
 }
 
 export interface AnsibleContentUnit
@@ -26,7 +34,7 @@ export interface AnsibleContentUnitFull extends AnsibleContentUnit {
 export interface AnsibleContentVersion extends Identifiable {
   version: string;
 }
-export interface AnsibleContentVersionCreate {
+export interface AnsibleGalaxyContentVersionCreate {
   version: string;
 }
 

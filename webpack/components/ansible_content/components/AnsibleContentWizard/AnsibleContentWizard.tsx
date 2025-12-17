@@ -10,13 +10,17 @@ import {
   TextContent,
   Text,
 } from '@patternfly/react-core';
-import { AnsibleContentUnitCreate } from '../../../../types/AnsibleContentTypes';
+import {
+  AnsibleGalaxyContentUnitCreate,
+  AnsibleGitContentUnitCreate,
+} from '../../../../types/AnsibleContentTypes';
 import { ReviewStep } from './components/ReviewStep';
 import ProviderSelectionStep from './components/ProviderSelectionStep';
 import FinishFooter from './components/components/FinishFooter';
-import { ContentUnitInput } from './components/components/ContentUnitInput';
+import { GalaxyContentUnitInput } from './components/components/GalaxyContentUnitInput';
 import { DefaultFooter } from './components/components/DefaultFooter';
 import { YamlEditor } from '../../../common/YamlEditor';
+import { GitContentUnitInput } from './components/components/GitContentUnitInput';
 
 interface AnsibleContentWizardProps {
   isContentWizardOpen: boolean;
@@ -24,19 +28,43 @@ interface AnsibleContentWizardProps {
   refreshRequest: () => void;
 }
 
+export type AnsibleContentUnitCreateType =
+  | AnsibleGalaxyContentUnitCreate
+  | AnsibleGitContentUnitCreate;
+
+export const isAnsibleGalaxyContentUnitCreate = (
+  cuCreate: AnsibleContentUnitCreateType
+): cuCreate is AnsibleGalaxyContentUnitCreate => 'versions' in cuCreate;
+
+export const isAnsibleGitContentUnitCreate = (
+  cuCreate: AnsibleContentUnitCreateType
+): cuCreate is AnsibleGitContentUnitCreate => 'gitUrl' in cuCreate;
+
+export const contentUnitCreateType = (
+  contentUnitCreate: AnsibleContentUnitCreateType
+): 'galaxy' | 'git' | null => {
+  if (isAnsibleGalaxyContentUnitCreate(contentUnitCreate)) {
+    return 'galaxy';
+  } else if (isAnsibleGitContentUnitCreate(contentUnitCreate)) {
+    return 'git';
+  }
+
+  return null;
+};
+
 const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
   isContentWizardOpen,
   setIsContentWizardOpen,
   refreshRequest,
 }) => {
   const [contentUnits, setContentUnits] = React.useState<
-    Array<AnsibleContentUnitCreate>
+    Array<AnsibleContentUnitCreateType>
   >([]);
   const [yamlFile, setYamlFile] = React.useState<string>('');
 
-  const [provider, setProvider] = React.useState<'galaxy' | 'yaml' | undefined>(
-    undefined
-  );
+  const [provider, setProvider] = React.useState<
+    'galaxy' | 'git' | 'yaml' | undefined
+  >(undefined);
 
   const resetWizard = (): void => {
     setContentUnits([]);
@@ -66,7 +94,71 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                     Declare content to import
                   </Text>
                 </TextContent>
-                <ContentUnitInput
+                <GalaxyContentUnitInput
+                  contentUnits={contentUnits}
+                  setContentUnits={setContentUnits}
+                />
+              </>
+            </WizardStep>,
+            <WizardStep
+              name={
+                contentUnits.length > 0 ? (
+                  <>
+                    Review <Badge key={1}>{contentUnits.length}</Badge>
+                  </>
+                ) : (
+                  'Review'
+                )
+              }
+              id="reviewStep"
+              footer={
+                <FinishFooter
+                  isFinishDisabled={contentUnits.length < 1}
+                  provider="galaxy"
+                  contentUnits={contentUnits}
+                  yamlFile={yamlFile}
+                  setIsContentWizardOpen={setIsContentWizardOpen}
+                  refreshRequest={refreshRequest}
+                  resetWizard={resetWizard}
+                />
+              }
+            >
+              <>
+                <TextContent>
+                  {' '}
+                  <Text component={TextVariants.h2}>
+                    Review content before importing
+                  </Text>
+                </TextContent>
+                <ReviewStep
+                  contentUnits={contentUnits}
+                  setContentUnits={setContentUnits}
+                />
+              </>
+            </WizardStep>,
+          ],
+        ];
+      case 'git':
+        return [
+          [
+            <WizardStep
+              name="Content Declaration"
+              id="declarationStep"
+              footer={
+                <DefaultFooter
+                  isBackDisabled={false}
+                  isNextDisabled={contentUnits.length < 1}
+                />
+              }
+            >
+              <>
+                <TextContent>
+                  {' '}
+                  <Text component={TextVariants.h2}>
+                    Declare content to import
+                  </Text>
+                </TextContent>
+                <GitContentUnitInput
                   contentUnits={contentUnits}
                   setContentUnits={setContentUnits}
                 />

@@ -5,12 +5,16 @@ import { WizardFooter, useWizardContext } from '@patternfly/react-core';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { useDispatch } from 'react-redux';
 import { addToast } from 'foremanReact/components/ToastsList';
-import { AnsibleContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
+import {
+  AnsibleContentUnitCreateType,
+  isAnsibleGalaxyContentUnitCreate,
+  isAnsibleGitContentUnitCreate,
+} from '../../AnsibleContentWizard';
 
 interface FinishFooterProps {
   isFinishDisabled: boolean;
   provider: 'galaxy' | 'yaml';
-  contentUnits: AnsibleContentUnitCreate[];
+  contentUnits: AnsibleContentUnitCreateType[];
   yamlFile: string;
   setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
   refreshRequest: () => void;
@@ -55,14 +59,29 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
           foremanUrl('/api/v2/ansible_director/ansible_content'),
           {
             organization_id: organization?.id,
-            units: contentUnits.map(unit => ({
-              unit_name: unit.identifier,
-              unit_type: unit.type,
-              unit_source: unit.source,
-              unit_versions: unit.versions.map(
-                versionObj => versionObj.version
-              ),
-            })),
+            units: contentUnits.map(unit => {
+              if (isAnsibleGalaxyContentUnitCreate(unit)) {
+                return {
+                  unit_name: unit.identifier,
+                  unit_type: unit.type,
+                  unit_source_type: 'galaxy',
+                  unit_source: unit.source,
+                  unit_versions: unit.versions.map(
+                    versionObj => versionObj.version
+                  ),
+                };
+              } else if (isAnsibleGitContentUnitCreate(unit)) {
+                return {
+                  unit_name: unit.identifier,
+                  unit_type: unit.type,
+                  unit_source_type: 'git',
+                  unit_source: unit.gitUrl,
+                  unit_refs: unit.gitRefs,
+                };
+              }
+
+              return null; // Never happens, but I want to use the type-guard to make TSC shut it
+            }),
           }
         );
         dispatch(

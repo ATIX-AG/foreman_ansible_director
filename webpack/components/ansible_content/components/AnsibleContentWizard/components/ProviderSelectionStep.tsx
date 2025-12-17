@@ -2,10 +2,11 @@ import React, { Dispatch, SetStateAction } from 'react';
 import { Tile, Flex, FlexItem, ListItem, List } from '@patternfly/react-core';
 import FileIcon from '@patternfly/react-icons/dist/esm/icons/file-icon';
 import TopologyIcon from '@patternfly/react-icons/dist/esm/icons/topology-icon';
+import CodeBranchIcon from '@patternfly/react-icons/dist/esm/icons/code-branch-icon';
 
 interface ProviderSelectionStepProps {
-  provider: 'galaxy' | 'yaml' | undefined;
-  setProvider: Dispatch<SetStateAction<'galaxy' | 'yaml' | undefined>>;
+  provider: 'galaxy' | 'git' | 'yaml' | undefined;
+  setProvider: Dispatch<SetStateAction<'galaxy' | 'git' | 'yaml' | undefined>>;
 }
 
 const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
@@ -19,7 +20,7 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
       style={{ height: '100%' }}
       alignItems={{ default: 'alignItemsCenter' }}
     >
-      <FlexItem style={{ width: '45%' }}>
+      <FlexItem style={{ width: '30%' }}>
         {' '}
         <Tile
           title="Ansible Galaxy"
@@ -56,7 +57,33 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           </List>
         </Tile>
       </FlexItem>
-      <FlexItem style={{ width: '45%' }}>
+      <FlexItem style={{ width: '30%' }}>
+        {' '}
+        <Tile
+          title="Git repository"
+          icon={<CodeBranchIcon />}
+          isStacked
+          isDisplayLarge
+          isSelected={provider === 'git'}
+          onClick={() => setProvider('git')}
+          style={{ width: '100%', height: '100%', minHeight: '340px' }}
+        >
+          Import Ansible collections and roles from a git repository.
+          <br />
+          <strong>
+            Note: The repository must be sufficiently decorated with a
+            galaxy.yml file.
+          </strong>
+          <br />
+          <p>
+            <strong>Supported sources:</strong>
+          </p>
+          <ul>
+            <li>Any server implementing the git API</li>
+          </ul>
+        </Tile>
+      </FlexItem>
+      <FlexItem style={{ width: '30%' }}>
         {' '}
         <Tile
           title="Y(A)ML File"
