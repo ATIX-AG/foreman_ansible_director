@@ -18,6 +18,9 @@ module ForemanAnsibleDirector
           when :import
             case unit.source_type
             when :git
+              plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Git::Import,
+                unit: unit,
+                organization_id: organization_id)
             when :galaxy
               plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Galaxy::Import,
                 unit: unit,
