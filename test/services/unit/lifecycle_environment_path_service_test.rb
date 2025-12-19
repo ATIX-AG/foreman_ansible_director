@@ -5,13 +5,6 @@ module ForemanAnsibleDirectorTests
     module Unit
       class LifecycleEnvironmentPathServiceTest < ForemanAnsibleDirectorTestCase
 
-        setup do
-          as_admin do
-            @organization = FactoryBot.create(:organization)
-            Organization.current = @organization
-          end
-        end
-
         describe '#create_path' do
           test 'creates a lifecycle environment path with valid params' do
             path_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathCreate.new(

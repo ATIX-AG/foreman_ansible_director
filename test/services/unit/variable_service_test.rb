@@ -7,7 +7,6 @@ module ForemanAnsibleDirectorTests
 
         setup do
           as_admin do
-            @organization = FactoryBot.create(:organization)
             @host = FactoryBot.create(:host)
             @host2 = FactoryBot.create(:host)
           end

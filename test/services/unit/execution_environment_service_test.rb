@@ -5,13 +5,6 @@ module ForemanAnsibleDirectorTests
     module Unit
       class ExecutionEnvironmentServiceTest < ForemanAnsibleDirectorTestCase
 
-        setup do
-          as_admin do
-            @organization = FactoryBot.create(:organization)
-            Organization.current = @organization
-          end
-        end
-
         describe '#create_execution_environment' do
           test 'creates an execution environment with valid params' do
 

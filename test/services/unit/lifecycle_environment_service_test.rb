@@ -8,8 +8,6 @@ module ForemanAnsibleDirectorTests
 
         setup do
           as_admin do
-            @organization = FactoryBot.create(:organization)
-            Organization.current = @organization
             @path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
           end
         end

@@ -11,5 +11,7 @@ FactoryBot.reload
 class ForemanAnsibleDirectorTestCase < ActiveSupport::TestCase
   setup do
     User.current = User.find_by login: 'admin'
+    @organization ||= Organization.find_by name: 'Organization 1'
+    Organization.current = @organization
   end
 end
