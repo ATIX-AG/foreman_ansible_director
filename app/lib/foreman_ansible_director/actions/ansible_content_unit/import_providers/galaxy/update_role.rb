@@ -12,7 +12,6 @@ module ForemanAnsibleDirector
             end
 
             def plan(args)
-
             end
           end
         end

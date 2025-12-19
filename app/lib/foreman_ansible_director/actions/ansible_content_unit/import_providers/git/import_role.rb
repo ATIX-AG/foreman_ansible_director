@@ -20,34 +20,34 @@ module ForemanAnsibleDirector
                 git_remote: unit.source
               )
 
-              #repository_create_action = plan_action(
+              # repository_create_action = plan_action(
               #  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
               #  name: "#{organization_id}-#{unit.name}"
-              #)
+              # )
               #
-              #distribution_create_action = plan_action(
+              # distribution_create_action = plan_action(
               #  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
               #  name: unit.name,
               #  base_path: "#{organization_id}/#{unit.name}",
               #  repository_href: repository_create_action.output['repository_create_response']['pulp_href']
-              #)
+              # )
               #
-              #collection_remote_create_action = plan_action(
+              # collection_remote_create_action = plan_action(
               #  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Create,
               #  name: "#{organization_id}-#{unit.name}",
               #  url: unit.source,
               #  requirements: unit.collection_file
-              #)
+              # )
               #
-              #remote_href = collection_remote_create_action.output['collection_remote_create_response']['pulp_href']
+              # remote_href = collection_remote_create_action.output['collection_remote_create_response']['pulp_href']
               #
-              #_snyc_action = plan_action(
+              # _snyc_action = plan_action(
               #  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
               #  repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
               #  remote_href: remote_href
-              #)
+              # )
               #
-              #_index_action = plan_action(
+              # _index_action = plan_action(
               #  Index,
               #  index_mode: 'import',
               #  repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
@@ -58,7 +58,7 @@ module ForemanAnsibleDirector
               #  unit_name: unit.unit_name,
               #  unit_namespace: unit.unit_namespace,
               #  organization_id: organization_id
-              #)
+              # )
             end
           end
         end

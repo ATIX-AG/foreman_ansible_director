@@ -14,7 +14,6 @@ module ForemanAnsibleDirector
             end
 
             def plan(args)
-
               unit = args[:unit]
               organization_id = args[:organization_id]
               unit_version = args[:unit_version]
