@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
+
 Foreman::Plugin.register :foreman_ansible_director do
   requires_foreman '>= 3.12.0'
   register_gettext
