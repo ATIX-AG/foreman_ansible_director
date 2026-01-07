@@ -4,7 +4,7 @@ require File.expand_path('lib/foreman_ansible_director/constants', __dir__)
 
 Gem::Specification.new do |s|
   s.name        = 'foreman_ansible_director'
-  s.version     = ForemanAnsibleDirector::Constants::PLUGIN_VERSION
+  s.version     = ::ForemanAnsibleDirector::Constants::PLUGIN_VERSION
   s.metadata    = { 'is_foreman_plugin' => 'true' }
   s.license     = 'GPL-3.0'
   s.authors     = ['Thorben Denzer']
