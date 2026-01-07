@@ -14,10 +14,6 @@ module ForemanAnsibleDirector
       ForemanAnsibleDirector::Engine.paths['db/migrate'].existent.each do |path|
         app.config.paths['db/migrate'] << path
       end
-
-      app.config.autoload_paths += Dir["#{config.root}/app/lib"]
-      app.config.autoload_paths += Dir["#{config.root}/lib"]
-      app.config.autoload_paths += Dir["#{config.root}/app/services/foreman_ansible_director"]
     end
 
     initializer 'foreman_ansible_director.require_dynflow', before: 'foreman_tasks.initialize_dynflow' do |_app|
