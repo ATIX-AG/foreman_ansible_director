@@ -10,6 +10,9 @@ module ForemanAnsibleDirector
 
     has_many :ansible_content_assignments, as: :consumable, dependent: :destroy
 
+    has_many :content_unit_revisions, dependent: :destroy, class_name: 'ContentUnitRevision',
+                                         inverse_of: :content_unit_version
+
     validates :version, presence: true
     validates :version, uniqueness: { scope: %i[versionable_type versionable_id] }
 
@@ -20,6 +23,11 @@ module ForemanAnsibleDirector
 
     def content_unit_type
       versionable.type == '::ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role'
+    end
+
+    def content_unit_revisions
+      return nil unless (versionable.source_type = 'git') && dynamic
+      super
     end
   end
 end
