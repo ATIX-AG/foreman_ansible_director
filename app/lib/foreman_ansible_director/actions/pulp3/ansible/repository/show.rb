@@ -15,6 +15,10 @@ module ForemanAnsibleDirector
             end
 
             def run
+              if input[:skip]
+                output.update(repository_show_response: { latest_version_href: '' })
+                return
+              end
               response = ::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Show.new(input[:repository_href]).request
               output.update(repository_show_response: response)
             end

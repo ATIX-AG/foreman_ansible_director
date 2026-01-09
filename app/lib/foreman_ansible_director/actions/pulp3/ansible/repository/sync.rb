@@ -11,10 +11,20 @@ module ForemanAnsibleDirector
             input_format do
               param :repository_href, String, required: true
               param :remote_href, String, required: true
+              param :skip, Boolean, required: false
             end
 
             output_format do
               param :repository_sync_response, Hash
+            end
+
+            def run(*args)
+              nil if input[:skip]
+              if input[:skip]
+                output.update(repository_sync_response: {})
+                return
+              end
+              super
             end
 
             def invoke_external_task

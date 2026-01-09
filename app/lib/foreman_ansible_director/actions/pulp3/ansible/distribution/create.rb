@@ -10,12 +10,23 @@ module ForemanAnsibleDirector
 
             input_format do
               param :name, String, required: true
+              param :name_suffix, String, required: false
               param :base_path, String, required: true
               param :repository_href, String, required: true
+              param :skip, Boolean, required: false
             end
 
             output_format do
               param :distribution_create_response, Hash
+            end
+
+            def run(*args)
+              nil if input[:skip]
+              if input[:skip]
+                output.update(distribution_create_response: { pulp_href: '' })
+                return
+              end
+              super
             end
 
             def invoke_external_task

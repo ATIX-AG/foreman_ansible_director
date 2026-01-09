@@ -10,6 +10,7 @@ module ForemanAnsibleDirector
           param :unit_name, String, required: true
           param :unit_namespace, String, required: true
           param :organization_id, Integer, required: true
+          param :skip, Boolean, required: false
         end
 
         output_format do
@@ -20,17 +21,20 @@ module ForemanAnsibleDirector
           sequence do
             repository_show_action = plan_action(
               ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Show,
-              repository_href: args[:repository_href]
+              repository_href: args[:repository_href],
+              skip: args[:skip]
             )
             if args[:content_unit_type] == :collection
               list_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Collection::List,
-                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
+                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href],
+                skip: args[:skip]
               )
             else
               list_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Role::List,
-                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href]
+                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href],
+                skip: args[:skip]
               )
             end
 
@@ -40,20 +44,24 @@ module ForemanAnsibleDirector
               list_action_output: list_action.output,
               organization_id: args[:organization_id],
               unit_name: args[:unit_name],
-              unit_namespace: args[:unit_namespace]
+              unit_namespace: args[:unit_namespace],
+              skip: args[:skip]
             )
 
             plan_self(
               args.merge(
                 list_action_output: list_action.output,
                 repository_show_action_output: repository_show_action.output,
-                extract_variables_action_output: extract_variables_action.output
+                extract_variables_action_output: extract_variables_action.output,
+                skip: args[:skip]
               )
             )
           end
         end
 
         def run
+          return if input[:skip]
+
           unit_versions = []
           imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
 
@@ -75,6 +83,8 @@ module ForemanAnsibleDirector
 
         def finalize
           # rubocop:disable Layout/LineLength
+
+          return if input[:skip]
           unit_versions = input[:indexed_unit_versions]
           unit_variables = input[:extract_variables_action_output][:extract_variables_response]
 

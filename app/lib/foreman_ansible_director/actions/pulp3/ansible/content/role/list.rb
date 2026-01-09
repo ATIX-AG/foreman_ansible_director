@@ -16,6 +16,10 @@ module ForemanAnsibleDirector
               end
 
               def run
+                if input[:skip]
+                  output.update(repository_artifacts: { results: [] })
+                  return
+                end
                 response = ::ForemanAnsibleDirector::Pulp3::Ansible::Content::Role::List.new(
                   input[:repository_version_href]
                 ).request

@@ -12,6 +12,7 @@ module ForemanAnsibleDirector
           param :unit_name, String, required: true
           param :unit_namespace, String, required: true
           param :organization_id, String, required: true
+          param :skip, Boolean, required: false
         end
 
         # output_format do
@@ -19,6 +20,8 @@ module ForemanAnsibleDirector
         # end
 
         def run
+          return if input[:skip]
+          output.update(extract_variables_response: []) if input[:skip]
           unit_identifier = "#{input[:unit_namespace]}.#{input[:unit_name]}"
           imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
 

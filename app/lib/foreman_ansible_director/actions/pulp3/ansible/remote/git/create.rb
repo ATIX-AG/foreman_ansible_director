@@ -11,6 +11,7 @@ module ForemanAnsibleDirector
                 param :name, String, required: true
                 param :url, String, required: true
                 param :git_ref, String, required: true
+                param :skip, Boolean, required: false
               end
 
               output_format do
@@ -18,6 +19,10 @@ module ForemanAnsibleDirector
               end
 
               def run
+                if input[:skip]
+                  output.update(git_remote_create_response: { pulp_href: '' })
+                  return
+                end
                 git_remote = PulpAnsibleClient::AnsibleGitRemote.new({
                   name: input[:name],
                   url: input[:url],

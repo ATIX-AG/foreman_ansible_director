@@ -9,6 +9,7 @@ module ForemanAnsibleDirector
             class List < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
               input_format do
                 param :repository_version_href, String, required: true
+                param :skip, Boolean, required: false
               end
 
               output_format do
@@ -16,6 +17,10 @@ module ForemanAnsibleDirector
               end
 
               def run
+                if input[:skip]
+                  output.update(repository_artifacts: { results: [] })
+                  return
+                end
                 response = ::ForemanAnsibleDirector::Pulp3::Ansible::Content::Collection::List.new(
                   input[:repository_version_href]
                 ).request
