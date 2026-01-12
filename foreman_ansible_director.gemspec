@@ -20,11 +20,11 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 3.0', '< 4'
 
-  s.add_dependency 'dynflow', '>= 1.0.2', '< 2.0.0'
-  s.add_dependency 'foreman_remote_execution', '~> 16.0'
-  s.add_dependency 'foreman-tasks', '>= 9.0.0'
-  s.add_dependency 'pulp_ansible_client', '>= 0.22.3', '<= 0.24.7'
-  s.add_dependency 'pulpcore_client', '>= 3.63.9', '< 3.73.16'
+  s.add_dependency 'dynflow', '>= 1.6.1'
+  s.add_dependency 'foreman_remote_execution', '>= 7.1.0', '< 16.3.0'
+  s.add_dependency 'foreman-tasks', '>= 9.1'
+  s.add_dependency 'pulp_ansible_client', '>= 0.24.1', '<= 0.25.0'
+  s.add_dependency 'pulpcore_client', '>= 3.73.0', '< 3.74.0'
 
   s.add_development_dependency 'rdoc'
 end
