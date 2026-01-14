@@ -38,3 +38,6 @@ Metrics/BlockLength:
 Naming/FileName:
   Exclude:
     - db/seeds.d/*
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
