@@ -22,8 +22,12 @@ module ForemanAnsibleDirector
                 output.update(repository_create_response: { pulp_href: nil })
                 return
               end
+
+              name = input[:name]
+              name = "#{name}-#{input[:name_suffix]}" if input[:name_suffix]
+
               repository = PulpAnsibleClient::AnsibleAnsibleRepository.new(
-                { name: input[:name] }
+                { name: name }
               )
               response = ::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Create.new(repository).request
               output.update(repository_create_response: response)

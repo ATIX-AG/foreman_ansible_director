@@ -9,6 +9,7 @@ module ForemanAnsibleDirector
             class Create < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
               input_format do
                 param :name, String, required: true
+                param :name_suffix, String, required: false
                 param :url, String, required: true
                 param :git_ref, String, required: true
                 param :skip, Boolean, required: false
@@ -23,8 +24,12 @@ module ForemanAnsibleDirector
                   output.update(git_remote_create_response: { pulp_href: '' })
                   return
                 end
+
+                name = input[:name]
+                name = "#{name}-#{input[:name_suffix]}" if input[:name_suffix]
+
                 git_remote = PulpAnsibleClient::AnsibleGitRemote.new({
-                  name: input[:name],
+                  name: name,
                   url: input[:url],
                   git_ref: input[:git_ref],
                 })

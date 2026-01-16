@@ -30,9 +30,12 @@ module ForemanAnsibleDirector
             end
 
             def invoke_external_task
+              name = input[:name]
+              name = "#{name}-#{input[:name_suffix]}" if input[:name_suffix]
+
               distribution = PulpAnsibleClient::AnsibleAnsibleDistribution.new(
                 {
-                  name: input[:name],
+                  name: name,
                   base_path: input[:base_path],
                   repository: input[:repository_href],
                 }
