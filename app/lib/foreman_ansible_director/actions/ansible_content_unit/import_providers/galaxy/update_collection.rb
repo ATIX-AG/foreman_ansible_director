@@ -39,7 +39,7 @@ module ForemanAnsibleDirector
                 )
 
                 _index_action = plan_action(
-                  Index,
+                  ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Index::IndexStatic,
                   index_mode: 'update',
                   repository_href: repository_href,
                   remote_href: remote_href,

@@ -42,7 +42,7 @@ module ForemanAnsibleDirector
               )
 
               _index_action = plan_action(
-                Index,
+                ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Index::IndexStatic,
                 index_mode: 'import',
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                 remote_href: remote_href,
