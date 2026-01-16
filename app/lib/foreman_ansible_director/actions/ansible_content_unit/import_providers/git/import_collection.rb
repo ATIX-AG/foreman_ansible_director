@@ -18,13 +18,17 @@ module ForemanAnsibleDirector
               organization_id = args[:organization_id]
               unit_version = args[:unit_version]
 
-              dynamic_reference = plan_self(git_ls_remote: args[:git_ls_remote],
-                reference: unit_version).output['dynamic_reference']
+              git_check = plan_self(git_ls_remote: args[:git_ls_remote],
+                reference: unit_version)
+
+              dynamic_reference = git_check.output['dynamic_reference']
+              ref = git_check.output['reference']
 
               repository_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
-                name: "#{organization_id}-#{unit.name}",
-                skip: dynamic_reference
+                name: "#{organization_id}-git-#{unit.name}",
+                name_suffix: args[:unit_version][0, 8],
+                skip: false
               )
 
               distribution_create_action = plan_action(
@@ -32,15 +36,15 @@ module ForemanAnsibleDirector
                 name: unit.name,
                 base_path: "#{organization_id}/#{unit.name}",
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
-                skip: dynamic_reference
+                skip: false
               )
 
               git_remote_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Create,
                 name: unit.name,
                 url: unit.source,
-                git_ref: unit_version,
-                skip: dynamic_reference
+                git_ref: ref,
+                skip: false
               )
 
               remote_href = git_remote_create_action.output['git_remote_create_response']['pulp_href']
@@ -49,25 +53,27 @@ module ForemanAnsibleDirector
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                 remote_href: remote_href,
-                skip: dynamic_reference
+                skip: false
               )
 
               _index_action = plan_action(
-                Index,
+                ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Index::IndexGitCollection,
                 index_mode: 'import',
+                unit_version: unit_version,
+                unit_name: unit.unit_name,
+                unit_namespace: unit.unit_namespace,
+                unit_source: unit.source,
+                unit_source_type: unit.source_type,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                 remote_href: remote_href,
                 distribution_href: distribution_create_action.output['distribution_create_response']['pulp_href'],
-                content_unit_type: unit.unit_type,
-                content_unit_source: unit.source,
-                unit_name: unit.unit_name,
-                unit_namespace: unit.unit_namespace,
+                dynamic_reference: dynamic_reference,
                 organization_id: organization_id,
-                skip: dynamic_reference
               )
             end
 
             def run
+              # TODO: Also check whether the reference exists at all. Raise and skip if not
               branches = input.dig(:git_ls_remote, :git_ls_remote, :branches)
               pulls = input.dig(:git_ls_remote, :git_ls_remote, :pull)
 
@@ -77,6 +83,7 @@ module ForemanAnsibleDirector
                         pulls&.keys&.include?(reference)
 
               output.update(dynamic_reference: dynamic)
+              output.update(reference: (branches[reference] || pulls[reference])[:sha][0, 8])
             end
           end
         end
