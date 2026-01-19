@@ -3,15 +3,21 @@
 module ForemanAnsibleDirector
   class ContentService
     class << self
-      def create_content_unit_revision(cur_create)
+      def create_content_unit_revision(cuv_id:,
+                                       git_ref:,
+                                       latest_version_href:,
+                                       pulp_repository_href:,
+                                       pulp_remote_href:,
+                                       pulp_distribution_href:
+      )
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::ContentUnitRevision.create!(
-            content_unit_version_id: cur_create[:cuv_id],
-            git_ref: cur_create[:git_ref],
-            latest_version_href: cur_create[:latest_version_href],
-            pulp_repository_href: cur_create[:pulp_repository_href],
-            pulp_remote_href: cur_create[:pulp_remote_href],
-            pulp_distribution_href: cur_create[:pulp_distribution_href]
+            content_unit_version_id: cuv_id,
+            git_ref: git_ref,
+            latest_version_href: latest_version_href,
+            pulp_repository_href: pulp_repository_href,
+            pulp_remote_href: pulp_remote_href,
+            pulp_distribution_href: pulp_distribution_href
           )
         end
       end
@@ -25,7 +31,8 @@ module ForemanAnsibleDirector
                                     pulp_repository_href: '',
                                     pulp_remote_href: '',
                                     pulp_distribution_href: '',
-                                    meta: false)
+                                    meta: false
+      )
 
         # rubocop:disable Style/GuardClause
         if meta
@@ -63,10 +70,40 @@ module ForemanAnsibleDirector
         end
       end
 
-      def create_collection_role(collection:, name:)
+      def create_collection_role(
+        collection:,
+        name:
+      )
         ActiveRecord::Base.transaction do
           collection.ansible_collection_roles.create!(
             name: name
+          )
+        end
+      end
+
+      def create_collection_role_for_revision(
+        revision:,
+        name:
+      )
+        ActiveRecord::Base.transaction do
+          ::ForemanAnsibleDirector::AnsibleCollectionRole.create!(
+            name: name,
+            content_unit_revision_id: revision.id
+          )
+        end
+      end
+
+      def create_revision_activator(
+        consumable_type:,
+        consumable_id:,
+        revision_id:
+      )
+
+        ActiveRecord::Base.transaction do
+          ::ForemanAnsibleDirector::ActiveRevision.create!(
+            consumable_id: consumable_id,
+            consumable_type: consumable_type,
+            content_unit_revision_id: revision_id,
           )
         end
       end

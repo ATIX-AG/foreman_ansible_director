@@ -11,6 +11,7 @@ module ForemanAnsibleDirector
             input_format do
               param :name, String, required: true
               param :name_suffix, String, required: false
+              param :path_suffix, String, required: false
               param :base_path, String, required: true
               param :repository_href, String, required: true
               param :skip, Boolean, required: false
@@ -33,10 +34,13 @@ module ForemanAnsibleDirector
               name = input[:name]
               name = "#{name}-#{input[:name_suffix]}" if input[:name_suffix]
 
+              path = input[:base_path]
+              path = "#{path}-#{input[:path_suffix]}" if input[:path_suffix]
+
               distribution = PulpAnsibleClient::AnsibleAnsibleDistribution.new(
                 {
                   name: name,
-                  base_path: input[:base_path],
+                  base_path: path,
                   repository: input[:repository_href],
                 }
               )

@@ -11,6 +11,7 @@ module ForemanAnsibleDirector
           param :repository_show_action_output, Object, required: true
           param :unit_name, String, required: true
           param :unit_namespace, String, required: true
+          param :unit_name_suffix, String, required: false
           param :organization_id, String, required: true
           param :skip, Boolean, required: false
         end
@@ -23,20 +24,22 @@ module ForemanAnsibleDirector
           return if input[:skip]
           output.update(extract_variables_response: []) if input[:skip]
           unit_identifier = "#{input[:unit_namespace]}.#{input[:unit_name]}"
+          distribution_path = unit_identifier
+          distribution_path = "#{unit_identifier}-#{input[:unit_name_suffix]}" if input[:unit_name_suffix]
           imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
 
           results = {}
           imported_versions.each do |version|
             results[version[:version]] =
-              extract_from_collection(unit_identifier, version[:version], input[:organization_id])
+              extract_from_collection(unit_identifier, distribution_path, version[:version], input[:organization_id])
           end
           output.update(extract_variables_response: results)
         end
 
         private
 
-        def extract_from_collection(unit_identifier, unit_version, organization_id)
-          url = "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/default/api/v3/plugin/ansible/content/#{organization_id}/#{unit_identifier}/collections/artifacts/#{unit_identifier.tr(
+        def extract_from_collection(unit_identifier, distribution_path, unit_version, organization_id)
+          url = "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/default/api/v3/plugin/ansible/content/#{organization_id}/#{distribution_path}/collections/artifacts/#{unit_identifier.tr(
             '.', '-'
           )}-#{unit_version}.tar.gz"
           begin
