@@ -25,19 +25,21 @@ module ForemanAnsibleDirector
                 repository_href: args[:repository_href],
                 skip: args[:skip]
               )
-              if args[:content_unit_type] == :collection
-                list_action = plan_action(
-                  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Collection::List,
-                  repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href],
-                  skip: args[:skip]
-                )
-              else
-                list_action = plan_action(
-                  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Role::List,
-                  repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href],
-                  skip: args[:skip]
-                )
-              end
+              list_action = if args[:content_unit_type] == :collection
+                              plan_action(
+                                ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Collection::List,
+                                repository_version_href:
+                                  repository_show_action.output[:repository_show_response][:latest_version_href],
+                                skip: args[:skip]
+                              )
+                            else
+                              plan_action(
+                                ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Role::List,
+                                repository_version_href:
+                                  repository_show_action.output[:repository_show_response][:latest_version_href],
+                                skip: args[:skip]
+                              )
+                            end
 
               extract_variables_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ExtractVariables,
@@ -83,8 +85,6 @@ module ForemanAnsibleDirector
           end
 
           def finalize
-            # rubocop:disable Layout/LineLength
-
             return if input[:skip]
             unit_versions = input[:indexed_unit_versions]
             unit_variables = input[:extract_variables_action_output][:extract_variables_response]
@@ -98,7 +98,8 @@ module ForemanAnsibleDirector
                     name: input[:unit_name],
                     namespace: input[:unit_namespace],
                     source: input[:content_unit_source],
-                    latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                    latest_version_href:
+                      input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                     pulp_repository_href: input[:repository_href],
                     pulp_remote_href: input[:remote_href],
                     pulp_distribution_href: input[:distribution_href],
@@ -111,7 +112,8 @@ module ForemanAnsibleDirector
                   {
                     name: input[:unit_name],
                     namespace: input[:unit_namespace],
-                    latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                    latest_version_href:
+                      input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                     pulp_repository_href: input[:repository_href],
                     pulp_remote_href: input[:remote_href],
                     pulp_distribution_href: input[:distribution_href],
@@ -138,8 +140,15 @@ module ForemanAnsibleDirector
 
                   ActiveRecord::Base.transaction do
                     cr_variables.each do |variable_name, variable_value|
-                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, 'yaml', variable_value) # TODO: Guess data-type
-                      ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
+                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(
+                        variable_name,
+                        'yaml',
+                        variable_value
+                      ) # TODO: Guess data-type
+                      ::ForemanAnsibleDirector::VariableService.create_variable(
+                        create,
+                        collection_role_record
+                      )
                     end
                   end
                 end
@@ -147,10 +156,15 @@ module ForemanAnsibleDirector
 
             when 'update'
 
-              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(pulp_repository_href: input[:repository_href])
+              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(
+                pulp_repository_href: input[:repository_href]
+              )
               existing_unit_versions = existing_unit.content_unit_versions.pluck(:version)
 
-              existing_unit.update(latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href])
+              existing_unit.update(
+                latest_version_href:
+                  input[:repository_show_action_output][:repository_show_response][:latest_version_href]
+              )
 
               new_unit_versions = unit_versions.reject do |unit_version|
                 existing_unit_versions.include?(unit_version[:version])
@@ -173,14 +187,22 @@ module ForemanAnsibleDirector
 
                   ActiveRecord::Base.transaction do
                     cr_variables.each do |variable_name, variable_value|
-                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(variable_name, 'yaml', variable_value) # TODO: Guess data-type
-                      ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
+                      create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(
+                        variable_name,
+                        'yaml',
+                        variable_value
+                      ) # TODO: Guess data-type
+                      ::ForemanAnsibleDirector::VariableService.create_variable(
+                        create,
+                        collection_role_record
+                      )
                     end
                   end
                 end
               end
+            else
+              raise NotImplementedError
             end
-            # rubocop:enable Layout/LineLength
           end
         end
       end

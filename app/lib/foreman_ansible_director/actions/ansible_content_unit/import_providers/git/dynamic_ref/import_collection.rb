@@ -28,8 +28,10 @@ module ForemanAnsibleDirector
                     git_remote: args[:git_url]
                   )
 
-                  top_commit = plan_self(git_ls_remote: git_ls_remote_action.output,
-                                         reference: args[:git_ref]).output[:top_commit]
+                  top_commit = plan_self(
+                    git_ls_remote: git_ls_remote_action.output,
+                    reference: args[:git_ref]
+                  ).output[:top_commit]
 
                   repository_create_action = plan_action(
                     ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
@@ -77,8 +79,8 @@ module ForemanAnsibleDirector
                     unit_version_id: args[:unit_version_id],
                     organization_id: organization_id,
                     activator_type: args[:activator_type],
-                    activator_id: args[:activator_id],
-                    )
+                    activator_id: args[:activator_id]
+                  )
                 end
               end
 

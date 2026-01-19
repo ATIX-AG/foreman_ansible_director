@@ -68,7 +68,7 @@ module ForemanAnsibleDirector
                 remote_href: remote_href,
                 distribution_href: distribution_create_action.output['distribution_create_response']['pulp_href'],
                 dynamic_reference: dynamic_reference,
-                organization_id: organization_id,
+                organization_id: organization_id
               )
             end
 

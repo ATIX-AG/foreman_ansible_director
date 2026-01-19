@@ -32,10 +32,10 @@ module ForemanAnsibleDirector
                 )
                 list_action = plan_action(
                   ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Collection::List,
-                  repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href],
+                  repository_version_href:
+                    repository_show_action.output[:repository_show_response][:latest_version_href],
                   skip: false
                 )
-
 
                 extract_variables_action = plan_action(
                   ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ExtractVariables,
@@ -78,14 +78,13 @@ module ForemanAnsibleDirector
             end
 
             def finalize
-              # rubocop:disable Layout/LineLength
-
               unit_variables = input[:extract_variables_action_output][:extract_variables_response]
 
               unit_revision = ::ForemanAnsibleDirector::ContentService.create_content_unit_revision(
                 cuv_id: input[:unit_version_id],
                 git_ref: input[:git_ref],
-                latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                latest_version_href:
+                  input[:repository_show_action_output][:repository_show_response][:latest_version_href],
                 pulp_repository_href: input[:repository_href],
                 pulp_remote_href: input[:remote_href],
                 pulp_distribution_href: input[:distribution_href]
@@ -120,8 +119,6 @@ module ForemanAnsibleDirector
                 consumable_type: input[:activator_type],
                 revision_id: unit_revision.id
               )
-
-              # rubocop:enable Layout/LineLength
             end
           end
         end

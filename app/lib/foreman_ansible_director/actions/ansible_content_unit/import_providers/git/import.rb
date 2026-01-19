@@ -39,7 +39,7 @@ module ForemanAnsibleDirector
                 )
 
               else
-                # TODO: Raise exception
+                raise NotImplementedError
               end
             end
           end

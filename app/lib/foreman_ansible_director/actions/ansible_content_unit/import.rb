@@ -25,15 +25,22 @@ module ForemanAnsibleDirector
               plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Galaxy::Import,
                 unit: unit,
                 organization_id: organization_id)
+            else
+              raise NotImplementedError
             end
           when :update
             case unit.source_type
             when :git
+              raise NotImplementedError
             when :galaxy
               plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Galaxy::Update,
                 unit: unit,
                 organization_id: organization_id)
+            else
+              raise NotImplementedError
             end
+          else
+            raise NotImplementedError
           end
         end
 

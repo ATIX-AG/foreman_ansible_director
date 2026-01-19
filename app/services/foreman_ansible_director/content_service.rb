@@ -8,8 +8,7 @@ module ForemanAnsibleDirector
                                        latest_version_href:,
                                        pulp_repository_href:,
                                        pulp_remote_href:,
-                                       pulp_distribution_href:
-      )
+                                       pulp_distribution_href:)
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::ContentUnitRevision.create!(
             content_unit_version_id: cuv_id,
@@ -31,8 +30,7 @@ module ForemanAnsibleDirector
                                     pulp_repository_href: '',
                                     pulp_remote_href: '',
                                     pulp_distribution_href: '',
-                                    meta: false
-      )
+                                    meta: false)
 
         # rubocop:disable Style/GuardClause
         if meta
@@ -103,7 +101,7 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::ActiveRevision.create!(
             consumable_id: consumable_id,
             consumable_type: consumable_type,
-            content_unit_revision_id: revision_id,
+            content_unit_revision_id: revision_id
           )
         end
       end

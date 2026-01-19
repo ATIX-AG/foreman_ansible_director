@@ -7,7 +7,8 @@ module ForemanAnsibleDirector
     belongs_to :ansible_collection_version,
       class_name: 'ContentUnitVersion', inverse_of: :ansible_collection_roles, optional: true
 
-    belongs_to :content_unit_revision, class_name: 'ContentUnitRevision', inverse_of: :ansible_collection_roles, optional: true
+    belongs_to :content_unit_revision, class_name: 'ContentUnitRevision', inverse_of: :ansible_collection_roles,
+                optional: true
 
     validates :name, presence: true
     validates :name, uniqueness: { scope: :ansible_collection_version_id }

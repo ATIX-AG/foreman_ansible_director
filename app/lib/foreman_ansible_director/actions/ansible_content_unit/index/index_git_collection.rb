@@ -32,7 +32,8 @@ module ForemanAnsibleDirector
               )
               list_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Content::Collection::List,
-                repository_version_href: repository_show_action.output[:repository_show_response][:latest_version_href],
+                repository_version_href:
+                  repository_show_action.output[:repository_show_response][:latest_version_href],
                 skip: false
               )
 
@@ -85,7 +86,8 @@ module ForemanAnsibleDirector
               namespace: input[:unit_namespace],
               source: input[:unit_source],
               source_type: 'git',
-              latest_version_href: input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+              latest_version_href:
+                input[:repository_show_action_output][:repository_show_response][:latest_version_href],
               pulp_repository_href: input[:repository_href],
               pulp_remote_href: input[:remote_href],
               pulp_distribution_href: input[:distribution_href],

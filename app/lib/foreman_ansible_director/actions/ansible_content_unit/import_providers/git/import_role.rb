@@ -12,13 +12,13 @@ module ForemanAnsibleDirector
             end
 
             def plan(args)
-              unit = args[:unit]
-              organization_id = args[:organization_id]
-
-              git_ls_remote_action = plan_action(
-                ::ForemanAnsibleDirector::Actions::GitOps::LsRemote,
-                git_remote: unit.source
-              )
+              # unit = args[:unit]
+              # organization_id = args[:organization_id]
+              #
+              # git_ls_remote_action = plan_action(
+              #  ::ForemanAnsibleDirector::Actions::GitOps::LsRemote,
+              #  git_remote: unit.source
+              # )
 
               # repository_create_action = plan_action(
               #  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
