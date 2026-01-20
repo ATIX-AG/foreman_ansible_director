@@ -76,14 +76,25 @@ module ForemanAnsibleDirector
               # TODO: Also check whether the reference exists at all. Raise and skip if not
               branches = input.dig(:git_ls_remote, :git_ls_remote, :branches)
               pulls = input.dig(:git_ls_remote, :git_ls_remote, :pull)
+              tags = input.dig(:git_ls_remote, :git_ls_remote, :tags)
 
               reference = input[:reference]
 
               dynamic = branches&.keys&.include?(reference) ||
                         pulls&.keys&.include?(reference)
 
+              if dynamic
+                ref = (branches[reference] || pulls[reference])[:sha][0, 8]
+              else
+                begin
+                  ref = (tags[reference])[:sha][0, 8]
+                rescue NoMethodError # ref is a commit literal
+                  ref = reference
+                end
+              end
+
               output.update(dynamic_reference: dynamic)
-              output.update(reference: (branches[reference] || pulls[reference])[:sha][0, 8])
+              output.update(reference: ref)
             end
           end
         end
