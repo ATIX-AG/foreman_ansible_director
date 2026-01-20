@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'pulp_ansible_client', '>= 0.24.1', '<= 0.25.0'
   s.add_dependency 'pulpcore_client', '>= 3.73.0', '< 3.74.0'
 
-  s.add_dependency 'git', '~> 2.3.0'
+  s.add_dependency 'git', '>= 1.18.0', '< 3.0.0'
 
   s.add_development_dependency 'rdoc'
 end
