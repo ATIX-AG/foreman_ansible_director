@@ -48,6 +48,7 @@ module ForemanAnsibleDirector
                 organization_id: args[:organization_id],
                 unit_name: args[:unit_name],
                 unit_namespace: args[:unit_namespace],
+                unit_name_suffix: 'galaxy',
                 skip: args[:skip]
               )
 

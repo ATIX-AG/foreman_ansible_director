@@ -13,6 +13,7 @@ module ForemanAnsibleDirector
             param :unit_namespace, String, required: true
             param :unit_source, String, required: true
             param :unit_source_type, String, required: true
+            param :unit_name_suffix, String, required: false
 
             param :repository_href, String, required: false
             param :remote_href, String, required: false
@@ -44,6 +45,7 @@ module ForemanAnsibleDirector
                 organization_id: args[:organization_id],
                 unit_name: args[:unit_name],
                 unit_namespace: args[:unit_namespace],
+                unit_name_suffix: "git-#{args[:unit_name_suffix]}",
                 skip: false
               )
 

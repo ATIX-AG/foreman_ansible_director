@@ -17,19 +17,19 @@ module ForemanAnsibleDirector
 
               repository_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
-                name: "#{organization_id}-#{unit.name}"
+                name: "#{organization_id}-galaxy-#{unit.name}"
               )
 
               distribution_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
-                name: unit.name,
-                base_path: "#{organization_id}/#{unit.name}",
+                name: "#{organization_id}-galaxy-#{unit.name}",
+                base_path: "#{organization_id}/#{unit.name}-galaxy",
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href']
               )
 
               collection_remote_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Create,
-                name: "#{organization_id}-#{unit.name}",
+                name: "#{organization_id}-galaxy-#{unit.name}",
                 url: unit.source,
                 requirements: unit.collection_file
               )

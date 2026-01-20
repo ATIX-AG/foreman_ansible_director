@@ -18,6 +18,8 @@ module ForemanAnsibleDirector
               organization_id = args[:organization_id]
               unit_version = args[:unit_version]
 
+              obj_name_suffix = Base64.encode64(args[:unit_version][0, 16]).strip
+
               git_check = plan_self(git_ls_remote: args[:git_ls_remote],
                 reference: unit_version)
 
@@ -27,21 +29,24 @@ module ForemanAnsibleDirector
               repository_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
                 name: "#{organization_id}-git-#{unit.name}",
-                name_suffix: args[:unit_version][0, 8],
+                name_suffix: obj_name_suffix,
                 skip: false
               )
 
               distribution_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
-                name: unit.name,
-                base_path: "#{organization_id}/#{unit.name}",
+                name: "#{organization_id}-git-#{unit.name}",
+                name_suffix: obj_name_suffix,
+                base_path: "#{organization_id}/#{unit.name}-git",
+                path_suffix: obj_name_suffix,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                 skip: false
               )
 
               git_remote_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Create,
-                name: unit.name,
+                name: "#{organization_id}-git-#{unit.name}",
+                name_suffix: obj_name_suffix,
                 url: unit.source,
                 git_ref: ref,
                 skip: false
@@ -64,6 +69,7 @@ module ForemanAnsibleDirector
                 unit_namespace: unit.unit_namespace,
                 unit_source: unit.source,
                 unit_source_type: unit.source_type,
+                unit_name_suffix: obj_name_suffix,
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                 remote_href: remote_href,
                 distribution_href: distribution_create_action.output['distribution_create_response']['pulp_href'],

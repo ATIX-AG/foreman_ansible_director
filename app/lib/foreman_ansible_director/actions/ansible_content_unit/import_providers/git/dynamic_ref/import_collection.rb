@@ -45,7 +45,7 @@ module ForemanAnsibleDirector
                     name: "#{organization_id}-git-#{unit_name}",
                     name_suffix: top_commit,
                     path_suffix: top_commit,
-                    base_path: "#{organization_id}/#{unit_name}",
+                    base_path: "#{organization_id}/#{unit_name}-git",
                     repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
                     skip: false
                   )

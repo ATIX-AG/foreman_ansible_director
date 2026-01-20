@@ -44,7 +44,7 @@ module ForemanAnsibleDirector
                   organization_id: args[:organization_id],
                   unit_name: args[:unit_name],
                   unit_namespace: args[:unit_namespace],
-                  unit_name_suffix: args[:git_ref],
+                  unit_name_suffix: "git-#{args[:git_ref]}",
                   skip: false
                 )
 

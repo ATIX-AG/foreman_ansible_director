@@ -22,8 +22,8 @@ module ForemanAnsibleDirector
 
               distribution_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
-                name: unit.name,
-                base_path: "#{organization_id}/#{unit.name}",
+                name: "#{organization_id}-galaxy-#{unit.name}",
+                base_path: "#{organization_id}/#{unit.name}-galaxy",
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href']
               )
 
