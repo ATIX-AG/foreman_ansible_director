@@ -105,11 +105,12 @@ module ForemanAnsibleDirector
 
                 ActiveRecord::Base.transaction do
                   cr_variables.each do |variable_name, variable_value|
-                    create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new(
-                      variable_name, 'yaml',
-                      variable_value
-                    ) # TODO: Guess data-type
-                    ::ForemanAnsibleDirector::VariableService.create_variable(create, collection_role_record)
+                    ::ForemanAnsibleDirector::VariableService.create_variable(
+                      key: variable_name,
+                      type: 'yaml',
+                      default_value: variable_value,
+                      owner: collection_role_record
+                    )
                   end
                 end
               end

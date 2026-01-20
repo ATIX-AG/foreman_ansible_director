@@ -17,28 +17,24 @@ module ForemanAnsibleDirector
           permitted_params = execution_environment_params
           # content = permitted_params.delete(:content)
 
-          ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
-            permitted_params[:name],
-            permitted_params[:base_image_url],
-            permitted_params[:ansible_version],
-            @organization.id
+          ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
+            name: permitted_params[:name],
+            base_image_url: permitted_params[:base_image_url],
+            ansible_version: permitted_params[:ansible_version],
+            organization_id: @organization.id
           )
-          ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment ee_create
         end
 
         def update
           permitted_params = execution_environment_params
           # content = permitted_params.delete(:content)
 
-          ee_update = ::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
-            permitted_params[:name],
-            permitted_params[:base_image_url],
-            permitted_params[:ansible_version],
-            @organization.id
+          ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
+            execution_environment: @execution_environment,
+            name: permitted_params[:name],
+            base_image_url: permitted_params[:base_image_url],
+            ansible_version: permitted_params[:ansible_version]
           )
-
-          ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment ee_update,
-            @execution_environment
         end
 
         def destroy

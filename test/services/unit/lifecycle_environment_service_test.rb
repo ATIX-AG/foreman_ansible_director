@@ -14,16 +14,16 @@ module ForemanAnsibleDirectorTests
 
         describe '#create_environment' do
           test 'creates a lifecycle environment with valid params' do
-            lce_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentCreate.new(
-              "test_env",
-              "Test environment description",
-              0,
-              @organization.id
-            )
 
             initial_count = ::ForemanAnsibleDirector::LifecycleEnvironment.count
 
-            env = ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(@path, lce_create)
+            env = ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(
+              lce_path: @path,
+              name: "test_env",
+              description: "Test environment description",
+              position: 0,
+              organization_id: @organization.id
+            )
 
             assert_not_nil env
             assert_equal 'test_env', env.name
@@ -33,29 +33,23 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'creates lifecycle environment within transaction' do
-            lce_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentCreate.new(
-              nil,
-              "Test environment description",
-              0,
-              @organization.id
-            )
 
             initial_count = ::ForemanAnsibleDirector::LifecycleEnvironment.count
 
             assert_raises(ActiveRecord::RecordInvalid) do
-              ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(@path, lce_create)
+              ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(
+                lce_path: @path,
+                name: nil,
+                description: "Test environment description",
+                position: 0,
+                organization_id: @organization.id
+              )
             end
 
             assert_equal initial_count, ::ForemanAnsibleDirector::LifecycleEnvironment.count
           end
 
           test 'calls LifecycleEnvironmentPathService to insert environment' do
-            lce_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentCreate.new(
-              "test_env",
-              "Test environment description",
-              1,
-              @organization.id
-            )
 
             service_called = false
             path_arg = nil
@@ -68,7 +62,13 @@ module ForemanAnsibleDirectorTests
               env_arg = env
               position_arg = position
             }) do
-              ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(@path, lce_create)
+              ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(
+                lce_path: @path,
+                name: "test_env",
+                description: "Test environment description",
+                position: 1,
+                organization_id: @organization.id
+              )
             end
 
             assert service_called
@@ -85,13 +85,13 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'updates lifecycle environment with valid params' do
-            lce_edit = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentEdit.new(
-              "updated_env",
-              "Updated description",
-              @execution_environment.id
-            )
 
-            ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(@environment, lce_edit)
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
+              environment: @environment,
+              name: "updated_env",
+              description: "Updated description",
+              execution_environment_id: @execution_environment.id
+            )
             @environment.reload
 
             assert_equal 'updated_env', @environment.name
@@ -102,14 +102,13 @@ module ForemanAnsibleDirectorTests
           test 'updates environment within transaction' do
             original_name = @environment.name
 
-            lce_edit = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentEdit.new(
-              nil,
-              "Updated description",
-              @execution_environment.id
-            )
-
             assert_raises(ActiveRecord::RecordInvalid) do
-              ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(@environment, lce_edit)
+              ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
+                environment: @environment,
+                name: nil,
+                description: "Updated description",
+                execution_environment_id: @execution_environment.id
+              )
             end
 
             @environment.reload

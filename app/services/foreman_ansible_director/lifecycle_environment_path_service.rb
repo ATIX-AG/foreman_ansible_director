@@ -3,21 +3,25 @@
 module ForemanAnsibleDirector
   class LifecycleEnvironmentPathService
     class << self
-      def create_path(path_create)
+      def create_path(name:,
+                      description:,
+                      organization_id:)
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::LifecycleEnvironmentPath.create!(
-            name: path_create[:name],
-            description: path_create[:description],
-            organization_id: path_create[:organization_id]
+            name: name,
+            description: description,
+            organization_id: organization_id
           )
         end
       end
 
-      def edit_path(path, path_edit)
+      def edit_path(lce_path:,
+                    name:,
+                    description:)
         ActiveRecord::Base.transaction do
-          path.update!(
-            name: path_edit[:name],
-            description: path_edit[:description]
+          lce_path.update!(
+            name: name,
+            description: description
           )
         end
       end
@@ -66,12 +70,14 @@ module ForemanAnsibleDirector
         end
       end
 
-      def promote(path, path_promote)
+      def promote(lce_path:,
+                  source_environment_id:,
+                  target_environment_id:)
         success = false
 
         ActiveRecord::Base.transaction do
-          source_env = path.lifecycle_environments.find_by(id: path_promote[:source_environment_id])
-          target_env = path.lifecycle_environments.find_by(id: path_promote[:target_environment_id])
+          source_env = lce_path.lifecycle_environments.find_by(id: source_environment_id)
+          target_env = lce_path.lifecycle_environments.find_by(id: target_environment_id)
 
           unless source_env
             # errors.add(:source_environment_id, 'Source environment not found')

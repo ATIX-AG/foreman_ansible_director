@@ -8,10 +8,12 @@ module ForemanAnsibleDirectorTests
         describe '#create_execution_environment' do
           test 'creates an execution environment with valid params' do
 
-            ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new("test_ee", "quay.io/ansible/base-ee:latest", "2.20.0", @organization.id
+            ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
+              name: "test_ee",
+              base_image_url: "quay.io/ansible/base-ee:latest",
+              ansible_version: "2.20.0",
+              organization_id: @organization.id
             )
-
-            ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(ee_create)
 
             assert_not_nil ee
             assert_equal 'test_ee', ee.name
@@ -21,13 +23,6 @@ module ForemanAnsibleDirectorTests
 
           test 'triggers execution environment build' do
 
-            ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
-              "test_ee",
-              "quay.io/ansible/base-ee:latest",
-              "2.20.0",
-              @organization.id
-            )
-
             task_called = false
             action_name = nil
             env_def = nil
@@ -36,7 +31,12 @@ module ForemanAnsibleDirectorTests
             action_name = action.name
             env_def = args[:execution_environment_definition]
             }) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(ee_create)
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
+                name: "test_ee",
+                base_image_url: "quay.io/ansible/base-ee:latest",
+                ansible_version: "2.20.0",
+                organization_id: @organization.id
+              )
             end
 
             assert task_called
@@ -45,17 +45,16 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'creates execution environment within transaction' do
-            ee_create = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
-              nil,
-              "quay.io/ansible/base-ee:latest",
-              "2.20.0",
-              @organization.id
-            )
 
             initial_count = ::ForemanAnsibleDirector::ExecutionEnvironment.count
 
             assert_raises(ActiveRecord::RecordInvalid) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(ee_create)
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
+                name: nil,
+                base_image_url: "quay.io/ansible/base-ee:latest",
+                ansible_version: "2.20.0",
+                organization_id: @organization.id
+              )
             end
 
             assert_equal initial_count, ::ForemanAnsibleDirector::ExecutionEnvironment.count
@@ -68,13 +67,13 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'updates execution environment with valid params' do
-            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEvironmentCreate.new(
-              "updated_ee",
-              "quay.io/ansible/updated-ee:latest",
-              "2.19.0"
-            )
 
-            ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(ee_update, @execution_environment)
+            ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
+              execution_environment: @execution_environment,
+              name: "updated_ee",
+              base_image_url: "quay.io/ansible/updated-ee:latest",
+              ansible_version: "2.19.0"
+            )
             @execution_environment.reload
 
             assert_equal 'updated_ee', @execution_environment.name
@@ -88,17 +87,16 @@ module ForemanAnsibleDirectorTests
             action_name = nil
             env_def = nil
 
-            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
-              "edited_name",
-              @execution_environment.base_image_url,
-              @execution_environment.ansible_version
-            )
-
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
             }) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(ee_update, @execution_environment)
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
+                execution_environment: @execution_environment,
+                name: "edited_name",
+                base_image_url: @execution_environment.base_image_url,
+                ansible_version: @execution_environment.ansible_version
+              )
             end
 
             @execution_environment.reload
@@ -107,17 +105,16 @@ module ForemanAnsibleDirectorTests
             assert_nil action_name
             assert_nil env_def
 
-            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
-              @execution_environment.name,
-              "quay.io/fedora/fedora:42",
-              @execution_environment.ansible_version
-            )
-
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
             }) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(ee_update, @execution_environment)
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
+                execution_environment: @execution_environment,
+                name: @execution_environment.name,
+                base_image_url: "quay.io/fedora/fedora:42",
+                ansible_version: @execution_environment.ansible_version
+              )
             end
 
             assert task_called
@@ -128,17 +125,16 @@ module ForemanAnsibleDirectorTests
             action_name = nil
             env_def = nil
 
-            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
-              @execution_environment.name,
-              @execution_environment.base_image_url,
-              "2.19.3"
-            )
-
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
             }) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(ee_update, @execution_environment)
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
+                execution_environment: @execution_environment,
+                name: @execution_environment.name,
+                base_image_url: @execution_environment.base_image_url,
+                ansible_version: "2.19.3"
+              )
             end
 
             assert task_called
@@ -150,14 +146,13 @@ module ForemanAnsibleDirectorTests
           test 'updates execution environment within transaction' do
             original_name = @execution_environment.name
 
-            ee_update = ::ForemanAnsibleDirector::Structs::ExecutionEnvironment::ExecutionEnvironmentEdit.new(
-              nil,
-              'quay.io/ansible/base-ee:latest',
-              '2.19.0'
-            )
-
             assert_raises(ActiveRecord::RecordInvalid) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(ee_update, @execution_environment)
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
+                execution_environment: @execution_environment,
+                name: nil,
+                base_image_url: 'quay.io/ansible/base-ee:latest',
+                ansible_version: '2.19.0'
+              )
             end
 
             @execution_environment.reload

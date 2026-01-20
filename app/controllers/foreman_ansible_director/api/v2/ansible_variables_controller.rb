@@ -11,13 +11,13 @@ module ForemanAnsibleDirector
 
         def update
           variable = variable_params
-          variable_update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableEdit.new(
-            variable[:key],
-            variable[:type],
-            variable[:default_value],
-            variable[:overridable]
+          ::ForemanAnsibleDirector::VariableService.edit_variable(
+            variable: @ansible_variable,
+            key: variable[:key],
+            type: variable[:type],
+            default_value: variable[:default_value],
+            overridable: variable[:overridable]
           )
-          ::ForemanAnsibleDirector::VariableService.edit_variable variable_update, @ansible_variable
         end
 
         private

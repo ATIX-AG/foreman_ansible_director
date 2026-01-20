@@ -3,25 +3,31 @@
 module ForemanAnsibleDirector
   class ExecutionEnvironmentService
     class << self
-      def create_execution_environment(execution_environment_create)
+      def create_execution_environment(name:,
+                                       base_image_url:,
+                                       ansible_version:,
+                                       organization_id:)
         ActiveRecord::Base.transaction do
           env = ::ForemanAnsibleDirector::ExecutionEnvironment.create!(
-            name: execution_environment_create[:name],
-            base_image_url: execution_environment_create[:base_image_url],
-            ansible_version: execution_environment_create[:ansible_version],
-            organization_id: execution_environment_create[:organization_id]
+            name: name,
+            base_image_url: base_image_url,
+            ansible_version: ansible_version,
+            organization_id: organization_id
           )
           env.update!(content_hash: env.generate_content_hash)
           env
         end
       end
 
-      def edit_execution_environment(execution_environment_edit, execution_environment)
+      def edit_execution_environment(execution_environment:,
+                                     name:,
+                                     base_image_url:,
+                                     ansible_version:)
         ActiveRecord::Base.transaction do
           execution_environment.update!(
-            name: execution_environment_edit[:name],
-            base_image_url: execution_environment_edit[:base_image_url],
-            ansible_version: execution_environment_edit[:ansible_version]
+            name: name,
+            base_image_url: base_image_url,
+            ansible_version: ansible_version
           )
           execution_environment.update!(content_hash: execution_environment.generate_content_hash)
           execution_environment

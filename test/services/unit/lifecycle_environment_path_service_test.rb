@@ -7,15 +7,14 @@ module ForemanAnsibleDirectorTests
 
         describe '#create_path' do
           test 'creates a lifecycle environment path with valid params' do
-            path_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathCreate.new(
-              "test_path",
-              "Test path description",
-              @organization.id
-            )
 
             initial_count = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.count
 
-            path = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(path_create)
+            path = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(
+              name: "test_path",
+              description: "Test path description",
+              organization_id: @organization.id
+            )
 
             assert_not_nil path
             assert_equal 'test_path', path.name
@@ -25,16 +24,15 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'creates lifecycle environment path within transaction' do
-            path_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathCreate.new(
-              nil,
-              "Test path description",
-              @organization.id
-            )
 
             initial_count = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.count
 
             assert_raises(ActiveRecord::RecordInvalid) do
-              ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(path_create)
+              ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(
+                name: nil,
+                description: "Test path description",
+                organization_id: @organization.id
+              )
             end
 
             assert_equal initial_count, ::ForemanAnsibleDirector::LifecycleEnvironmentPath.count
@@ -47,12 +45,12 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'updates lifecycle environment path with valid params' do
-            path_edit = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathEdit.new(
-              "updated_path",
-              "Updated path description"
-            )
 
-            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(@path, path_edit)
+            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(
+              lce_path: @path,
+              name: "updated_path",
+              description: "Updated path description"
+            )
             @path.reload
 
             assert_equal 'updated_path', @path.name
@@ -62,13 +60,12 @@ module ForemanAnsibleDirectorTests
           test 'updates path within transaction' do
             original_name = @path.name
 
-            path_edit = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathEdit.new(
-              nil,
-              "Updated path description"
-            )
-
             assert_raises(ActiveRecord::RecordInvalid) do
-              ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(@path, path_edit)
+              ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(
+                lce_path: @path,
+                name: nil,
+                description: "Updated path description"
+              )
             end
 
             @path.reload
@@ -211,12 +208,11 @@ module ForemanAnsibleDirectorTests
             execution_environment = FactoryBot.create(:execution_environment, organization: @organization)
             @source_env.update!(content_snapshot: content_snapshot, execution_environment: execution_environment)
 
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              @source_env.id,
-              @target_env.id
+            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: @source_env.id,
+              target_environment_id: @target_env.id
             )
-
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
 
             assert result
             @target_env.reload
@@ -236,12 +232,12 @@ module ForemanAnsibleDirectorTests
               # Mock create_snapshot method
               new_snapshot = FactoryBot.create(:content_snapshot, references: 1)
               ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.stub(:create_snapshot, new_snapshot) do
-                path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-                  @source_env.id,
-                  @target_env.id
-                )
 
-                result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
+                result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+                  lce_path: @path,
+                  source_environment_id: @source_env.id,
+                  target_environment_id: @target_env.id
+                )
 
                 assert result
                 @target_env.reload
@@ -252,23 +248,23 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'fails when source environment not found' do
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              999999,
-              @target_env.id
-            )
 
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
+            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: 999999,
+              target_environment_id: @target_env.id
+            )
 
             assert_not result
           end
 
           test 'fails when target environment not found' do
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              @source_env.id,
-              999999
-            )
 
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
+            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: @source_env.id,
+              target_environment_id: 999999
+            )
 
             assert_not result
           end
@@ -280,14 +276,13 @@ module ForemanAnsibleDirectorTests
             source_snapshot = FactoryBot.create(:content_snapshot, references: 2) # 2 because the snapshot will be destroyed when refs = 0
             source_env.update(content_snapshot: source_snapshot)
 
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              @source_env.id,
-              @target_env.id
-            )
-
             initial_references = source_snapshot.references
 
-            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
+            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: @source_env.id,
+              target_environment_id: @target_env.id
+            )
 
             source_snapshot.reload
             assert_equal initial_references, source_snapshot.references
@@ -295,12 +290,11 @@ module ForemanAnsibleDirectorTests
 
           test 'fails when promotion direction is wrong' do
 
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              @target_env.id,
-              @source_env.id
+            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: @target_env.id,
+              target_environment_id: @source_env.id
             )
-
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
 
             assert_not result
           end
@@ -312,12 +306,11 @@ module ForemanAnsibleDirectorTests
             @source_env.update!(child: intermediate_env)
             intermediate_env.update!(child: @target_env)
 
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              @source_env.id,
-              @target_env.id
+            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: @source_env.id,
+              target_environment_id: @target_env.id
             )
-
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
 
             assert_not result
           end
@@ -328,12 +321,11 @@ module ForemanAnsibleDirectorTests
             @source_env.update!(content_snapshot: source_snapshot)
             @target_env.update!(content_snapshot: target_snapshot)
 
-            path_promote = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              @source_env.id,
-              @target_env.id
+            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+              lce_path: @path,
+              source_environment_id: @source_env.id,
+              target_environment_id: @target_env.id
             )
-
-            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(@path, path_promote)
 
             source_snapshot.reload
             target_snapshot.reload

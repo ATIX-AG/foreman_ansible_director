@@ -18,8 +18,12 @@ module ForemanAnsibleDirectorTests
         describe '#create_variable' do
           test 'creates a variable with valid params for collection role' do
 
-            create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableCreate.new("test_variable", "string", "test_value")
-            variable = ::ForemanAnsibleDirector::VariableService.create_variable(create, @collection_role)
+            variable = ::ForemanAnsibleDirector::VariableService.create_variable(
+              key: "test_variable",
+              type: "string",
+              default_value: "test_value",
+              owner: @collection_role
+            )
 
             assert_not_nil variable
             assert_equal 'test_variable', variable.key
@@ -40,9 +44,13 @@ module ForemanAnsibleDirectorTests
 
           test 'updates variable with valid params' do
 
-            update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableEdit.new("updated_key", "boolean", true, true)
-
-            ::ForemanAnsibleDirector::VariableService.edit_variable(update, @variable)
+            ::ForemanAnsibleDirector::VariableService.edit_variable(
+              variable: @variable,
+              key: "updated_key",
+              type: "boolean",
+              default_value: true,
+              overridable: true
+            )
             @variable.reload
 
             assert_equal 'updated_key', @variable.key
@@ -66,14 +74,23 @@ module ForemanAnsibleDirectorTests
             assert_not variable1.overridable?
             assert_not variable2.overridable?
 
-            update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableEdit.new(variable1.key, variable1.key_type, variable1.default_value, true)
-            ::ForemanAnsibleDirector::VariableService.edit_variable(update, variable1)
+            ::ForemanAnsibleDirector::VariableService.edit_variable(
+              variable: variable1,
+              key: variable1.key,
+              type: variable1.key_type,
+              default_value: variable1.default_value,
+              overridable: true
+            )
             variable1.reload
 
             assert variable1.overridable?
 
-            override = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
-            ::ForemanAnsibleDirector::VariableService.create_override override, variable2
+            ::ForemanAnsibleDirector::VariableService.create_override(
+              variable: variable2,
+              value: "new_value",
+              matcher: "fqdn",
+              matcher_value: @host.fqdn
+            )
             variable2.reload
 
             assert variable2.overridable?
@@ -89,8 +106,12 @@ module ForemanAnsibleDirectorTests
 
           test 'creates an override with valid params' do
 
-            override_create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
-            override = ::ForemanAnsibleDirector::VariableService.create_override override_create, @variable
+            override = ::ForemanAnsibleDirector::VariableService.create_override(
+              variable: @variable,
+              value: "new_value",
+              matcher: "fqdn",
+              matcher_value: @host.fqdn
+            )
 
             assert_not_nil override
             assert_equal "fqdn=#{@host.fqdn}", override.match
@@ -109,9 +130,12 @@ module ForemanAnsibleDirectorTests
           end
 
           test 'updates override with valid params' do
-            override_update = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new("new_value", "fqdn", @host.fqdn)
-
-            ::ForemanAnsibleDirector::VariableService.edit_override(override_update, @override)
+            ::ForemanAnsibleDirector::VariableService.edit_override(
+              override: @override,
+              value: "new_value",
+              matcher: "fqdn",
+              matcher_value: @host.fqdn
+            )
             @override.reload
 
             assert_equal 'new_value', @override.value

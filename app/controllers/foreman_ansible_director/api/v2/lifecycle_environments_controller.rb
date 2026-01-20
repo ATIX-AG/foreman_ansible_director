@@ -22,29 +22,23 @@ module ForemanAnsibleDirector
           permitted_params = lifecycle_environment_params
           position = permitted_params.delete(:position) || 0
 
-          lce_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentCreate.new(
-            permitted_params[:name],
-            permitted_params[:description],
-            position,
-            @organization.id
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(
+            lce_path: @lifecycle_environment_path,
+            name: permitted_params[:name],
+            description: permitted_params[:description],
+            position: position,
+            organization_id: @organization.id
           )
-
-          ::ForemanAnsibleDirector::LifecycleEnvironmentService.create_environment(@lifecycle_environment_path,
-            lce_create)
         end
 
         def update
           permitted_params = lifecycle_environment_update_params
 
-          lce_edit = ::ForemanAnsibleDirector::Structs::LifecycleEnvironment::LifecycleEnvironmentEdit.new(
-            permitted_params[:name],
-            permitted_params[:description],
-            permitted_params[:execution_environment_id]
-          )
-
           ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
-            @lifecycle_environment,
-            lce_edit
+            environment: @lifecycle_environment,
+            name: permitted_params[:name],
+            description: permitted_params[:description],
+            execution_environment_id: permitted_params[:execution_environment_id]
           )
         end
 

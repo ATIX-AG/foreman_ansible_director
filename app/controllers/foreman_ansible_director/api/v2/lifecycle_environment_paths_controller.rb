@@ -16,22 +16,21 @@ module ForemanAnsibleDirector
         def create
           permitted_params = lifecycle_environment_path_params
 
-          path_create = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathCreate.new(
-            permitted_params[:name],
-            permitted_params[:description],
-            @organization.id
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(
+            name: permitted_params[:name],
+            description: permitted_params[:description],
+            organization_id: @organization.id
           )
-          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.create_path(path_create)
         end
 
         def update
           permitted_params = lifecycle_environment_path_params
-          path_update = ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathEdit.new(
-            permitted_params[:name],
-            permitted_params[:description]
-          )
 
-          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(@lifecycle_environment_path, path_update)
+          ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.edit_path(
+            lce_path: @lifecycle_environment_path,
+            name: permitted_params[:name],
+            description: permitted_params[:description]
+          )
         end
 
         def destroy
@@ -43,15 +42,10 @@ module ForemanAnsibleDirector
         def promote
           permitted_params = promote_params
 
-          path_promote =
-            ::ForemanAnsibleDirector::Structs::LifecycleEnvironmentPath::LifecycleEnvironmentPathPromote.new(
-              permitted_params[:source_environment_id],
-              permitted_params[:target_environment_id]
-            )
-
           ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
-            @lifecycle_environment_path,
-            path_promote
+            lce_path: @lifecycle_environment_path,
+            source_environment_id: permitted_params[:source_environment_id],
+            target_environment_id: permitted_params[:target_environment_id]
           )
         end
 

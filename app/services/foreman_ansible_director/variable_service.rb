@@ -3,43 +3,56 @@
 module ForemanAnsibleDirector
   class VariableService
     class << self
-      def create_variable(variable_create, owner)
+      def create_variable(key:,
+                          type:,
+                          default_value:,
+                          owner:)
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::AnsibleVariable.create!(
-            key: variable_create[:key],
-            default_value: variable_create[:default_value],
-            variable_type: variable_create[:type],
+            key: key,
+            default_value: default_value,
+            variable_type: type,
             ownable: owner
           )
         end
       end
 
-      def edit_variable(variable_update, variable)
+      def edit_variable(variable:,
+                        key:,
+                        type:,
+                        default_value:,
+                        overridable:)
         ActiveRecord::Base.transaction do
           variable.update!(
-            key: variable_update[:key],
-            key_type: variable_update[:type],
-            default_value: variable_update[:default_value],
-            override: variable_update[:overridable]
+            key: key,
+            key_type: type,
+            default_value: default_value,
+            override: overridable
           )
         end
       end
 
-      def create_override(variable_override, variable)
+      def create_override(variable:,
+                          value:,
+                          matcher:,
+                          matcher_value:)
         ActiveRecord::Base.transaction do
           LookupValue.create!(
-            match: "#{variable_override[:matcher]}=#{variable_override[:matcher_value]}",
-            value: variable_override[:value],
+            match: "#{matcher}=#{matcher_value}",
+            value: value,
             lookup_key_id: variable.id
           )
         end
       end
 
-      def edit_override(variable_override, override)
+      def edit_override(override:,
+                        value:,
+                        matcher:,
+                        matcher_value:)
         ActiveRecord::Base.transaction do
           override.update!(
-            match: "#{variable_override[:matcher]}=#{variable_override[:matcher_value]}",
-            value: variable_override[:value]
+            match: "#{matcher}=#{matcher_value}",
+            value: value
           )
         end
       end

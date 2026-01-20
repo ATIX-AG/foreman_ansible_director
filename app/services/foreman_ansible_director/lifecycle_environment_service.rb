@@ -3,29 +3,36 @@
 module ForemanAnsibleDirector
   class LifecycleEnvironmentService
     class << self
-      def create_environment(path, lifecycle_env_create)
+      def create_environment(lce_path:,
+                             name:,
+                             description:,
+                             position:,
+                             organization_id:)
         created_env = nil
         ActiveRecord::Base.transaction do
           created_env = ::ForemanAnsibleDirector::LifecycleEnvironment.new(
-            name: lifecycle_env_create[:name],
-            description: lifecycle_env_create[:description],
-            organization_id: lifecycle_env_create[:organization_id]
+            name: name,
+            description: description,
+            organization_id: organization_id
           )
           ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.insert_environment(
-            path,
+            lce_path,
             created_env,
-            lifecycle_env_create[:position]
+            position
           )
         end
         created_env
       end
 
-      def edit_environment(environment, lifecycle_env_edit)
+      def edit_environment(environment:,
+                           name:,
+                           description:,
+                           execution_environment_id:)
         ActiveRecord::Base.transaction do
           environment.update!(
-            name: lifecycle_env_edit[:name],
-            description: lifecycle_env_edit[:description],
-            execution_environment_id: lifecycle_env_edit[:execution_environment_id]
+            name: name,
+            description: description,
+            execution_environment_id: execution_environment_id
           )
         end
       end

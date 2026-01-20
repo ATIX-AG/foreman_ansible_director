@@ -16,16 +16,22 @@ module ForemanAnsibleDirector
 
         def create
           override = override_params
-          create = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value],
-            override[:matcher], override[:matcher_value])
-          ::ForemanAnsibleDirector::VariableService.create_override(create, @ansible_variable)
+          ::ForemanAnsibleDirector::VariableService.create_override(
+            variable: @ansible_variable,
+            value: override[:value],
+            matcher: override[:matcher],
+            matcher_value: override[:matcher_value]
+          )
         end
 
         def update
           override = override_params
-          edit = ::ForemanAnsibleDirector::Structs::AnsibleVariable::AnsibleVariableOverride.new(override[:value],
-            override[:matcher], override[:matcher_value])
-          ::ForemanAnsibleDirector::VariableService.edit_override(edit, @override)
+          ::ForemanAnsibleDirector::VariableService.edit_override(
+            override: @override,
+            value: override[:value],
+            matcher: override[:matcher],
+            matcher_value: override[:matcher_value]
+          )
         end
 
         def destroy
