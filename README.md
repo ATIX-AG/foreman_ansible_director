@@ -1,44 +1,43 @@
 # Foreman Ansible Director
 
-Foreman Ansible Director is a plugin that is currently under development and aims to integrate basic and advanced Ansible features into Foreman.
+Foreman Ansible Director is a foreman plugin integrating Ansible into Foreman.
+
+## Current Status
+> [!WARNING]  
+> At the time of publishing (2026-02-01), this plugin is in an intermediate state.
+> It is not ready for production use.
+
+Several sections of code need to be refactored and cleaned up.
+The API is not stable yet and may change without notice.
+Test coverage is very low.
+Breaking changes are expected until version 1.0.0 is reached.
 
 ## Features
-### Supported Features
-- Manage Ansible roles and collections from different organizations
-- Use lifecycle management like `Development` -> `Test` -> `Production` for your Ansible content
-- Ansible content is automatically synchronized to Smart Proxies
-- Ansible Execution Environments are used to run Ansible
-- Possibility to use different Ansible/Python versions in Ansible runs
+- Explicit management of both Ansible Roles and Collections
+- Native multi-version support for Ansible content
+- Organizations can be used to taxonomize Ansible content
+- Simplified Ansible content management:
+  - Importing and deletion of Ansible content can be done via the Foreman web-UI
+  - Ansible content can be imported from Ansible Galaxy and Git repositories
+- A dedicated lifecycle management system for Ansible content allows promotion of configurations along a path such as `Development` -> `Test` -> `Production` similar to Katello lifecycle environments.
+- Ansible and its dependencies are encapsulated in execution environments, which are used to run Ansible content.
+- Use of different ansible-core versions through execution environments.
+- Automatic provisioning of execution environments and Ansible content based on user-defined Ansible configurations.
+- Unified interface (REST API) for both UI and external tools.
 
-### Planned Features
-- Importing Ansible roles from version control systems
-- Secret management
-- Application centric approach
 
-## Installation
+## Installation and contribution
 
-Enable Ansible Director on Foreman Server:
-
-```sh
-dnf install rubygem-foreman_ansible_director
-
-foreman-installer
-```
+Because we are still in the early stages of development, facilities for packaging this plugin do not exist yet.
+If you want to test this plugin or contribute to it, you can install it manually.
+Please see the instructions in [the contribution guidelines](CONTRIBUTING.md) for more details.
 
 ### Smart Proxy Installation
 You need to install [Smart Proxy Ansible Director](https://github.com/ATIX-AG/smart_proxy_ansible_director) to use this plugin.
 
-## Documentation
-
-The documentation will be available, soon.
-
-## Contributing
-
-Fork and send a Pull Request. Thanks!
-
 ## Copyright
 
-Copyright (c) 2025 ATIX AG - https://atix.de
+Copyright (c) 2026 ATIX AG - https://atix.de
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
