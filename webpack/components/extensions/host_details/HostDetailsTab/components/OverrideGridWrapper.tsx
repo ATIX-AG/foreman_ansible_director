@@ -42,7 +42,16 @@ export const OverrideGridWrapper = ({
     );
     return <div>Placeholder error component</div>;
   } else if (overridesRequest.status === 'RESOLVED') {
-    return <OverrideGrid overrides={overridesRequest.response} fqdn={fqdn} />;
+    return (
+      <OverrideGrid
+        overrides={
+          Object.keys(overridesRequest.response).length === 0
+            ? []
+            : overridesRequest.response
+        }
+        fqdn={fqdn}
+      />
+    );
   }
 
   return (
