@@ -1,7 +1,7 @@
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
+import { Skeleton } from '@patternfly/react-core';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
-import EmptyPage from 'foremanReact/routes/common/EmptyPage';
 import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 import { AnsibleLcePath } from '../../../../../types/AnsibleEnvironmentsTypes';
 import { LcePathSelector } from './LcePathSelector';
@@ -46,12 +46,11 @@ export const LcePathSelectorWrapper = ({
     return null;
   } else if (getLcePathsResponse.status === 'PENDING') {
     return (
-      <EmptyPage
-        message={{
-          type: 'loading',
-          text: 'Loading Lifecycle Environment Paths...',
-        }}
-      />
+      <>
+        <Skeleton screenreaderText="Loading lce path" />
+        <br />
+        <Skeleton screenreaderText="Loading lce" />
+      </>
     );
   }
 
