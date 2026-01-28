@@ -14,7 +14,6 @@ import {
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
-import EmptyPage from 'foremanReact/routes/common/EmptyPage';
 import Permitted from 'foremanReact/components/Permitted';
 
 import { HostDetailsLceCardHeaderActions } from './components/HostDetailsLceCardHeaderActions';
@@ -184,12 +183,5 @@ export const HostDetailsLceCard = ({
     return null; // TODO: Handle request error
   }
 
-  return (
-    <EmptyPage
-      message={{
-        type: 'loading',
-        text: 'Loading Lifecycle Environment...',
-      }}
-    />
-  );
+  return null;
 };
