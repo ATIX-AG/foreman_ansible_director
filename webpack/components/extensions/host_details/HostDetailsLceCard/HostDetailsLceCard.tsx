@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import {
@@ -6,10 +6,15 @@ import {
   CardBody,
   CardHeader,
   CardTitle,
+  EmptyState,
+  EmptyStateHeader,
+  EmptyStateIcon,
+  EmptyStateVariant,
   Flex,
   FlexItem,
   GridItem,
 } from '@patternfly/react-core';
+import CatalogIcon from '@patternfly/react-icons/dist/esm/icons/catalog-icon';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
@@ -30,7 +35,7 @@ interface HostDetailsLceCardProps {
     id: number;
     name: string;
     // eslint-disable-next-line camelcase
-    ansible_lifecycle_environment_id: number;
+    ansible_lifecycle_environment_id: number | null;
   };
 }
 
@@ -55,26 +60,11 @@ export const HostDetailsLceCard = ({
     LCE_SELECTOR_PLACEHOLDER
   );
 
-  const dispatch = useDispatch();
+  const [isUsingLibrary, setIsUsingLibrary] = React.useState(
+    hostDetails.ansible_lifecycle_environment_id === null
+  );
 
-  useEffect(() => {
-    let lcePath: string = LCE_PATH_SELECTOR_PLACEHOLDER;
-    let lce: string = LCE_SELECTOR_PLACEHOLDER;
-    if (availableLcePaths.length !== 0) {
-      for (let i = 0; i < availableLcePaths.length; i++) {
-        const pathLces: SparseAnsibleLce[] =
-          availableLcePaths[i].lifecycle_environments;
-        for (let j = 0; j < pathLces.length; j++) {
-          if (pathLces[j].id === hostDetails.ansible_lifecycle_environment_id) {
-            lcePath = availableLcePaths[i].name;
-            lce = pathLces[j].name;
-          }
-        }
-      }
-    }
-    setSelectedLcePath(lcePath);
-    setSelectedLce(lce);
-  }, [availableLcePaths, hostDetails.ansible_lifecycle_environment_id]);
+  const dispatch = useDispatch();
 
   const handleEdit = (): void => {
     if (isEditMode) {
@@ -91,12 +81,12 @@ export const HostDetailsLceCard = ({
       .filter(lcePath => lcePath.name === selectedLcePath)[0]
       .lifecycle_environments.filter(lce => lce.name === name)[0];
 
-  const setLce = async (): Promise<void> => {
+  const setLce = async (library = false): Promise<void> => {
     try {
       await axios.post(
         foremanUrl(
           `/api/v2/ansible_director/lifecycle_environments/${
-            lceForName(selectedLce).id
+            library ? 'library' : lceForName(selectedLce).id
           }/assign/HOST/${hostDetails.id}`
         ),
         {}
@@ -105,7 +95,7 @@ export const HostDetailsLceCard = ({
         addToast({
           type: 'success',
           key: `UPDATE_HOST_${hostDetails.id}_ANSIBLE_LCE_SUCC`,
-          message: `Sucessfully updated Ansible lifecycle environment of "${hostDetails.name}"!`,
+          message: `Successfully updated Ansible content source of "${hostDetails.name}"!`,
           sticky: false,
         })
       );
@@ -114,7 +104,7 @@ export const HostDetailsLceCard = ({
         addToast({
           type: 'danger',
           key: `UPDATE_HOST_${hostDetails.id}_ANSIBLE_LCE_ERR`,
-          message: `Updating Ansible lifecycle environment of "${
+          message: `Updating Ansible content source of "${
             hostDetails.name
           }" failed with error code "${
             (e as { response: AxiosResponse }).response.status
@@ -123,6 +113,13 @@ export const HostDetailsLceCard = ({
         })
       );
     }
+  };
+
+  const handleContentSourceSet = async (): Promise<void> => {
+    if (!isUsingLibrary) {
+      await setLce(true);
+    }
+    setIsUsingLibrary(!isUsingLibrary);
   };
 
   if (status === 'RESOLVED') {
@@ -135,6 +132,8 @@ export const HostDetailsLceCard = ({
                 <HostDetailsLceCardHeaderActions
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
+                  isUsingLibrary={isUsingLibrary}
+                  handleContentSourceSet={handleContentSourceSet}
                 />
               ),
             }}
@@ -150,7 +149,7 @@ export const HostDetailsLceCard = ({
                   justifyContent={{ default: 'justifyContentSpaceBetween' }}
                 >
                   <FlexItem>
-                    <CardTitle>Ansible Lifecycle environment</CardTitle>
+                    <CardTitle>Ansible content source</CardTitle>
                   </FlexItem>
                 </Flex>
               </FlexItem>
@@ -163,15 +162,27 @@ export const HostDetailsLceCard = ({
                 AdPermissions.ansibleLcePaths.view,
               ]}
             >
-              <LcePathSelectorWrapper
-                isEditMode={isEditMode}
-                selectedLcePath={selectedLcePath}
-                setSelectedLcePath={setSelectedLcePath}
-                selectedLce={selectedLce}
-                setSelectedLce={setSelectedLce}
-                availableLcePaths={availableLcePaths}
-                setAvailableLcePaths={setAvailableLcePaths}
-              />
+              {!isUsingLibrary ? (
+                <LcePathSelectorWrapper
+                  isEditMode={isEditMode}
+                  selectedLcePath={selectedLcePath}
+                  setSelectedLcePath={setSelectedLcePath}
+                  selectedLce={selectedLce}
+                  setSelectedLce={setSelectedLce}
+                  availableLcePaths={availableLcePaths}
+                  setAvailableLcePaths={setAvailableLcePaths}
+                  hostDetails={hostDetails}
+                />
+              ) : (
+                <EmptyState variant={EmptyStateVariant.xs}>
+                  <EmptyStateHeader
+                    headingLevel="h4"
+                    titleText='This host is using content from the "Library"
+                    environment.'
+                    icon={<EmptyStateIcon icon={CatalogIcon} />}
+                  />
+                </EmptyState>
+              )}
             </Permitted>
           </CardBody>
         </Card>

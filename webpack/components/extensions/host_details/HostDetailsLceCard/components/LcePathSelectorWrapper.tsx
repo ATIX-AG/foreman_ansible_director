@@ -1,19 +1,33 @@
-import React, { Dispatch, ReactElement, SetStateAction } from 'react';
+import React, {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+} from 'react';
 import { Skeleton } from '@patternfly/react-core';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
-import { AnsibleLcePath } from '../../../../../types/AnsibleEnvironmentsTypes';
+import {
+  AnsibleLcePath,
+  SparseAnsibleLce,
+} from '../../../../../types/AnsibleEnvironmentsTypes';
 import { LcePathSelector } from './LcePathSelector';
 
 interface LcePathSelectorWrapperProps {
   isEditMode: boolean;
-  selectedLcePath: string | undefined;
+  selectedLcePath: string;
   setSelectedLcePath: Dispatch<SetStateAction<string>>;
-  selectedLce: string | undefined;
+  selectedLce: string;
   setSelectedLce: Dispatch<SetStateAction<string>>;
   availableLcePaths: AnsibleLcePath[];
   setAvailableLcePaths: Dispatch<SetStateAction<AnsibleLcePath[]>>;
+  hostDetails: {
+    id: number;
+    name: string;
+    // eslint-disable-next-line camelcase
+    ansible_lifecycle_environment_id: number | null;
+  };
 }
 interface LcePathsResponse extends IndexResponse {
   results: AnsibleLcePath[];
@@ -27,8 +41,11 @@ export const LcePathSelectorWrapper = ({
   setSelectedLce,
   availableLcePaths,
   setAvailableLcePaths,
+  hostDetails,
 }: LcePathSelectorWrapperProps): ReactElement | null => {
   const organization = useForemanOrganization();
+
+  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Select an LCE Path';
 
   const getLcePathsResponse = useAPI<LcePathsResponse>(
     'get',
@@ -39,29 +56,67 @@ export const LcePathSelectorWrapper = ({
     )
   );
 
+  useEffect(() => {
+    if (getLcePathsResponse.status === 'RESOLVED') {
+      setAvailableLcePaths(getLcePathsResponse.response.results);
+
+      if (
+        selectedLcePath === LCE_PATH_SELECTOR_PLACEHOLDER &&
+        getLcePathsResponse.response.results.length !== 0
+      ) {
+        let lcePath: string = selectedLcePath;
+        let lce: string = selectedLce;
+
+        for (let i = 0; i < getLcePathsResponse.response.results.length; i++) {
+          const pathLces: SparseAnsibleLce[] =
+            getLcePathsResponse.response.results[i].lifecycle_environments;
+          for (let j = 0; j < pathLces.length; j++) {
+            if (
+              pathLces[j].id === hostDetails.ansible_lifecycle_environment_id
+            ) {
+              lcePath = getLcePathsResponse.response.results[i].name;
+              lce = pathLces[j].name;
+              break;
+            }
+          }
+          if (lcePath !== selectedLcePath) break;
+        }
+
+        setSelectedLcePath(lcePath);
+        setSelectedLce(lce);
+      }
+    }
+  }, [
+    getLcePathsResponse,
+    hostDetails.ansible_lifecycle_environment_id,
+    selectedLce,
+    selectedLcePath,
+    setAvailableLcePaths,
+    setSelectedLce,
+    setSelectedLcePath,
+  ]);
+
   if (getLcePathsResponse.status === 'RESOLVED') {
-    setAvailableLcePaths(getLcePathsResponse.response.results);
+    return (
+      <LcePathSelector
+        lcePaths={availableLcePaths}
+        isEditMode={isEditMode}
+        selectedLcePath={selectedLcePath}
+        setSelectedLcePath={setSelectedLcePath}
+        selectedLce={selectedLce}
+        setSelectedLce={setSelectedLce}
+      />
+    );
   } else if (getLcePathsResponse.status === 'ERROR') {
     // TODO: Handle request error
     return null;
-  } else if (getLcePathsResponse.status === 'PENDING') {
-    return (
-      <>
-        <Skeleton screenreaderText="Loading lce path" />
-        <br />
-        <Skeleton screenreaderText="Loading lce" />
-      </>
-    );
   }
 
   return (
-    <LcePathSelector
-      lcePaths={availableLcePaths}
-      isEditMode={isEditMode}
-      selectedLcePath={selectedLcePath}
-      setSelectedLcePath={setSelectedLcePath}
-      selectedLce={selectedLce}
-      setSelectedLce={setSelectedLce}
-    />
+    <>
+      <Skeleton screenreaderText="Loading lce path" />
+      <br />
+      <Skeleton screenreaderText="Loading lce" />
+    </>
   );
 };

@@ -76,7 +76,7 @@ export const LcePathSelector = ({
         <Select
           id="single-select"
           isOpen={isLcePathToggleOpen}
-          selected="Option 1"
+          selected={selectedLcePath}
           onSelect={(event?, value?) => {
             setSelectedLcePath(value as string);
             setIsLcePathToggleOpen(false);
@@ -100,7 +100,7 @@ export const LcePathSelector = ({
         <Select
           id="single-select"
           isOpen={isLceToggleOpen}
-          selected="Option 1"
+          selected={selectedLce}
           onSelect={(event?, value?) => {
             setSelectedLce(value as string);
             setIsLceToggleOpen(false);

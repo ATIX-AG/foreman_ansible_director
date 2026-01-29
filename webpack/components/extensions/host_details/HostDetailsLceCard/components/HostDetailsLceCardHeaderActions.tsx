@@ -1,6 +1,9 @@
-import { Icon } from '@patternfly/react-core';
+import { Icon, ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
+import CatalogIcon from '@patternfly/react-icons/dist/esm/icons/catalog-icon';
+import BundleIcon from '@patternfly/react-icons/dist/esm/icons/bundle-icon';
+
 import React from 'react';
 import { PermittedButton } from '../../../../common/PermittedButton';
 import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
@@ -8,38 +11,57 @@ import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPe
 interface HostDetailsLceCardHeaderActionsProps {
   isEditMode: boolean;
   handleEdit: () => void;
+  isUsingLibrary: boolean;
+  handleContentSourceSet: () => void;
 }
 
 export const HostDetailsLceCardHeaderActions: React.FC<HostDetailsLceCardHeaderActionsProps> = ({
   isEditMode,
   handleEdit,
+  isUsingLibrary,
+  handleContentSourceSet,
 }) => (
   <>
-    <PermittedButton
-      requiredPermissions={[AdPermissions.assignments.create]}
-      hasPopover
-      popoverProps={{
-        triggerAction: 'hover',
-        'aria-label': 'edit host lce popover',
-        headerComponent: 'h1',
-        headerContent: 'Edit LCE assignment',
-        bodyContent: (
-          <div>Set the lifecycle environment this host belongs to.</div>
-        ),
-      }}
-      variant="plain"
-      aria-label="Action"
-      onClick={handleEdit}
+    <ToggleGroup
+      areAllGroupsDisabled={false}
+      aria-label="Default with multiple selectable"
     >
-      {isEditMode ? (
-        <Icon size="lg">
-          <SaveIcon />
-        </Icon>
-      ) : (
-        <Icon size="lg">
-          <EditIcon />
-        </Icon>
-      )}
-    </PermittedButton>
+      <ToggleGroupItem
+        icon={isUsingLibrary ? <CatalogIcon /> : <BundleIcon />}
+        text={isUsingLibrary ? 'Library' : 'LC-Environment'}
+        key={0}
+        buttonId="toggle-group-multiple-1"
+        isSelected={isUsingLibrary}
+        onChange={() => handleContentSourceSet()}
+      />
+    </ToggleGroup>
+    {!isUsingLibrary && (
+      <PermittedButton
+        requiredPermissions={[AdPermissions.assignments.create]}
+        hasPopover
+        popoverProps={{
+          triggerAction: 'hover',
+          'aria-label': 'edit host lce popover',
+          headerComponent: 'h1',
+          headerContent: 'Edit LCE assignment',
+          bodyContent: (
+            <div>Set the lifecycle environment this host belongs to.</div>
+          ),
+        }}
+        variant="plain"
+        aria-label="Action"
+        onClick={handleEdit}
+      >
+        {isEditMode ? (
+          <Icon size="lg">
+            <SaveIcon />
+          </Icon>
+        ) : (
+          <Icon size="lg">
+            <EditIcon />
+          </Icon>
+        )}
+      </PermittedButton>
+    )}
   </>
 );
