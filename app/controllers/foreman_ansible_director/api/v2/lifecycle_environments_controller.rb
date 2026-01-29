@@ -6,7 +6,7 @@ module ForemanAnsibleDirector
       class LifecycleEnvironmentsController < AnsibleDirectorApiController
         include ::Api::Version2
 
-        before_action :find_resource, only: %i[show update destroy update_content content assign]
+        before_action :find_resource, only: %i[show update destroy update_content content]
         before_action :find_path, only: %i[create]
         before_action :find_organization, only: %i[create update_content]
         before_action :find_assignment_target, only: %i[assign]
@@ -64,10 +64,15 @@ module ForemanAnsibleDirector
         end
 
         def assign
-          ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign(
-            @lifecycle_environment,
-            @target
-          )
+          if params[:id] == 'library'
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_library @target
+          else
+            lce = ::ForemanAnsibleDirector::LifecycleEnvironment.find_by(id: params[:id])
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign(
+              lce,
+              @target
+            )
+          end
         end
 
         def destroy
