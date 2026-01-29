@@ -61,6 +61,13 @@ module ForemanAnsibleDirector
         end
       end
 
+      # TODO: TEST
+      def assign_library(target)
+        ActiveRecord::Base.transaction do
+          target.update!(ansible_lifecycle_environment_id: nil)
+        end
+      end
+
       def assign_content(environment, content_assignments, execution_environment_id)
         ActiveRecord::Base.transaction do
           success = false
