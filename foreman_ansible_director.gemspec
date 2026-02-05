@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version     = ::ForemanAnsibleDirector::Constants::PLUGIN_VERSION
   s.metadata    = { 'is_foreman_plugin' => 'true' }
   s.license     = 'GPL-3.0'
-  s.authors     = ['Thorben Denzer']
-  s.email       = ['denzer@atix.de']
+  s.authors     = ['ATIX AG']
+  s.email       = ['info@atix.de']
   s.homepage    = 'https://www.atix.de'
   s.summary     = 'Advanced Ansible integration with Foreman and Katello.'
   s.description = 'Ansible support with Execution Environments, different Ansible/Python ' \
