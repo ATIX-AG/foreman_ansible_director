@@ -22,7 +22,7 @@ module ForemanAnsibleDirector
     scope :role_versions, -> { where(versionable_type: 'AnsibleRole') }
 
     def content_unit_type
-      versionable.type == '::ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role'
+      versionable.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role'
     end
 
     def content_unit_revisions
