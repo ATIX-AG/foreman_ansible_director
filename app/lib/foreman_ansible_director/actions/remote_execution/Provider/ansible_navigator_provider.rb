@@ -22,14 +22,16 @@ if defined? ForemanRemoteExecution
                 content = ForemanAnsibleDirector::Generators::ContentGenerator.generate host
                 variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate host
 
-                begin
-                  default_environment = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-                    id: Setting[:ad_default_ee_internal]
-                  )
-                  raise ActiveRecord::RecordNotFound if environment.nil?
-                end
+                environment_url = host.lifecycle_environment&.execution_environment&.registry_url
 
-                environment = host.lifecycle_environment&.execution_environment&.registry_url || default_environment
+                environment_url ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+                  id: Setting[:ad_default_ee_internal]
+                )&.registry_url
+
+                unless environment_url
+                  # TODO: Actual error message
+                  raise StandardError
+                end
 
                 unless host.lifecycle_environment.execution_environment
                   raise "Host #{host.name} is not in any Lifecycle environment"
@@ -39,7 +41,7 @@ if defined? ForemanRemoteExecution
                   playbook: playbook,
                   content: content,
                   variables: variables,
-                  execution_environment: environment
+                  execution_environment: environment_url
                 )
               end
 
