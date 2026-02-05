@@ -70,16 +70,13 @@ module ForemanAnsibleDirector
 
       def assign_content(environment, content_assignments, execution_environment_id)
         ActiveRecord::Base.transaction do
-          success = false
           environment.direct_content_unit_versions.clear
           content_assignments.each do |assignment|
             unit = ::ForemanAnsibleDirector::ContentUnit.find(assignment[:id])
             unit_version = unit.content_unit_versions.find_by!(version: assignment[:version])
-            success &&= environment.assign_content_unit_version!(unit_version)
+            environment.assign_content_unit_version!(unit_version)
           end
-          success &&= environment.assign_execution_environment!(execution_environment_id) if execution_environment_id
-
-          raise ActiveRecord::Rollback unless success
+          environment.assign_execution_environment!(execution_environment_id) if execution_environment_id
         end
       end
 
