@@ -6,11 +6,14 @@ module ForemanAnsibleDirector
       class AnsibleVariableOverridesController < AnsibleDirectorApiController
         before_action :find_variable, only: %i[create]
         before_action :find_override, only: %i[update destroy]
-        before_action :find_target, only: %i[index_for_target]
 
         def index_for_target
+          target = ::ForemanAnsibleDirector::AssignmentService.find_target(
+            target_type: params[:target],
+            target_id: params[:target_id]
+          )
           include_overridable = ::Foreman::Cast.to_bool(params[:include_overridable])
-          @target_overrides = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target @target,
+          @target_overrides = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target target,
             include_overridable: include_overridable
         end
 

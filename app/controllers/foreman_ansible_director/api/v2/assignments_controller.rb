@@ -5,38 +5,44 @@ module ForemanAnsibleDirector
     module V2
       class AssignmentsController < AnsibleDirectorApiController
         before_action :find_resource, only: %i[destroy]
-        before_action :find_resources, only: %i[assign]
-        before_action :find_target, only: %i[assignments]
 
         def assignments
-          @assignments = @target.resolved_ansible_content
+          target = ::ForemanAnsibleDirector::AssignmentService.find_target(
+            target_type: params[:target],
+            target_id: params[:target_id]
+          )
+          # TODO: Null check target
+          @assignments = target.resolved_ansible_content
         end
 
         def assign
-          ::ForemanAnsibleDirector::AnsibleContentAssignment.create!(consumable: @source, assignable: @target)
+          assignment = assignment_params
+
+          source = ::ForemanAnsibleDirector::AssignmentService.find_target(
+            target_type: assignment[:source][:type],
+            target_id: assignment[:source][:id]
+          )
+
+          target = ::ForemanAnsibleDirector::AssignmentService.find_target(
+            target_type: assignment[:target][:type],
+            target_id: assignment[:target][:id]
+          )
+
+          ::ForemanAnsibleDirector::AssignmentService.create_assignment(
+            consumable: source,
+            assignable: target
+          )
         end
 
         def assign_bulk
           assignments = bulk_assignment_params
-          cleared_targets = []
-          ActiveRecord::Base.transaction do
-            assignments.each do |assignment|
-              source_finder = finder(assignment[:source][:type])
-              target_finder = finder(assignment[:target][:type])
-              source = source_finder.find_by(id: assignment[:source][:id])
-              target = target_finder.find_by(id: assignment[:target][:id])
-
-              unless target.id.in?(cleared_targets)
-                ::ForemanAnsibleDirector::AnsibleContentAssignment.where(assignable: target).destroy_all
-                cleared_targets.push(target.id)
-              end
-              ::ForemanAnsibleDirector::AnsibleContentAssignment.create!(consumable: source, assignable: target)
-            end
-          end
+          ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(
+            assignments: assignments
+          )
         end
 
         def destroy
-          @assignment.destroy
+          ::ForemanAnsibleDirector::AssignmentService.destroy_assignment(@assignment)
         end
 
         private
@@ -61,36 +67,6 @@ module ForemanAnsibleDirector
               target: %i[type id]
             )
           end
-        end
-
-        def find_resources
-          assignment = assignment_params
-          source_finder = finder(assignment[:source][:type])
-          target_finder = finder(assignment[:target][:type])
-          source = source_finder.find_by(id: assignment[:source][:id])
-          target = target_finder.find_by(id: assignment[:target][:id])
-          if source.nil?
-            render_error(
-              'custom_error',
-              status: :unprocessable_entity,
-              locals: {
-                message: "Source object of type #{assignment[:source][:type]} with \
-                          id #{assignment[:source][:id]} does not exist.",
-              }
-            )
-          end
-          if target.nil?
-            render_error(
-              'custom_error',
-              status: :unprocessable_entity,
-              locals: {
-                message: "Target object of type #{assignment[:target][:type]} \
-                with id #{assignment[:target][:id]} does not exist.",
-              }
-            )
-          end
-          @source = source
-          @target = target
         end
       end
     end
