@@ -9,8 +9,6 @@ import {
   Text,
 } from '@patternfly/react-core';
 
-import { Helmet } from 'react-helmet';
-
 interface PageProps {
   header: string;
   children: ReactElement;
@@ -26,9 +24,6 @@ export const Page = ({
   customToolbarItems,
 }: PageProps): ReactElement => (
   <div id="foreman-page">
-    <Helmet>
-      <title>{header}</title>
-    </Helmet>
     <PageSection
       variant={PageSectionVariants.light}
       className="table-title-section"
