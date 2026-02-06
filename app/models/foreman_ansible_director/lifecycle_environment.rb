@@ -66,8 +66,6 @@ module ForemanAnsibleDirector
 
       # Create the association
       lifecycle_environment_content_unit_versions.create!(content_unit_version: content_unit_version)
-
-      content_unit_version
     end
 
     def using_snapshot_content?

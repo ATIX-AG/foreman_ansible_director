@@ -4,7 +4,7 @@ module ForemanAnsibleDirector
   module Generators
     class InventoryGenerator
       class << self
-        def generate(_host)
+        def generate(host)
           {
             "#{host.name}": {
               hosts: {
@@ -19,4 +19,3 @@ module ForemanAnsibleDirector
     end
   end
 end
-
