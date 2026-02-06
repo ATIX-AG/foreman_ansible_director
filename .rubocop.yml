@@ -2,9 +2,8 @@ inherit_gem:
   theforeman-rubocop:
     - default.yml
 
-
 AllCops:
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 2.7
   TargetRailsVersion: 7.0
   Exclude:
     - 'locale/**/*'
