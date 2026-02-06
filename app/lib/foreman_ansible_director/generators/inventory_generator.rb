@@ -19,4 +19,3 @@ module ForemanAnsibleDirector
     end
   end
 end
-

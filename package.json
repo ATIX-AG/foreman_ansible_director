@@ -17,7 +17,6 @@
     "@types/react-helmet": "^6.1.11",
     "@xyflow/react": "^12.8.5",
     "react-ace": "^9.5.0",
-    "react-helmet": "^6.1.0",
     "react-intl": "^7.1.10",
     "react-use-websocket": "^3.0.0"
   },
