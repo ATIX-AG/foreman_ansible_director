@@ -11,7 +11,6 @@ module ForemanAnsibleDirector
             target_type: params[:target],
             target_id: params[:target_id]
           )
-          # TODO: Null check target
           @assignments = target.resolved_ansible_content
         end
 

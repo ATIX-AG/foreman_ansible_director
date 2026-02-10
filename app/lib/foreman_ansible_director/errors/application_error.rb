@@ -40,6 +40,26 @@ module ForemanAnsibleDirector
       message
     end
 
-    ERROR_OBJECTS = HashWithIndifferentAccess.new({})
+    ERROR_OBJECTS = HashWithIndifferentAccess.new({
+      "ADR-003-005-004-001": {
+        response_status: :not_found,
+        title: <<~TITLE,
+          Invalid target type %<type>s specified.
+        TITLE
+        description: <<~DESC,
+          A target type with the name %<type>s was not found. You likely misspelled it.
+          Allowed types are [HOST, HOSTGROUP, ACR, CONTENT].
+        DESC
+      },
+      "ADR-003-005-005-001": {
+        response_status: :not_found,
+        title: <<~TITLE,
+          Target not found.
+        TITLE
+        description: <<~DESC,
+          A target of type %<target_type>s with id %<target_id>s was not found.
+        DESC
+      },
+    })
   end
 end

@@ -3,6 +3,8 @@
 module ForemanAnsibleDirector
   class AssignmentService
     class << self
+      include ForemanAnsibleDirector::Errors::Helpers
+
       def destroy_assignment(assignment)
         ActiveRecord::Base.transaction do
           assignment.destroy
@@ -38,26 +40,35 @@ module ForemanAnsibleDirector
       end
 
       def finder(type:)
-        case type
+        error_scope(['ADR-003-005-004-001']).try do
+          case type
 
-        when 'ACR'
-          ::ForemanAnsibleDirector::AnsibleCollectionRole
-        when 'CONTENT'
-          ::ForemanAnsibleDirector::ContentUnitVersion
-        when 'HOST'
-          Host::Managed
-        when 'HOSTGROUP'
-          Hostgroup
-        else
-          # TODO: Actual error message
-          raise "Invalid type: #{type}"
+          when 'ACR'
+            ::ForemanAnsibleDirector::AnsibleCollectionRole
+          when 'CONTENT'
+            ::ForemanAnsibleDirector::ContentUnitVersion
+          when 'HOST'
+            Host::Managed
+          when 'HOSTGROUP'
+            Hostgroup
+          else
+            raise app_error_for('ADR-003-005-004-001', args: { type: type })
+          end
         end
       end
 
       def find_target(target_type:, target_id:)
-        # TODO: Null check target
         finder = finder(type: target_type)
-        finder.find_by(id: target_id)
+        error_scope(['ADR-003-005-005-001']).try do
+          target = finder.find_by(id: target_id)
+          unless target
+            raise app_error_for('ADR-003-005-005-001', args: {
+              target_type: target_type,
+              target_id: target_id,
+            })
+          end
+          target
+        end
       end
     end
   end
