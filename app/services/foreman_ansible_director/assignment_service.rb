@@ -23,10 +23,8 @@ module ForemanAnsibleDirector
         cleared_targets = []
         ActiveRecord::Base.transaction do
           assignments.each do |assignment|
-            source_finder = ::ForemanAnsibleDirector::AssignmentService.finder(type: assignment[:source][:type])
-            target_finder = ::ForemanAnsibleDirector::AssignmentService.finder(type: assignment[:target][:type])
-            source = source_finder.find_by(id: assignment[:source][:id])
-            target = target_finder.find_by(id: assignment[:target][:id])
+            source = find_target(target_type: assignment[:source][:type], target_id: assignment[:source][:id])
+            target = find_target(target_type: assignment[:target][:type], target_id: assignment[:target][:id])
 
             unless target.id.in?(cleared_targets)
               ::ForemanAnsibleDirector::AnsibleContentAssignment.where(assignable: target).destroy_all
