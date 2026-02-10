@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = 'foreman_ansible_director'
   s.version     = ::ForemanAnsibleDirector::Constants::PLUGIN_VERSION
   s.metadata    = { 'is_foreman_plugin' => 'true' }
-  s.license     = 'GPL-3.0'
+  s.license     = 'GPL-3.0-only'
   s.authors     = ['ATIX AG']
   s.email       = ['info@atix.de']
   s.homepage    = 'https://www.atix.de'
