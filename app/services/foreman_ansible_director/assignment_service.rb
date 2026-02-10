@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class AssignmentService
+  class AssignmentService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
-      include ForemanAnsibleDirector::Errors::Helpers
-
       def destroy_assignment(assignment)
         ActiveRecord::Base.transaction do
           assignment.destroy

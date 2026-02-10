@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class VariableService
+  class VariableService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
       def create_variable(key:,
                           type:,
