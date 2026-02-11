@@ -1,6 +1,6 @@
 {
   "name": "foreman_ansible_director",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "DESCRIPTION",
   "scripts": {
     "lint": "npx eslint -c .eslintrc 'webpack/**/'",
