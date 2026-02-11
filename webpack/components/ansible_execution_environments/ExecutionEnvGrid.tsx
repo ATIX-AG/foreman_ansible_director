@@ -9,6 +9,9 @@ import {
   EmptyStateVariant,
   Gallery,
   GalleryItem,
+  Panel,
+  PanelMain,
+  PanelMainBody,
 } from '@patternfly/react-core';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
 
@@ -24,6 +27,7 @@ import {
 } from 'foremanReact/common/hooks/API/APIHooks';
 import Pagination from 'foremanReact/components/Pagination';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+import SearchBar from 'foremanReact/components/SearchBar';
 
 import { ExecutionEnvCard } from './components/ExecutionEnvCard';
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';
@@ -38,6 +42,8 @@ interface ExecutionEnvGridProps {
   apiResponse: GetAnsibleExecutionEnvResponse;
   setAPIOptions: Dispatch<SetStateAction<APIOptions>>;
   onPagination: (newPagination: PaginationProps) => void;
+  search: string;
+  onSearch: (search: string) => void;
   setConfirmationModalMode: Dispatch<SetStateAction<'destroy' | 'update'>>;
   setIsConfirmationModalOpen: Dispatch<SetStateAction<boolean>>;
   setConfirmationModalTitle: Dispatch<SetStateAction<string>>;
@@ -54,6 +60,8 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   apiResponse,
   setAPIOptions,
   onPagination,
+  search,
+  onSearch,
   setConfirmationModalMode,
   setIsConfirmationModalOpen,
   setConfirmationModalTitle,
@@ -171,6 +179,25 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
 
   return (
     <>
+      <Panel>
+        <PanelMain>
+          <PanelMainBody style={{ width: '50%' }}>
+            <SearchBar
+              data={{
+                autocomplete: {
+                  id: 'name',
+                  url:
+                    '/api/v2/ansible_director/execution_environments/auto_complete_search',
+                  searchQuery: search,
+                },
+              }}
+              onSearch={onSearch}
+              name="ad_ee"
+            />
+          </PanelMainBody>
+        </PanelMain>
+      </Panel>
+
       {gridContent()}
       {totalItemsCount !== undefined && totalItemsCount > 0 && (
         <Pagination itemCount={totalItemsCount} onChange={onPagination} />
