@@ -21,6 +21,7 @@ Rails.application.routes.draw do
             collection do
               get '/', action: :index
               post '/', action: :create
+              get 'auto_complete_search'
             end
             member do
               patch '/', action: :update

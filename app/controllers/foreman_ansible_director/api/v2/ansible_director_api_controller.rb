@@ -5,6 +5,7 @@ module ForemanAnsibleDirector
     module V2
       class AnsibleDirectorApiController < ::Api::V2::BaseController
         include ::Api::Version2
+        include ::Foreman::Controller::AutoCompleteSearch
 
         def find_organization
           @organization = Organization.current || find_optional_organization

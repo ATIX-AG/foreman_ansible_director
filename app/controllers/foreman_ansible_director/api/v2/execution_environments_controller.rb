@@ -42,6 +42,10 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::ExecutionEnvironmentService.destroy_execution_environment @execution_environment
         end
 
+        def model_of_controller
+          resource_class
+        end
+
         private
 
         def execution_environment_params
