@@ -2,8 +2,6 @@
 
 module ForemanAnsibleDirector
   class LifecycleEnvironmentPath < ::ForemanAnsibleDirector::AnsibleDirectorModel
-    scoped_search on: %i[name]
-
     belongs_to :organization, inverse_of: :lifecycle_environment_paths
 
     belongs_to :root_environment,
@@ -16,6 +14,8 @@ module ForemanAnsibleDirector
 
     scope :by_name, ->(name) { where(name: name) }
     scope :with_root, -> { where.not(root_environment_id: nil) }
+
+    scoped_search on: :name, complete_value: true
 
     # TODO: Unused. Does this bring advantages anywhere?
     def swap_environments(env1_id, env2_id)
