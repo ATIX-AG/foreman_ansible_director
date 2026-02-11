@@ -6,6 +6,7 @@ module ForemanAnsibleDirector
       class AnsibleDirectorApiController < ::Api::V2::BaseController
         include ::Api::Version2
         include ::ForemanAnsibleDirector::Errors::Helpers
+        include ::Foreman::Controller::AutoCompleteSearch
 
         rescue_from 'ForemanAnsibleDirector::Errors::ApplicationError' do |exception|
           message = {
