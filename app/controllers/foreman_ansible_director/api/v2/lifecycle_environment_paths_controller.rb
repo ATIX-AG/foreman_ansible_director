@@ -49,6 +49,10 @@ module ForemanAnsibleDirector
           )
         end
 
+        def model_of_controller
+          resource_class
+        end
+
         private
 
         def lifecycle_environment_path_params

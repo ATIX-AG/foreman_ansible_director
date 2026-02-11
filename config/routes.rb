@@ -35,6 +35,7 @@ Rails.application.routes.draw do
                 collection do
                   get '/', action: :index, to: 'lifecycle_environment_paths#index'
                   post '/', action: :create, to: 'lifecycle_environment_paths#create'
+                  get 'auto_complete_search'
                 end
                 member do
                   put '/', action: :update
