@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import {
   IndexResponse,
@@ -27,7 +27,13 @@ export interface GetAnsibleExecutionEnvResponse extends IndexResponse {
   results: AnsibleExecutionEnv[];
 }
 
-const ExecutionEnvGridWrapper: React.FC = () => {
+interface ExecutionEnvGridWrapperProps {
+  initialSearch: string;
+}
+
+const ExecutionEnvGridWrapper = ({
+  initialSearch,
+}: ExecutionEnvGridWrapperProps): ReactElement | null => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = React.useState<
     boolean
   >(false);
@@ -60,17 +66,21 @@ const ExecutionEnvGridWrapper: React.FC = () => {
     apiUrl: foremanUrl(
       `/api/v2/ansible_director/execution_environments${
         organization ? `?organization_id=${organization.id}&` : ''
-      }`
+      }${`search=${initialSearch}&`}`
     ),
   });
 
   const { setParamsAndAPI, params } = useSetParamsAndApiAndSearch({
-    defaultParams: { search: '' },
+    defaultParams: { search: initialSearch },
     setAPIOptions: executionEnvResponse.setAPIOptions,
   });
 
   const onPagination = (newPagination: PaginationProps): void => {
     setParamsAndAPI({ ...params, ...newPagination });
+  };
+
+  const onSearch = (search: string): void => {
+    setParamsAndAPI({ ...params, search });
   };
 
   const refreshRequest = (): void => {
@@ -213,6 +223,8 @@ const ExecutionEnvGridWrapper: React.FC = () => {
             apiResponse={executionEnvResponse.response}
             setAPIOptions={executionEnvResponse.setAPIOptions}
             onPagination={onPagination}
+            search={params.search as string}
+            onSearch={onSearch}
             setConfirmationModalMode={setConfirmationModalMode}
             setIsConfirmationModalOpen={setIsConfirmationModalOpen}
             setConfirmationModalTitle={setConfirmationModalTitle}
