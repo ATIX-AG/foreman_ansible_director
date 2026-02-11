@@ -2,8 +2,6 @@
 
 module ForemanAnsibleDirector
   class ExecutionEnvironment < ::ForemanAnsibleDirector::AnsibleDirectorModel
-    scoped_search on: %i[name]
-
     belongs_to :organization, inverse_of: :execution_environments
 
     has_many :execution_environment_content_units, dependent: :destroy
@@ -18,6 +16,10 @@ module ForemanAnsibleDirector
     validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
 
     after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
+
+    scoped_search on: :name, complete_value: true
+    scoped_search on: :base_image_url, complete_value: true
+    scoped_search on: :ansible_version, complete_value: true
 
     def registry_url
       registry_port = 4321
