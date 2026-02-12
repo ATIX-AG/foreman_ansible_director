@@ -1,36 +1,12 @@
 import React from 'react';
-
-import { translate as _ } from 'foremanReact/common/I18n';
+import { useUrlParams } from 'foremanReact/components/PF4/TableIndexPage/Table/TableHooks';
 
 import AnsibleContentTableWrapper from './components/AnsibleContentTableWrapper';
-import { Page } from '../common/Page';
-import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
-import { PermittedButton } from '../common/PermittedButton';
 
 const AnsibleContentPage: React.FC = () => {
-  const [isContentWizardOpen, setIsContentWizardOpen] = React.useState<boolean>(
-    false
-  );
+  const { searchParam } = useUrlParams();
 
-  return (
-    <Page
-      header={_('Ansible content')}
-      customToolbarItems={[
-        <PermittedButton
-          onClick={() => setIsContentWizardOpen(true)}
-          requiredPermissions={[AdPermissions.ansibleContent.create]}
-        >
-          {_('Import Ansible content')}
-        </PermittedButton>,
-      ]}
-      hasDocumentation={false}
-    >
-      <AnsibleContentTableWrapper
-        isContentWizardOpen={isContentWizardOpen}
-        setIsContentWizardOpen={setIsContentWizardOpen}
-      />
-    </Page>
-  );
+  return <AnsibleContentTableWrapper initialSearch={searchParam} />;
 };
 
 export default AnsibleContentPage;
