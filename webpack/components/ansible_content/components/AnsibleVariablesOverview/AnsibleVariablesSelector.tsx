@@ -58,6 +58,9 @@ export const AnsibleVariablesSelector = ({
     [key: string]: boolean;
   }>({});
 
+  // This search approach is fine for 50 items, but not 500. For that, we should use a server-side search.
+  const [roleFilter, setRoleFilter] = React.useState<string>('');
+
   // TODO: Maybe it would be smarter to store the role name of the currently open dropdown item
   // eslint-disable-next-line no-unused-vars
   const [dropdownOpen, setDropdownOpen] = React.useState<{
@@ -130,9 +133,11 @@ export const AnsibleVariablesSelector = ({
           <StackItem>
             <SearchInput
               placeholder="Find by name"
-              value=""
-              onChange={(_event, value) => {}}
-              onClear={() => {}}
+              value={roleFilter}
+              onChange={(_event, value) => {
+                setRoleFilter(value);
+              }}
+              onClear={() => setRoleFilter('')}
             />
           </StackItem>
           <StackItem>
@@ -151,20 +156,24 @@ export const AnsibleVariablesSelector = ({
                     selectedDataListItemId={selectedRole}
                     isCompact
                   >
-                    {ansibleRoles.map(role => (
-                      <DataListItem
-                        aria-labelledby="simple-item1"
-                        id={role.name}
-                      >
-                        <DataListItemRow>
-                          <DataListItemCells
-                            dataListCells={[
-                              <DataListCell key="primary content">
-                                <span id="simple-item1">{role.name}</span>
-                              </DataListCell>,
-                            ]}
-                          />
-                          {/* <DataListAction
+                    {ansibleRoles
+                      .filter(role =>
+                        role.name.startsWith(roleFilter.toLowerCase())
+                      )
+                      .map(role => (
+                        <DataListItem
+                          aria-labelledby="simple-item1"
+                          id={role.name}
+                        >
+                          <DataListItemRow>
+                            <DataListItemCells
+                              dataListCells={[
+                                <DataListCell key="primary content">
+                                  <span id="simple-item1">{role.name}</span>
+                                </DataListCell>,
+                              ]}
+                            />
+                            {/* <DataListAction
                             aria-labelledby="check-action-item1 check-action-action1"
                             id="check-action-action1"
                             aria-label="Actions"
@@ -223,9 +232,9 @@ export const AnsibleVariablesSelector = ({
                               </DropdownList>
                             </Dropdown>
                           </DataListAction> */}
-                        </DataListItemRow>
-                      </DataListItem>
-                    ))}
+                          </DataListItemRow>
+                        </DataListItem>
+                      ))}
                   </DataList>
                 </PanelMainBody>
               </PanelMain>
