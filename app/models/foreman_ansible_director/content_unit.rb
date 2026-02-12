@@ -24,11 +24,11 @@ module ForemanAnsibleDirector
     validates :type, presence: true
 
     def collection?
-      type == '::ForemanAnsibleDirector::AnsibleCollection'
+      type == 'ForemanAnsibleDirector::AnsibleCollection'
     end
 
     def role?
-      type == '::ForemanAnsibleDirector::AnsibleRole'
+      type == 'ForemanAnsibleDirector::AnsibleRole'
     end
 
     def full_name
