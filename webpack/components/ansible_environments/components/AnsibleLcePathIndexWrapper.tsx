@@ -12,6 +12,7 @@ import {
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import SearchBar from 'foremanReact/components/SearchBar';
 
 import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 import { AnsibleLcePathIndex } from './AnsibleLcePathIndex';
@@ -23,7 +24,13 @@ export interface GetAnsibleLcePathsResponse extends IndexResponse {
   results: AnsibleLcePath[];
 }
 
-const AnsibleContentTableWrapper: React.FC = () => {
+interface AnsibleContentTableWrapperProps {
+  initialSearch: string;
+}
+
+const AnsibleContentTableWrapper = ({
+  initialSearch,
+}: AnsibleContentTableWrapperProps): ReactElement | null => {
   const organization = useForemanOrganization();
 
   const [isCreateButtonLoading, setIsCreateButtonLoading] = React.useState<
@@ -56,18 +63,22 @@ const AnsibleContentTableWrapper: React.FC = () => {
     apiUrl: foremanUrl(
       `/api/v2/ansible_director/lifecycle_environments/paths?order=name&${
         organization ? `organization_id=${organization.id}&` : ''
-      }`
+      }${`search=${initialSearch}&`}`
     ),
   });
 
   const { setParamsAndAPI, params } = useSetParamsAndApiAndSearch({
-    defaultParams: { search: '' },
+    defaultParams: { search: initialSearch },
     setAPIOptions: contentRequest.setAPIOptions,
   });
 
   // eslint-disable-next-line no-unused-vars
   const onPagination = (newPagination: PaginationProps): void => {
     setParamsAndAPI({ ...params, ...newPagination });
+  };
+
+  const onSearch = (search: string): void => {
+    setParamsAndAPI({ ...params, search });
   };
 
   const refreshRequest = (): void => {
@@ -91,6 +102,20 @@ const AnsibleContentTableWrapper: React.FC = () => {
           header="Ansible Environments"
           customToolbarItems={toolbarItems()}
           hasDocumentation={false}
+          searchBar={
+            <SearchBar
+              data={{
+                autocomplete: {
+                  id: 'name',
+                  url:
+                    '/api/v2/ansible_director/lifecycle_environments/paths/auto_complete_search',
+                  searchQuery: params.search as string,
+                },
+              }}
+              onSearch={onSearch}
+              name="ad_lce_path"
+            />
+          }
         >
           <AnsibleLcePathIndex
             lcePaths={contentRequest.response.results}
