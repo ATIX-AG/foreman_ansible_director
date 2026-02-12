@@ -1,0 +1,18 @@
+003:
+  description: "Internal service"
+  children:
+    005:
+      description: "AssignmentService"
+      children:
+        004:
+          description: "finder"
+          children:
+            001:
+              description: "Invalid target type"
+              details: "Raised when the target type is not supported"
+        005:
+          description: "find_target"
+          children:
+            001:
+              description: "Target not found"
+              details: "Raised when the target is not found"

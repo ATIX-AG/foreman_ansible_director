@@ -5,6 +5,19 @@ module ForemanAnsibleDirector
     module V2
       class AnsibleDirectorApiController < ::Api::V2::BaseController
         include ::Api::Version2
+        include ::ForemanAnsibleDirector::Errors::Helpers
+
+        rescue_from 'ForemanAnsibleDirector::Errors::ApplicationError' do |exception|
+          message = {
+            error_code: exception.error_code,
+            title: exception.title,
+            description: exception.description,
+            docs_link: exception.docs_link,
+          }.compact
+
+          render_error('custom_error', status: exception.response_status,
+                       locals: { message: message })
+        end
 
         def find_organization
           @organization = Organization.current || find_optional_organization

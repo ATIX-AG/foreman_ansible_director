@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class ExecutionEnvironmentService
+  class ExecutionEnvironmentService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
       def create_execution_environment(name:,
                                        base_image_url:,

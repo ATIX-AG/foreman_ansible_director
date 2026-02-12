@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class ContentService
+  class ContentService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
       def create_content_unit_revision(cuv_id:,
                                        git_ref:,
