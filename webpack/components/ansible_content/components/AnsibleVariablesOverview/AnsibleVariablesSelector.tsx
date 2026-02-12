@@ -61,6 +61,7 @@ export const AnsibleVariablesSelector = ({
 
   // This search approach is fine for 50 items, but not 500. For that, we should use a server-side search.
   const [roleFilter, setRoleFilter] = React.useState<string>('');
+  const [variableFilter, setVariableFilter] = React.useState<string>('');
 
   // TODO: Maybe it would be smarter to store the role name of the currently open dropdown item
   // eslint-disable-next-line no-unused-vars
@@ -249,9 +250,9 @@ export const AnsibleVariablesSelector = ({
             <StackItem>
               <SearchInput
                 placeholder="Find by name"
-                value=""
-                onChange={(_event, value) => {}}
-                onClear={() => {}}
+                value={variableFilter}
+                onChange={(_event, value) => setVariableFilter(value)}
+                onClear={() => setVariableFilter('')}
               />
             </StackItem>
             <StackItem>
@@ -268,101 +269,114 @@ export const AnsibleVariablesSelector = ({
                           aria-label="Simple data list example"
                           isCompact
                         >
-                          {availableVariables.map(variable => (
-                            <DataListItem
-                              aria-labelledby="simple-item1"
-                              id={variable.name}
-                            >
-                              <DataListItemRow>
-                                <DataListItemCells
-                                  dataListCells={[
-                                    <DataListCell
-                                      key={`${variable.name}-name`}
-                                      wrapModifier={
-                                        DataListWrapModifier.breakWord
-                                      }
-                                    >
-                                      <span id="simple-item1">
-                                        {variable.name}
-                                      </span>
-                                    </DataListCell>,
-                                    <DataListCell
-                                      key={`${variable.name}-default-value`}
-                                      wrapModifier={
-                                        DataListWrapModifier.breakWord
-                                      }
-                                    >
-                                      <span id="simple-item1">
-                                        {JSON.stringify(variable.default_value)}
-                                      </span>
-                                    </DataListCell>,
-                                    <DataListCell
-                                      key={`${variable.name}-type`}
-                                      wrapModifier={
-                                        DataListWrapModifier.breakWord
-                                      }
-                                      alignRight
-                                      isFilled={false}
-                                    >
-                                      <span id="simple-item1">
-                                        <Label color="blue">
-                                          {variable.type}
-                                        </Label>
-                                      </span>
-                                    </DataListCell>,
-                                    <DataListCell
-                                      key={`${variable.name}-override`}
-                                      alignRight
-                                      isFilled={false}
-                                    >
-                                      {variableUpdating === variable.id ? (
-                                        <Spinner
-                                          size="md"
-                                          aria-label="Contents of the medium example"
+                          {availableVariables
+                            .filter(variable =>
+                              variable.name.startsWith(
+                                variableFilter.toLowerCase()
+                              )
+                            )
+                            .map(variable => (
+                              <DataListItem
+                                aria-labelledby="simple-item1"
+                                id={variable.name}
+                              >
+                                <DataListItemRow>
+                                  <DataListItemCells
+                                    dataListCells={[
+                                      <DataListCell
+                                        key={`${variable.name}-name`}
+                                        wrapModifier={
+                                          DataListWrapModifier.breakWord
+                                        }
+                                      >
+                                        <span id="simple-item1">
+                                          {variable.name}
+                                        </span>
+                                      </DataListCell>,
+                                      <DataListCell
+                                        key={`${variable.name}-default-value`}
+                                        wrapModifier={
+                                          DataListWrapModifier.breakWord
+                                        }
+                                      >
+                                        <span id="simple-item1">
+                                          {JSON.stringify(
+                                            variable.default_value
+                                          )}
+                                        </span>
+                                      </DataListCell>,
+                                      <DataListCell
+                                        key={`${variable.name}-type`}
+                                        wrapModifier={
+                                          DataListWrapModifier.breakWord
+                                        }
+                                        alignRight
+                                        isFilled={false}
+                                      >
+                                        <span id="simple-item1">
+                                          <Label color="blue">
+                                            {variable.type}
+                                          </Label>
+                                        </span>
+                                      </DataListCell>,
+                                      <DataListCell
+                                        key={`${variable.name}-override`}
+                                        alignRight
+                                        isFilled={false}
+                                      >
+                                        {variableUpdating === variable.id ? (
+                                          <Spinner
+                                            size="md"
+                                            aria-label="Contents of the medium example"
+                                          />
+                                        ) : (
+                                          <Switch
+                                            isChecked={
+                                              // eslint-disable-next-line standard/computed-property-even-spacing
+                                              overridableOverrides[
+                                                variable.id
+                                              ] || variable.overridable
+                                            }
+                                            onChange={(event, checked) =>
+                                              onOverrideToggle(
+                                                variable,
+                                                checked
+                                              )
+                                            }
+                                            isDisabled={!userCanEditVariables}
+                                          />
+                                        )}
+                                      </DataListCell>,
+                                      <DataListAction
+                                        aria-labelledby="single-action-item1 single-action-action1"
+                                        id="single-action-action1"
+                                        aria-label="Actions"
+                                        isPlainButtonAction
+                                      >
+                                        <PermittedButton
+                                          onClick={() => {
+                                            setSelectedVariable(variable);
+                                          }}
+                                          hasPopover={false}
+                                          key={`${variable.name}-action`}
+                                          variant="plain"
+                                          icon={<PencilAltIcon />}
+                                          requiredPermissions={[
+                                            AdPermissions.ansibleVariables.edit,
+                                            AdPermissions
+                                              .ansibleVariableOverrides.view,
+                                            AdPermissions
+                                              .ansibleVariableOverrides.destroy,
+                                            AdPermissions
+                                              .ansibleVariableOverrides.edit,
+                                          ]}
                                         />
-                                      ) : (
-                                        <Switch
-                                          isChecked={
-                                            overridableOverrides[variable.id] ||
-                                            variable.overridable
-                                          }
-                                          onChange={(event, checked) =>
-                                            onOverrideToggle(variable, checked)
-                                          }
-                                          isDisabled={!userCanEditVariables}
-                                        />
-                                      )}
-                                    </DataListCell>,
-                                    <DataListAction
-                                      aria-labelledby="single-action-item1 single-action-action1"
-                                      id="single-action-action1"
-                                      aria-label="Actions"
-                                      isPlainButtonAction
-                                    >
-                                      <PermittedButton
-                                        onClick={() => {
-                                          setSelectedVariable(variable);
-                                        }}
-                                        hasPopover={false}
-                                        key={`${variable.name}-action`}
-                                        variant="plain"
-                                        icon={<PencilAltIcon />}
-                                        requiredPermissions={[
-                                          AdPermissions.ansibleVariables.edit,
-                                          AdPermissions.ansibleVariableOverrides
-                                            .view,
-                                          AdPermissions.ansibleVariableOverrides
-                                            .destroy,
-                                          AdPermissions.ansibleVariableOverrides
-                                            .edit,
-                                        ]}
-                                      />
-                                    </DataListAction>,
-                                  ]}
-                                />
-                              </DataListItemRow>
-                            </DataListItem>
-                          ))}
+                                      </DataListAction>,
+                                    ]}
+                                  />
+                                </DataListItemRow>
+                              </DataListItem>
+                            ))}
                         </DataList>
                       </PanelMainBody>
                     </Permitted>
