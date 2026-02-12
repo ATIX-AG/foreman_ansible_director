@@ -14,6 +14,7 @@ Rails.application.routes.draw do
               post '/', action: :create_units
               get '/', action: :index
               delete '/', action: :destroy_units
+              get 'auto_complete_search'
               get '/:version', action: :version_detail
             end
           end

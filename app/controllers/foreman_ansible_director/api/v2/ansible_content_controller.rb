@@ -43,6 +43,10 @@ module ForemanAnsibleDirector
               resolved_content_units: resolved, organization_id: @organization.id)
         end
 
+        def model_of_controller
+          resource_class
+        end
+
         private
 
         def validate_requirements_payload
