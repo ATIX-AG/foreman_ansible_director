@@ -1,18 +1,31 @@
 const { foremanLocation, foremanRelativePath } = require('@theforeman/find-foreman')
 const foremanReactRelative = 'webpack/assets/javascripts/react_app';
-const foremanFull = foremanLocation();
 const foremanReactFull = foremanRelativePath(foremanReactRelative);
 
 // Jest configuration
 module.exports = {
-  testURL: 'http://localhost/',
+  preset: 'ts-jest',
+  collectCoverageFrom: [
+    'webpack/**/*.tsx',
+  ],
+  testEnvironmentOptions: {
+    url: 'http://localhost/'
+  },
   setupFiles: [
-    // './webpack/test_setup.js',
+    './webpack/test_setup.js',
   ],
   setupFilesAfterEnv: [
     // './webpack/global_test_setup.js',
     '@testing-library/jest-dom'
   ],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.jsx?$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!@patternfly)',
+  ],
+  testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
     '/node_modules/',
     '<rootDir>/foreman/',
@@ -20,7 +33,6 @@ module.exports = {
     '<rootDir>/engines',
   ],
   moduleDirectories: [
-    `${foremanFull}/node_modules`,
     'node_modules',
     'webpack/test-utils',
   ],
