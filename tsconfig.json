@@ -10,7 +10,7 @@
     "moduleResolution": "node",
     "jsx": "react-jsx",
     "paths": {"foremanReact/*" :  ["./types/foremanReact/*"]},
-    "types": ["node", "jest"]
+    "types": ["node", "jest", "@testing-library/jest-dom"],
   },
   "include": [
     "./webpack/**/*"
