@@ -12,9 +12,9 @@ import {
 interface PageProps {
   header: string;
   children: ReactElement;
-  customToolbarItems: ReactElement[];
+  customToolbarItems?: ReactElement[];
   // eslint-disable-next-line react/no-unused-prop-types
-  hasDocumentation: boolean;
+  hasDocumentation?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   docsUrl?: string;
 }
