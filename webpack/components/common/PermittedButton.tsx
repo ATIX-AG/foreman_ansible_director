@@ -67,12 +67,20 @@ export const PermittedButton = ({
     <>
       {showPopover ? (
         <Popover {...popoverProps}>
-          <Button isAriaDisabled={!userHasPermissions} {...buttonProps}>
+          <Button
+            isAriaDisabled={!userHasPermissions}
+            {...buttonProps}
+            data-testid="permitted-button"
+          >
             {children}
           </Button>
         </Popover>
       ) : (
-        <Button isAriaDisabled={!userHasPermissions} {...buttonProps}>
+        <Button
+          isAriaDisabled={!userHasPermissions}
+          {...buttonProps}
+          data-testid="permitted-button"
+        >
           {children}
         </Button>
       )}
