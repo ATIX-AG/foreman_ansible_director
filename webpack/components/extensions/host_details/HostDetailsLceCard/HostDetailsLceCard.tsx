@@ -20,6 +20,7 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
 import Permitted from 'foremanReact/components/Permitted';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import { HostDetailsLceCardHeaderActions } from './components/HostDetailsLceCardHeaderActions';
 import { LcePathSelectorWrapper } from './components/LcePathSelectorWrapper';
@@ -43,8 +44,8 @@ export const HostDetailsLceCard = ({
   status,
   hostDetails,
 }: HostDetailsLceCardProps): React.ReactElement | null => {
-  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Select an LCE Path';
-  const LCE_SELECTOR_PLACEHOLDER = 'Select an LCE';
+  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Lifecycle environment path';
+  const LCE_SELECTOR_PLACEHOLDER = 'Lifecycle environment';
 
   const [isEditMode, setIsEditMode] = React.useState<boolean>(false);
 
@@ -149,7 +150,7 @@ export const HostDetailsLceCard = ({
                   justifyContent={{ default: 'justifyContentSpaceBetween' }}
                 >
                   <FlexItem>
-                    <CardTitle>Ansible content source</CardTitle>
+                    <CardTitle>{_('Ansible environment')}</CardTitle>
                   </FlexItem>
                 </Flex>
               </FlexItem>
@@ -177,8 +178,9 @@ export const HostDetailsLceCard = ({
                 <EmptyState variant={EmptyStateVariant.xs}>
                   <EmptyStateHeader
                     headingLevel="h4"
-                    titleText='This host is using content from the "Library"
-                    environment.'
+                    titleText={_(
+                      'This host uses Ansible content from the Library environment.'
+                    )}
                     icon={<EmptyStateIcon icon={CatalogIcon} />}
                   />
                 </EmptyState>

@@ -13,6 +13,7 @@ import {
 } from 'foremanReact/common/hooks/API/APIHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { foremanUrl } from 'foremanReact/common/helpers';
+import { translate as _ } from 'foremanReact/common/I18n';
 import { AssignmentComponent } from './AssignmentComponent';
 import { DenseAnsibleLce } from '../../../../../types/AnsibleEnvironmentsTypes';
 import { AnsibleContentUnitWithCounts } from '../../../../ansible_content/components/AnsibleContentTableWrapper';
@@ -106,7 +107,7 @@ export const AssignmentComponentWrapper = ({
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText="Loading Lifecycle Environment content..."
+        titleText={_('Loading lifecycle environment content...')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />

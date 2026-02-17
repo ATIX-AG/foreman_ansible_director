@@ -4,6 +4,8 @@ import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import CatalogIcon from '@patternfly/react-icons/dist/esm/icons/catalog-icon';
 import BundleIcon from '@patternfly/react-icons/dist/esm/icons/bundle-icon';
 
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import React from 'react';
 import { PermittedButton } from '../../../../common/PermittedButton';
 import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
@@ -28,7 +30,7 @@ export const HostDetailsLceCardHeaderActions: React.FC<HostDetailsLceCardHeaderA
     >
       <ToggleGroupItem
         icon={isUsingLibrary ? <CatalogIcon /> : <BundleIcon />}
-        text={isUsingLibrary ? 'Library' : 'LC-Environment'}
+        text={isUsingLibrary ? _('Library') : _('Lifecycle environment')}
         key={0}
         buttonId="toggle-group-multiple-1"
         isSelected={isUsingLibrary}
@@ -43,9 +45,9 @@ export const HostDetailsLceCardHeaderActions: React.FC<HostDetailsLceCardHeaderA
           triggerAction: 'hover',
           'aria-label': 'edit host lce popover',
           headerComponent: 'h1',
-          headerContent: 'Edit LCE assignment',
+          headerContent: _('Assign lifecycle environment'),
           bodyContent: (
-            <div>Set the lifecycle environment this host belongs to.</div>
+            <div>{_('Set the lifecycle environment of this host.')}</div>
           ),
         }}
         variant="plain"

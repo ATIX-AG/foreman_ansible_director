@@ -45,7 +45,7 @@ export const LcePathSelectorWrapper = ({
 }: LcePathSelectorWrapperProps): ReactElement | null => {
   const organization = useForemanOrganization();
 
-  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Select an LCE Path';
+  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Lifecycle environment path';
 
   const getLcePathsResponse = useAPI<LcePathsResponse>(
     'get',

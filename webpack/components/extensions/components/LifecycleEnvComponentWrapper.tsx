@@ -3,6 +3,8 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
 import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 
 interface LifecycleEnvComponentWrapperProps {
@@ -34,7 +36,7 @@ export const LifecycleEnvComponentWrapper: React.FC<LifecycleEnvComponentWrapper
     <EmptyPage
       message={{
         type: 'loading',
-        text: 'Loading Lifecycle Environment Paths...',
+        text: _('Loading lifecycle environment paths...'),
       }}
     />
   );

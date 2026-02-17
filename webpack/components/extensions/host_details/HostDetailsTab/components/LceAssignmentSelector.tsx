@@ -263,7 +263,7 @@ export const InnerLceAssignmentSelector = ({
     );
     return (
       <DualListSelectorPane
-        title={isChosen ? 'Chosen' : 'Available'}
+        title={isChosen ? _('Selected') : _('Available')}
         searchInput=""
         isChosen={isChosen}
         listMinHeight="300px"
