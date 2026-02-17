@@ -1,4 +1,9 @@
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import React, {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+} from 'react';
 import {
   DualListSelector,
   DualListSelectorPane,
@@ -15,11 +20,19 @@ import {
   EmptyStateBody,
   EmptyStateActions,
   EmptyStateIcon,
+  Stack,
+  StackItem,
+  TextContent,
+  TextVariants,
+  Text,
 } from '@patternfly/react-core';
 import AngleLeftIcon from '@patternfly/react-icons/dist/esm/icons/angle-left-icon';
 import AngleRightIcon from '@patternfly/react-icons/dist/esm/icons/angle-right-icon';
 import SearchIcon from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import { Link, LinkProps } from 'react-router-dom';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import {
   AnsibleContentUnit,
   AnsibleContentUnitAssignment,
@@ -201,28 +214,32 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
     ];
   };
 
-  const paneEmptyState = (
+  const paneEmptyState = (isChosen: boolean): ReactElement => (
     <>
       <EmptyState variant={EmptyStateVariant.sm}>
         <EmptyStateHeader
           headingLevel="h4"
-          titleText="No results found"
+          titleText={
+            isChosen
+              ? _('No content assigned to lifecycle environment')
+              : _('No content units found')
+          }
           icon={<EmptyStateIcon icon={SearchIcon} />}
         />
-        <EmptyStateBody>
-          No content here! Assign content or import some.
-        </EmptyStateBody>
+        <EmptyStateBody />
         <EmptyStateFooter>
           <EmptyStateActions>
-            <Button
-              variant="link"
-              onClick={() => {}}
-              component={(props: LinkProps) => (
-                <Link {...props} to="/ansible/content" />
-              )}
-            >
-              Import Ansible content
-            </Button>
+            {!isChosen && (
+              <Button
+                variant="link"
+                onClick={() => {}}
+                component={(props: LinkProps) => (
+                  <Link {...props} to="/ansible/content" />
+                )}
+              >
+                {_('Import Ansible content')}
+              </Button>
+            )}
           </EmptyStateActions>
         </EmptyStateFooter>
       </EmptyState>
@@ -237,12 +254,12 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
     );
     return (
       <DualListSelectorPane
-        title={isChosen ? 'Chosen' : 'Available'}
+        title={isChosen ? _('Selected') : _('Available')}
         searchInput=""
         isChosen={isChosen}
         listMinHeight="300px"
       >
-        {true && options.length === 0 && paneEmptyState}
+        {true && options.length === 0 && paneEmptyState(isChosen)}
         {/* This is for search support, which is not implemented yet. */}
         {options.length > 0 && (
           <DualListSelectorList>
@@ -288,10 +305,21 @@ export const ContentUnitSelector: React.FC<ContentUnitSelectorProps> = ({
   chosenUnits,
   setChosenUnits,
 }) => (
-  <InnerContentUnitSelector
-    data={contentUnits}
-    targetContentUnits={targetContentUnits}
-    chosenUnits={chosenUnits}
-    setChosenUnits={setChosenUnits}
-  />
+  <Stack hasGutter>
+    <StackItem>
+      <TextContent>
+        <Text component={TextVariants.h6}>
+          {_('Add or remove Ansible content unit versions')}
+        </Text>
+      </TextContent>
+    </StackItem>
+    <StackItem>
+      <InnerContentUnitSelector
+        data={contentUnits}
+        targetContentUnits={targetContentUnits}
+        chosenUnits={chosenUnits}
+        setChosenUnits={setChosenUnits}
+      />
+    </StackItem>
+  </Stack>
 );

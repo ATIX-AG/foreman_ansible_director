@@ -5,6 +5,9 @@ import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import AnsibleTowerIcon from '@patternfly/react-icons/dist/esm/icons/ansible-tower-icon';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 import { PermittedButton } from '../../../common/PermittedButton';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
@@ -34,13 +37,8 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
         triggerAction: 'hover',
         'aria-label': 'ansible content popover',
         headerComponent: 'h1',
-        headerContent: 'Manage Ansible content',
-        bodyContent: (
-          <div>
-            Manage Ansible content for Lifecycle Environment{' '}
-            <strong>{lce.name}</strong>.
-          </div>
-        ),
+        headerContent: _('Manage Ansible content'),
+        bodyContent: <div>{_('Add, remove, and update Ansible content.')}</div>,
       }}
       variant="plain"
       aria-label="Action"
@@ -61,8 +59,8 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
             triggerAction: 'hover',
             'aria-label': 'destroy popover',
             headerComponent: 'h1',
-            headerContent: 'Destroy',
-            bodyContent: <div>Delete this Lifecycle Environment.</div>,
+            headerContent: _('Delete'),
+            bodyContent: <div>{_('Delete this lifecycle environment.')}</div>,
           }}
           variant="plain"
           aria-label="Action"
@@ -80,8 +78,8 @@ export const AnsibleLceComponentHeaderActions: React.FC<AnsibleLceComponentHeade
             triggerAction: 'hover',
             'aria-label': 'edit popover',
             headerComponent: 'h1',
-            headerContent: 'Edit',
-            bodyContent: <div>Edit this Lifecycle Environment.</div>,
+            headerContent: _('Edit'),
+            bodyContent: <div>{_('Edit this lifecycle environment.')}</div>,
           }}
           variant="plain"
           aria-label="Action"

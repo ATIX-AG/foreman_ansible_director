@@ -1,6 +1,8 @@
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { useAPI, UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 import { foremanUrl } from 'foremanReact/common/helpers';
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import React from 'react';
 import {
   Button,
@@ -50,7 +52,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
           >
             <FlexItem>
               <TextContent>
-                <Text component={TextVariants.h3}>Library</Text>
+                <Text component={TextVariants.h3}>{_('Library')}</Text>
               </TextContent>
             </FlexItem>
             <Divider
@@ -69,7 +71,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
                 }}
                 icon={<ExternalLinkSquareAltIcon />}
               >
-                Roles
+                {_('Roles')}
               </Button>{' '}
             </FlexItem>
             <Divider
@@ -88,7 +90,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
                 }}
                 icon={<ExternalLinkSquareAltIcon />}
               >
-                Collections
+                {_('Collections')}
               </Button>{' '}
             </FlexItem>
             <Divider
@@ -107,7 +109,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
                 }}
                 icon={<ExternalLinkSquareAltIcon />}
               >
-                Execution Environments
+                {_('Execution Environments')}
               </Button>{' '}
             </FlexItem>{' '}
             <Divider
@@ -127,7 +129,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText='Loading Library"...'
+        titleText={_('Loading Library...')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />

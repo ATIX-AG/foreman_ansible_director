@@ -9,6 +9,7 @@ import {
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { useAPI, UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 import { foremanUrl } from 'foremanReact/common/helpers';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import { AnsibleLceComponent } from './AnsibleLceComponent';
 import {
   AnsibleLce,
@@ -78,7 +79,9 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText={`Loading LCE "${lce.name}"...`}
+        titleText={__(_('Loading lifecycle environment %(lce)s...'), {
+          lce: lce.name,
+        })}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />

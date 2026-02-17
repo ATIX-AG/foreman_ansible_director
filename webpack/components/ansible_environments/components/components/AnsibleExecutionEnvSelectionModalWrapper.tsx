@@ -5,6 +5,8 @@ import { useTableIndexAPIResponse } from 'foremanReact/components/PF4/TableIndex
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import EmptyPage from 'foremanReact/routes/common/EmptyPage';
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { AnsibleExecutionEnvSelectionModal } from './AnsibleExecutionEnvSelectionModal';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 import { GetAnsibleExecutionEnvResponse } from '../../../ansible_execution_environments/components/ExecutionEnvGridWrapper';
@@ -48,7 +50,10 @@ export const AnsibleExecutionEnvSelectionModalWrapper = ({
   return (
     <Modal isOpen variant={ModalVariant.large}>
       <EmptyPage
-        message={{ type: 'loading', text: 'Loading Execution Environments...' }}
+        message={{
+          type: 'loading',
+          text: _('Loading Execution Environments...'),
+        }}
       />
     </Modal>
   );

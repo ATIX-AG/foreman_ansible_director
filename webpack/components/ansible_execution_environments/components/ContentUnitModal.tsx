@@ -5,6 +5,9 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { Modal, ModalVariant, Button } from '@patternfly/react-core';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { ContentUnitSelectorWrapper } from './components/ContentUnitSelectorWrapper';
 import {
   AnsibleExecutionEnv,
@@ -118,7 +121,7 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
     <React.Fragment>
       <Modal
         variant={ModalVariant.medium}
-        title="Content units"
+        title={_('Manage content units')}
         isOpen={isContentUnitModalOpen}
         onClose={closeModal}
         onEscapePress={closeModal}
@@ -129,10 +132,10 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
             onClick={() => updateTargetContent()}
             isLoading={isConfirmLoading}
           >
-            Confirm
+            {_('Confirm')}
           </Button>,
           <Button key="cancel" variant="link" onClick={closeModal}>
-            Cancel
+            {_('Cancel')}
           </Button>,
         ]}
       >
