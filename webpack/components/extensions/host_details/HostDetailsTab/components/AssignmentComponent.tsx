@@ -14,6 +14,7 @@ import {
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useDispatch } from 'react-redux';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { translate as _ } from 'foremanReact/common/I18n';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import { LceAssignmentSelector } from './LceAssignmentSelector';
 import {
@@ -118,9 +119,9 @@ export const AssignmentComponent = ({
                     triggerAction: 'hover',
                     'aria-label': 'destroy popover',
                     headerComponent: 'h1',
-                    headerContent: 'Edit content assignments',
+                    headerContent: _('Assign Ansible content'),
                     bodyContent: (
-                      <div>Edit the content assigned to this host.</div>
+                      <div>{_('Edit the content assigned to this host.')}</div>
                     ),
                   }}
                   variant="plain"
@@ -140,7 +141,7 @@ export const AssignmentComponent = ({
             ),
           }}
         />
-        <CardTitle>Using content from Lifecycle Environment</CardTitle>
+        <CardTitle>{_('Using content from lifecycle environment')}</CardTitle>
         <CardBody>
           {isAnsibleLce(contentResponse) ? (
             <LceAssignmentSelector

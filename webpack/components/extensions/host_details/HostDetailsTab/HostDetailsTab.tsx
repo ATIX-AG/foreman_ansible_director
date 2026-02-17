@@ -15,6 +15,7 @@ import DatabaseIcon from '@patternfly/react-icons/dist/esm/icons/database-icon';
 
 import { UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
 import Permitted from 'foremanReact/components/Permitted';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import { AssignmentComponentWrapper } from './components/AssignmentComponentWrapper';
 import { OverrideGridWrapper } from './components/OverrideGridWrapper';
@@ -53,7 +54,7 @@ export const HostDetailsTab = ({
               <TabTitleIcon>
                 <IntegrationIcon />
               </TabTitleIcon>{' '}
-              <TabTitleText>Content</TabTitleText>{' '}
+              <TabTitleText>{_('Content')}</TabTitleText>{' '}
             </>
           }
         >
@@ -73,7 +74,7 @@ export const HostDetailsTab = ({
               <TabTitleIcon>
                 <DatabaseIcon />
               </TabTitleIcon>{' '}
-              <TabTitleText>Variables</TabTitleText>{' '}
+              <TabTitleText>{_('Variables')}</TabTitleText>{' '}
             </>
           }
         >
@@ -89,7 +90,7 @@ export const HostDetailsTab = ({
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText="Waiting for host to load..."
+        titleText={_('Loading host details...')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />

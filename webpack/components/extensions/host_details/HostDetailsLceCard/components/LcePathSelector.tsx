@@ -8,6 +8,8 @@ import {
   SelectOption,
   MenuToggleElement,
 } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { AnsibleLcePath } from '../../../../../types/AnsibleEnvironmentsTypes';
 
 interface LcePathSelectorProps {
@@ -27,7 +29,7 @@ export const LcePathSelector = ({
   selectedLce,
   setSelectedLce,
 }: LcePathSelectorProps): React.ReactElement => {
-  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Select an LCE Path';
+  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Lifecycle environment path';
   const [isLcePathToggleOpen, setIsLcePathToggleOpen] = React.useState<boolean>(
     false
   );
@@ -43,7 +45,7 @@ export const LcePathSelector = ({
       isDisabled={!isEditMode}
       style={
         {
-          width: '200px',
+          width: '50%',
         } as React.CSSProperties
       }
     >
@@ -63,7 +65,7 @@ export const LcePathSelector = ({
       }
       style={
         {
-          width: '200px',
+          width: '50%',
         } as React.CSSProperties
       }
     >
@@ -72,7 +74,7 @@ export const LcePathSelector = ({
   );
   return (
     <Form>
-      <FormGroup label="Lifecycle Environment Path">
+      <FormGroup label={_('Lifecycle environment path')}>
         <Select
           id="single-select"
           isOpen={isLcePathToggleOpen}
@@ -96,7 +98,7 @@ export const LcePathSelector = ({
           </SelectList>
         </Select>
       </FormGroup>
-      <FormGroup label="Lifecycle Environment">
+      <FormGroup label={_('Lifecycle environment')}>
         <Select
           id="single-select"
           isOpen={isLceToggleOpen}

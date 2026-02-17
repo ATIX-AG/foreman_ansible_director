@@ -8,6 +8,7 @@ import {
   Spinner,
 } from '@patternfly/react-core';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { translate as _ } from 'foremanReact/common/I18n';
 import { useDispatch } from 'react-redux';
 
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
@@ -57,7 +58,7 @@ export const OverrideGridWrapper = ({
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText="Loading Lifecycle Environment content..."
+        titleText={_('Loading lifecycle environment content...')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />
