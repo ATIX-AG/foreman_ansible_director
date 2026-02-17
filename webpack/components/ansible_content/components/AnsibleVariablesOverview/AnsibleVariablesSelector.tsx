@@ -33,6 +33,7 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 import Permitted from 'foremanReact/components/Permitted';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { useDispatch } from 'react-redux';
 import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
@@ -362,7 +363,10 @@ export const AnsibleVariablesSelector = ({
                 <Bullseye>
                   <EmptyState>
                     <EmptyStateHeader
-                      titleText={`${selectedRole} does not have any variables defined.`}
+                      titleText={__(
+                        _('%(role) does not have any variables defined.'),
+                        { role: selectedRole }
+                      )}
                       headingLevel="h4"
                       icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
                     />
@@ -375,7 +379,7 @@ export const AnsibleVariablesSelector = ({
           <Bullseye>
             <EmptyState>
               <EmptyStateHeader
-                titleText="Select a role to see its variables"
+                titleText={_('Select a role to see its variables')}
                 headingLevel="h4"
                 icon={<EmptyStateIcon icon={DatabaseIcon} />}
               />

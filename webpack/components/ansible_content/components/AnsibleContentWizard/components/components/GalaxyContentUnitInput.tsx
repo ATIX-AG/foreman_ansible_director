@@ -17,6 +17,8 @@ import UndoIcon from '@patternfly/react-icons/dist/esm/icons/undo-icon';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+
 import { AnsibleGalaxyContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { VersionInput } from './components/VersionInput';
 import { AnsibleContentUnitCreateType } from '../../AnsibleContentWizard';
@@ -83,14 +85,15 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
     let validationState: ValidatedOptions;
 
     if (name === '') {
-      helperText = `${
-        unitType === 'collection' ? 'Collection' : 'Role'
-      } identifier may not be empty!`;
+      helperText = __(_('%(uType)s identifier may not be empty.'), {
+        uType: unitType === 'collection' ? 'Collection' : 'Role',
+      });
       validationState = ValidatedOptions.error;
     } else if (!new RegExp('^[a-z0-9_]+\\.[a-z0-9_]+$').test(name)) {
-      helperText = `${
-        unitType === 'collection' ? 'Collection' : 'Role'
-      } identifier does not match /^[a-z0-9_]+\\.[a-z0-9_]+$/!`;
+      helperText = __(
+        _('%(uType)s identifier does not match /^[a-z0-9_]+\\.[a-z0-9_]+$/.'),
+        { uType: unitType === 'collection' ? 'Collection' : 'Role' }
+      );
       validationState = ValidatedOptions.error;
     } else if (
       contentUnits.some(
@@ -163,14 +166,18 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
       {/*  /> */}
       {/* </FormGroup> */}
       <FormGroup
-        label={`${
-          unitType === 'collection' ? 'Collection' : 'Role'
-        } Indentifier`}
+        label={_('Identifier')}
         isRequired
         fieldId="content-unit-form-01"
         labelIcon={
           <Popover
-            headerContent={<div>The identifier of an Ansible {unitType}.</div>}
+            headerContent={
+              <div>
+                {__(_('The identifier of an Ansible %(uType)s.'), {
+                  uType: unitType,
+                })}
+              </div>
+            }
             bodyContent={<div>$namespace.$name</div>}
           >
             <button
@@ -201,10 +208,7 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
           </FormHelperText>
         )}
       </FormGroup>
-      <FormGroup
-        label={`${unitType === 'collection' ? 'Collection' : 'Role'} Source`}
-        fieldId="cu-source-01"
-      >
+      <FormGroup label={_('Source')} fieldId="cu-source-01">
         <InputGroup>
           <InputGroupItem isFill>
             <TextInput
@@ -258,7 +262,9 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
           ouiaId="PrimaryWithIcon"
           onClick={addToBatch}
         >
-          {`Add ${unitType === 'collection' ? 'Collection' : 'Role'} to batch`}{' '}
+          {__(_('Add Ansible %(uType)s to batch'), {
+            uType: unitType,
+          })}
         </Button>{' '}
       </ActionGroup>
     </Form>

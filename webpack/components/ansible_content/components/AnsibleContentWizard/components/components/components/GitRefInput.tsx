@@ -14,6 +14,8 @@ import {
 } from '@patternfly/react-core';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 
+import { translate as _ } from 'foremanReact/common/I18n';
+
 interface VersionInputProps {
   gitRefs: Array<string>;
   setGitRefs: Dispatch<SetStateAction<Array<string>>>;
@@ -48,7 +50,7 @@ export const GitRefInput: React.FC<VersionInputProps> = ({
   };
 
   return (
-    <FormGroup label="Git references">
+    <FormGroup label={_('References')}>
       <InputGroup>
         <InputGroupItem isFill>
           <TextInput

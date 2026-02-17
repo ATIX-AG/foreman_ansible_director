@@ -10,6 +10,9 @@ import {
   TextContent,
   Text,
 } from '@patternfly/react-core';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import {
   AnsibleGalaxyContentUnitCreate,
   AnsibleGitContentUnitCreate,
@@ -78,7 +81,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
         return [
           [
             <WizardStep
-              name="Content Declaration"
+              name={_('Content')}
               id="declarationStep"
               footer={
                 <DefaultFooter
@@ -91,7 +94,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 <TextContent>
                   {' '}
                   <Text component={TextVariants.h2}>
-                    Declare content to import
+                    {_('Specify content to import')}
                   </Text>
                 </TextContent>
                 <GalaxyContentUnitInput
@@ -104,10 +107,10 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
               name={
                 contentUnits.length > 0 ? (
                   <>
-                    Review <Badge key={1}>{contentUnits.length}</Badge>
+                    {_('Review')} <Badge key={1}>{contentUnits.length}</Badge>
                   </>
                 ) : (
-                  'Review'
+                  _('Review')
                 )
               }
               id="reviewStep"
@@ -127,7 +130,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 <TextContent>
                   {' '}
                   <Text component={TextVariants.h2}>
-                    Review content before importing
+                    {_('Review content before importing')}
                   </Text>
                 </TextContent>
                 <ReviewStep
@@ -142,7 +145,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
         return [
           [
             <WizardStep
-              name="Content Declaration"
+              name={_('Content')}
               id="declarationStep"
               footer={
                 <DefaultFooter
@@ -155,7 +158,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 <TextContent>
                   {' '}
                   <Text component={TextVariants.h2}>
-                    Declare content to import
+                    {_('Import content from Git repository')}
                   </Text>
                 </TextContent>
                 <GitContentUnitInput
@@ -168,10 +171,10 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
               name={
                 contentUnits.length > 0 ? (
                   <>
-                    Review <Badge key={1}>{contentUnits.length}</Badge>
+                    {_('Review')} <Badge key={1}>{contentUnits.length}</Badge>
                   </>
                 ) : (
-                  'Review'
+                  _('Review')
                 )
               }
               id="reviewStep"
@@ -191,7 +194,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 <TextContent>
                   {' '}
                   <Text component={TextVariants.h2}>
-                    Review content before importing
+                    {_('Review content before importing')}
                   </Text>
                 </TextContent>
                 <ReviewStep
@@ -205,7 +208,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
       case 'yaml':
         return (
           <WizardStep
-            name="Content Declaration"
+            name={_('Content')}
             id="declarationStep"
             footer={
               <FinishFooter
@@ -223,7 +226,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
               <TextContent>
                 {' '}
                 <Text component={TextVariants.h2}>
-                  Declare Ansible content using a requirements file
+                  {_('Import Ansible content using a requirements file')}
                 </Text>
               </TextContent>
               <YamlEditor yamlFile={yamlFile} setYamlFile={setYamlFile} />
@@ -252,7 +255,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
           startIndex={1}
           header={
             <WizardHeader
-              title="Import Ansible content"
+              title={_('Import Ansible content')}
               titleId="modal-wizard-label"
               onClose={() => {
                 setIsContentWizardOpen(false);
@@ -267,7 +270,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
           }}
         >
           <WizardStep
-            name="Provider Selection"
+            name={_('Source')}
             id="provider-selection-step"
             footer={
               <DefaultFooter
@@ -280,7 +283,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
               <TextContent>
                 {' '}
                 <Text component={TextVariants.h2}>
-                  Select source of Ansible content
+                  {_('Select source of Ansible content')}
                 </Text>
               </TextContent>
               <ProviderSelectionStep

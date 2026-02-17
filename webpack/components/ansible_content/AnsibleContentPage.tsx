@@ -1,4 +1,7 @@
 import React from 'react';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import AnsibleContentTableWrapper from './components/AnsibleContentTableWrapper';
 import { Page } from '../common/Page';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
@@ -11,13 +14,13 @@ const AnsibleContentPage: React.FC = () => {
 
   return (
     <Page
-      header="Ansible Content"
+      header={_('Ansible content')}
       customToolbarItems={[
         <PermittedButton
           onClick={() => setIsContentWizardOpen(true)}
           requiredPermissions={[AdPermissions.ansibleContent.create]}
         >
-          Import Ansible content
+          {_('Import Ansible content')}
         </PermittedButton>,
       ]}
       hasDocumentation={false}

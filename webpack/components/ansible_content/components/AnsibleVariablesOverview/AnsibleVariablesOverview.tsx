@@ -11,6 +11,7 @@ import {
 import { IAction } from '@patternfly/react-table';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
 import { AnsibleVariablesSelector } from './AnsibleVariablesSelector';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
@@ -47,10 +48,10 @@ export const AnsibleVariablesOverview = ({
     if (showControl) {
       actions = [
         <Button key="confirm" variant="primary" onClick={() => {}}>
-          Confirm
+          {_('Submit')}
         </Button>,
         <Button key="cancel" variant="link" onClick={() => {}}>
-          Cancel
+          {_('Cancel')}
         </Button>,
       ];
     }
@@ -58,7 +59,9 @@ export const AnsibleVariablesOverview = ({
     return (
       <React.Fragment>
         <Modal
-          title={`Collection overview: ${selectedIdentifier}:${selectedVersion}`}
+          title={__(_('Collection overview: %(id)s'), {
+            id: `${selectedIdentifier}:${selectedVersion}`,
+          })}
           isOpen
           onClose={onClose}
           actions={actions}
@@ -87,7 +90,7 @@ export const AnsibleVariablesOverview = ({
     return modal(
       <EmptyState>
         <EmptyStateHeader
-          titleText="Loading Ansible roles..."
+          titleText={_('Loading Ansible roles...')}
           headingLevel="h4"
           icon={<EmptyStateIcon icon={Spinner} />}
         />
