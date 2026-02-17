@@ -9,13 +9,13 @@ Foreman::Plugin.register :foreman_ansible_director do
   sub_menu :top_menu, :ansible, caption: N_('Ansible'), after: :hosts_menu, icon: 'pficon pficon-in-progress' do
     menu :top_menu, :ansible_content,
       url: '/ansible/content',
-      caption: 'Ansible Content'
+      caption: 'Content'
     menu :top_menu, :ansible_execution_environments,
       url: '/ansible/execution_environments',
-      caption: 'Ansible Execution Environments'
+      caption: 'Execution Environments'
     menu :top_menu, :ansible_environments,
       url: '/ansible/environments',
-      caption: 'Ansible Environments'
+      caption: 'Environments'
   end
 
   security_block :foreman_ansible_director do
