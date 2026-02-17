@@ -3,6 +3,9 @@ import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import React from 'react';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import {
   AnsibleExecutionEnv,
   AnsibleExecutionEnvCreate,
@@ -33,8 +36,8 @@ export const ExecutionEnvCardHeaderActions: React.FC<ExecutionEnvCardHeaderActio
         triggerAction: 'hover',
         'aria-label': 'destroy popover',
         headerComponent: 'h1',
-        headerContent: 'Destroy',
-        bodyContent: <div>Destroy this Execution Environment definition.</div>,
+        headerContent: _('Delete'),
+        bodyContent: <div>{_('Delete this Execution Environment.')}</div>,
       }}
       variant="plain"
       aria-label="Action"
@@ -51,11 +54,12 @@ export const ExecutionEnvCardHeaderActions: React.FC<ExecutionEnvCardHeaderActio
         triggerAction: 'hover',
         'aria-label': 'edit popover',
         headerComponent: 'h1',
-        headerContent: 'Edit',
+        headerContent: _('Edit'),
         bodyContent: (
           <div>
-            Edit this Execution Environment definition. This will require the
-            image to be rebuilt.
+            {_(
+              'Edit this Execution Environment. If you make a change, Foreman will rebuild the Execution Environment.'
+            )}
           </div>
         ),
       }}

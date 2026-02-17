@@ -11,6 +11,8 @@ import {
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { useDispatch } from 'react-redux';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { ExecutionEnvGrid } from '../ExecutionEnvGrid';
@@ -245,7 +247,10 @@ const ExecutionEnvGridWrapper: React.FC = () => {
 
   return (
     <EmptyPage
-      message={{ type: 'loading', text: 'Loading Execution Environments...' }}
+      message={{
+        type: 'loading',
+        text: _('Loading Execution Environments...'),
+      }}
     />
   );
 };
