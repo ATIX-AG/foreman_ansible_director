@@ -6,6 +6,8 @@ import {
   Spinner,
 } from '@patternfly/react-core';
 import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+
 import { ContentUnitSelector } from './components/ContentUnitSelector';
 import { AnsibleContentUnit } from '../../../../types/AnsibleContentTypes';
 import {
@@ -54,7 +56,10 @@ export const ContentUnitSelectorWrapper: React.FC<ContentUnitSelectorWrapperProp
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText={`Loading content for Execution environment "${executionEnvironment.name}"...`}
+        titleText={__(
+          _('Loading content for execution environment %(ee)s...'),
+          { ee: executionEnvironment.name }
+        )}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />

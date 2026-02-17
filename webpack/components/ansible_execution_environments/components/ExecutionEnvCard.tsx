@@ -12,6 +12,8 @@ import {
 import styles from '@patternfly/react-styles/css/components/Form/form';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import { TextInputEditable } from './components/TextInputEditable';
 
 import { ExecutionEnvCardHeaderActions } from './ExecutionEnvCardHeaderActions';
@@ -97,7 +99,7 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
       </CardTitle>
       <CardBody>
         <Form isHorizontal>
-          <FormGroup label="Base-Image URL">
+          <FormGroup label={_('Base image URL')}>
             <TextInputEditable
               isEditable={editMode}
               value={executionEnvironment.base_image_url}
@@ -110,21 +112,22 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
             />
           </FormGroup>
           <FormGroup
-            label="Ansible version"
+            label={_('Ansible version')}
             labelIcon={
               <Popover
-                headerContent={<div>ansible-core version</div>}
+                headerContent={<div>{_('Ansible version')}</div>}
                 bodyContent={
                   <div>
-                    The version of ansible-core to be used in this Execution
-                    environment. As ansible-core is installed from PyPi, the
-                    version must match one of{' '}
+                    {_(
+                      'The ansible-core version for this Execution Environment.\n' +
+                        'As ansible-core is installed from PyPi, the version must match one of '
+                    )}
                     <a
                       href="https://pypi.org/project/ansible-core/#history"
                       target="_blank"
                       rel="noreferrer"
                     >
-                      the available releases.
+                      {_('the available releases.')}
                     </a>
                   </div>
                 }
