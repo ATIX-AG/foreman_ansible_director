@@ -111,9 +111,7 @@ export const VersionInput: React.FC<VersionInputProps> = ({
         <FormHelperText>
           <HelperText>
             <HelperTextItem>
-              {_(
-                'List does not conform to the pattern: $version, $version.'
-              )}
+              {_('List does not conform to the pattern: $version, $version.')}
             </HelperTextItem>
           </HelperText>
         </FormHelperText>

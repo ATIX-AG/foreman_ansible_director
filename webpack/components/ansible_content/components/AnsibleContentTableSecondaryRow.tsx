@@ -95,7 +95,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
           id: `${identifier}:${version.version}`,
         })
       );
-      setConfirmationModalOnConfirm(async () => {
+      setConfirmationModalOnConfirm(() => async () => {
         try {
           await axios.delete(
             foremanUrl('/api/v2/ansible_director/ansible_content'),
