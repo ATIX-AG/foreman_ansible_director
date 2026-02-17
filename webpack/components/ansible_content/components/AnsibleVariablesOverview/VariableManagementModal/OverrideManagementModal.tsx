@@ -24,6 +24,8 @@ import {
 } from '@patternfly/react-core';
 import OutlinedQuestionCircleIcon from '@patternfly/react-icons/dist/esm/icons/outlined-question-circle-icon';
 import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+
 import {
   AnsibleVariableDetail,
   AnsibleVariableOverride,
@@ -173,7 +175,7 @@ export const OverrideManagementModal = ({
   return (
     <>
       <Modal
-        title="Edit override"
+        title={_('Edit override')}
         style={{ minHeight: '400px' }}
         isOpen
         onClose={() => setSelectedOverride(undefined)}
@@ -188,14 +190,14 @@ export const OverrideManagementModal = ({
             }}
             isLoading={isConfirmLoading}
           >
-            Confirm
+            {_('Submit')}
           </Button>,
           <Button
             key="cancel"
             variant="link"
             onClick={() => setSelectedOverride(undefined)}
           >
-            Cancel
+            {_('Cancel')}
           </Button>,
         ]}
         ouiaId="BasicModal"
@@ -206,8 +208,8 @@ export const OverrideManagementModal = ({
             <SplitItem>
               <FormGroup fieldId="override-name" isRequired>
                 <Switch
-                  label="Custom Matcher Creation"
-                  labelOff="Simple Matcher Creation"
+                  label={_('Simple Matcher Creation')}
+                  labelOff={_('Custom Matcher Creation')}
                   id="checked-with-label-switch-on"
                   isChecked={isSimpleMatcherCreation}
                   hasCheckIcon
@@ -220,12 +222,16 @@ export const OverrideManagementModal = ({
                   headerContent={<div>Matcher creation type</div>}
                   bodyContent={
                     <div>
-                      <strong>Simple matcher creation</strong> mode allows you
-                      to set a matcher and its type from a dropdown, while{' '}
-                      <strong>custom matcher creation</strong> mode allows you
-                      to set a matcher and its type manually. Custom matcher
-                      creation mode is useful when you want to set a matcher
-                      that uses advanced functionality like regular expressions.
+                      <strong>{_('Simple matcher creation')}</strong>{' '}
+                      {_(
+                        'mode allows you to set a matcher and its type from a dropdown, while'
+                      )}
+                      <strong>{_('custom matcher creation')}</strong>{' '}
+                      {_(
+                        'mode allows you to set a matcher and its type manually. Custom matcher creation mode' +
+                          ' is useful when you want to set a matcher that uses advanced functionality' +
+                          ' like regular expressions.'
+                      )}
                     </div>
                   }
                 >
@@ -237,7 +243,7 @@ export const OverrideManagementModal = ({
             </SplitItem>
             <SplitItem isFilled />
             <SplitItem span={4}>
-              <FormGroup label="Type" fieldId="override-name">
+              <FormGroup label={_('Type')} fieldId="override-name">
                 <Dropdown
                   isOpen={false}
                   onSelect={(_event, value) => {}}
@@ -260,7 +266,7 @@ export const OverrideManagementModal = ({
           </Split>
           {isSimpleMatcherCreation ? (
             <>
-              <FormGroup label="Matcher type">
+              <FormGroup label={_('Matcher type')}>
                 <FormSelect
                   value={overrideMatcher}
                   onChange={(event, value) => {
@@ -282,7 +288,7 @@ export const OverrideManagementModal = ({
                   ))}
                 </FormSelect>
               </FormGroup>
-              <FormGroup label="Matcher value">
+              <FormGroup label={_('Matcher value')}>
                 {matcherRequest.status === 'RESOLVED' && (
                   <MatcherSelector
                     matcherOptions={matcherRequest.response.results.map(
@@ -299,7 +305,11 @@ export const OverrideManagementModal = ({
             </>
           ) : (
             <>
-              <FormGroup label="Matcher type" fieldId="matcher-type" isRequired>
+              <FormGroup
+                label={_('Matcher type')}
+                fieldId="matcher-type"
+                isRequired
+              >
                 <TextInput
                   value={overrideMatcher}
                   id="age-1"
@@ -310,11 +320,13 @@ export const OverrideManagementModal = ({
                         value as AnsibleVariableOverride['matcher']
                       ) // TODO: This is, at best, a hack. AnsibleVariableOverride[matcher] should extend string at some point
                   }
-                  placeholder={`One of ${matcherTypes.join(', ')}`}
+                  placeholder={__(_('One of: %(types)s.'), {
+                    types: matcherTypes.join(', '),
+                  })}
                 />
               </FormGroup>
               <FormGroup
-                label="Matcher value"
+                label={_('Matcher value')}
                 fieldId="matcher-value"
                 isRequired
               >
@@ -330,9 +342,9 @@ export const OverrideManagementModal = ({
           <FormGroup
             label={
               <>
-                Override value
+                {_('Override value')}
                 <br />
-                {`(variable type: ${variable.type})`}
+                {__(_('Variable type: %(vType)s'), { vType: variable.type })}
               </>
             }
           >

@@ -36,6 +36,8 @@ import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 
 import styles from '@patternfly/react-styles/css/components/Form/form';
 
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import {
   AnsibleVariable,
   AnsibleVariableDetail,
@@ -193,7 +195,7 @@ export const VariableManagementModalContent = ({
             <TabTitleIcon>
               <CodeIcon />
             </TabTitleIcon>{' '}
-            <TabTitleText>Base variable</TabTitleText>{' '}
+            <TabTitleText>{_('Base variable')}</TabTitleText>{' '}
           </>
         }
         aria-label="filled tabs with icons content users"
@@ -209,7 +211,7 @@ export const VariableManagementModalContent = ({
               <Form>
                 <Grid hasGutter>
                   <GridItem span={8}>
-                    <FormGroup label="Variable name">
+                    <FormGroup label={_('Name')}>
                       <TextInputEditable
                         isEditable={isEditMode}
                         value={ansibleVariable.name}
@@ -224,7 +226,7 @@ export const VariableManagementModalContent = ({
                   </GridItem>
                   <GridItem span={4}>
                     <FormGroup
-                      label="Variable type"
+                      label={_('Type')}
                       labelIcon={
                         <Popover
                           headerContent={<div>Variable type</div>}
@@ -286,7 +288,7 @@ export const VariableManagementModalContent = ({
                     </FormGroup>
                   </GridItem>
                   <GridItem span={12}>
-                    <FormGroup label="Default value">
+                    <FormGroup label={_('Default value')}>
                       {valueAdapter(ansibleVariable)}
                     </FormGroup>
                   </GridItem>
@@ -303,7 +305,7 @@ export const VariableManagementModalContent = ({
             <TabTitleIcon>
               <CodeBranchIcon />
             </TabTitleIcon>{' '}
-            <TabTitleText>Overrides</TabTitleText>
+            <TabTitleText>{_('Overrides')}</TabTitleText>
           </>
         }
       >

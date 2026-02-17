@@ -1,5 +1,6 @@
 import React from 'react';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface DefaultFooterProps {
   isBackDisabled: boolean;
@@ -20,6 +21,9 @@ export const DefaultFooter: React.FC<DefaultFooterProps> = ({
       onClose={close}
       isBackDisabled={isBackDisabled}
       isNextDisabled={isNextDisabled}
+      nextButtonText={_('Next')}
+      backButtonText={_('Back')}
+      cancelButtonText={_('Cancel')}
     />
   );
 };

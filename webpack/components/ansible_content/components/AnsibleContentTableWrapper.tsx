@@ -23,6 +23,7 @@ import {
   useSetParamsAndApiAndSearch,
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
+import { translate as _ } from 'foremanReact/common/I18n';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { AnsibleContentTable } from './AnsibleContentTable';
 import AnsibleContentWizard from './AnsibleContentWizard/AnsibleContentWizard';
@@ -122,7 +123,9 @@ const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
   }
 
   return (
-    <EmptyPage message={{ type: 'loading', text: 'Loading Ansible content' }} />
+    <EmptyPage
+      message={{ type: 'loading', text: _('Loading Ansible content...') }}
+    />
   );
 };
 

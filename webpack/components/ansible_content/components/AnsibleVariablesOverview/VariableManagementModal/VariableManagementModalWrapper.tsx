@@ -8,6 +8,7 @@ import {
 } from '@patternfly/react-core';
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import { useAPI, UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
   AnsibleVariable,
@@ -62,7 +63,7 @@ export const VariableManagementModalWrapper = ({
   return modal(
     <EmptyState>
       <EmptyStateHeader
-        titleText="Loading Ansible variable details..."
+        titleText={_('Loading Ansible variable details...')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />

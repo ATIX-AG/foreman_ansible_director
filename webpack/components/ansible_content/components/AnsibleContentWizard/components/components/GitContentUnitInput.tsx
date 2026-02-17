@@ -25,6 +25,9 @@ import CodeBranchIcon from '@patternfly/react-icons/dist/esm/icons/code-branch-i
 import CodeIcon from '@patternfly/react-icons/dist/esm/icons/code-icon';
 import TagIcon from '@patternfly/react-icons/dist/esm/icons/tag-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
+
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+
 import { AnsibleGitContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { AnsibleContentUnitCreateType } from '../../AnsibleContentWizard';
 import { GitRefInput } from './components/GitRefInput';
@@ -145,7 +148,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
       {/*  /> */}
       {/* </FormGroup> */}
       <FormGroup
-        label="Repository URL"
+        label={_('Repository URL')}
         isRequired
         fieldId="content-unit-form-01"
         labelIcon={
@@ -153,8 +156,10 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
             alertSeverityVariant="info"
             headerContent={
               <div>
-                The URL of the git repository containing the Ansible{' '}
-                {unitType === 'collection' ? 'Collection' : 'Role'}.
+                {__(
+                  _('The URL of the Git repository containing the %(uType)s.'),
+                  { uType: unitType }
+                )}
               </div>
             }
             bodyContent={<div />}
@@ -197,13 +202,13 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
               aria-label="inspect repository"
               onClick={() => {}}
             >
-              Inspect repository
+              {_('Inspect repository')}
             </Button>
           </InputGroupItem>
         </InputGroup>
       </FormGroup>
       <FormGroup
-        label="Git reference"
+        label={_('Reference type')}
         isRequired
         fieldId="git-ref-form-01"
         labelIcon={
@@ -211,8 +216,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
             alertSeverityVariant="info"
             headerContent={
               <div>
-                A valid git branch/tag/commit pointing to an object in the
-                specified repository.
+                {_('A Git branch/tag/commit in the specified repository.')}
               </div>
             }
             bodyContent={<div />}
@@ -244,13 +248,11 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
                 <TabTitleIcon>
                   <CodeIcon />
                 </TabTitleIcon>{' '}
-                <TabTitleText>Commit / Manual input</TabTitleText>{' '}
+                <TabTitleText>{_('Commit or manual input')}</TabTitleText>{' '}
               </>
             }
             aria-label="filled tabs with icons content users"
-          >
-            Users
-          </Tab>
+          />
           <Tab
             eventKey={'branch' as refTabKeys}
             isDisabled={manualInputOnly}
@@ -259,12 +261,10 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
                 <TabTitleIcon>
                   <CodeBranchIcon />
                 </TabTitleIcon>{' '}
-                <TabTitleText>Branch</TabTitleText>{' '}
+                <TabTitleText>{_('Branch')}</TabTitleText>{' '}
               </>
             }
-          >
-            Containers
-          </Tab>
+          />
           <Tab
             eventKey={'tag' as refTabKeys}
             isDisabled={manualInputOnly}
@@ -273,12 +273,10 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
                 <TabTitleIcon>
                   <TagIcon />
                 </TabTitleIcon>{' '}
-                <TabTitleText>Tag</TabTitleText>{' '}
+                <TabTitleText>{_('Tag')}</TabTitleText>{' '}
               </>
             }
-          >
-            Database
-          </Tab>
+          />
         </Tabs>
       </FormGroup>
 
@@ -307,7 +305,9 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
           ouiaId="PrimaryWithIcon"
           onClick={addToBatch}
         >
-          {`Add ${unitType === 'collection' ? 'Collection' : 'Role'} to batch`}{' '}
+          {__(_('Add Ansible %(uType)s to batch'), {
+            uType: unitType,
+          })}{' '}
         </Button>{' '}
       </ActionGroup>
     </Form>

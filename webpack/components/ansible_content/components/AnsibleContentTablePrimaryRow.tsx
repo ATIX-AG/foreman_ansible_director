@@ -5,6 +5,8 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
+
 import { useDispatch } from 'react-redux';
 import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
@@ -74,12 +76,14 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
   ]);
 
   const destroyAction = (): IAction => ({
-    title: 'Destroy',
+    title: _('Delete'),
     onClick: () => {
       setIsConfirmationModalOpen(true);
-      setConfirmationModalTitle(`Destroy ${identifier}?`);
+      setConfirmationModalTitle(__(_('Delete %(id)s?'), { id: identifier }));
       setConfirmationModalBody(
-        `This will destroy all imported versions of ${identifier}.\nAre you sure you want to destroy ${identifier}?`
+        __(_('Are you sure you want to delete %(id)s?'), {
+          id: identifier,
+        })
       );
       setConfirmationModalOnConfirm(() => async () => {
         try {

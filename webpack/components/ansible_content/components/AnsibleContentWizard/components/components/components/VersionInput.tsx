@@ -16,6 +16,7 @@ import {
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface VersionInputProps {
   contentUnitVersions: Array<string>;
@@ -54,15 +55,20 @@ export const VersionInput: React.FC<VersionInputProps> = ({
 
   return (
     <FormGroup
-      label="Collection versions"
+      label={_('Versions')}
       labelIcon={
         <Popover
-          headerContent={<div>A subset of versions to import.</div>}
+          headerContent={<div>{_('A list of versions to import.')}</div>}
           bodyContent={
             <div>
-              If left empty, all available versions will be imported. Versions
-              are not checked for validity. Invalid versions will cause failure
-              of the importer.
+              {_('If left empty, Foreman will import all available versions.')}
+            </div>
+          }
+          footerContent={
+            <div>
+              {_(
+                'Versions are not checked for validity. The import task will fail if you enter a nonexistent version.'
+              )}
             </div>
           }
         >
@@ -105,14 +111,14 @@ export const VersionInput: React.FC<VersionInputProps> = ({
         <FormHelperText>
           <HelperText>
             <HelperTextItem>
-              {
-                'Version list does not conform to the pattern: "<version>, <version>"'
-              }
+              {_(
+                'List does not conform to the pattern: $version, $version.'
+              )}
             </HelperTextItem>
           </HelperText>
         </FormHelperText>
       )}
-      <ChipGroup categoryName="Only import: " numChips={10}>
+      <ChipGroup categoryName={_('Only import: ')} numChips={10}>
         {contentUnitVersions.map(unitVersion => (
           <Chip
             key={unitVersion}

@@ -5,6 +5,7 @@ import { WizardFooter, useWizardContext } from '@patternfly/react-core';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { useDispatch } from 'react-redux';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleContentUnitCreateType,
   isAnsibleGalaxyContentUnitCreate,
@@ -131,7 +132,7 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
   return (
     <WizardFooter
       isNextDisabled={isFinishDisabled}
-      nextButtonText="Finish"
+      nextButtonText={_('Finish')}
       activeStep={activeStep}
       nextButtonProps={{
         spinnerAriaValueText: 'Loading',

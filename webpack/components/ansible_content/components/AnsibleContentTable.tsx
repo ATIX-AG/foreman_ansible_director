@@ -5,6 +5,9 @@ import {
   APIOptions,
   PaginationProps,
 } from 'foremanReact/common/hooks/API/APIHooks';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import {
   AnsibleContentUnitWithCounts,
   GetAnsibleContentResponse,
@@ -113,10 +116,10 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
       <Table aria-label="Simple table" isTreeTable variant="compact">
         <Thead>
           <Tr>
-            <Th>Identifier</Th>
-            <Th>Type</Th>
-            <Th>Namespace</Th>
-            <Th>Name</Th>
+            <Th dataLabel="Identifier">{_('Identifier')}</Th>
+            <Th dataLabel="Type">{_('Type')}</Th>
+            <Th dataLabel="Namespace">{_('Namespace')}</Th>
+            <Th dataLabel="Name">{_('Name')}</Th>
           </Tr>
         </Thead>
         <Tbody>{renderRows(apiResponse.results)}</Tbody>

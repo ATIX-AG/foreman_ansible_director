@@ -16,6 +16,8 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+
 import { useDispatch } from 'react-redux';
 import { AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
@@ -64,8 +66,8 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             }}
           >
             {version.roles_count === 1
-              ? `${version.roles_count} role`
-              : `${version.roles_count} roles`}
+              ? _('1 role')
+              : __(_('%(count)s roles'), { count: version.roles_count })}
           </Button>
         </Td>
         <Td isActionCell>
@@ -82,12 +84,16 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
   ]);
 
   const destroyAction = (version: AnsibleContentVersionWithCount): IAction => ({
-    title: 'Destroy',
+    title: _('Delete'),
     onClick: () => {
       setIsConfirmationModalOpen(true);
-      setConfirmationModalTitle(`Destroy ${identifier}:${version.version}?`);
+      setConfirmationModalTitle(
+        __(_('Delete %(id)s?'), { id: `${identifier}:${version.version}` })
+      );
       setConfirmationModalBody(
-        `This will destroy only version ${version.version} of ${identifier}.\nAre you sure you want to destroy ${identifier}:${version.version}?`
+        __(_('Are you sure you want to delete %(id)s?'), {
+          id: `${identifier}:${version.version}`,
+        })
       );
       setConfirmationModalOnConfirm(async () => {
         try {
@@ -145,8 +151,8 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
           <Table aria-label="Simple table" variant="compact">
             <Thead>
               <Tr>
-                <Th>Version</Th>
-                <Th>Roles</Th>
+                <Th dataLabel="Version">{_('Version')}</Th>
+                <Th dataLabel="Roles">{_('Roles')}</Th>
               </Tr>
             </Thead>
             <Tbody>{versionRows(nodeVersions)}</Tbody>
