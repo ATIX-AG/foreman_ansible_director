@@ -12,6 +12,7 @@ import {
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import { AnsibleLcePath } from '../../../types/AnsibleEnvironmentsTypes';
 import { AnsibleLcePathIndex } from './AnsibleLcePathIndex';
@@ -80,7 +81,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
       requiredPermissions={[AdPermissions.ansibleLcePaths.create]}
       isLoading={isCreateButtonLoading}
     >
-      Create LCE Path
+      {_('Create lifecycle environment path')}
     </PermittedButton>,
   ];
 
@@ -88,7 +89,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
     return (
       <>
         <Page
-          header="Ansible Environments"
+          header={_('Ansible environments')}
           customToolbarItems={toolbarItems()}
           hasDocumentation={false}
         >
@@ -103,7 +104,7 @@ const AnsibleContentTableWrapper: React.FC = () => {
     return null; // TODO: Handle request error
   }
 
-  return <EmptyPage message={{ type: 'loading', text: 'Loading...' }} />;
+  return <EmptyPage message={{ type: 'loading', text: _('Loading...') }} />;
 };
 
 export default AnsibleContentTableWrapper;

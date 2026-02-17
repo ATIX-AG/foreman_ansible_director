@@ -28,6 +28,7 @@ import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext
 import { addToast } from 'foremanReact/components/ToastsList';
 
 import Permitted from 'foremanReact/components/Permitted';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import {
   AnsibleLce,
@@ -321,11 +322,12 @@ export const AnsibleLcePathComponent = ({
             triggerAction: 'hover',
             'aria-label': 'destroy popover',
             headerComponent: 'h1',
-            headerContent: 'New Lifecycle Environment',
+            headerContent: 'New lifecycle environment',
             bodyContent: (
               <div>
-                Insert new Lifecycle environment after{' '}
-                <strong>{env.name}</strong>.
+                {__(_('Insert new lifecycle environment after %(lce)s.'), {
+                  lce: env.name,
+                })}
               </div>
             ),
           }}
@@ -352,16 +354,16 @@ export const AnsibleLcePathComponent = ({
               'aria-label': 'promote equivalent popover',
               headerComponent: 'h1',
               headerContent: (
-                <div>{`Environments ${env.name} and ${nextEnv.name} are equivalent.`}</div>
-              ),
-              bodyContent: (
                 <div>
-                  These environments are using the same content.
-                  <br />
-                  {'Content hash: '}
-                  <strong>{env.content_hash}</strong>
+                  {__(
+                    _(
+                      'Ansible environments %(env)s and %(nEnv)s are equivalent.'
+                    ),
+                    { env: env.name, nEnv: nextEnv.name }
+                  )}
                 </div>
               ),
+              bodyContent: <div>{_('They provide the same content.')}</div>,
             }}
             variant="plain"
             aria-label="Action"
@@ -385,16 +387,22 @@ export const AnsibleLcePathComponent = ({
             headerComponent: 'h1',
             headerContent: (
               <div>
-                {`Environments ${env.name} and ${nextEnv.name} are `}
-                <strong>not</strong>
-                {' equivalent.'}
+                {__(
+                  _(
+                    'Ansible environments %(env)s and %(nEnv)s are not equivalent.'
+                  ),
+                  { env: env.name, nEnv: nextEnv.name }
+                )}
               </div>
             ),
             bodyContent: (
               <div>
-                These environments are using different content.
+                {_('They provide different content.')}
                 <br />
-                {`Promotion will assign the content of ${env.name} to ${nextEnv.name}.`}
+                {__(
+                  _('Promote to assign the content of %(env)s to %(nEnv)s.'),
+                  { env: env.name, nEnv: nextEnv.name }
+                )}
               </div>
             ),
           }}

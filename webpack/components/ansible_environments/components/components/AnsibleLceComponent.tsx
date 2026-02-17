@@ -13,6 +13,7 @@ import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { AnsibleLceComponentHeaderActions } from './AnsibleLceComponentHeaderActions';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
@@ -136,6 +137,15 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     }
   };
 
+  const contentUnitCountString = (lceObj: AnsibleLce): string => {
+    if (lceObj.content.length === 1) {
+      return _('1 content unit');
+    }
+    return __(_('%(count)s content units'), {
+      count: lceObj.content.length,
+    });
+  };
+
   const handleEditContent = async (): Promise<void> => {
     setLifecycleEnv(lce);
     setIsContentUnitModalOpen(true);
@@ -199,7 +209,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
                 color: 'var(--pf-global--Color--200)',
               }}
             >
-              Execution environment:{' '}
+              {_('Execution Environment:')}
               <Button
                 onClick={handleEditExecutionEnv}
                 component="a"
@@ -223,7 +233,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               variant="link"
               isDisabled
             >
-              {`${lifecycleEnvironment.content.length} content units`}
+              {contentUnitCountString(lifecycleEnvironment)}
             </Button>
           </SplitItem>
         </Split>
