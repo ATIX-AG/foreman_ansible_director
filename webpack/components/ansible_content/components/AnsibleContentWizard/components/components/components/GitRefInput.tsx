@@ -64,12 +64,17 @@ export const GitRefInput: React.FC<VersionInputProps> = ({
                 : null
             }
             id="cu-source-input-01"
+            data-testid="git-ref-input"
             type="text"
             aria-label="content unit source input"
           />
         </InputGroupItem>
         <InputGroupItem>
-          <Button variant="control" onClick={handleGitRefAdd}>
+          <Button
+            variant="control"
+            onClick={handleGitRefAdd}
+            data-testid="add-git-ref-btn"
+          >
             <PlusIcon />
           </Button>
         </InputGroupItem>
