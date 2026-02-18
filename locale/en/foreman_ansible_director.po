@@ -2,12 +2,10 @@
 #
 # This file is distributed under the same license as foreman_ansible_director.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 08:46+0100\n"
 "PO-Revision-Date: 2014-08-20 08:54+0100\n"
 "Last-Translator: Foreman Team <foreman-dev@googlegroups.com>\n"
 "Language-Team: Foreman Team <foreman-dev@googlegroups.com>\n"
@@ -17,3 +15,260 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "%(count)s content units"
+msgstr ""
+
+msgid "%(uType)s identifier does not match /^[a-z0-9_]+\\.[a-z0-9_]+$/."
+msgstr ""
+
+msgid "%(uType)s identifier may not be empty."
+msgstr ""
+
+msgid "1 content unit"
+msgstr ""
+
+msgid "A list of versions to import."
+msgstr ""
+
+msgid "Add Ansible %(uType)s to batch"
+msgstr ""
+
+msgid "Add, remove, and update Ansible content."
+msgstr ""
+
+msgid "Ansible"
+msgstr ""
+
+msgid "Ansible Content"
+msgstr ""
+
+msgid "Ansible Execution Environments"
+msgstr ""
+
+msgid "Ansible content"
+msgstr ""
+
+msgid "Ansible environments %(env)s and %(nEnv)s are equivalent."
+msgstr ""
+
+msgid "Ansible support with Execution Environments, different Ansible/Python versions and traditional Ansible features."
+msgstr ""
+
+msgid "Ansible version"
+msgstr ""
+
+msgid "Are you sure you want to delete %(id)s?"
+msgstr ""
+
+msgid "Assign Ansible content"
+msgstr ""
+
+msgid "Assign lifecycle environment"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Base image URL"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Collection overview: %(id)s"
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "Content"
+msgstr ""
+
+msgid "Create lifecycle environment path"
+msgstr ""
+
+msgid "Custom Matcher Creation"
+msgstr ""
+
+msgid "Default value"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete %(id)s?"
+msgstr ""
+
+msgid "Delete this Execution Environment."
+msgstr ""
+
+msgid "Delete this lifecycle environment path."
+msgstr ""
+
+msgid "Delete this lifecycle environment."
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Edit override"
+msgstr ""
+
+msgid "Edit the content assigned to this host."
+msgstr ""
+
+msgid "Edit this Execution Environment. If you make a change, Foreman will rebuild the Execution Environment."
+msgstr ""
+
+msgid "Edit this lifecycle environment path."
+msgstr ""
+
+msgid "Edit this lifecycle environment."
+msgstr ""
+
+msgid "Finish"
+msgstr ""
+
+msgid "Identifier"
+msgstr ""
+
+msgid "Import Ansible content"
+msgstr ""
+
+msgid "Insert new lifecycle environment after %(lce)s."
+msgstr ""
+
+msgid "Library"
+msgstr ""
+
+msgid "Lifecycle environment"
+msgstr ""
+
+msgid "Lifecycle environment path"
+msgstr ""
+
+msgid "List does not conform to the pattern: $version, $version."
+msgstr ""
+
+msgid "Loading Ansible content..."
+msgstr ""
+
+msgid "Loading Ansible context..."
+msgstr ""
+
+msgid "Loading Ansible roles..."
+msgstr ""
+
+msgid "Loading Ansible variable details..."
+msgstr ""
+
+msgid "Loading Execution Environments..."
+msgstr ""
+
+msgid "Loading Library..."
+msgstr ""
+
+msgid "Loading content for execution environment %(ee)s..."
+msgstr ""
+
+msgid "Loading lifecycle environment %(lce)s..."
+msgstr ""
+
+msgid "Loading lifecycle environment content..."
+msgstr ""
+
+msgid "Loading lifecycle environment paths..."
+msgstr ""
+
+msgid "Loading lifecycle environment..."
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Manage Ansible content"
+msgstr ""
+
+msgid "Manage content units"
+msgstr ""
+
+msgid "Matcher type"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Namespace"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "No content assigned to lifecycle environment"
+msgstr ""
+
+msgid "No content units found"
+msgstr ""
+
+msgid "Override value"
+msgstr ""
+
+msgid "References"
+msgstr ""
+
+msgid "Review"
+msgstr ""
+
+msgid "Run Ansible Playbook"
+msgstr ""
+
+msgid "Run Ansible roles"
+msgstr ""
+
+msgid "Runs an Ansible playbook defined by the user."
+msgstr ""
+
+msgid "Runs an Ansible playbook which contains all the roles defined for a host"
+msgstr ""
+
+msgid "Select source of Ansible content"
+msgstr ""
+
+msgid "Set the lifecycle environment of this host."
+msgstr ""
+
+msgid "Simple Matcher Creation"
+msgstr ""
+
+msgid "Simple matcher creation"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Supported sources include:"
+msgstr ""
+
+msgid "They provide different content."
+msgstr ""
+
+msgid "This host uses Ansible content from the Library environment."
+msgstr ""
+
+msgid "Using content from lifecycle environment"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Versions"
+msgstr ""
+
+msgid "Versions are not checked for validity. The import task will fail if you enter a nonexistent version."
+msgstr ""
+
+msgid "mode allows you to set a matcher and its type manually. Custom matcher creation mode is useful when you want to set a matcher that uses advanced functionality like regular expressions."
+msgstr ""
+
+msgid "the available releases."
+msgstr ""

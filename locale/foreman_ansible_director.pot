@@ -1,19 +1,471 @@
-# foreman_ansible_director
-#
-# This file is distributed under the same license as foreman_ansible_director.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the foreman_ansible_director package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: version 0.0.1\n"
+"Project-Id-Version: foreman_ansible_director 0.3.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-20 08:46+0100\n"
-"PO-Revision-Date: 2014-08-20 08:46+0100\n"
-"Last-Translator: Foreman Team <foreman-dev@googlegroups.com>\n"
-"Language-Team: Foreman Team <foreman-dev@googlegroups.com>\n"
+"POT-Creation-Date: 2026-02-18 14:11+0000\n"
+"PO-Revision-Date: 2026-02-18 14:11+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+#:
+#: ../app/views/foreman_ansible_director/ansible_content/_ansible_content_tab_title.html.erb:1
+#: ../app/views/foreman_ansible_director/ansible_content/ansible_content/_ansible_content_tab_title.html.erb:1
+msgid "Ansible Content"
+msgstr ""
+
+#: ../lib/foreman_ansible_director/register.rb:9
+msgid "Ansible"
+msgstr ""
+
+#: ../lib/foreman_ansible_director/remote_execution.rb:23
+msgid "Run Ansible roles"
+msgstr ""
+
+#: ../lib/foreman_ansible_director/remote_execution.rb:24
+msgid "Runs an Ansible playbook which contains all the roles defined for a host"
+msgstr ""
+
+#: ../lib/foreman_ansible_director/remote_execution.rb:30
+msgid "Run Ansible Playbook"
+msgstr ""
+
+#: ../lib/foreman_ansible_director/remote_execution.rb:31
+msgid "Runs an Ansible playbook defined by the user."
+msgstr ""
+
+#: ../webpack/components/ansible_content/AnsibleContentPage.tsx:17
+msgid "Ansible content"
+msgstr ""
+
+#: ../webpack/components/ansible_content/AnsibleContentPage.tsx:23
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:258
+#: ../webpack/components/ansible_execution_environments/components/components/components/ContentUnitSelector.tsx:240
+msgid "Import Ansible content"
+msgstr ""
+
+#: ../webpack/components/ansible_content/components/AnsibleContentTable.tsx:119
+msgid "Identifier"
+msgstr ""
+
+#: ../webpack/components/ansible_content/components/AnsibleContentTable.tsx:121
+msgid "Namespace"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentTablePrimaryRow.tsx:79
+#: ../webpack/components/ansible_content/components/AnsibleContentTableSecondaryRow.tsx:87
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentHeaderActions.tsx:62
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponentHeaderActions.tsx:54
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCardHeaderActions.tsx:39
+msgid "Delete"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentTablePrimaryRow.tsx:82
+#: ../webpack/components/ansible_content/components/AnsibleContentTableSecondaryRow.tsx:91
+msgid "Delete %(id)s?"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentTablePrimaryRow.tsx:84
+#: ../webpack/components/ansible_content/components/AnsibleContentTableSecondaryRow.tsx:94
+msgid "Are you sure you want to delete %(id)s?"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentTableSecondaryRow.tsx:154
+msgid "Version"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentTableWrapper.tsx:127
+msgid "Loading Ansible content..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:84
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:148
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:211
+#: ../webpack/components/extensions/host_details/HostDetailsTab/HostDetailsTab.tsx:57
+msgid "Content"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:110
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:113
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:174
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:177
+msgid "Review"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/AnsibleContentWizard.tsx:286
+msgid "Select source of Ansible content"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/ProviderSelectionStep.tsx:40
+msgid "Supported sources include:"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/DefaultFooter.tsx:24
+msgid "Next"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/DefaultFooter.tsx:25
+msgid "Back"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/DefaultFooter.tsx:26
+msgid "Cancel"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/FinishFooter.tsx:135
+msgid "Finish"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/GalaxyContentUnitInput.tsx:88
+msgid "%(uType)s identifier may not be empty."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/GalaxyContentUnitInput.tsx:94
+msgid "%(uType)s identifier does not match /^[a-z0-9_]+\\.[a-z0-9_]+$/."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/GalaxyContentUnitInput.tsx:265
+msgid "Add Ansible %(uType)s to batch"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/components/GitRefInput.tsx:53
+msgid "References"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/components/VersionInput.tsx:58
+msgid "Versions"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/components/VersionInput.tsx:61
+msgid "A list of versions to import."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/components/VersionInput.tsx:69
+msgid ""
+"Versions are not checked for validity. The import task will fail if you enter "
+"a nonexistent version."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleContentWizard/components/components/components/VersionInput.tsx:114
+msgid "List does not conform to the pattern: $version, $version."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/AnsibleVariablesOverview.tsx:51
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:193
+msgid "Submit"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/AnsibleVariablesOverview.tsx:62
+msgid "Collection overview: %(id)s"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/AnsibleVariablesOverview.tsx:93
+msgid "Loading Ansible roles..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:178
+msgid "Edit override"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:211
+msgid "Simple Matcher Creation"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:212
+msgid "Custom Matcher Creation"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:225
+msgid "Simple matcher creation"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:230
+msgid ""
+"mode allows you to set a matcher and its type manually. Custom matcher creatio"
+"n mode is useful when you want to set a matcher that uses advanced functionali"
+"ty like regular expressions."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:269
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:309
+msgid "Matcher type"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/OverrideManagementModal.tsx:345
+msgid "Override value"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/VariableManagementModalContent.tsx:214
+msgid "Name"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/VariableManagementModalContent.tsx:291
+msgid "Default value"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/VariableManagementModalWrapper.tsx:66
+msgid "Loading Ansible variable details..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/AnsibleLcePathIndexWrapper.tsx:84
+msgid "Create lifecycle environment path"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/AnsibleLcePathIndexWrapper.tsx:107
+msgid "Loading..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleExecutionEnvSelectionModalWrapper.tsx:55
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvGridWrapper.tsx:252
+msgid "Loading Execution Environments..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponent.tsx:142
+msgid "1 content unit"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponent.tsx:144
+msgid "%(count)s content units"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentHeaderActions.tsx:40
+msgid "Manage Ansible content"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentHeaderActions.tsx:41
+msgid "Add, remove, and update Ansible content."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentHeaderActions.tsx:63
+msgid "Delete this lifecycle environment."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentHeaderActions.tsx:81
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponentHeaderActions.tsx:72
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCardHeaderActions.tsx:57
+msgid "Edit"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentHeaderActions.tsx:82
+msgid "Edit this lifecycle environment."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLceComponentWrapper.tsx:82
+msgid "Loading lifecycle environment %(lce)s..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponent.tsx:328
+msgid "Insert new lifecycle environment after %(lce)s."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponent.tsx:359
+msgid "Ansible environments %(env)s and %(nEnv)s are equivalent."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponent.tsx:400
+msgid "They provide different content."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponentHeaderActions.tsx:55
+msgid "Delete this lifecycle environment path."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLcePathComponentHeaderActions.tsx:73
+msgid "Edit this lifecycle environment path."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLibraryOverview.tsx:55
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/components/HostDetailsLceCardHeaderActions.tsx:33
+msgid "Library"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_environments/components/components/AnsibleLibraryOverview.tsx:132
+msgid "Loading Library..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/AnsibleExecutionEnvPage.tsx:10
+msgid "Ansible Execution Environments"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ContentUnitModal.tsx:124
+msgid "Manage content units"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ContentUnitModal.tsx:135
+msgid "Confirm"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCard.tsx:102
+msgid "Base image URL"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCard.tsx:115
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCard.tsx:118
+msgid "Ansible version"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCard.tsx:130
+msgid "the available releases."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCardHeaderActions.tsx:40
+msgid "Delete this Execution Environment."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/ExecutionEnvCardHeaderActions.tsx:60
+msgid ""
+"Edit this Execution Environment. If you make a change, Foreman will rebuild th"
+"e Execution Environment."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/components/ContentUnitSelectorWrapper.tsx:60
+msgid "Loading content for execution environment %(ee)s..."
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/components/components/ContentUnitSelector.tsx:224
+msgid "No content assigned to lifecycle environment"
+msgstr ""
+
+#:
+#: ../webpack/components/ansible_execution_environments/components/components/components/ContentUnitSelector.tsx:225
+msgid "No content units found"
+msgstr ""
+
+#: ../webpack/components/common/AdContextWrapper.tsx:57
+msgid "Loading Ansible context..."
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/components/LifecycleEnvComponentWrapper.tsx:39
+msgid "Loading lifecycle environment paths..."
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/HostDetailsLceCard.tsx:181
+msgid "This host uses Ansible content from the Library environment."
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/components/HostDetailsLceCardHeaderActions.tsx:33
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/components/LcePathSelector.tsx:101
+msgid "Lifecycle environment"
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/components/HostDetailsLceCardHeaderActions.tsx:48
+msgid "Assign lifecycle environment"
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/components/HostDetailsLceCardHeaderActions.tsx:50
+msgid "Set the lifecycle environment of this host."
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsLceCard/components/LcePathSelector.tsx:77
+msgid "Lifecycle environment path"
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsTab/components/AssignmentComponent.tsx:122
+msgid "Assign Ansible content"
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsTab/components/AssignmentComponent.tsx:124
+msgid "Edit the content assigned to this host."
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsTab/components/AssignmentComponent.tsx:144
+msgid "Using content from lifecycle environment"
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsTab/components/AssignmentComponentWrapper.tsx:110
+#: ../webpack/components/extensions/host_details/HostDetailsTab/components/OverrideGridWrapper.tsx:61
+msgid "Loading lifecycle environment content..."
+msgstr ""
+
+#:
+#: ../webpack/components/extensions/host_details/HostDetailsTab/components/LceContentListWrapper.tsx:32
+msgid "Loading lifecycle environment..."
+msgstr ""
+
+#: gemspec.rb:2
+msgid ""
+"Ansible support with Execution Environments, different Ansible/Python versions"
+" and traditional Ansible features."
+msgstr ""
