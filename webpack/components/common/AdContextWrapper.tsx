@@ -1,5 +1,7 @@
 import React, { createContext, ReactElement, useContext } from 'react';
 import { useAPI, UseAPIReturn } from 'foremanReact/common/hooks/API/APIHooks';
+import { translate as _ } from 'foremanReact/common/I18n';
+
 import {
   EmptyState,
   EmptyStateHeader,
@@ -52,7 +54,7 @@ export const AdContextWrapper = ({
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText="Loading Ansible context..."
+        titleText={_('Loading Ansible context...')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={Spinner} />}
       />
