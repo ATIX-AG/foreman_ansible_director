@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import {
   FormSelect,
   FormSelectOption,
@@ -11,21 +11,26 @@ interface DropdownEditableProps {
   value: string;
   setValue: (event: React.FormEvent<HTMLSelectElement>, value: string) => void;
 }
-export const DropdownEditable: React.FC<DropdownEditableProps> = ({
+export const DropdownEditable = ({
   isEditable,
   options,
   value,
   setValue,
-}) => (
-  <FormSelect
-    isDisabled={!isEditable}
-    value={value}
-    onChange={setValue}
-    aria-label="FormSelect Input"
-    ouiaId="BasicFormSelect"
-  >
-    {options.map((option, index) => (
+}: DropdownEditableProps): ReactElement => {
+  const optionItems = (): ReactElement[] =>
+    options.map((option, index) => (
       <FormSelectOption key={index} value={option.value} label={option.label} />
-    ))}
-  </FormSelect>
-);
+    ));
+  return (
+    <FormSelect
+      isDisabled={!isEditable}
+      value={value}
+      onChange={setValue}
+      aria-label="FormSelect Input"
+      ouiaId="BasicFormSelect"
+      data-testid="dropdown-editable-select"
+    >
+      {optionItems()}
+    </FormSelect>
+  );
+};
