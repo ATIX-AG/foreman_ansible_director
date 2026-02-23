@@ -8,22 +8,5 @@ module ForemanAnsibleDirector
     DEFAULT_GALAXY_URL = 'https://galaxy.ansible.com/'
     DEFAULT_ANSIBLE_VERSION = '2.19.3'
 
-    ANSIBLE_VERSIONS = %w[
-      v10.0.0
-      v10.0.1
-      v10.1.0
-      v10.2.0
-      v10.3.0
-      v10.4.0
-      v10.5.0
-      v10.6.0
-      v10.7.0
-      v11.0.0
-      v11.1.0
-      v11.2.0
-      v11.3.0
-      v11.4.0
-      v11.5.0
-    ].freeze
   end
 end
