@@ -22,6 +22,7 @@ module ForemanAnsibleDirector
                 sequence do
                   organization_id = args[:organization_id]
                   unit_name = args[:unit_name]
+                  prefix = ::ForemanAnsibleDirector::Constants::PULP_OBJECT_NAME_PREFIX
 
                   git_ls_remote_action = plan_action(
                     ::ForemanAnsibleDirector::Actions::GitOps::LsRemote,
@@ -35,14 +36,14 @@ module ForemanAnsibleDirector
 
                   repository_create_action = plan_action(
                     ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
-                    name: "#{organization_id}-git-#{unit_name}",
+                    name: "#{prefix}#{organization_id}-git-#{unit_name}",
                     name_suffix: top_commit,
                     skip: false
                   )
 
                   distribution_create_action = plan_action(
                     ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
-                    name: "#{organization_id}-git-#{unit_name}",
+                    name: "#{prefix}#{organization_id}-git-#{unit_name}",
                     name_suffix: top_commit,
                     path_suffix: top_commit,
                     base_path: "#{organization_id}/#{unit_name}-git",
@@ -52,7 +53,7 @@ module ForemanAnsibleDirector
 
                   git_remote_create_action = plan_action(
                     ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Create,
-                    name: "#{organization_id}-git-#{unit_name}",
+                    name: "#{prefix}#{organization_id}-git-#{unit_name}",
                     name_suffix: top_commit,
                     url: args[:git_url],
                     git_ref: top_commit,

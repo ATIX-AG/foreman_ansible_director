@@ -14,22 +14,23 @@ module ForemanAnsibleDirector
             def plan(args)
               unit = args[:unit]
               organization_id = args[:organization_id]
+              prefix = ::ForemanAnsibleDirector::Constants::PULP_OBJECT_NAME_PREFIX
 
               repository_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
-                name: "#{organization_id}-#{unit.name}"
+                name: "#{prefix}#{organization_id}-#{unit.name}"
               )
 
               distribution_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
-                name: "#{organization_id}-galaxy-#{unit.name}",
+                name: "#{prefix}#{organization_id}-galaxy-#{unit.name}",
                 base_path: "#{organization_id}/#{unit.name}-galaxy",
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href']
               )
 
               role_remote_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Role::Create,
-                name: "#{organization_id}-#{unit.name}",
+                name: "#{prefix}#{organization_id}-#{unit.name}",
                 url: unit.role_url
               )
 
