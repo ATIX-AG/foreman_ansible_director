@@ -1,0 +1,62 @@
+---
+name: React Tests
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: foreman_ansible_director
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-24.04
+    continue-on-error: false
+
+    steps:
+      - name: Checkout foreman_ansible_director
+        uses: actions/checkout@v6
+        with:
+          path: ${{ github.workspace }}/foreman_ansible_director
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      # Temporarily using this custom branch until the changes are merged into Foreman
+      - name: Checkout foreman
+        uses: actions/checkout@v6
+        with:
+          repository: ATIX-AG/foreman
+          path: ${{ github.workspace }}/foreman
+          ref: develop_with_ts
+
+      - name: Install Foreman dependencies
+        working-directory: ${{ github.workspace }}/foreman
+        run: npm install
+        env:
+          npm_config_audit: false
+
+      - name: Install ansible_director dependencies
+        working-directory: ${{ github.workspace }}/foreman_ansible_director
+        run: npm clean-install
+        env:
+          npm_config_audit: false
+
+      - name: Run ESLint(lint)
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+        env:
+          CI: true
