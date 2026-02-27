@@ -49,7 +49,7 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
             </ListItem>
             <ListItem>
               <strong>{_('Private Galaxy servers')}</strong>
-              {_(' - Self-hosted instances based on')}
+              {_(' - Self-hosted instances based on ')}
               <a href="https://pulpproject.org/">Pulp</a>
             </ListItem>
             <ListItem>
