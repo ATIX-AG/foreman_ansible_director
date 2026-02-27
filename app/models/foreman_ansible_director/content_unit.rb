@@ -2,7 +2,13 @@
 
 module ForemanAnsibleDirector
   class ContentUnit < ::ForemanAnsibleDirector::AnsibleDirectorModel
-    scoped_search on: %i[name namespace]
+    scoped_search on: :name, complete_value: true
+    scoped_search on: :namespace, complete_value: true
+    scoped_search on: :type,
+      complete_value: {
+        collection: 'ForemanAnsibleDirector::AnsibleCollection',
+        role: 'ForemanAnsibleDirector::AnsibleRole',
+      }
 
     def self.table_name
       'ad_content_units'
@@ -18,11 +24,11 @@ module ForemanAnsibleDirector
     validates :type, presence: true
 
     def collection?
-      type == '::ForemanAnsibleDirector::AnsibleCollection'
+      type == 'ForemanAnsibleDirector::AnsibleCollection'
     end
 
     def role?
-      type == '::ForemanAnsibleDirector::AnsibleRole'
+      type == 'ForemanAnsibleDirector::AnsibleRole'
     end
 
     def full_name

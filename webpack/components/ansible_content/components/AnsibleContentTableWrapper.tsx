@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { ReactElement } from 'react';
 
 import {
   Button,
@@ -25,16 +25,20 @@ import {
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
 import { translate as _ } from 'foremanReact/common/I18n';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import SearchBar from 'foremanReact/components/SearchBar';
+
 import { AnsibleContentTable } from './AnsibleContentTable';
 import AnsibleContentWizard from './AnsibleContentWizard/AnsibleContentWizard';
 import {
   AnsibleContentUnit,
   AnsibleContentVersion,
 } from '../../../types/AnsibleContentTypes';
+import { Page } from '../../common/Page';
+import { PermittedButton } from '../../common/PermittedButton';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 
 interface AnsibleContentTableWrapperProps {
-  isContentWizardOpen: boolean;
-  setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
+  initialSearch: string;
 }
 
 export interface AnsibleContentVersionWithCount extends AnsibleContentVersion {
@@ -49,10 +53,13 @@ export interface GetAnsibleContentResponse extends IndexResponse {
   results: AnsibleContentUnitWithCounts[];
 }
 
-const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
-  isContentWizardOpen,
-  setIsContentWizardOpen,
-}) => {
+const AnsibleContentTableWrapper = ({
+  initialSearch,
+}: AnsibleContentTableWrapperProps): ReactElement | null => {
+  const [isContentWizardOpen, setIsContentWizardOpen] = React.useState<boolean>(
+    false
+  );
+
   const organization = useForemanOrganization();
 
   const contentRequest: UseAPIReturn<GetAnsibleContentResponse> = useTableIndexAPIResponse<
@@ -61,12 +68,12 @@ const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
     apiUrl: foremanUrl(
       `/api/v2/ansible_director/ansible_content${
         organization ? `?organization_id=${organization.id}&` : ''
-      }`
+      }${`search=${initialSearch}&`}`
     ),
   });
 
   const { setParamsAndAPI, params } = useSetParamsAndApiAndSearch({
-    defaultParams: { search: '' },
+    defaultParams: { search: initialSearch },
     setAPIOptions: contentRequest.setAPIOptions,
   });
 
@@ -77,46 +84,77 @@ const AnsibleContentTableWrapper: React.FC<AnsibleContentTableWrapperProps> = ({
     setParamsAndAPI({ ...params, ...newPagination });
   };
 
+  const onSearch = (search: string): void => {
+    setParamsAndAPI({ ...params, search });
+  };
+
   if (contentRequest.status === 'RESOLVED') {
     return (
-      <>
-        {contentRequest.response.results.length > 0 ? (
-          <AnsibleContentTable
-            apiResponse={contentRequest.response}
-            setAPIOptions={contentRequest.setAPIOptions}
-            onPagination={onPagination}
+      <Page
+        header="Ansible Content"
+        customToolbarItems={[
+          <PermittedButton
+            onClick={() => setIsContentWizardOpen(true)}
+            requiredPermissions={[AdPermissions.ansibleContent.create]}
+          >
+            Import Ansible content
+          </PermittedButton>,
+        ]}
+        hasDocumentation={false}
+        searchBar={
+          <SearchBar
+            data={{
+              autocomplete: {
+                id: 'name',
+                url:
+                  '/api/v2/ansible_director/ansible_content/auto_complete_search',
+                searchQuery: params.search as string,
+              },
+            }}
+            onSearch={onSearch}
+            name="ad_acu"
+          />
+        }
+      >
+        <>
+          {contentRequest.response.results.length > 0 ? (
+            <AnsibleContentTable
+              apiResponse={contentRequest.response}
+              setAPIOptions={contentRequest.setAPIOptions}
+              onPagination={onPagination}
+              refreshRequest={refreshRequest}
+            />
+          ) : (
+            <EmptyState variant={EmptyStateVariant.xl}>
+              <EmptyStateHeader
+                headingLevel="h4"
+                titleText="No Ansible content in this organization"
+                icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
+              />
+              <EmptyStateBody>
+                This organization does not have any Ansible content.
+              </EmptyStateBody>
+              <EmptyStateFooter>
+                <EmptyStateActions>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setIsContentWizardOpen(true);
+                    }}
+                  >
+                    Import Ansible content
+                  </Button>
+                </EmptyStateActions>
+              </EmptyStateFooter>
+            </EmptyState>
+          )}
+          <AnsibleContentWizard
+            isContentWizardOpen={isContentWizardOpen}
+            setIsContentWizardOpen={setIsContentWizardOpen}
             refreshRequest={refreshRequest}
           />
-        ) : (
-          <EmptyState variant={EmptyStateVariant.xl}>
-            <EmptyStateHeader
-              headingLevel="h4"
-              titleText="No Ansible content in this organization"
-              icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
-            />
-            <EmptyStateBody>
-              This organization does not have any Ansible content.
-            </EmptyStateBody>
-            <EmptyStateFooter>
-              <EmptyStateActions>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setIsContentWizardOpen(true);
-                  }}
-                >
-                  Import Ansible content
-                </Button>
-              </EmptyStateActions>
-            </EmptyStateFooter>
-          </EmptyState>
-        )}
-        <AnsibleContentWizard
-          isContentWizardOpen={isContentWizardOpen}
-          setIsContentWizardOpen={setIsContentWizardOpen}
-          refreshRequest={refreshRequest}
-        />
-      </>
+        </>
+      </Page>
     );
   } else if (contentRequest.status === 'ERROR') {
     return null; // TODO: Handle request error
