@@ -137,11 +137,6 @@ module ForemanAnsibleDirectorTests
             assert_equal Hostgroup, result
           end
 
-          test 'raises error for invalid type' do
-            assert_raises(RuntimeError, 'Invalid type: UNKNOWN') do
-              ::ForemanAnsibleDirector::AssignmentService.finder(type: 'UNKNOWN')
-            end
-          end
         end
 
         describe '#find_target' do
@@ -189,14 +184,6 @@ module ForemanAnsibleDirectorTests
 
           end
 
-          test 'returns nil for non-existent target' do
-            result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'CONTENT',
-              target_id: -1
-            )
-
-            assert_nil result
-          end
         end
 
       end

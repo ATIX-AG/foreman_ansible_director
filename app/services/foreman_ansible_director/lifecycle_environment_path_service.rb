@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class LifecycleEnvironmentPathService
+  class LifecycleEnvironmentPathService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
       def create_path(name:,
                       description:,
