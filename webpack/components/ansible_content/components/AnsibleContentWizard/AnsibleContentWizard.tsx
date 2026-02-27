@@ -252,6 +252,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
         disableFocusTrap
       >
         <Wizard
+          key={provider}
           startIndex={1}
           header={
             <WizardHeader
