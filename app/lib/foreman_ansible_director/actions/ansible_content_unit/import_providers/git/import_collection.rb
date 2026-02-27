@@ -17,6 +17,7 @@ module ForemanAnsibleDirector
               unit = args[:unit]
               organization_id = args[:organization_id]
               unit_version = args[:unit_version]
+              prefix = ::ForemanAnsibleDirector::Constants::PULP_OBJECT_NAME_PREFIX
 
               obj_name_suffix = Base64.encode64(args[:unit_version][0, 16]).strip
 
@@ -28,14 +29,14 @@ module ForemanAnsibleDirector
 
               repository_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Create,
-                name: "#{organization_id}-git-#{unit.name}",
+                name: "#{prefix}#{organization_id}-git-#{unit.name}",
                 name_suffix: obj_name_suffix,
                 skip: false
               )
 
               distribution_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Create,
-                name: "#{organization_id}-git-#{unit.name}",
+                name: "#{prefix}#{organization_id}-git-#{unit.name}",
                 name_suffix: obj_name_suffix,
                 base_path: "#{organization_id}/#{unit.name}-git",
                 path_suffix: obj_name_suffix,
@@ -45,7 +46,7 @@ module ForemanAnsibleDirector
 
               git_remote_create_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Create,
-                name: "#{organization_id}-git-#{unit.name}",
+                name: "#{prefix}#{organization_id}-git-#{unit.name}",
                 name_suffix: obj_name_suffix,
                 url: unit.source,
                 git_ref: ref,
