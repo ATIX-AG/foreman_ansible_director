@@ -22,7 +22,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible Content
     # View
     permission :view_ansible_content,
-      { 'foreman_ansible_director/api/v2/ansible_content': %i[index version_detail],
+      { 'foreman_ansible_director/api/v2/ansible_content': %i[index version_detail auto_complete_search],
         'foreman_ansible_director/api/v2/status': %i[content context] },
       resource_type: 'ContentUnit'
     # Create
@@ -81,7 +81,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible Lifecycle Environment Paths
     # View
     permission :view_ansible_lifecycle_environment_paths,
-      { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': [:index] },
+      { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search] },
       resource_type: 'LifecycleEnvironmentPath'
     # Create
     permission :create_ansible_lifecycle_environment_paths,
@@ -102,7 +102,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible Execution Environments
     # View
     permission :view_ansible_execution_environments,
-      { 'foreman_ansible_director/api/v2/execution_environments': [:index] },
+      { 'foreman_ansible_director/api/v2/execution_environments': %i[index auto_complete_search] },
       resource_type: 'ExecutionEnvironment'
     # Create
     permission :create_ansible_execution_environments,
