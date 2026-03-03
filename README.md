@@ -3,7 +3,7 @@
 Foreman Ansible Director is a foreman plugin integrating Ansible into Foreman.
 
 ## Current Status
-> [!WARNING]  
+> [!WARNING]
 > At the time of publishing (2026-02-01), this plugin is in an intermediate state.
 > It is not ready for production use.
 
