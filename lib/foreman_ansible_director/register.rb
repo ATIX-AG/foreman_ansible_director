@@ -199,7 +199,7 @@ Foreman::Plugin.register :foreman_ansible_director do
         full_name: 'Content - Force override of existing content'
       setting 'ad_default_ansible_core_version',
         type: :string,
-        description: 'Default Ansible-Core version used for execution environments.
+        description: 'Default Ansible-Core version used for Execution Environments.
                        Must match an available release from PyPI
                        (check history: https://pypi.org/project/ansible-core/#history).',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_ANSIBLE_VERSION,

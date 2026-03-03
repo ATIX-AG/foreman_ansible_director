@@ -60,7 +60,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
         addToast({
           type: 'success',
           key: `UPDATE_LCE_EE_${env.name}_SUCC`,
-          message: `Successfully updated Ansible execution environment for environment "${env.name}"!`,
+          message: `Successfully updated Ansible Execution Environment for environment "${env.name}"!`,
           sticky: false,
         })
       );
@@ -70,7 +70,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
         addToast({
           type: 'danger',
           key: `UPDATE_LCE_EE_${env.name}_ERR`,
-          message: `Updating of Ansible execution environment "${
+          message: `Updating of Ansible Execution Environment "${
             env.name
           }" failed with error code "${
             (e as { response: AxiosResponse }).response.status
