@@ -155,11 +155,11 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
       <EmptyState variant={EmptyStateVariant.xl}>
         <EmptyStateHeader
           headingLevel="h4"
-          titleText="No execution environments"
+          titleText="No Execution Environments"
           icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
         />
         <EmptyStateBody>
-          No execution environments found in this organization
+          No Execution Environments found in this organization
         </EmptyStateBody>
         <EmptyStateFooter>
           <EmptyStateActions>
@@ -169,7 +169,7 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
                 setShowCreateCard(true);
               }}
             >
-              Create execution environment
+              Create Execution Environment
             </Button>
           </EmptyStateActions>
         </EmptyStateFooter>

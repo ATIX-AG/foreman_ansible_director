@@ -27,7 +27,7 @@ if defined? ForemanRemoteExecution
                 raise "Host #{host.name} is not in any lifecycle environment" unless host.lifecycle_environment
                 unless host.lifecycle_environment.execution_environment
                   raise "Lifecycle environment #{host.lifecycle_environment.name}
-                          does not provide an execution environment"
+                          does not provide an Execution Environment"
                 end
                 # As the templates currently do not have an execution environment input, this suffices
                 super(template_invocation, host).merge(

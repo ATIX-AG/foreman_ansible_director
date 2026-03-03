@@ -57,7 +57,7 @@ export const ContentUnitSelectorWrapper: React.FC<ContentUnitSelectorWrapperProp
     <EmptyState>
       <EmptyStateHeader
         titleText={__(
-          _('Loading content for execution environment %(ee)s...'),
+          _('Loading content for Execution Environment %(ee)s...'),
           { ee: executionEnvironment.name }
         )}
         headingLevel="h4"

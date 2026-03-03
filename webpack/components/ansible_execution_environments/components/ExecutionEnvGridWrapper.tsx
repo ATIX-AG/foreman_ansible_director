@@ -141,7 +141,7 @@ const ExecutionEnvGridWrapper = ({
           addToast({
             type: 'success',
             key: `UPDATE_EE_${selectedEnv.name}_SUCC`,
-            message: `Successfully updated Ansible execution environment "${selectedEnv.name}"!`,
+            message: `Successfully updated Ansible Execution Environment "${selectedEnv.name}"!`,
             sticky: false,
           })
         );
@@ -150,7 +150,7 @@ const ExecutionEnvGridWrapper = ({
           addToast({
             type: 'danger',
             key: `UPDATE_EE_${selectedEnv.name}_ERR`,
-            message: `Updating of Ansible execution environment "${
+            message: `Updating of Ansible Execution Environment "${
               selectedEnv.name
             }" failed with error code "${
               (e as { response: AxiosResponse }).response.status
@@ -181,7 +181,7 @@ const ExecutionEnvGridWrapper = ({
         addToast({
           type: 'success',
           key: `CREATE_EE_${env.name}_SUCC`,
-          message: `Successfully created Ansible execution environment "${env.name}"!`,
+          message: `Successfully created Ansible Execution Environment "${env.name}"!`,
           sticky: false,
         })
       );
@@ -191,7 +191,7 @@ const ExecutionEnvGridWrapper = ({
         addToast({
           type: 'danger',
           key: `CREATE_EE_${env.name}_ERR`,
-          message: `Creation of Ansible execution environment "${
+          message: `Creation of Ansible Execution Environment "${
             env.name
           }" failed with error code "${
             (e as { response: AxiosResponse }).response.status
@@ -261,7 +261,7 @@ const ExecutionEnvGridWrapper = ({
     <EmptyPage
       message={{
         type: 'loading',
-        text: _('Loading Execution Environments...'),
+        text: _('Loading Ansible Execution Environments...'),
       }}
     />
   );

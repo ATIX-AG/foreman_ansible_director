@@ -20,9 +20,9 @@ Breaking changes are expected until version 1.0.0 is reached.
   - Importing and deletion of Ansible content can be done via the Foreman web-UI
   - Ansible content can be imported from Ansible Galaxy and Git repositories
 - A dedicated lifecycle management system for Ansible content allows promotion of configurations along a path such as `Development` -> `Test` -> `Production` similar to Katello lifecycle environments.
-- Ansible and its dependencies are encapsulated in execution environments, which are used to run Ansible content.
-- Use of different ansible-core versions through execution environments.
-- Automatic provisioning of execution environments and Ansible content based on user-defined Ansible configurations.
+- Ansible and its dependencies are encapsulated in Execution Environments, which are used to run Ansible content.
+- Use of different ansible-core versions through Execution Environments.
+- Automatic provisioning of Execution Environments and Ansible content based on user-defined Ansible configurations.
 - Unified interface (REST API) for both UI and external tools.
 
 
