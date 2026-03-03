@@ -6,11 +6,8 @@ module ForemanAnsibleDirector
     class BaseClient
       class << self
         def pulp3_configuration(config_class)
-          # TODO: parameterize
-          url = 'https://centos9-katello-devel-stable.example.com'
-          k = URI.parse(url)
           config_class.new do |config|
-            uri = k
+            uri = URI.parse(::SmartProxy.first.url)
             config.host = uri.host
             config.scheme = uri.scheme
             config.ssl_ca_file = ::ForemanAnsibleDirector::Cert::Certs.ca_cert_file
