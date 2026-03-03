@@ -25,8 +25,8 @@ Use one of the following types to describe your changes:
 
 **Example Commit Message**
 ```
-feat(ui/execution_environments): rotate execution environment page by 180 degrees  
-```  
+feat(ui/execution_environments): rotate execution environment page by 180 degrees
+```
 
 If your work addresses a specific issue, reference the issue in the commit description (e.g., `refs #123`).
 
@@ -55,32 +55,32 @@ To comply:
 ### Foreman Plugin
 
 1. **Clone the repository**:
-   ```bash  
-   git clone https://github.com/ATIX-AG/foreman_ansible_director.git  
-   ```  
+   ```bash
+   git clone https://github.com/ATIX-AG/foreman_ansible_director.git
+   ```
 
 2. **Update the Gemfile**:
   - In the `foreman/bundler.d/` directory, create or edit `Gemfile.local.rb` and add:
-    ```ruby  
-    gem 'foreman_ansible_director', :path => '../foreman_ansible_director'  
-    ```  
+    ```ruby
+    gem 'foreman_ansible_director', :path => '../foreman_ansible_director'
+    ```
 
 3. **Install dependencies**:
-   ```bash  
-   cd foreman  
-   bundle install  
-   ```  
+   ```bash
+   cd foreman
+   bundle install
+   ```
 
 4. **Run database migrations**:
-   ```bash  
-   bundle exec rake db:migrate  
-   ```  
+   ```bash
+   bundle exec rake db:migrate
+   ```
 
-5. **Compile the UI**:  
+5. **Compile the UI**:
    Since the UI is client-side, compile it using:
-   ```bash  
-   bundle exec foreman start webpack  
-   ```  
+   ```bash
+   bundle exec foreman start webpack
+   ```
 
 > **Note**: This plugin requires a [custom branch](https://github.com/ATIX-AG/foreman/tree/develop_with_ts) of Foreman to support TypeScript.
 
@@ -93,21 +93,21 @@ For additional context, refer to:
 ### Smart Proxy Plugin
 
 1. **Clone the repository**:
-   ```bash  
-   git clone https://github.com/ATIX-AG/smart_proxy_ansible_director.git  
+   ```bash
+   git clone https://github.com/ATIX-AG/smart_proxy_ansible_director.git
    ```
 
 2. **Update the Gemfile**:
   - In the `smart-proxy/bundler.d/` directory, create or edit `Gemfile.local.rb` and add:
-    ```ruby  
-    gem 'smart_proxy_ansible_director', :path => '../../smart_proxy_ansible_director'  
-    ```  
+    ```ruby
+    gem 'smart_proxy_ansible_director', :path => '../../smart_proxy_ansible_director'
+    ```
 
 3. **Install dependencies**:
-   ```bash  
-   cd smart-proxy  
-   bundle install  
-   ```  
+   ```bash
+   cd smart-proxy
+   bundle install
+   ```
 
-4. **Verify Installation**:  
+4. **Verify Installation**:
    Ensure the plugin is correctly loaded by checking the smart proxy logs.
