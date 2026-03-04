@@ -67,18 +67,33 @@ module ForemanAnsibleDirector
             return if input[:skip]
 
             unit_versions = []
-            imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
 
-            raise unless imported_versions
-            imported_versions.each do |result|
-              sliced = result.slice(:artifact, :version, :sha256)
-              if input[:content_unit_type] == 'collection'
-                unit_contents = result.slice(:contents)
-                unit_contents = unit_contents[:contents].select { |cu| cu['content_type'] == 'role' }
-                unit_contents = unit_contents.map { |cu| cu['name'] }
-                sliced[:collection_roles] = unit_contents
-              end
-              unit_versions.push(sliced)
+            # COMPAT: 3.16 - 1
+            # The pulp_ansible version used in 3.16 is not consistent in the responses of certain API calls
+            # with the version used in 3.18.
+            # Notably, the "contents" key is not in the response, causing this code to fail.
+            # As a workaround, the version identifiers gathered during variable extraction can be used.
+            # This is suboptimal, as the cross referencing done below is meaningless.
+            # ------
+            # imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
+
+            # raise unless imported_versions
+            # imported_versions.each do |result|
+            #  sliced = result.slice(:artifact, :version, :sha256)
+            #  if input[:content_unit_type] == 'collection'
+            #    unit_contents = result.slice(:contents)
+            #    unit_contents = unit_contents[:contents].select { |cu| cu['content_type'] == 'role' }
+            #    unit_contents = unit_contents.map { |cu| cu['name'] }
+            #    sliced[:collection_roles] = unit_contents
+            #  end
+            #  unit_versions.push(sliced)
+            # end
+
+            input.dig(:extract_variables_action_output, :extract_variables_response).each do |version, roles|
+              unit_versions << {
+                version: version,
+                collection_roles: roles.keys,
+              }
             end
 
             input.update(indexed_unit_versions: unit_versions)
