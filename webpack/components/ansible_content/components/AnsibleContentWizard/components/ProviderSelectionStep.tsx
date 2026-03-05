@@ -11,6 +11,8 @@ interface ProviderSelectionStepProps {
   setProvider: Dispatch<SetStateAction<'galaxy' | 'git' | 'yaml' | undefined>>;
 }
 
+// COMPAT 3.16 - 4
+// Unstable import methods disabled
 const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
   provider,
   setProvider,
@@ -72,6 +74,7 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           isSelected={provider === 'git'}
           onClick={() => setProvider('git')}
           style={{ width: '100%', height: '100%', minHeight: '340px' }}
+          isDisabled
         >
           {_('Import an Ansible collection or role from a git repository.')}
           <br />
@@ -101,6 +104,7 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           isSelected={provider === 'yaml'}
           onClick={() => setProvider('yaml')}
           style={{ width: '100%', height: '100%', minHeight: '340px' }}
+          isDisabled
         >
           <p>
             <strong>
