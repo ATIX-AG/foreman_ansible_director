@@ -83,11 +83,30 @@ module ForemanAnsibleDirector
           roles.transform_values! do |v|
             all_defaults = {}
             v[:defaults].each do |defaults_yaml_str|
-              if (loaded = YAML.safe_load(defaults_yaml_str))
-                all_defaults.merge!(loaded)
-              end
+              next unless (loaded = YAML.safe_load(defaults_yaml_str))
+              all_defaults.merge!(loaded.transform_values do |variable|
+                                    {
+                                      value: variable,
+                                      type: key_type(variable),
+                                    }
+                                  end)
             end
             all_defaults
+          end
+        end
+
+        def key_type(variable)
+          case variable
+          when TrueClass || FalseClass
+            'boolean'
+          when String
+            'string'
+          when Integer
+            'integer'
+          when Float
+            'float'
+          else
+            'yaml'
           end
         end
       end
