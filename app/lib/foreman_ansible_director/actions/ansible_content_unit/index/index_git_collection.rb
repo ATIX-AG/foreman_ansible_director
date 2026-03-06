@@ -116,11 +116,11 @@ module ForemanAnsibleDirector
               next if cr_variables.nil?
 
               ActiveRecord::Base.transaction do
-                cr_variables.each do |variable_name, variable_value|
+                cr_variables.each do |variable_name, variable|
                   ::ForemanAnsibleDirector::VariableService.create_variable(
                     key: variable_name,
-                    type: 'yaml',
-                    default_value: variable_value,
+                    type: variable[:type],
+                    default_value: variable[:value],
                     owner: collection_role_record
                   )
                 end
