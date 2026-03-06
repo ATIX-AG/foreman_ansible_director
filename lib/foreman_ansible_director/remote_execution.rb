@@ -20,14 +20,14 @@ module ForemanAnsibleDirector
     def self.register_rex_feature
       RemoteExecutionFeature.register(
         :ansible_run_host,
-        N_('Run Ansible roles'),
+        N_('Run Ansible roles using Ansible Director'),
         description: N_('Runs an Ansible playbook which contains all'\
                              ' the roles defined for a host'),
         host_action_button: true
       )
       RemoteExecutionFeature.register(
         :ansible_run_playbook,
-        N_('Run Ansible Playbook'),
+        N_('Run Ansible Playbook using Ansible Director'),
         description: N_('Runs an Ansible playbook defined by the user.'),
         host_action_button: true
       )
