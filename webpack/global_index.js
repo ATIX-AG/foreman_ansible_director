@@ -10,17 +10,17 @@ import { HostDetailsLceCard } from './components/extensions/host_details/HostDet
 const fills = [
   {
     slot: 'host-details-page-tabs',
-    name: _('Ansible'),
+    name: 'ansible_director',
     component: props => <HostDetailsTab {...props} />,
     weight: 500,
-    metadata: { title: 'Ansible' },
+    metadata: { title: _('Ansible Director') },
   },
   {
     slot: 'host-overview-cards',
-    name: _('Ansible environment'),
+    name: 'ansible_environment',
     component: props => <HostDetailsLceCard {...props} />,
     weight: 3700,
-    metadata: { title: _('Ansible') },
+    metadata: { title: _('Ansible environment') },
   },
 ];
 
