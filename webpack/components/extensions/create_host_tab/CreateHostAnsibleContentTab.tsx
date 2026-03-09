@@ -44,7 +44,7 @@ export const CreateHostAnsibleContentTab = () => {
             onChange={() => setContentSource('inherit')}
           />
           <ToggleGroupItem
-            text="Lifecycle Environment"
+            text="Lifecycle environment"
             buttonId="toggle-group-single-3"
             isSelected={contentSource === 'lce'}
             onChange={() => setContentSource('lce')}

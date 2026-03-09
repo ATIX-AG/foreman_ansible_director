@@ -47,7 +47,7 @@ export const LceContentList = ({ lce }: LceContentListProps): ReactElement => {
     <>
       <EmptyState variant="full">
         <EmptyStateHeader>{`No Ansible ${contentType}`}</EmptyStateHeader>
-        <EmptyStateBody>{`Lifecycle Environment does not contain any Ansible ${contentType}`}</EmptyStateBody>
+        <EmptyStateBody>{`Lifecycle environment does not contain any Ansible ${contentType}`}</EmptyStateBody>
       </EmptyState>
     </>
   );

@@ -15,12 +15,12 @@ export const AnsibleLcePathEmptyState = ({
 }: AnsibleLcePathEmptyStateProps): ReactElement => (
   <EmptyState style={{ padding: '0px' }}>
     <EmptyStateBody>
-      This Lifecycle Environment Path contains no Lifecycle Environments.
+      This lifecycle environment path contains no lifecycle environments.
     </EmptyStateBody>
     <EmptyStateFooter>
       <EmptyStateActions>
         <Button variant="primary" onClick={() => insertFirstEnv('DEV')}>
-          Create Lifecycle Environment
+          Create lifecycle environment
         </Button>
       </EmptyStateActions>
     </EmptyStateFooter>

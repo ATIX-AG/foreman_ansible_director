@@ -34,7 +34,7 @@ if defined? ForemanRemoteExecution
                 end
 
                 unless host.lifecycle_environment.execution_environment
-                  raise "Host #{host.name} is not in any Lifecycle environment"
+                  raise "Host #{host.name} is not in any lifecycle environment"
                 end
                 super(template_invocation, host).merge(
                   inventory: inventory,
