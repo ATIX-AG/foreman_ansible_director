@@ -153,7 +153,7 @@ export const AssignmentComponent = ({
           ) : (
             <EmptyState>
               <EmptyStateHeader
-                titleText="As of now, only content from Lifecycle Environments can be assigned to hosts."
+                titleText="As of now, only content from lifecycle environments can be assigned to hosts."
                 headingLevel="h4"
               />
             </EmptyState>

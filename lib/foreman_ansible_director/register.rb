@@ -61,7 +61,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     permission :destroy_ansible_variable_overrides,
       { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:destroy] },
       resource_type: 'LookupValue'
-    # Ansible Lifecycle Environments
+    # Ansible lifecycle environments
     # View
     permission :view_ansible_lifecycle_environments,
       { 'foreman_ansible_director/api/v2/lifecycle_environments': %i[show content] },
@@ -78,7 +78,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     permission :destroy_ansible_lifecycle_environments,
       { 'foreman_ansible_director/api/v2/lifecycle_environments': [:destroy] },
       resource_type: 'LifecycleEnvironment'
-    ## Ansible Lifecycle Environment Paths
+    ## Ansible lifecycle environment paths
     # View
     permission :view_ansible_lifecycle_environment_paths,
       { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search] },
@@ -171,13 +171,13 @@ Foreman::Plugin.register :foreman_ansible_director do
                       (e.g., DEV → TEST → PROD). When disabled, promotions can skip intermediate environments
                       (e.g., DEV → PROD directly, with implicit promotion of DEV → TEST).',
         default: true,
-        full_name: 'Lifecycle Environments - Force incremental promotion of lifecycle environments'
+        full_name: 'Lifecycle environments - Force incremental promotion of lifecycle environments'
       setting 'ad_lce_path_prevent_destruction_if_used',
         type: :boolean,
         description: 'When enabled, lifecycle environment paths can only be destroyed if none of its lifecycle
                             environments is referenced anywhere.',
         default: true,
-        full_name: 'Lifecycle Environments - Prevent path destruction if lifecycle environment is in use.'
+        full_name: 'Lifecycle environments - Prevent path destruction if lifecycle environment is in use.'
     end
   end
 
