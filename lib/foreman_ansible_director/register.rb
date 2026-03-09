@@ -130,6 +130,45 @@ Foreman::Plugin.register :foreman_ansible_director do
     permission :destroy_ansible_assignments,
       { 'foreman_ansible_director/api/v2/assignments': [:destroy] },
       resource_type: 'AnsibleContentAssignment'
+
+    role 'AnsibleDirector Viewer', %i[
+      view_ansible_content
+      view_ansible_variables
+      view_ansible_variable_overrides
+      view_ansible_lifecycle_environments
+      view_ansible_lifecycle_environment_paths
+      view_ansible_execution_environments
+      view_ansible_assignments
+    ], 'All read-only permissions defined by AnsibleDirector.'
+
+    role 'AnsibleDirector Manager', %i[
+      view_ansible_content
+      create_ansible_content
+      destroy_ansible_content
+      view_ansible_variables
+      edit_ansible_variables
+      view_ansible_variable_overrides
+      create_ansible_variable_overrides
+      destroy_ansible_variable_overrides
+      view_ansible_lifecycle_environments
+      create_ansible_lifecycle_environments
+      edit_ansible_lifecycle_environments
+      destroy_ansible_lifecycle_environments
+      view_ansible_lifecycle_environment_paths
+      create_ansible_lifecycle_environment_paths
+      edit_ansible_lifecycle_environment_paths
+      destroy_ansible_lifecycle_environment_paths
+      promote_ansible_lifecycle_environment_paths
+      view_ansible_execution_environments
+      create_ansible_execution_environments
+      edit_ansible_execution_environments
+      destroy_ansible_execution_environments
+      view_ansible_assignments
+      create_ansible_assignments
+      destroy_ansible_assignments
+    ], 'All permissions defined by AnsibleDirector.'
+
+    add_all_permissions_to_default_roles
   end
 
   settings do
