@@ -6,6 +6,16 @@ module ForemanAnsibleDirector
       class AssignmentsController < AnsibleDirectorApiController
         before_action :find_resource, only: %i[destroy]
 
+        resource_description do
+          resource_id 'assignments'
+          api_version 'v2'
+          api_base_url '/ansible_director'
+        end
+
+        api :GET, '/assignments/:target/:target_id', N_('List assignments for a target')
+        param :target, String, required: true, desc: N_('Target type')
+        param :target_id, :identifier_dottable, required: true
+
         def assignments
           target = ::ForemanAnsibleDirector::AssignmentService.find_target(
             target_type: params[:target],
@@ -13,6 +23,18 @@ module ForemanAnsibleDirector
           )
           # TODO: Null check target
           @assignments = target.resolved_ansible_content
+        end
+
+        api :POST, '/assignments/', N_('Assign ansible content')
+        param :assignment, Hash, required: true do
+          param :source, Hash, required: true do
+            param :type, String, required: true
+            param :id, :identifier_dottable, required: true
+          end
+          param :target, Hash, required: true do
+            param :type, String, required: true
+            param :id, :identifier_dottable, required: true
+          end
         end
 
         def assign
@@ -34,12 +56,18 @@ module ForemanAnsibleDirector
           )
         end
 
+        api :POST, '/assignments/bulk', N_('Assign ansible content in bulk')
+        param :assignments, Array, required: true, desc: N_('List of assignments')
+
         def assign_bulk
           assignments = bulk_assignment_params
           ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(
             assignments: assignments
           )
         end
+
+        api :DELETE, '/assignments/:id', N_('Remove assignment')
+        param :id, :identifier_dottable, required: true
 
         def destroy
           ::ForemanAnsibleDirector::AssignmentService.destroy_assignment(@assignment)

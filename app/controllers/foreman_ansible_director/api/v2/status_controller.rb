@@ -6,6 +6,16 @@ module ForemanAnsibleDirector
       class StatusController < AnsibleDirectorApiController
         before_action :find_organization, only: %i[content]
 
+        resource_description do
+          resource_id 'status'
+          api_version 'v2'
+          api_base_url '/ansible_director'
+          param :organization_id, Integer, show: false
+        end
+
+        api :GET, '/status/content', N_('Show global ansible content counts')
+        param :organization_id, Integer, required: true
+
         def content
           @global_content = {
             roles: ::ForemanAnsibleDirector::AnsibleRole.count,
@@ -13,6 +23,8 @@ module ForemanAnsibleDirector
             execution_environments: ::ForemanAnsibleDirector::ExecutionEnvironment.count,
           }
         end
+
+        api :GET, '/status/context', N_('Show ansible director settings context')
 
         def context
           @context = {

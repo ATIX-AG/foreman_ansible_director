@@ -8,6 +8,16 @@ module ForemanAnsibleDirector
       class AnsibleRunsController < AnsibleDirectorApiController
         before_action :find_target_host, only: %i[run_all]
 
+        resource_description do
+          resource_id 'ansible_runs'
+          api_version 'v2'
+          api_base_url '/ansible_director'
+        end
+
+        # TODO: Route missing in config/routes.rb for this endpoint.
+        api :POST, '/ansible_runs/:host_id/run_all', N_('Run all ansible content for a host')
+        param :host_id, :identifier_dottable, required: true
+
         def run_all
           playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate @target_host
           inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate @target_host

@@ -9,8 +9,27 @@ module ForemanAnsibleDirector
         before_action :find_resource, only: %i[update destroy]
         before_action :find_organization, only: %i[create]
 
+        resource_description do
+          resource_id 'execution_environments'
+          api_version 'v2'
+          api_base_url '/ansible_director'
+          param :organization_id, Integer, show: false
+        end
+
+        api :GET, '/execution_environments/', N_('List execution environments')
+        param_group :search_and_pagination, ::Api::V2::BaseController
+        add_scoped_search_description_for(::ForemanAnsibleDirector::ExecutionEnvironment)
+
         def index
           @execution_environments = resource_scope_for_index
+        end
+
+        api :POST, '/execution_environments/', N_('Create execution environment')
+        param :organization_id, Integer, required: true
+        param :execution_environment, Hash, required: true do
+          param :name, String, required: true
+          param :base_image_url, String, required: true
+          param :ansible_version, String, required: true
         end
 
         def create
@@ -25,6 +44,14 @@ module ForemanAnsibleDirector
           )
         end
 
+        api :PATCH, '/execution_environments/:id', N_('Update execution environment')
+        param :id, :identifier_dottable, required: true
+        param :execution_environment, Hash, required: true do
+          param :name, String, required: false
+          param :base_image_url, String, required: false
+          param :ansible_version, String, required: false
+        end
+
         def update
           permitted_params = execution_environment_params
           # content = permitted_params.delete(:content)
@@ -36,6 +63,9 @@ module ForemanAnsibleDirector
             ansible_version: permitted_params[:ansible_version]
           )
         end
+
+        api :DELETE, '/execution_environments/:id', N_('Delete execution environment')
+        param :id, :identifier_dottable, required: true
 
         def destroy
           @execution_environment.destroy

@@ -11,11 +11,34 @@ module ForemanAnsibleDirector
         before_action :find_organization, only: %i[create update_content]
         before_action :find_assignment_target, only: %i[assign]
 
+        resource_description do
+          resource_id 'lifecycle_environments'
+          api_version 'v2'
+          api_base_url '/ansible_director'
+          param :organization_id, Integer, show: false
+        end
+
+        api :GET, '/lifecycle_environments/:id', N_('Show lifecycle environment')
+        param :id, :identifier_dottable, required: true
+
         def show
         end
 
+        api :GET, '/lifecycle_environments/:id/content', N_('Show lifecycle environment content')
+        param :id, :identifier_dottable, required: true
+        param :full, :bool, required: false, desc: N_('Include full content details')
+
         def content
           @full_content = Foreman::Cast.to_bool params[:full]
+        end
+
+        api :POST, '/lifecycle_environments/', N_('Create lifecycle environment')
+        param :organization_id, Integer, required: true
+        param :lifecycle_environment_path_id, :identifier_dottable, required: true
+        param :lifecycle_environment, Hash, required: true do
+          param :name, String, required: true
+          param :description, String, required: false
+          param :position, Integer, required: false
         end
 
         def create
@@ -31,6 +54,14 @@ module ForemanAnsibleDirector
           )
         end
 
+        api :PUT, '/lifecycle_environments/:id', N_('Update lifecycle environment')
+        param :id, :identifier_dottable, required: true
+        param :lifecycle_environment, Hash, required: true do
+          param :name, String, required: false
+          param :description, String, required: false
+          param :execution_environment_id, :identifier_dottable, required: false
+        end
+
         def update
           permitted_params = lifecycle_environment_update_params
 
@@ -41,6 +72,13 @@ module ForemanAnsibleDirector
             execution_environment_id: permitted_params[:execution_environment_id]
           )
         end
+
+        api :PATCH, '/lifecycle_environments/:id', N_('Assign content to lifecycle environment')
+        param :id, :identifier_dottable, required: true
+        param :organization_id, Integer, required: true
+        param :execution_environment_id, :identifier_dottable, required: false
+        param :content_assignments, Array, required: true,
+          desc: N_('List of content assignments')
 
         def update_content
           content_params = content_assignments_params
@@ -63,6 +101,12 @@ module ForemanAnsibleDirector
           )
         end
 
+        api :POST, '/lifecycle_environments/:id/assign/:target_type/:target_id',
+          N_('Assign lifecycle environment to a target')
+        param :id, :identifier_dottable, required: true
+        param :target_type, String, required: true
+        param :target_id, :identifier_dottable, required: true
+
         def assign
           if params[:id] == 'library'
             ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_library @target
@@ -74,6 +118,9 @@ module ForemanAnsibleDirector
             )
           end
         end
+
+        api :DELETE, '/lifecycle_environments/:id', N_('Delete lifecycle environment')
+        param :id, :identifier_dottable, required: true
 
         def destroy
           ::ForemanAnsibleDirector::LifecycleEnvironmentService.destroy_environment @lifecycle_environment

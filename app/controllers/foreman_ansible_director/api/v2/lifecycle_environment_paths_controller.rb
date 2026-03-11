@@ -9,8 +9,26 @@ module ForemanAnsibleDirector
         before_action :find_resource, only: %i[promote update destroy]
         before_action :find_organization, only: %i[create]
 
+        resource_description do
+          resource_id 'lifecycle_environment_paths'
+          api_version 'v2'
+          api_base_url '/ansible_director'
+          param :organization_id, Integer, show: false
+        end
+
+        api :GET, '/lifecycle_environments/paths/', N_('List lifecycle environment paths')
+        param_group :search_and_pagination, ::Api::V2::BaseController
+        add_scoped_search_description_for(::ForemanAnsibleDirector::LifecycleEnvironmentPath)
+
         def index
           @lifecycle_environment_paths = resource_scope_for_index
+        end
+
+        api :POST, '/lifecycle_environments/paths/', N_('Create lifecycle environment path')
+        param :organization_id, Integer, required: true
+        param :lifecycle_environment_path, Hash, required: true do
+          param :name, String, required: true
+          param :description, String, required: false
         end
 
         def create
@@ -23,6 +41,13 @@ module ForemanAnsibleDirector
           )
         end
 
+        api :PUT, '/lifecycle_environments/paths/:id', N_('Update lifecycle environment path')
+        param :id, :identifier_dottable, required: true
+        param :lifecycle_environment_path, Hash, required: true do
+          param :name, String, required: false
+          param :description, String, required: false
+        end
+
         def update
           permitted_params = lifecycle_environment_path_params
 
@@ -33,10 +58,20 @@ module ForemanAnsibleDirector
           )
         end
 
+        api :DELETE, '/lifecycle_environments/paths/:id', N_('Delete lifecycle environment path')
+        param :id, :identifier_dottable, required: true
+
         def destroy
           ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.destroy_path(
             @lifecycle_environment_path
           )
+        end
+
+        api :POST, '/lifecycle_environments/paths/:id/promote', N_('Promote lifecycle environment path')
+        param :id, :identifier_dottable, required: true
+        param :promote, Hash, required: true do
+          param :source_environment_id, :identifier_dottable, required: true
+          param :target_environment_id, :identifier_dottable, required: true
         end
 
         def promote
