@@ -88,7 +88,7 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
 
   const destroyEnv = (env: AnsibleExecutionEnv): void => {
     setConfirmationModalTitle(`Confirm deletion of ${env?.name}`);
-    setConfirmationModalBody(`Are you sure you want to destroy ${env?.name}?`);
+    setConfirmationModalBody(`Are you sure you want to delete ${env?.name}?`);
     setConfirmationModalMode('destroy');
     setIsConfirmationModalOpen(true);
   };

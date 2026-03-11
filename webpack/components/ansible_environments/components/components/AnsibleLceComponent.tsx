@@ -116,7 +116,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
         addToast({
           type: 'success',
           key: `DESTROY_LCE_${lceRef.name}_SUCC`,
-          message: `Successfully destroyed Ansible environment "${lceRef.name}"!`,
+          message: `Successfully deleted Ansible environment "${lceRef.name}"!`,
           sticky: false,
         })
       );
@@ -126,7 +126,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
         addToast({
           type: 'danger',
           key: `DESTROY_LCE_${lceRef.name}_ERR`,
-          message: `Destruction of Ansible environment "${
+          message: `Deletion of Ansible environment "${
             lceRef.name
           }" failed with error code "${
             (e as { response: AxiosResponse }).response.status

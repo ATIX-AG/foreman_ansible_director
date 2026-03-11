@@ -225,10 +225,10 @@ Foreman::Plugin.register :foreman_ansible_director do
         full_name: 'Lifecycle environments - Force incremental promotion of lifecycle environments'
       setting 'ad_lce_path_prevent_destruction_if_used',
         type: :boolean,
-        description: 'When enabled, lifecycle environment paths can only be destroyed if none of its lifecycle
+        description: 'When enabled, lifecycle environment paths can only be deleted if none of its lifecycle
                             environments is referenced anywhere.',
         default: true,
-        full_name: 'Lifecycle environments - Prevent path destruction if lifecycle environment is in use.'
+        full_name: 'Lifecycle environments - Prevent path deletion if lifecycle environment is in use.'
     end
   end
 

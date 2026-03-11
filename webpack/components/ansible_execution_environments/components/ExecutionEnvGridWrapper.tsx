@@ -99,7 +99,7 @@ const ExecutionEnvGridWrapper = ({
           addToast({
             type: 'success',
             key: `DESTROY_EE_${selectedEnv.name}_SUCC`,
-            message: `Successfully destroyed Ansible execution environment "${selectedEnv.name}"!`,
+            message: `Successfully deleted Ansible Execution Environment "${selectedEnv.name}"!`,
             sticky: false,
           })
         );
@@ -109,7 +109,7 @@ const ExecutionEnvGridWrapper = ({
           addToast({
             type: 'danger',
             key: `DESTROY_EE_${selectedEnv.name}_ERR`,
-            message: `Destruction of Ansible execution environment "${
+            message: `Deletion of Ansible Execution Environment "${
               selectedEnv.name
             }" failed with error code "${
               (e as { response: AxiosResponse }).response.status
