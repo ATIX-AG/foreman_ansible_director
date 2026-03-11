@@ -115,7 +115,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             addToast({
               type: 'success',
               key: `DESTROY_CUV_${identifier}_${version.version}_SUCC`,
-              message: `Sucessfully destroyed Ansible content unit version "${identifier}:${version.version}"!`,
+              message: `Sucessfully deleted Ansible content unit version "${identifier}:${version.version}"!`,
               sticky: false,
             })
           );

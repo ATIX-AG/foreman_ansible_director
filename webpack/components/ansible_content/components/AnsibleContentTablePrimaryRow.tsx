@@ -104,7 +104,7 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
             addToast({
               type: 'success',
               key: `DESTROY_CU_${node.id}_SUCC`,
-              message: `Sucessfully destroyed Ansible content unit "${identifier}"!`,
+              message: `Sucessfully deleted Ansible content unit "${identifier}"!`,
               sticky: false,
             })
           );
@@ -113,7 +113,7 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
             addToast({
               type: 'danger',
               key: `DESTROY_CU_${node.id}_ERR`,
-              message: `Destroying Ansible content unit "${identifier}" failed with error code "${
+              message: `Deleting Ansible content unit "${identifier}" failed with error code "${
                 (e as { response: AxiosResponse }).response.status
               }".`,
               sticky: false,

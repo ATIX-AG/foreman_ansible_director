@@ -144,7 +144,7 @@ export const AnsibleLcePathComponent = ({
         addToast({
           type: 'success',
           key: `DESTROY_LCE_PATH_${path.name}_SUCC`,
-          message: `Successfully destroyed Ansible environment path "${path.name}"!`,
+          message: `Successfully deleted Ansible lifecycle environment path "${path.name}"!`,
           sticky: false,
         })
       );
@@ -154,7 +154,7 @@ export const AnsibleLcePathComponent = ({
         addToast({
           type: 'danger',
           key: `DESTROY_LCE_${path.name}_ERR`,
-          message: `Destruction of Ansible environment path "${
+          message: `Deletion of Ansible environment path "${
             path.name
           }" failed with error code "${
             (e as { response: AxiosResponse }).response.status
@@ -206,7 +206,7 @@ export const AnsibleLcePathComponent = ({
     setIsConfirmationModalOpen(true);
     setConfirmationModalTitle(`Destroy "${path.name}"?`);
     setConfirmationModalBody(
-      `This will destroy "${path.name}" and ${path.lifecycle_environments.length} lifecycle environments.\nAre you sure you want to destroy ${path.name}?`
+      `This will delete "${path.name}" and ${path.lifecycle_environments.length} lifecycle environments.\nAre you sure you want to delete ${path.name}?`
     );
     setConfirmationModalOnConfirm(() => async () => {
       await destroyLcePath(path);
@@ -222,7 +222,7 @@ export const AnsibleLcePathComponent = ({
   //      addToast({
   //        type: 'success',
   //        key: `DESTROY_LCE_${lce.name}_SUCC`,
-  //        message: `Successfully destroyed Ansible environment "${lce.name}"!`,
+  //        message: `Successfully deleted Ansible environment "${lce.name}"!`,
   //        sticky: false,
   //      })
   //    );
@@ -232,7 +232,7 @@ export const AnsibleLcePathComponent = ({
   //      addToast({
   //        type: 'danger',
   //        key: `DESTROY_LCE_${lce.name}_ERR`,
-  //        message: `Destruction of Ansible environment "${
+  //        message: `Deletion of Ansible environment "${
   //          lce.name
   //        }" failed with error code "${
   //          (e as { response: AxiosResponse }).response.status
