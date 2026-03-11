@@ -9,13 +9,25 @@ Foreman::Plugin.register :foreman_ansible_director do
   sub_menu :top_menu, :ansible, caption: N_('Ansible'), after: :hosts_menu, icon: 'pficon pficon-in-progress' do
     menu :top_menu, :ansible_content,
       url: '/ansible/content',
-      caption: 'Content'
+      caption: 'Content',
+      url_hash: {
+        controller: 'foreman_ansible_director/api/v2/ansible_content',
+        action: 'index',
+      }
     menu :top_menu, :ansible_execution_environments,
       url: '/ansible/execution_environments',
-      caption: 'Execution Environments'
+      caption: 'Execution Environments',
+      url_hash: {
+        controller: 'foreman_ansible_director/api/v2/execution_environments',
+        action: 'index',
+      }
     menu :top_menu, :ansible_environments,
       url: '/ansible/environments',
-      caption: 'Environments'
+      caption: 'Environments',
+      url_hash: {
+        controller: 'foreman_ansible_director/api/v2/lifecycle_environment_paths',
+        action: 'index',
+      }
   end
 
   security_block :foreman_ansible_director do
