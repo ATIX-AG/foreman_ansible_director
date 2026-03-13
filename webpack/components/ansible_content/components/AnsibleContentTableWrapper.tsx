@@ -91,7 +91,7 @@ const AnsibleContentTableWrapper = ({
   if (contentRequest.status === 'RESOLVED') {
     return (
       <Page
-        header="Ansible Content"
+        header={_('Ansible content')}
         customToolbarItems={[
           <PermittedButton
             onClick={() => setIsContentWizardOpen(true)}
