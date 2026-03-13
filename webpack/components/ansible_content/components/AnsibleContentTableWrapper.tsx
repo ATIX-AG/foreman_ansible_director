@@ -77,6 +77,8 @@ const AnsibleContentTableWrapper = ({
     setAPIOptions: contentRequest.setAPIOptions,
   });
 
+  const hasResults = contentRequest?.response?.results?.length > 0;
+
   const refreshRequest = (): void => {
     contentRequest.setAPIOptions(options => ({ ...options }));
   };
@@ -93,12 +95,16 @@ const AnsibleContentTableWrapper = ({
       <Page
         header={_('Ansible content')}
         customToolbarItems={[
-          <PermittedButton
-            onClick={() => setIsContentWizardOpen(true)}
-            requiredPermissions={[AdPermissions.ansibleContent.create]}
-          >
-            Import Ansible content
-          </PermittedButton>,
+          hasResults ? (
+            <PermittedButton
+              onClick={() => setIsContentWizardOpen(true)}
+              requiredPermissions={[AdPermissions.ansibleContent.create]}
+            >
+              {_('Import Ansible content')}
+            </PermittedButton>
+          ) : (
+            <></>
+          ),
         ]}
         hasDocumentation={false}
         searchBar={
@@ -117,7 +123,7 @@ const AnsibleContentTableWrapper = ({
         }
       >
         <>
-          {contentRequest.response.results.length > 0 ? (
+          {hasResults ? (
             <AnsibleContentTable
               apiResponse={contentRequest.response}
               setAPIOptions={contentRequest.setAPIOptions}
