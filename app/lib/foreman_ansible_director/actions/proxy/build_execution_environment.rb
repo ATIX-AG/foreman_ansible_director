@@ -11,6 +11,7 @@ module ForemanAnsibleDirector
         input_format do
           param :proxy_task_id, Integer
           param :execution_environment_definition, Hash
+          param :execution_environment_id, String
         end
 
         output_format do
@@ -28,7 +29,9 @@ module ForemanAnsibleDirector
           task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(input[:proxy_task_id]).request
           task_status = ::ForemanAnsibleDirector::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
 
-          { progress: task_status.progress }
+          { progress: task_status.progress,
+            external_output: task_status.external_output,
+            success: task_status.success? }
         end
 
         def done?
@@ -41,6 +44,14 @@ module ForemanAnsibleDirector
 
         def attempts_before_next_interval
           4
+        end
+
+        def finalize
+          env = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(id: input[:execution_environment_id])
+
+          env.update!(
+            build_status: (output[:task]&.[](:success) ? 'success' : 'failed')
+          )
         end
       end
     end

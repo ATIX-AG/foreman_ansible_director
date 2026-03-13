@@ -15,8 +15,6 @@ module ForemanAnsibleDirector
 
     validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
 
-    after_save :trigger_rebuild, if: :rebuild_necessary? # TODO: Is this the correct callback? What about rollback?
-
     scoped_search on: :name, complete_value: true
     scoped_search on: :base_image_url, complete_value: true
     scoped_search on: :ansible_version, complete_value: true
