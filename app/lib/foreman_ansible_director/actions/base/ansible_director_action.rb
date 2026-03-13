@@ -9,9 +9,10 @@ module ForemanAnsibleDirector
         end
 
         def task_output
-          return output if Rails.env.development?
-          # TODO: Change default output so something sensible
-          humanized_name
+          # return output if Rails.env.development?
+          ## TODO: Change default output so something sensible
+          # humanized_name
+          output
         end
 
         def humanized_name

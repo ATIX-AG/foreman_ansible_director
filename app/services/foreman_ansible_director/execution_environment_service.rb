@@ -7,31 +7,39 @@ module ForemanAnsibleDirector
                                        base_image_url:,
                                        ansible_version:,
                                        organization_id:)
-        ActiveRecord::Base.transaction do
-          env = ::ForemanAnsibleDirector::ExecutionEnvironment.create!(
-            name: name,
-            base_image_url: base_image_url,
-            ansible_version: ansible_version,
-            organization_id: organization_id
-          )
-          env.update!(content_hash: env.generate_content_hash)
-          env
-        end
+        # ActiveRecord::Base.transaction do
+        env = ::ForemanAnsibleDirector::ExecutionEnvironment.create!(
+          name: name,
+          base_image_url: base_image_url,
+          ansible_version: ansible_version,
+          organization_id: organization_id,
+          build_status: 'pending'
+        )
+        task = build_execution_environment env
+        env.update!(content_hash: env.generate_content_hash, build_job: task.id)
+
+        env
+        # end
       end
 
       def edit_execution_environment(execution_environment:,
                                      name:,
                                      base_image_url:,
                                      ansible_version:)
-        ActiveRecord::Base.transaction do
-          execution_environment.update!(
-            name: name,
-            base_image_url: base_image_url,
-            ansible_version: ansible_version
-          )
-          execution_environment.update!(content_hash: execution_environment.generate_content_hash)
-          execution_environment
+        # TODO: Disabling this transaction as it locks up the task for an unknown reason
+        # ActiveRecord::Base.transaction do
+        execution_environment.update!(
+          name: name,
+          base_image_url: base_image_url,
+          ansible_version: ansible_version
+        )
+        new_hash = execution_environment.generate_content_hash
+        if new_hash != execution_environment.content_hash
+          task = build_execution_environment execution_environment
+          execution_environment.update!(content_hash: new_hash, build_job: task.id)
         end
+        execution_environment
+        # end
       end
 
       def destroy_execution_environment(execution_environment)
@@ -57,17 +65,21 @@ module ForemanAnsibleDirector
           },
         }
 
+        execution_environment.update!(build_status: 'running')
+
         if Rails.env.development?
           ForemanTasks.sync_task(
             ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
             proxy_task_id: SecureRandom.uuid,
-            execution_environment_definition: env_definition
+            execution_environment_definition: env_definition,
+            execution_environment_id: execution_environment.id
           )
         else
           ForemanTasks.async_task(
             ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
             proxy_task_id: SecureRandom.uuid,
-            execution_environment_definition: env_definition
+            execution_environment_definition: env_definition,
+            execution_environment_id: execution_environment.id
           )
         end
       end

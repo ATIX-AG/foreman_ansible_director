@@ -15,7 +15,6 @@ export interface AnsibleExecutionEnvBase {
   // eslint-disable-next-line camelcase
   image_url?: string;
   // eslint-disable-next-line camelcase
-  last_built?: string;
   content: AnsibleContentUnitAssignment[];
 }
 
@@ -27,6 +26,11 @@ export interface ExecutionEnvContentUnit extends Identifiable {
 
 export interface AnsibleExecutionEnv
   extends Identifiable,
-    AnsibleExecutionEnvBase {}
+    AnsibleExecutionEnvBase {
+  // eslint-disable-next-line camelcase
+  build_status: 'pending' | 'running' | 'success' | 'failed';
+  // eslint-disable-next-line camelcase
+  build_job: string;
+}
 
 export interface AnsibleExecutionEnvCreate extends AnsibleExecutionEnvBase {}
