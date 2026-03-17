@@ -20,6 +20,7 @@ import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissi
 import { isAnsibleExecutionEnv } from '../../../helpers/typeGuards/executionEnvTypeGuards';
 
 interface ExecutionEnvCardHeaderActionsProps {
+  inputValid: boolean;
   editMode: boolean;
   handleEdit: () => void;
   handleDestroy: (
@@ -29,6 +30,7 @@ interface ExecutionEnvCardHeaderActionsProps {
 }
 
 export const ExecutionEnvCardHeaderActions = ({
+  inputValid,
   editMode,
   handleEdit,
   handleDestroy,
@@ -144,6 +146,7 @@ export const ExecutionEnvCardHeaderActions = ({
         variant="plain"
         aria-label="Action"
         onClick={handleEdit}
+        isDisabled={editMode && !inputValid}
       >
         {editMode ? (
           <Icon size="lg">
