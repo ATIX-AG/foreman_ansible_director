@@ -59,7 +59,7 @@ class CreateAnsibleSchema < ActiveRecord::Migration[6.1]
 
     add_foreign_key :ad_execution_environments, :taxonomies, column: :organization_id
     add_index :ad_execution_environments, :organization_id
-    add_index :ad_execution_environments, :name
+    add_index :ad_execution_environments, :name, unique: true
 
     create_table :ad_execution_environment_content_units do |t|
       t.integer :execution_environment_id, null: false
