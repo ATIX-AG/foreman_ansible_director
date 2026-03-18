@@ -56,7 +56,7 @@ module ForemanAnsibleDirector
               unit_versions: versions
             )
 
-            units[name] = simple_unit
+            units[name] = { unit: simple_unit, content_unit_id: existing_unit.id }
           end
 
           units.values

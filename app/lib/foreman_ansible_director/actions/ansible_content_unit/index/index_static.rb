@@ -108,40 +108,31 @@ module ForemanAnsibleDirector
             case input[:index_mode]
             when 'import'
 
-              if input[:content_unit_type] == 'collection'
-                unit_record = ::ForemanAnsibleDirector::AnsibleCollection.create!(
-                  {
-                    name: input[:unit_name],
-                    namespace: input[:unit_namespace],
-                    source: input[:content_unit_source],
-                    latest_version_href:
-                      input[:repository_show_action_output][:repository_show_response][:latest_version_href],
-                    pulp_repository_href: input[:repository_href],
-                    pulp_remote_href: input[:remote_href],
-                    pulp_distribution_href: input[:distribution_href],
-                    organization_id: input[:organization_id],
-                  }
-                )
-              else
-                # Make intellisense shut up - input[:content_unit_type] == 'role'
-                unit_record = ::ForemanAnsibleDirector::AnsibleRole.new(
-                  {
-                    name: input[:unit_name],
-                    namespace: input[:unit_namespace],
-                    latest_version_href:
-                      input[:repository_show_action_output][:repository_show_response][:latest_version_href],
-                    pulp_repository_href: input[:repository_href],
-                    pulp_remote_href: input[:remote_href],
-                    pulp_distribution_href: input[:distribution_href],
-                    organization_id: input[:organization_id],
-                  }
-                )
-              end
+              unit_record = if input[:content_unit_type] == 'collection'
+                              ::ForemanAnsibleDirector::ContentService.create_ansible_collection(
+                                name: input[:unit_name],
+                                namespace: input[:unit_namespace],
+                                organization_id: input[:organization_id]
+                              )
+                            else
+                              # Make intellisense shut up - input[:content_unit_type] == 'role'
+                              ::ForemanAnsibleDirector::ContentService.create_ansible_role(
+                                name: input[:unit_name],
+                                namespace: input[:unit_namespace],
+                                organization_id: input[:organization_id]
+                              )
+                            end
               unit_versions.each do |version|
-                content_unit_version = ::ForemanAnsibleDirector::ContentUnitVersion.create!(
+                content_unit_version = ::ForemanAnsibleDirector::ContentService.create_ansible_content_unit_version(
                   versionable: unit_record,
                   version: version[:version],
-                  versionable_type: unit_record.class.to_s
+                  source: input[:content_unit_source],
+                  source_type: 'galaxy',
+                  latest_version_href:
+                    input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                  pulp_repository_href: input[:repository_href],
+                  pulp_remote_href: input[:remote_href],
+                  pulp_distribution_href: input[:distribution_href]
                 )
 
                 next unless unit_record.is_a?(::ForemanAnsibleDirector::AnsibleCollection)
@@ -169,29 +160,44 @@ module ForemanAnsibleDirector
 
             when 'update'
 
-              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(
-                pulp_repository_href: input[:repository_href]
-              )
-              existing_unit_versions = existing_unit.content_unit_versions.pluck(:version)
+              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(id: input[:content_unit_id])
 
-              existing_unit.update(
-                latest_version_href:
-                  input[:repository_show_action_output][:repository_show_response][:latest_version_href]
-              )
+              existing_unit_versions = []
+
+              existing_unit.content_unit_versions.each do |unit_version_record|
+                existing_unit_versions.push(unit_version_record.version)
+                unit_version_record.update(
+                  latest_version_href:
+                    input[:repository_show_action_output][:repository_show_response][:latest_version_href]
+                )
+              end
 
               new_unit_versions = unit_versions.reject do |unit_version|
                 existing_unit_versions.include?(unit_version[:version])
               end
 
+              source = existing_unit.content_unit_versions.first.source
+              repository_href = existing_unit.content_unit_versions.first.pulp_repository_href
+              remote_href = existing_unit.content_unit_versions.first.pulp_remote_href
+              distribution_href = existing_unit.content_unit_versions.first.pulp_distribution_href
+
               new_unit_versions.each do |new_version|
-                content_unit_version = ::ForemanAnsibleDirector::ContentUnitVersion.create!(
+                collection_version = ::ForemanAnsibleDirector::ContentService.create_ansible_content_unit_version(
                   versionable: existing_unit,
+                  source: source,
+                  source_type: 'galaxy',
+                  latest_version_href:
+                    input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+                  pulp_repository_href: repository_href,
+                  pulp_distribution_href: distribution_href,
+                  pulp_remote_href: remote_href,
                   version: new_version[:version],
-                  versionable_type: existing_unit.class.to_s
+                  dynamic: false
                 )
 
                 new_version[:collection_roles].each do |collection_role|
-                  collection_role_record = content_unit_version.ansible_collection_roles.create!(
+                  collection_role_record = ::ForemanAnsibleDirector::ContentService.create_collection_role(
+                    collection: collection_version,
                     name: collection_role
                   )
 

@@ -86,13 +86,6 @@ module ForemanAnsibleDirector
             unit_record = ::ForemanAnsibleDirector::ContentService.create_ansible_collection(
               name: input[:unit_name],
               namespace: input[:unit_namespace],
-              source: input[:unit_source],
-              source_type: 'git',
-              latest_version_href:
-                input[:repository_show_action_output][:repository_show_response][:latest_version_href],
-              pulp_repository_href: input[:repository_href],
-              pulp_remote_href: input[:remote_href],
-              pulp_distribution_href: input[:distribution_href],
               organization_id: input[:organization_id]
             )
 
@@ -100,9 +93,16 @@ module ForemanAnsibleDirector
 
             version = input[:indexed_unit_versions][0]
 
-            collection_version = ::ForemanAnsibleDirector::ContentService.create_ansible_collection_version(
-              collection: unit_record,
+            collection_version = ::ForemanAnsibleDirector::ContentService.create_ansible_content_unit_version(
+              versionable: unit_record,
               version: input[:unit_version],
+              source: input[:unit_source],
+              source_type: 'git',
+              latest_version_href:
+                input[:repository_show_action_output][:repository_show_response][:latest_version_href],
+              pulp_repository_href: input[:repository_href],
+              pulp_remote_href: input[:remote_href],
+              pulp_distribution_href: input[:distribution_href],
               dynamic: input[:dynamic_reference]
             )
 

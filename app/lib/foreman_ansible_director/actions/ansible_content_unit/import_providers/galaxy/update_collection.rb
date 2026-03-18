@@ -8,28 +8,25 @@ module ForemanAnsibleDirector
           class UpdateCollection < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
             input_format do
               param :unit, Object, required: true # SimpleAnsibleContentUnit
+              param :content_unit_id, String, required: true
               param :organization_id, required: true
             end
 
             def plan(args)
-              unit = args[:unit]
+              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(id: args[:content_unit_id])
+              new_unit = args[:unit]
               organization_id = args[:organization_id]
 
-              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(
-                namespace: unit.unit_namespace,
-                name: unit.unit_name,
-                organization_id: organization_id
-              )
-
-              repository_href = existing_unit.pulp_repository_href
-              remote_href = existing_unit.pulp_remote_href
-              distribution_href = existing_unit.pulp_distribution_href
+              # For collections coming from Ansible Galaxy, we can reuse the existing Pulp objects
+              repository_href = existing_unit.content_unit_versions.first.pulp_repository_href
+              remote_href = existing_unit.content_unit_versions.first.pulp_remote_href
+              distribution_href = existing_unit.content_unit_versions.first.pulp_distribution_href
 
               sequence do
                 _remote_update_action = plan_action(
                   ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Update,
                   collection_remote_href: remote_href,
-                  requirements: existing_unit.requirements_file(unit)
+                  requirements: existing_unit.requirements_file(new_unit)
                 )
 
                 _snyc_action = plan_action(
@@ -44,10 +41,11 @@ module ForemanAnsibleDirector
                   repository_href: repository_href,
                   remote_href: remote_href,
                   distribution_href: distribution_href,
-                  content_unit_type: unit.unit_type,
-                  content_unit_source: unit.source,
-                  unit_name: unit.unit_name,
-                  unit_namespace: unit.unit_namespace,
+                  content_unit_type: new_unit.unit_type,
+                  content_unit_source: new_unit.source,
+                  content_unit_id: args[:content_unit_id],
+                  unit_name: new_unit.unit_name,
+                  unit_namespace: new_unit.unit_namespace,
                   organization_id: organization_id
                 )
               end

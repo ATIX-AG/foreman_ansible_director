@@ -8,6 +8,7 @@ module ForemanAnsibleDirector
           class Update < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
             input_format do
               param :unit, Object, required: true # SimpleAnsibleContentUnit
+              param :content_unit_id, String, required: true
               param :organization_id, required: true
             end
 
@@ -17,6 +18,7 @@ module ForemanAnsibleDirector
               plan_action(
                 ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Galaxy::UpdateCollection,
                 unit: unit,
+                content_unit_id: args[:content_unit_id],
                 organization_id: args[:organization_id]
               )
             end

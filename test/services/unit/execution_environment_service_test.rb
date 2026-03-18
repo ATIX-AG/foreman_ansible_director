@@ -23,6 +23,7 @@ module ForemanAnsibleDirectorTests
 
           test 'triggers execution environment build' do
 
+            fake_task = Struct.new(:id).new(1234)
             task_called = false
             action_name = nil
             env_def = nil
@@ -30,6 +31,7 @@ module ForemanAnsibleDirectorTests
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
+            return fake_task
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
                 name: "test_ee",
@@ -83,6 +85,7 @@ module ForemanAnsibleDirectorTests
 
           test 'triggers execution environment build on hash change' do
 
+            fake_task = Struct.new(:id).new(1234)
             task_called = false
             action_name = nil
             env_def = nil
@@ -90,6 +93,7 @@ module ForemanAnsibleDirectorTests
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
+            return fake_task
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
@@ -108,6 +112,7 @@ module ForemanAnsibleDirectorTests
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
+            return fake_task
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
@@ -128,6 +133,7 @@ module ForemanAnsibleDirectorTests
             ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
             action_name = action.name
             env_def = args[:execution_environment_definition]
+            return fake_task
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
