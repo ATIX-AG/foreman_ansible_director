@@ -15,7 +15,7 @@ module ForemanAnsibleDirector
         units.append(
           'name' => "#{namespace}.#{name}",
           'version' => content_version.version,
-          'source' => source
+          'source' => content_version.source
         )
       end
 

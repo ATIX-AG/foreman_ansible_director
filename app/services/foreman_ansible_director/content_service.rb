@@ -23,45 +23,51 @@ module ForemanAnsibleDirector
 
       def create_ansible_collection(name:,
                                     namespace:,
-                                    source:,
-                                    source_type:,
-                                    organization_id:,
-                                    latest_version_href: '',
-                                    pulp_repository_href: '',
-                                    pulp_remote_href: '',
-                                    pulp_distribution_href: '',
-                                    meta: false)
+                                    organization_id:)
 
-        # rubocop:disable Style/GuardClause
-        if meta
-          raise NotImplementedError
-        else
-          ActiveRecord::Base.transaction do
-            ::ForemanAnsibleDirector::AnsibleCollection.create!(
-              name: name,
-              namespace: namespace,
-              source: source,
-              source_type: source_type,
-              latest_version_href: latest_version_href,
-              pulp_repository_href: pulp_repository_href,
-              pulp_distribution_href: pulp_distribution_href,
-              pulp_remote_href: pulp_remote_href,
-              organization_id: organization_id
-            )
-          end
+        ActiveRecord::Base.transaction do
+          ::ForemanAnsibleDirector::AnsibleCollection.create!(
+            name: name,
+            namespace: namespace,
+            organization_id: organization_id
+          )
         end
-        # rubocop:enable Style/GuardClause
       end
 
-      def create_ansible_collection_version(
-        collection:,
+      def create_ansible_role(name:,
+                              namespace:,
+                              organization_id:)
+
+        ActiveRecord::Base.transaction do
+          ::ForemanAnsibleDirector::AnsibleRole.create!(
+            name: name,
+            namespace: namespace,
+            organization_id: organization_id
+          )
+        end
+      end
+
+      def create_ansible_content_unit_version(
+        versionable:,
+        source:,
+        source_type:,
+        latest_version_href:,
+        pulp_repository_href:,
+        pulp_remote_href:,
+        pulp_distribution_href:,
         version:,
         dynamic: false
       )
 
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::ContentUnitVersion.create!(
-            versionable: collection,
+            versionable: versionable,
+            source: source,
+            source_type: source_type,
+            latest_version_href: latest_version_href,
+            pulp_repository_href: pulp_repository_href,
+            pulp_distribution_href: pulp_distribution_href,
+            pulp_remote_href: pulp_remote_href,
             version: version,
             dynamic: dynamic
           )

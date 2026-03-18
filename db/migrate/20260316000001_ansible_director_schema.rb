@@ -2,25 +2,24 @@
 
 class AnsibleDirectorSchema < ActiveRecord::Migration[6.1]
   def change
-
     # ====== Ansible content ======
     create_table :ad_content_units do |t|
       t.string :name, null: false
       t.string :namespace, null: false
       t.string :type, null: false
-      t.string :source, null: false
       t.text :description
-      t.string :latest_version_href
-      t.string :pulp_repository_href
-      t.string :pulp_remote_href
-      t.string :pulp_distribution_href
       t.integer :organization_id, null: false
-      t.string :source_type
       t.timestamps
     end
 
     create_table :ad_content_unit_versions do |t|
+      t.string :source, null: false
+      t.string :source_type
       t.string :version, null: false
+      t.string :latest_version_href
+      t.string :pulp_repository_href
+      t.string :pulp_remote_href
+      t.string :pulp_distribution_href
       t.references :versionable, polymorphic: true, null: false
       t.boolean :dynamic, default: false
       t.timestamps

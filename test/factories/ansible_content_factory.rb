@@ -3,7 +3,6 @@ FactoryBot.define do
   factory :content_unit, class: "ForemanAnsibleDirector::ContentUnit" do
     sequence(:name) { |n| "name_#{n}" }
     sequence(:namespace) { |n| "namespace_#{n}" }
-    sequence(:source) { |n| "https://galaxy.ansible.com/#{n}" }
     association :organization
   end
 
@@ -20,6 +19,8 @@ FactoryBot.define do
 
   factory :content_unit_version, class: 'ForemanAnsibleDirector::ContentUnitVersion' do
     sequence(:version) { |n| "#{n}.0.0" }
+    sequence(:source) { |n| "https://galaxy.ansible.com/#{n}" }
+    sequence(:source_type) { |n| "galaxy" }
     association :versionable, factory: :ansible_collection
 
     trait :for_collection do
