@@ -19,10 +19,9 @@ module ForemanAnsibleDirector
 
     def self.register_rex_feature
       RemoteExecutionFeature.register(
-        :ansible_run_host,
-        N_('Run Ansible roles using Ansible Director'),
-        description: N_('Runs an Ansible playbook which contains all'\
-                             ' the roles defined for a host'),
+        :ansible_director_configure_host,
+        N_('Apply Ansible configuration'),
+        description: N_('Configure the host using Ansible content assigned to it'),
         host_action_button: true
       )
       RemoteExecutionFeature.register(

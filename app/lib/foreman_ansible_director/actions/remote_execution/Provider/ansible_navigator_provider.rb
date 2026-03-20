@@ -8,7 +8,7 @@ if defined? ForemanRemoteExecution
           class AnsibleNavigatorProvider < RemoteExecutionProvider
             class << self
               def humanized_name
-                'AnsibleDirector'
+                'ansible-navigator via AnsibleDirector'
               end
 
               def provider_input_namespace
