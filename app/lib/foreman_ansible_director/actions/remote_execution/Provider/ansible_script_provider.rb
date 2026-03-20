@@ -8,7 +8,7 @@ if defined? ForemanRemoteExecution
           class AnsibleScriptProvider < RemoteExecutionProvider
             class << self
               def humanized_name
-                'AnsibleDirector'
+                'ansible-playbook via AnsibleDirector'
               end
 
               def provider_input_namespace
