@@ -22,13 +22,13 @@ if defined? ForemanRemoteExecution
                 content = ForemanAnsibleDirector::Generators::ContentGenerator.generate host
                 variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate host
 
-                environment_url = host.lifecycle_environment&.execution_environment&.registry_url
+                execution_environment = host.lifecycle_environment&.execution_environment
 
-                environment_url ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+                execution_environment ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
                   id: Setting[:ad_default_ee_internal]
-                )&.registry_url
+                )
 
-                unless environment_url
+                unless execution_environment
                   # TODO: Actual error message
                   raise StandardError
                 end
@@ -41,7 +41,11 @@ if defined? ForemanRemoteExecution
                   playbook: playbook,
                   content: content,
                   variables: variables,
-                  execution_environment: environment_url
+                  execution_environment: {
+                    id: execution_environment.id,
+                    registry_url: execution_environment.registry_url,
+                    ansible_core_version: execution_environment.ansible_version,
+                  }
                 )
               end
 
@@ -51,6 +55,10 @@ if defined? ForemanRemoteExecution
 
               def proxy_action_class
                 'Proxy::AnsibleDirector::Actions::Meta::RunPlaybook'
+              end
+
+              def required_proxy_selector_for(_template)
+                ::ForemanAnsibleDirector::AnsibleDirectorProxySelector.new
               end
             end
           end
