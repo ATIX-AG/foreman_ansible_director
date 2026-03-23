@@ -29,7 +29,7 @@ module ForemanAnsibleDirector
               type: cu.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role',
               identifier: cu.full_name,
               version: cuv.version,
-              source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{host.organization_id}/#{cu.full_name}",
+              source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{host.organization_id}/#{cu.full_name}-#{cuv.source_type}",
             }
           end
 
