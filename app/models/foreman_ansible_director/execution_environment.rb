@@ -19,9 +19,13 @@ module ForemanAnsibleDirector
     scoped_search on: :base_image_url, complete_value: true
     scoped_search on: :ansible_version, complete_value: true
 
+    # COMPAT 3.16 - 3
+    # Registry authorization has not been finalized.
+    # Therefore, execution images are not pulled, but rather sourced from Podman storage.
     def registry_url
-      registry_port = 4321
-      "#{SETTINGS[:fqdn]}:#{registry_port}/ansibleng/#{id}"
+      # registry_port = 4321
+      # "#{SETTINGS[:fqdn]}:#{registry_port}/ansibleng/#{id}:latest"
+      "localhost/ansibleng/#{id}:latest"
     end
 
     def rebuild_necessary?
