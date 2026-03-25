@@ -5,7 +5,9 @@ import {
   CardFooter,
   Bullseye,
   CardHeader,
+  Tooltip,
 } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import {
   AnsibleExecutionEnv,
@@ -64,24 +66,26 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
   };
 
   return !createMode ? (
-    <Card ouiaId="BasicCard" isClickable isRounded isLarge>
-      <CardHeader
-        selectableActions={{
-          onClickAction: () => {
-            setCreateMode(true);
-          },
-          selectableActionId: 'aee-create-card-id',
-          selectableActionAriaLabelledby: 'aee-create-card-name',
-          name: 'aee-create-card-name',
-        }}
-      />
-      <CardBody>
-        <Bullseye>
-          <PlusIcon style={{ width: '100px', height: '100px' }} />
-        </Bullseye>
-      </CardBody>
-      <CardFooter />
-    </Card>
+    <Tooltip content={<div>{_('Create new Execution Environment')}</div>}>
+      <Card ouiaId="BasicCard" isClickable isRounded isLarge>
+        <CardHeader
+          selectableActions={{
+            onClickAction: () => {
+              setCreateMode(true);
+            },
+            selectableActionId: 'aee-create-card-id',
+            selectableActionAriaLabelledby: 'aee-create-card-name',
+            name: 'aee-create-card-name',
+          }}
+        />
+        <CardBody>
+          <Bullseye>
+            <PlusIcon style={{ width: '100px', height: '100px' }} />
+          </Bullseye>
+        </CardBody>
+        <CardFooter />
+      </Card>
+    </Tooltip>
   ) : (
     <ExecutionEnvEditCard
       editMode
