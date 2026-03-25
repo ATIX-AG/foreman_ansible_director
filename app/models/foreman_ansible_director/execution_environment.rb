@@ -24,8 +24,8 @@ module ForemanAnsibleDirector
     # Therefore, execution images are not pulled, but rather sourced from Podman storage.
     def registry_url
       # registry_port = 4321
-      # "#{SETTINGS[:fqdn]}:#{registry_port}/ansibleng/#{id}:latest"
-      "localhost/ansibleng/#{id}:latest"
+      # "#{SETTINGS[:fqdn]}:#{registry_port}/ansible_director/#{id}:latest"
+      "localhost/ansible_director/#{id}:latest"
     end
 
     def rebuild_necessary?
