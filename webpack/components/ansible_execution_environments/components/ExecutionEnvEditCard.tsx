@@ -134,6 +134,7 @@ export const ExecutionEnvEditCard = ({
           readOnlyVariant={editMode ? undefined : 'plain'}
           aria-label={_('Environment Name')}
           id="ansible-dir-ex-env-edit-card"
+          placeholder={_('Execution Environment Name')}
         />
       </CardTitle>
       <CardBody>
