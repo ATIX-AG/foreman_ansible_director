@@ -41,14 +41,31 @@ module ForemanAnsibleDirector
         ActiveRecord::Base.transaction do
           path = environment.lifecycle_environment_path
 
+          # A - X - ?
           if environment.parent
-            environment.child.update!(
-              parent_id: environment.parent.id
+            environment.parent.update!(
+              child_id: environment.child&.try(:id) || nil
             )
+            # A - X - B
+            if environment.child
+              environment.child.update!(
+                parent_id: environment.parent.id
+              )
+              decrement_position environment.child
+            end
+
+          # X - ?
           else # env is root environment in path
             path.update!(
               root_environment_id: environment.child&.try(:id) || nil
             )
+            # X - B
+            if environment.child
+              environment.child.update!(
+                parent_id: nil
+              )
+              decrement_position environment.child
+            end
           end
 
           environment.destroy!
