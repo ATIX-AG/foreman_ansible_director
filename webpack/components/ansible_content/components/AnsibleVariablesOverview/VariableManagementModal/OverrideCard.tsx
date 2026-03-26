@@ -31,7 +31,7 @@ const matcherNames: Record<AnsibleVariableOverride['matcher'], string> = {
 
 // TODO: Do I still need this?
 // eslint-disable-next-line no-unused-vars
-const matcherUrls: { [key: string]: string } = {
+const matcherUrls: Record<AnsibleVariableOverride['matcher'], string> = {
   fqdn: '/new/hosts',
   hostgroup: '/hostgroups',
 };
@@ -98,7 +98,11 @@ export const OverrideCard = ({
           isInline
           component="span"
           onClick={() => {
-            window.open(`${override.matcher}/${override.matcher_value}`);
+            window.open(
+              `${matcherUrls[override.matcher]}?search=name++%3D++${
+                override.matcher_value
+              }`
+            );
           }}
         >
           {override.matcher_value}
