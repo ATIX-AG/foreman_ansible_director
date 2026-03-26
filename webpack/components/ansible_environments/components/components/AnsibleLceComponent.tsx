@@ -68,6 +68,15 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     setEditMode(!editMode);
   };
 
+  const handleDestroy = (): void => {
+    setIsConfirmationModalOpen(true);
+    setConfirmationModalTitle(`Delete "${lce.name}"?`);
+    setConfirmationModalBody('');
+    setConfirmationModalOnConfirm(() => async () => {
+      await destroyLce(lce);
+    });
+  };
+
   const updateLce = async (env: AnsibleLce): Promise<void> => {
     try {
       await axios.put(
@@ -174,7 +183,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               pathEditMode={pathEditMode}
               editMode={editMode}
               handleEdit={handleLceUpdate}
-              handleDestroy={() => new Promise<void>(() => {})}
+              handleDestroy={handleDestroy}
               handleEditContent={handleEditContent}
             />
           ),

@@ -17,7 +17,7 @@ interface AnsibleLceComponentHeaderActionsProps {
   pathEditMode: boolean;
   editMode: boolean;
   handleEdit: () => void;
-  handleDestroy: () => Promise<void>;
+  handleDestroy: () => void;
   handleEditContent: () => void;
 }
 
