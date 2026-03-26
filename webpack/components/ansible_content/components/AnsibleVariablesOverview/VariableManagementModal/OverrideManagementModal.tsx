@@ -21,6 +21,7 @@ import {
   MenuToggleElement,
   MenuToggle,
   Dropdown,
+  SelectOptionProps,
 } from '@patternfly/react-core';
 import OutlinedQuestionCircleIcon from '@patternfly/react-icons/dist/esm/icons/outlined-question-circle-icon';
 import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
@@ -58,7 +59,7 @@ interface OverrideManagementModalProps {
 }
 
 interface HostGroupsResponse extends IndexResponse {
-  results: { id: string; name: string }[];
+  results: { id: string; name: string; title: string }[];
 }
 interface HostsResponse extends IndexResponse {
   results: { id: string; name: string }[];
@@ -171,6 +172,25 @@ export const OverrideManagementModal = ({
   if (matcherRequest.status === 'ERROR') {
     // TODO: Handle request error
   }
+
+  const matcherOptions = (
+    apiResponse: ApiResponseMap[typeof overrideMatcher]
+  ): SelectOptionProps[] => {
+    switch (overrideMatcher) {
+      case 'fqdn':
+        return (apiResponse as HostsResponse).results.map(matcher => ({
+          value: matcher.name,
+          children: matcher.name,
+        }));
+      case 'hostgroup':
+        return (apiResponse as HostGroupsResponse).results.map(matcher => ({
+          value: matcher.name,
+          children: matcher.title,
+        }));
+      default:
+        return [];
+    }
+  };
 
   return (
     <>
@@ -291,12 +311,7 @@ export const OverrideManagementModal = ({
               <FormGroup label={_('Matcher value')}>
                 {matcherRequest.status === 'RESOLVED' && (
                   <MatcherSelector
-                    matcherOptions={matcherRequest.response.results.map(
-                      matcher => ({
-                        value: matcher.name,
-                        children: matcher.name,
-                      })
-                    )}
+                    matcherOptions={matcherOptions(matcherRequest.response)}
                     matcherValue={overrideMatcherValue}
                     setMatcherValue={setOverrideMatcherValue}
                   />
