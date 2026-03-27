@@ -108,20 +108,25 @@ module ForemanAnsibleDirector
             case input[:index_mode]
             when 'import'
 
-              unit_record = if input[:content_unit_type] == 'collection'
-                              ::ForemanAnsibleDirector::ContentService.create_ansible_collection(
-                                name: input[:unit_name],
-                                namespace: input[:unit_namespace],
-                                organization_id: input[:organization_id]
-                              )
-                            else
-                              # Make intellisense shut up - input[:content_unit_type] == 'role'
-                              ::ForemanAnsibleDirector::ContentService.create_ansible_role(
-                                name: input[:unit_name],
-                                namespace: input[:unit_namespace],
-                                organization_id: input[:organization_id]
-                              )
-                            end
+              unit_record = ::ForemanAnsibleDirector::AnsibleCollection.find_by(name: input[:unit_name],
+                namespace: input[:unit_namespace],
+                organization_id: input[:organization_id])
+
+              unit_record ||= if input[:content_unit_type] == 'collection'
+                                ::ForemanAnsibleDirector::ContentService.create_ansible_collection(
+                                  name: input[:unit_name],
+                                  namespace: input[:unit_namespace],
+                                  organization_id: input[:organization_id]
+                                )
+                              else
+                                # Make intellisense shut up - input[:content_unit_type] == 'role'
+                                ::ForemanAnsibleDirector::ContentService.create_ansible_role(
+                                  name: input[:unit_name],
+                                  namespace: input[:unit_namespace],
+                                  organization_id: input[:organization_id]
+                                )
+                              end
+
               unit_versions.each do |version|
                 content_unit_version = ::ForemanAnsibleDirector::ContentService.create_ansible_content_unit_version(
                   versionable: unit_record,
