@@ -207,15 +207,30 @@ Foreman::Plugin.register :foreman_ansible_director do
       setting 'ad_default_ee_rex',
         type: :integer,
         description: 'Default Execution Environment used for execution of Remote Execution jobs.',
-        default: 0,
+        default: nil,
         full_name: 'Execution Environments - Default Ansible Execution Environment for Remote Execution',
-        collection: proc { Hash[::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map { |ee| [ee.id, ee.name] }] }
+        collection: proc {
+                      Hash[[[nil,
+                             'No default Execution Environment']].concat(
+                               ::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map do |ee|
+                                 [ee.id, ee.name]
+                               end
+                             )
+                      ]
+                    }
       setting 'ad_default_ee_internal',
         type: :integer,
         description: 'Default Execution Environment used for execution of default Ansible jobs.',
-        default: 0,
-        full_name: 'Execution Environments - Default Ansible Execution Environment for Ansible jobs',
-        collection: proc { Hash[::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map { |ee| [ee.id, ee.name] }] }
+        default: nil,
+        collection: proc {
+                      Hash[[[nil,
+                             'No default Execution Environment']].concat(
+                               ::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map do |ee|
+                                 [ee.id, ee.name]
+                               end
+                             )
+                      ]
+                    }
       setting 'ad_lce_path_force_incremental',
         type: :boolean,
         description: 'When enabled, lifecycle environment promotions must follow the defined path incrementally
