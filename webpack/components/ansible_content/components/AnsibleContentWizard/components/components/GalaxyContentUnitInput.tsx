@@ -9,20 +9,18 @@ import {
   HelperTextItem,
   InputGroup,
   InputGroupItem,
-  Popover,
   TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
 import UndoIcon from '@patternfly/react-icons/dist/esm/icons/undo-icon';
-import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
-import styles from '@patternfly/react-styles/css/components/Form/form';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { AnsibleGalaxyContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { VersionInput } from './components/VersionInput';
 import { AnsibleContentUnitCreateType } from '../../AnsibleContentWizard';
 import { useAdContext } from '../../../../../common/AdContextWrapper';
+import { IdentifierInput } from './components/IdentifierInput';
 
 interface GalaxyContentUnitInputProps {
   contentUnits: Array<AnsibleContentUnitCreateType>;
@@ -37,21 +35,17 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
 }) => {
   const ctx = useAdContext();
 
-  const defaultGalaxy: string = ctx.settings.ad_default_galaxy_url; // TODO: Extract this from context; Assume valid
+  const defaultGalaxy: string = ctx.settings.ad_default_galaxy_url;
 
   const [contentUnitName, setContentUnitName] = React.useState<string>('');
   const [contentUnitValidation, setContentUnitValidation] = React.useState<
     ValidatedOptions
   >(ValidatedOptions.default);
 
-  const [
-    contentUnitValidationHelperText,
-    setContentUnitValidationHelperText,
-  ] = React.useState<string>('');
-
   const [contentUnitSource, setContentUnitSource] = React.useState(
     defaultGalaxy
-  ); // TODO: Global default
+  );
+
   const [
     contentUnitSourceValidation,
     setContentUnitSourceValidation,
@@ -77,43 +71,6 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
     }
   };
 
-  const handleNameChange = (
-    _event: React.FormEvent<HTMLInputElement>,
-    name: string
-  ): void => {
-    let helperText: string;
-    let validationState: ValidatedOptions;
-
-    if (name === '') {
-      helperText = __(_('%(uType)s identifier may not be empty.'), {
-        uType: unitType === 'collection' ? 'Collection' : 'Role',
-      });
-      validationState = ValidatedOptions.error;
-    } else if (!new RegExp('^[a-z0-9_]+\\.[a-z0-9_]+$').test(name)) {
-      helperText = __(
-        _('%(uType)s identifier does not match /^[a-z0-9_]+\\.[a-z0-9_]+$/.'),
-        { uType: unitType === 'collection' ? 'Collection' : 'Role' }
-      );
-      validationState = ValidatedOptions.error;
-    } else if (
-      contentUnits.some(
-        unit => unit.identifier === name && unit.type === unitType
-      )
-    ) {
-      helperText = `${
-        unitType === 'collection' ? 'Collection' : 'Role'
-      } already in batch. If version sets differ, their union will be used!`;
-      validationState = ValidatedOptions.warning;
-    } else {
-      validationState = ValidatedOptions.success;
-      helperText = '';
-    }
-
-    setContentUnitName(name);
-    setContentUnitValidation(validationState);
-    setContentUnitValidationHelperText(helperText);
-  };
-
   const handleUnitSourceChange = (
     _event: React.FormEvent<HTMLInputElement>,
     sourceUrl: string
@@ -137,7 +94,6 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
     };
     setContentUnitName('');
     setContentUnitValidation(ValidatedOptions.default);
-    setContentUnitValidationHelperText('');
     setContentUnitVersions([]);
     setContentUnits(oldUnits => [...oldUnits, unit]);
   };
@@ -165,49 +121,14 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
       {/*    id="role-radio-01" */}
       {/*  /> */}
       {/* </FormGroup> */}
-      <FormGroup
-        label={_('Identifier')}
-        isRequired
-        fieldId="content-unit-form-01"
-        labelIcon={
-          <Popover
-            headerContent={
-              <div>
-                {__(_('The identifier of an Ansible %(uType)s.'), {
-                  uType: unitType,
-                })}
-              </div>
-            }
-            bodyContent={<div>$namespace.$name</div>}
-          >
-            <button
-              type="button"
-              aria-label="More info for unit id field"
-              onClick={e => e.preventDefault()}
-              aria-describedby="content-unit-identifier-field-01"
-              className={styles.formGroupLabelHelp}
-            >
-              <HelpIcon />
-            </button>
-          </Popover>
-        }
-      >
-        <TextInput
-          isRequired
-          type="text"
-          id="content-unit-id-input-01"
-          value={contentUnitName}
-          onChange={handleNameChange}
-          validated={contentUnitValidation}
-        />
-        {contentUnitValidation === ValidatedOptions.error && (
-          <FormHelperText>
-            <HelperText>
-              <HelperTextItem>{contentUnitValidationHelperText}</HelperTextItem>
-            </HelperText>
-          </FormHelperText>
-        )}
-      </FormGroup>
+      <IdentifierInput
+        identifier={contentUnitName}
+        setIdentifier={setContentUnitName}
+        unitType={unitType}
+        contentUnits={contentUnits}
+        identifierValidation={contentUnitValidation}
+        setIdentifierValidation={setContentUnitValidation}
+      />
       <FormGroup label={_('Source')} fieldId="cu-source-01">
         <InputGroup>
           <InputGroupItem isFill>

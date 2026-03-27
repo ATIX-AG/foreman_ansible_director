@@ -77,7 +77,7 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
                   unit_type: unit.type,
                   unit_source_type: 'git',
                   unit_source: unit.gitUrl,
-                  unit_refs: unit.gitRefs,
+                  unit_versions: unit.gitRefs,
                 };
               }
 
