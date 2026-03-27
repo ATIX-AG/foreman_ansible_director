@@ -70,6 +70,12 @@ module ForemanAnsibleDirector
             unit.versions.include? x.version
           end
 
+          filtered_versions = existing_unit_versions.select do |x|
+            unit.source_type == x.source_type
+          end
+
+          return :import if filtered_versions.empty?
+
           return :noop if !existing_unit_versions.empty? && !force_override
           :update
         end
