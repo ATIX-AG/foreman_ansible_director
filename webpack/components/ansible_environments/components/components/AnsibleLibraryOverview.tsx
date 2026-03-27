@@ -70,6 +70,9 @@ export const AnsibleLibraryOverview: React.FC = () => {
                   className: 'custom-badge-unread',
                 }}
                 icon={<ExternalLinkSquareAltIcon />}
+                onClick={() => {
+                  window.open('/ansible/content?search=type++%3D++role');
+                }}
               >
                 {_('Roles')}
               </Button>{' '}
@@ -89,6 +92,9 @@ export const AnsibleLibraryOverview: React.FC = () => {
                   className: 'custom-badge-unread',
                 }}
                 icon={<ExternalLinkSquareAltIcon />}
+                onClick={() => {
+                  window.open('/ansible/content?search=type++%3D++collection');
+                }}
               >
                 {_('Collections')}
               </Button>{' '}
@@ -108,6 +114,9 @@ export const AnsibleLibraryOverview: React.FC = () => {
                   className: 'custom-badge-unread',
                 }}
                 icon={<ExternalLinkSquareAltIcon />}
+                onClick={() => {
+                  window.open('/ansible/execution_environments');
+                }}
               >
                 {_('Execution Environments')}
               </Button>{' '}
