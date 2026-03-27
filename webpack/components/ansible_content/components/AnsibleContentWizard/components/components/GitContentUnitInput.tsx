@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, { Dispatch, SetStateAction } from 'react';
 import {
   ActionGroup,
@@ -31,6 +32,7 @@ import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import { AnsibleGitContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { AnsibleContentUnitCreateType } from '../../AnsibleContentWizard';
 import { GitRefInput } from './components/GitRefInput';
+import { IdentifierInput } from './components/IdentifierInput';
 
 interface GitContentUnitInputProps {
   contentUnits: Array<AnsibleContentUnitCreateType>;
@@ -47,6 +49,11 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
 }) => {
   const [repoUrl, setRepoUrl] = React.useState<string>('');
   const [repoUrlValidation, setRepoUrlValidation] = React.useState<
+    ValidatedOptions
+  >(ValidatedOptions.default);
+
+  const [identifier, setIdentifier] = React.useState<string>('');
+  const [identifierValidation, setIdentifierValidation] = React.useState<
     ValidatedOptions
   >(ValidatedOptions.default);
 
@@ -113,7 +120,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
   const addToBatch = (_event: never): void => {
     const unit: AnsibleGitContentUnitCreate = {
       type: unitType,
-      identifier: 'nextcloud.admin',
+      identifier,
       gitUrl: repoUrl,
       gitRefs,
     };
@@ -122,6 +129,8 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
     setContentUnitValidationHelperText('');
     setContentUnitVersions([]);
     setContentUnits(oldUnits => [...oldUnits, unit]);
+    setIdentifier('');
+    setIdentifierValidation(ValidatedOptions.default);
   };
 
   return (
@@ -147,6 +156,14 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
       {/*    id="role-radio-01" */}
       {/*  /> */}
       {/* </FormGroup> */}
+      <IdentifierInput
+        identifier={identifier}
+        setIdentifier={setIdentifier}
+        unitType={unitType}
+        contentUnits={contentUnits}
+        identifierValidation={identifierValidation}
+        setIdentifierValidation={setIdentifierValidation}
+      />
       <FormGroup
         label={_('Repository URL')}
         isRequired
@@ -186,15 +203,6 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
               onChange={handleRepoUrlChange}
               validated={repoUrlValidation}
             />
-            {repoUrlValidation === ValidatedOptions.error && (
-              <FormHelperText>
-                <HelperText>
-                  <HelperTextItem>
-                    {contentUnitValidationHelperText}
-                  </HelperTextItem>
-                </HelperText>
-              </FormHelperText>
-            )}
           </InputGroupItem>
           <InputGroupItem>
             <Button
@@ -206,6 +214,13 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
             </Button>
           </InputGroupItem>
         </InputGroup>
+        {repoUrlValidation === ValidatedOptions.error && (
+          <FormHelperText>
+            <HelperText>
+              <HelperTextItem>{contentUnitValidationHelperText}</HelperTextItem>
+            </HelperText>
+          </FormHelperText>
+        )}
       </FormGroup>
       <FormGroup
         label={_('Reference type')}
@@ -299,7 +314,9 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
 
       <ActionGroup>
         <Button
-          isDisabled={repoUrlValidation !== ValidatedOptions.success}
+          isDisabled={
+            repoUrlValidation !== ValidatedOptions.success && gitRefs.length > 0
+          }
           variant="primary"
           icon={<PlusIcon />}
           ouiaId="PrimaryWithIcon"

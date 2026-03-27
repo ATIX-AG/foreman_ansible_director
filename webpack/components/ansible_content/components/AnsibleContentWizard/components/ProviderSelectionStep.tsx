@@ -74,7 +74,6 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           isSelected={provider === 'git'}
           onClick={() => setProvider('git')}
           style={{ width: '100%', height: '100%', minHeight: '340px' }}
-          isDisabled
         >
           {_('Import an Ansible collection or role from a git repository.')}
           <br />
