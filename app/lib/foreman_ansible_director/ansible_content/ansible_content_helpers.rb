@@ -22,44 +22,51 @@ module ForemanAnsibleDirector
         end
 
         def resolve_destroy_payload(payload)
-          units = {}
+          unit_ids = payload.map { |u| u[:unit_id] }
+
+          units = ::ForemanAnsibleDirector::ContentUnit
+                  .where(id: unit_ids)
+                  .includes(:content_unit_versions)
+                  .index_by(&:id)
+
+          unit_versions = Hash.new { |h, k| h[k] = { versions: { galaxy: Set.new, git: Set.new }, complete: false } }
 
           payload.each do |unit|
-            name = unit[:unit_name]
+            unit_id = unit[:unit_id]
+            unit_record = units[unit_id]
+            raise(ActiveRecord::RecordNotFound, "Content unit with id #{unit_id} not found") unless unit_record
 
-            unless name.match?(/^(.*)\.(.*)$/)
-              raise "Invalid unit name format: #{name}" # TODO: Proper error code
-            end
+            all_version_ids = unit_record.content_unit_versions.pluck(:id).to_set
 
-            unit_namespace, unit_name = name.match(/^(.*)\.(.*)$/).captures
-            existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit_namespace, name: unit_name)
+            if (requested_versions = unit[:unit_version_ids]).nil?
+              unit_versions[unit_id][:complete] = true # Key not given -> Full deletion
+            else
+              requested_versions.each do |version_id|
+                cuv = ContentUnitVersion.find_by(id: version_id)
+                raise(ActiveRecord::RecordNotFound, "Version with id #{version_id} not found") unless cuv
 
-            raise "Unit not found: #{name}" unless existing_unit # TODO: Proper error code
-
-            unit_type = existing_unit.collection? ? :collection : :role
-
-            versions = []
-
-            if unit_type == :collection
-              versions = unit[:unit_versions]&.select do |version|
-                existing_unit.content_unit_versions.find_by(version: version)
-              end
-
-              if versions && versions.length == existing_unit.content_unit_versions.count
-                versions = [] # In this case, we are deleting the complete unit
+                source_type = cuv.source_type.to_sym
+                unit_versions[unit_id][:versions][source_type].add(version_id)
               end
             end
 
-            simple_unit = SimpleAnsibleContentUnit.new(
-              unit_type: unit_type,
-              unit_name: name,
-              unit_versions: versions
-            )
+            supplied_galaxy_versions = unit_versions[unit_id][:versions][:galaxy]
+            supplied_git_versions = unit_versions[unit_id][:versions][:git]
 
-            units[name] = { unit: simple_unit, content_unit_id: existing_unit.id }
+            if (supplied_galaxy_versions + supplied_git_versions).to_set.superset?(all_version_ids)
+              unit_versions[unit_id][:complete] = true
+            end
           end
 
-          units.values
+          unit_versions.transform_values do |types|
+            {
+              versions: {
+                galaxy: types[:versions][:galaxy].to_a,
+                git: types[:versions][:git].to_a,
+              },
+              complete: types[:complete],
+            }
+          end
         end
 
         def resolve_import_payload(payload)

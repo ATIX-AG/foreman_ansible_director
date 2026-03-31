@@ -92,6 +92,7 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
         />,
         <AnsibleContentTableSecondaryRow
           identifier={identifier}
+          nodeId={result.id}
           nodeVersions={result.versions}
           isExpanded={isExpanded}
           setSelectedVersionId={setSelectedVersionId}

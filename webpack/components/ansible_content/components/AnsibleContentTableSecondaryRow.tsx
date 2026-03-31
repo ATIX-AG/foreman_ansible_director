@@ -14,7 +14,6 @@ import { Button } from '@patternfly/react-core';
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
-import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
@@ -24,6 +23,7 @@ import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissi
 
 interface AnsibleContentTableSecondaryRowProps {
   identifier: string; // Needed for keys
+  nodeId: string;
   nodeVersions: AnsibleContentVersionWithCount[];
   isExpanded: boolean;
   setSelectedVersionId: Dispatch<SetStateAction<string>>;
@@ -38,6 +38,7 @@ interface AnsibleContentTableSecondaryRowProps {
 
 const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowProps> = ({
   identifier,
+  nodeId,
   nodeVersions,
   isExpanded,
   setSelectedVersionId,
@@ -76,7 +77,6 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
       </Tr>
     ));
 
-  const organization = useForemanOrganization();
   const dispatch = useDispatch();
 
   const userCanDestroyContent: boolean = usePermissions([
@@ -101,11 +101,10 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             foremanUrl('/api/v2/ansible_director/ansible_content'),
             {
               data: {
-                organization_id: organization?.id,
                 units: [
                   {
-                    unit_name: identifier,
-                    unit_versions: [version.version],
+                    unit_id: nodeId,
+                    unit_version_ids: [version.id],
                   },
                 ],
               },

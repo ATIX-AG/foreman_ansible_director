@@ -4,7 +4,7 @@ module ForemanAnsibleDirector
   module Api
     module V2
       class AnsibleContentController < AnsibleDirectorApiController
-        before_action :find_organization, only: %i[create_units destroy_units]
+        before_action :find_organization, only: %i[create_units]
         before_action :find_optional_organization, only: %i[index]
 
         # TODO: APIDOC
@@ -36,7 +36,7 @@ module ForemanAnsibleDirector
         # TODO: This needs to check and invalidate built EEs
         def destroy_units
           resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload(
-            params[:units]
+            destroy_params
           )
           @bulk_destroy_task =
             ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Destroy,
@@ -48,6 +48,15 @@ module ForemanAnsibleDirector
         end
 
         private
+
+        def destroy_params
+          params.require(:units).map do |unit|
+            unit.permit(
+              :unit_id,
+              unit_version_ids: []
+            )
+          end
+        end
 
         def validate_requirements_payload
           # TODO: Grammar

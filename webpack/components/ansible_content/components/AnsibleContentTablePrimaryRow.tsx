@@ -4,7 +4,6 @@ import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
-import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 
 import { useDispatch } from 'react-redux';
@@ -68,7 +67,6 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
     },
   };
 
-  const organization = useForemanOrganization();
   const dispatch = useDispatch();
 
   const userCanDestroyContent: boolean = usePermissions([
@@ -91,10 +89,9 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
             foremanUrl('/api/v2/ansible_director/ansible_content'),
             {
               data: {
-                organization_id: organization?.id,
                 units: [
                   {
-                    unit_name: identifier,
+                    unit_id: node.id,
                   },
                 ],
               },
