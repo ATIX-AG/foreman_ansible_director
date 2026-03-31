@@ -5,101 +5,88 @@ module ForemanAnsibleDirector
     module AnsibleContentUnit
       class Destroy < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
         input_format do
-          param :unit
-          param :content_unit_id
-          param :organization_id
+          param :unit_id
+          param :unit_version_ids # {git: [], galaxy: []}
+          param :complete, Boolean
         end
 
         def plan(args)
-          unit = args[:unit]
-          content_unit_id = args[:content_unit_id]
+          unit_id = args[:unit_id]
+          unit_version_ids = args[:unit_version_ids]
 
-          if !unit.versions.empty?
-            plan_partial_destroy(unit, content_unit_id)
+          complete = args[:complete]
+
+          if complete
+            plan_full_destroy(unit_id)
+            plan_self(
+              unit_id: unit_id
+            )
           else
-            plan_full_destroy(content_unit_id)
+            plan_partial_destroy(unit_id, unit_version_ids)
           end
-          plan_self(
-            content_unit_id: content_unit_id,
-            unit_type: unit.unit_type,
-            unit_versions: unit.versions
-          )
         end
 
         def finalize
           acu = ::ForemanAnsibleDirector::ContentUnit.find_by(
-            id: input[:content_unit_id]
+            id: input[:unit_id]
           )
-          if input[:unit_type] == 'collection'
-            if !input[:unit_versions].empty? # partial
-              input[:unit_versions].each do |version|
-                acu&.content_unit_versions&.find_by(version: version)&.destroy
-              end
-            else
-              acu&.destroy
-            end
-          else
-            acu&.destroy
-          end
+          acu&.destroy
         end
 
         private
 
-        def plan_full_destroy(content_unit_id)
-          acu = ::ForemanAnsibleDirector::ContentUnit.find_by(id: content_unit_id)
+        # I am disabling the guard-clause rule here, because I don't think it makes a lot of sense in this case.
+        # galaxy_cuvs and git_cuvs are independent of each other, so early returning is not possible.
+        # rubocop: disable Style/GuardClause
+        def plan_full_destroy(unit_id)
+          galaxy_cuvs = ::ForemanAnsibleDirector::ContentUnit
+                        .find_by(id: unit_id)
+                        .content_unit_versions
+                        .where(source_type: 'galaxy')
 
-          unique_remotes = Set[]
-          unique_repositories = Set[]
-          unique_distributions = Set[]
+          git_cuvs = ::ForemanAnsibleDirector::ContentUnit
+                     .find_by(id: unit_id)
+                     .content_unit_versions
+                     .where(source_type: 'git')
 
-          acu.content_unit_versions.each do |version|
-            unique_remotes.add(version.pulp_remote_href)
-            unique_repositories.add(version.pulp_repository_href)
-            unique_distributions.add(version.pulp_distribution_href)
+          unless galaxy_cuvs.empty?
+            plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::DestroyProviders::Galaxy::DestroyFull,
+              unit_id: unit_id,
+              unit_version_ids: galaxy_cuvs)
           end
 
-          unique_remotes = unique_remotes.to_a
-          unique_repositories = unique_repositories.to_a
-          unique_distributions = unique_distributions.to_a
-
-          # unique_* all have the same length, neither of these objects can be created without the other ones
-          concurrence do
-            unique_remotes.length.times do |n|
-              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
-                repository_href: unique_repositories[n])
-              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
-                distribution_href: unique_distributions[n])
-
-              if acu.collection?
-                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Destroy,
-                  collection_remote_href: unique_remotes[n])
-              else
-                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Role::Destroy,
-                  role_remote_href: unique_remotes[n])
-              end
+          unless git_cuvs.empty?
+            git_cuvs.each do |git_cuv|
+              plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::DestroyProviders::Git::DestroyFull,
+                unit_id: unit_id,
+                unit_version_id: git_cuv)
             end
           end
         end
+        # rubocop: enable Style/GuardClause
 
-        def plan_partial_destroy(unit, content_unit_id)
-          acu = ::ForemanAnsibleDirector::AnsibleCollection.find_by(id: content_unit_id) # Only collections
+        # Same as above
+        # rubocop: disable Style/GuardClause
+        def plan_partial_destroy(unit_id, unit_version_ids)
+          galaxy_cuvs = unit_version_ids[:galaxy]
+          git_cuvs = unit_version_ids[:git]
 
-          repository_href = acu.content_unit_versions.first.pulp_repository_href
-          remote_href = acu.content_unit_versions.first.pulp_remote_href
+          unless galaxy_cuvs.empty?
+            plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::DestroyProviders::Galaxy::DestroyPartial,
+              unit_id: unit_id,
+              unit_version_ids: galaxy_cuvs)
+          end
 
-          sequence do
-            _remote_update_action = plan_action(
-              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Update,
-              collection_remote_href: remote_href,
-              requirements: acu.requirements_file(unit, subtractive: true)
-            )
-            _snyc_action = plan_action(
-              ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
-              repository_href: repository_href,
-              remote_href: remote_href
-            )
+          unless git_cuvs.empty?
+            git_cuvs.each do |git_cuv|
+              plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::DestroyProviders::Git::DestroyPartial,
+                unit_id: unit_id,
+                unit_version_id: git_cuv)
+            end
+
           end
         end
+        # rubocop: enable Style/GuardClause
       end
     end
   end

@@ -12,11 +12,12 @@ module ForemanAnsibleDirector
 
           def plan(args)
             concurrence do
-              args[:resolved_content_units].each do |unit_hash|
+              args[:resolved_content_units].each do |unit_id, instruction|
+                complete = instruction.delete(:complete)
                 plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Destroy,
-                  unit: unit_hash[:unit],
-                  content_unit_id: unit_hash[:content_unit_id],
-                  organization_id: args[:organization_id])
+                  unit_id: unit_id,
+                  unit_version_ids: instruction[:versions],
+                  complete: complete)
               end
             end
           end

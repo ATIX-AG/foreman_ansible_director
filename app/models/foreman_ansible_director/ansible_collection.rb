@@ -11,7 +11,7 @@ module ForemanAnsibleDirector
 
     def requirements_file(simple_content_unit = nil, subtractive: false)
       units = []
-      content_unit_versions.each do |content_version| # Fixed: was ansible_content_versions
+      content_unit_versions.where(source_type: 'galaxy').find_each do |content_version|
         units.append(
           'name' => "#{namespace}.#{name}",
           'version' => content_version.version,
