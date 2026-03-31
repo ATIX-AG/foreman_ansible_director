@@ -30,6 +30,11 @@ module ForemanAnsibleDirector
         ActiveRecord::Base.transaction do # TODO: Rollback if any LCE is used by host; Setting
           # raise ActiveRecord::Rollback if path.lifecycle_environments.any? { |lce| lce.hosts.positive? }
           path.update!(root_environment_id: nil)
+          # I am disabling the linter rule here, because in this case, I do not care about callbacks.
+          # Associated lifecycle environments will be deleted anyway and update_all is faster than manual iteration.
+          # rubocop:disable Rails/SkipsModelValidations
+          path.lifecycle_environments.update_all(parent_id: nil, child_id: nil)
+          # rubocop:enable Rails/SkipsModelValidations
           path.destroy!
         end
       end
