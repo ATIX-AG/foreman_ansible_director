@@ -36,25 +36,25 @@ Foreman::Plugin.register :foreman_ansible_director do
     permission :view_ansible_content,
       { 'foreman_ansible_director/api/v2/ansible_content': %i[index version_detail auto_complete_search],
         'foreman_ansible_director/api/v2/status': %i[content context] },
-      resource_type: 'ContentUnit'
+      resource_type: 'ForemanAnsibleDirector::ContentUnit'
     # Create
     permission :create_ansible_content,
       { 'foreman_ansible_director/api/v2/ansible_content': [:create_units] },
-      resource_type: 'ContentUnit'
+      resource_type: 'ForemanAnsibleDirector::ContentUnit'
     # Edit
     # Destroy
     permission :destroy_ansible_content,
       { 'foreman_ansible_director/api/v2/ansible_content': [:destroy_units] },
-      resource_type: 'ContentUnit'
+      resource_type: 'ForemanAnsibleDirector::ContentUnit'
     ## Ansible Variables
     # View
     permission :view_ansible_variables,
       { 'foreman_ansible_director/api/v2/ansible_variables': %i[show index] },
-      resource_type: 'AnsibleVariable'
+      resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Edit
     permission :edit_ansible_variables,
       { 'foreman_ansible_director/api/v2/ansible_variables': [:update] },
-      resource_type: 'AnsibleVariable'
+      resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Destroy
     ## Ansible Variable Overrides
     # View
@@ -77,71 +77,71 @@ Foreman::Plugin.register :foreman_ansible_director do
     # View
     permission :view_ansible_lifecycle_environments,
       { 'foreman_ansible_director/api/v2/lifecycle_environments': %i[show content] },
-      resource_type: 'LifecycleEnvironment'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     # Create
     permission :create_ansible_lifecycle_environments,
       { 'foreman_ansible_director/api/v2/lifecycle_environments': [:create] },
-      resource_type: 'LifecycleEnvironment'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     # Edit
     permission :edit_ansible_lifecycle_environments,
       { 'foreman_ansible_director/api/v2/lifecycle_environments': %i[update update_content assign] },
-      resource_type: 'LifecycleEnvironment'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     # Destroy
     permission :destroy_ansible_lifecycle_environments,
       { 'foreman_ansible_director/api/v2/lifecycle_environments': [:destroy] },
-      resource_type: 'LifecycleEnvironment'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     ## Ansible lifecycle environment paths
     # View
     permission :view_ansible_lifecycle_environment_paths,
       { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search] },
-      resource_type: 'LifecycleEnvironmentPath'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     # Create
     permission :create_ansible_lifecycle_environment_paths,
       { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': [:create] },
-      resource_type: 'LifecycleEnvironmentPath'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     # Edit
     permission :edit_ansible_lifecycle_environment_paths,
       { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': [:update] },
-      resource_type: 'LifecycleEnvironmentPath'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     # Destroy
     permission :destroy_ansible_lifecycle_environment_paths,
       { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': [:destroy] },
-      resource_type: 'LifecycleEnvironmentPath'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     # Promote
     permission :promote_ansible_lifecycle_environment_paths,
       { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': [:promote] },
-      resource_type: 'LifecycleEnvironmentPath'
+      resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     ## Ansible Execution Environments
     # View
     permission :view_ansible_execution_environments,
       { 'foreman_ansible_director/api/v2/execution_environments': %i[index auto_complete_search] },
-      resource_type: 'ExecutionEnvironment'
+      resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Create
     permission :create_ansible_execution_environments,
       { 'foreman_ansible_director/api/v2/execution_environments': [:create] },
-      resource_type: 'ExecutionEnvironment'
+      resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Edit
     permission :edit_ansible_execution_environments,
       { 'foreman_ansible_director/api/v2/execution_environments': [:update] },
-      resource_type: 'ExecutionEnvironment'
+      resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Destroy
     permission :destroy_ansible_execution_environments,
       { 'foreman_ansible_director/api/v2/execution_environments': [:destroy] },
-      resource_type: 'ExecutionEnvironment'
+      resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     ## Ansible assignments
     # View
     permission :view_ansible_assignments,
       { 'foreman_ansible_director/api/v2/assignments': [:assignments] },
-      resource_type: 'AnsibleContentAssignment'
+      resource_type: 'ForemanAnsibleDirector::AnsibleContentAssignment'
     # Create
     permission :create_ansible_assignments,
       { 'foreman_ansible_director/api/v2/assignments': %i[assign assign_bulk] },
-      resource_type: 'AnsibleContentAssignment'
+      resource_type: 'ForemanAnsibleDirector::AnsibleContentAssignment'
     # Edit
     # Destroy
     permission :destroy_ansible_assignments,
       { 'foreman_ansible_director/api/v2/assignments': [:destroy] },
-      resource_type: 'AnsibleContentAssignment'
+      resource_type: 'ForemanAnsibleDirector::AnsibleContentAssignment'
 
     role 'AnsibleDirector Viewer', %i[
       view_ansible_content
