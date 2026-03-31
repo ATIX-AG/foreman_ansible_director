@@ -206,7 +206,7 @@ export const AnsibleLcePathComponent = ({
     setIsConfirmationModalOpen(true);
     setConfirmationModalTitle(`Destroy "${path.name}"?`);
     setConfirmationModalBody(
-      `This will delete "${path.name}" and ${path.lifecycle_environments.length} lifecycle environments.\nAre you sure you want to delete ${path.name}?`
+      `This will delete "${path.name}" and ${path.lifecycle_environments.length} lifecycle environments.\nAre you sure you want to delete "${path.name}"?`
     );
     setConfirmationModalOnConfirm(() => async () => {
       await destroyLcePath(path);
