@@ -40,7 +40,7 @@ module ForemanAnsibleDirector
           )
           @bulk_destroy_task =
             ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Destroy,
-              resolved_content_units: resolved, organization_id: @organization.id)
+              resolved_content_units: resolved)
         end
 
         def model_of_controller
