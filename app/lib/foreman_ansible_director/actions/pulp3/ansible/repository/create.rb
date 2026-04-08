@@ -19,7 +19,7 @@ module ForemanAnsibleDirector
             def run
               if input[:skip]
                 # Output needs to remain persistent, or we will get an error dereferencing this
-                output.update(repository_create_response: { pulp_href: nil })
+                output.update(repository_create_response: { pulp_href: nil }, success: true, error: nil)
                 return
               end
 
@@ -29,8 +29,13 @@ module ForemanAnsibleDirector
               repository = PulpAnsibleClient::AnsibleAnsibleRepository.new(
                 { name: name }
               )
-              response = ::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Create.new(repository).request
-              output.update(repository_create_response: response)
+
+              begin
+                response = ::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Create.new(repository).request
+                output.update(repository_create_response: response, success: true, error: nil)
+              rescue PulpAnsibleClient::ApiError => e
+                output.update(repository_create_response: nil, success: false, error: e.message)
+              end
             end
 
             def task_output

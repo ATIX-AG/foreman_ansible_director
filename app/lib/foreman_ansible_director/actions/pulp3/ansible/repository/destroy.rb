@@ -10,6 +10,7 @@ module ForemanAnsibleDirector
 
             input_format do
               param :repository_href, String, required: true
+              param :skip, Boolean
             end
 
             output_format do
@@ -17,9 +18,19 @@ module ForemanAnsibleDirector
             end
 
             def invoke_external_task
-              response =
-                ::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Destroy.new(input[:repository_href]).request
-              output.update(repository_destroy_response: response)
+              if input[:skip]
+                output.update(repository_destroy_response: nil, success: true)
+              else
+                begin
+                  response =
+                    ::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Destroy.new(input[:repository_href]).request
+                  output.update(repository_destroy_response: response, success: true)
+                rescue PulpAnsibleClient::ApiError
+                  # If the repository never existed, this job can still be considered successful
+                  output.update(repository_destroy_response: nil, success: true)
+                end
+              end
+
               nil
             end
 
@@ -28,11 +39,14 @@ module ForemanAnsibleDirector
             end
 
             def poll_external_task
-              repository_destroy_task = output&.[](:repository_destroy_response)&.[](:task)
-              task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(repository_destroy_task).request
-              task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
+              if (repository_destroy_task = output.dig(:repository_destroy_response, :task))
+                task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(repository_destroy_task).request
+                task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
-              { progress: task_status.progress }
+                { progress: task_status.progress }
+              end
+
+              { progress: 1 }
             end
 
             def task_output

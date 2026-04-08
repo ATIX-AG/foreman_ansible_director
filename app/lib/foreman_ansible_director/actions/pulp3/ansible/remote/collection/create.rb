@@ -25,9 +25,14 @@ module ForemanAnsibleDirector
                     requirements_file: input[:requirements],
                   }
                 )
-                response =
-                  ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
-                output.update(collection_remote_create_response: response)
+
+                begin
+                  response =
+                    ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Create.new(collection_remote).request
+                  output.update(collection_remote_create_response: response, success: true, error: nil)
+                rescue PulpAnsibleClient::ApiError => e
+                  output.update(collection_remote_create_response: nil, success: false, error: e.message)
+                end
               end
 
               def task_output
