@@ -32,6 +32,7 @@ module ForemanAnsibleDirector
                   name: name,
                   url: input[:url],
                   git_ref: input[:git_ref],
+                  pulp_labels: ::ForemanAnsibleDirector::Constants::PULP_OBJECT_LABELS,
                 })
                 response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
                 output.update(git_remote_create_response: response)

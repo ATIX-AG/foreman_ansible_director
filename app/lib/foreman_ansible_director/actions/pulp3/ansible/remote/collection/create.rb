@@ -23,6 +23,7 @@ module ForemanAnsibleDirector
                     name: input[:name],
                     url: input[:url],
                     requirements_file: input[:requirements],
+                    pulp_labels: ::ForemanAnsibleDirector::Constants::PULP_OBJECT_LABELS,
                   }
                 )
 
