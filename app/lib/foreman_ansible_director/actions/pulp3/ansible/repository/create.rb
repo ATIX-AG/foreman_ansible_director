@@ -27,7 +27,10 @@ module ForemanAnsibleDirector
               name = "#{name}-#{input[:name_suffix]}" if input[:name_suffix]
 
               repository = PulpAnsibleClient::AnsibleAnsibleRepository.new(
-                { name: name }
+                {
+                  name: name,
+                  pulp_labels: ::ForemanAnsibleDirector::Constants::PULP_OBJECT_LABELS,
+                }
               )
 
               begin

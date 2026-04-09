@@ -8,6 +8,12 @@ module ForemanAnsibleDirector
     DEFAULT_GALAXY_URL = 'https://galaxy.ansible.com/'
     DEFAULT_ANSIBLE_VERSION = '2.19.3'
 
+    PULP_OBJECT_LABELS = {
+      katello_orphan_cleanup: 'false',
+      creator: ::ForemanAnsibleDirector::Constants::PLUGIN_NAME,
+      creator_version: ::ForemanAnsibleDirector::Constants::PLUGIN_VERSION,
+    }.freeze
+
     ANSIBLE_VERSIONS = %w[
       v10.0.0
       v10.0.1

@@ -21,6 +21,7 @@ module ForemanAnsibleDirector
                   {
                     name: input[:name],
                     url: input[:url],
+                    pulp_labels: ::ForemanAnsibleDirector::Constants::PULP_OBJECT_LABELS,
                   }
                 )
                 response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Role::Create.new(role_remote).request

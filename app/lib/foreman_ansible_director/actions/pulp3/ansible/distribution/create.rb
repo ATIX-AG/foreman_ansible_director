@@ -47,6 +47,7 @@ module ForemanAnsibleDirector
                   name: name,
                   base_path: path,
                   repository: repository_href,
+                  pulp_labels: ::ForemanAnsibleDirector::Constants::PULP_OBJECT_LABELS,
                 }
               )
               begin
