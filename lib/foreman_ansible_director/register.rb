@@ -222,6 +222,7 @@ Foreman::Plugin.register :foreman_ansible_director do
         type: :integer,
         description: 'Default Execution Environment used for execution of default Ansible jobs.',
         default: nil,
+        full_name: 'Execution Environments - Default Ansible Execution Environment for Ansible jobs',
         collection: proc {
                       Hash[[[nil,
                              'No default Execution Environment']].concat(
