@@ -39,7 +39,7 @@ module ForemanAnsibleDirector
                 name_suffix: obj_name_suffix,
                 base_path: "#{organization_id}/#{unit.name}-git",
                 path_suffix: obj_name_suffix,
-                repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
+                repository_create_action: repository_create_action.output,
                 skip: false
               )
 
