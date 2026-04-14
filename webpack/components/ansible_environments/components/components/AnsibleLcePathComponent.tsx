@@ -400,7 +400,9 @@ export const AnsibleLcePathComponent = ({
                 {_('They provide different content.')}
                 <br />
                 {__(
-                  _('Promote to assign the content of %(env)s to %(nEnv)s.'),
+                  _(
+                    'Promote to assign the Ansible content and Execution Environment of %(env)s to %(nEnv)s.'
+                  ),
                   { env: env.name, nEnv: nextEnv.name }
                 )}
               </div>
