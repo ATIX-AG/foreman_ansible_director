@@ -2,28 +2,29 @@
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import {
   Bullseye,
-  DataList,
-  DataListAction,
-  DataListCell,
-  DataListItem,
-  DataListItemCells,
-  DataListItemRow,
-  DataListWrapModifier,
   EmptyState,
   EmptyStateHeader,
   EmptyStateIcon,
   Grid,
   GridItem,
   Label,
-  Panel,
-  PanelMain,
-  PanelMainBody,
   SearchInput,
   Spinner,
   Stack,
   StackItem,
   Switch,
 } from '@patternfly/react-core';
+import {
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  OuterScrollContainer,
+  InnerScrollContainer,
+} from '@patternfly/react-table';
+
 import DatabaseIcon from '@patternfly/react-icons/dist/esm/icons/database-icon';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
 import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-icon';
@@ -62,12 +63,6 @@ export const AnsibleVariablesSelector = ({
   // This search approach is fine for 50 items, but not 500. For that, we should use a server-side search.
   const [roleFilter, setRoleFilter] = React.useState<string>('');
   const [variableFilter, setVariableFilter] = React.useState<string>('');
-
-  // TODO: Maybe it would be smarter to store the role name of the currently open dropdown item
-  // eslint-disable-next-line no-unused-vars
-  const [dropdownOpen, setDropdownOpen] = React.useState<{
-    [key: string]: boolean;
-  }>({});
 
   const [variableUpdating, setVariableUpdating] = React.useState<string>('');
 
@@ -127,10 +122,9 @@ export const AnsibleVariablesSelector = ({
     }
   };
 
-  // TODO: As for the header, this should be a table instead of the useless datalist
   return (
     <Grid hasGutter>
-      <GridItem span={4}>
+      <GridItem span={3}>
         <Stack>
           <StackItem>
             <SearchInput
@@ -143,108 +137,51 @@ export const AnsibleVariablesSelector = ({
             />
           </StackItem>
           <StackItem>
-            <Panel isScrollable>
-              <PanelMain>
-                <PanelMainBody>
-                  <DataList
-                    aria-label="Simple data list example"
-                    onSelectDataListItem={(_event, id: string) => {
-                      setSelectedRole(id);
-                      setAvailableVariables(
-                        ansibleRoles.find(role => role.name === id)
-                          ?.variables || []
-                      );
-                    }}
-                    selectedDataListItemId={selectedRole}
-                    isCompact
-                  >
-                    {ansibleRoles
-                      .filter(role =>
-                        role.name.startsWith(roleFilter.toLowerCase())
-                      )
-                      .map(role => (
-                        <DataListItem
-                          aria-labelledby="simple-item1"
-                          id={role.name}
-                        >
-                          <DataListItemRow>
-                            <DataListItemCells
-                              dataListCells={[
-                                <DataListCell key="primary content">
-                                  <span id="simple-item1">{role.name}</span>
-                                </DataListCell>,
-                              ]}
-                            />
-                            {/* <DataListAction
-                            aria-labelledby="check-action-item1 check-action-action1"
-                            id="check-action-action1"
-                            aria-label="Actions"
-                            isPlainButtonAction
+            <div style={{ height: '70vh' }}>
+              <OuterScrollContainer>
+                <InnerScrollContainer>
+                  <Table variant="compact" isStickyHeader>
+                    <Thead>
+                      <Tr>
+                        <Th modifier="nowrap" width={30}>
+                          {_('Role')}
+                        </Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {ansibleRoles
+                        .filter(role =>
+                          role.name.startsWith(roleFilter.toLowerCase())
+                        )
+                        .map(role => (
+                          <Tr
+                            key={role.name}
+                            onRowClick={() => {
+                              setSelectedRole(role.name);
+                              setAvailableVariables(
+                                ansibleRoles.find(
+                                  ansibleRole => ansibleRole.name === role.name
+                                )?.variables || []
+                              );
+                            }}
+                            isSelectable
+                            isClickable
+                            isRowSelected={selectedRole === role.name}
                           >
-                            <Dropdown
-                              popperProps={{ position: 'right' }}
-                              onSelect={() => {}}
-                              toggle={(
-                                toggleRef: React.Ref<MenuToggleElement>
-                              ) => (
-                                <MenuToggle
-                                  ref={toggleRef}
-                                  isExpanded={
-                                    dropdownOpen[role.name] !== undefined &&
-                                    dropdownOpen[role.name]
-                                  }
-                                  onClick={() => {
-                                    setDropdownOpen(oldDropdownOpen => {
-                                      // eslint-disable-next-line standard/computed-property-even-spacing
-                                      oldDropdownOpen[
-                                        role.name
-                                      ] = !oldDropdownOpen[role.name];
-                                      return { ...oldDropdownOpen };
-                                    });
-                                  }}
-                                  variant="plain"
-                                  aria-label="Data list with checkboxes, actions and additional cells example kebab toggle 1"
-                                >
-                                  <EllipsisVIcon aria-hidden="true" />
-                                </MenuToggle>
-                              )}
-                              isOpen={
-                                dropdownOpen[role.name] !== undefined &&
-                                dropdownOpen[role.name]
-                              }
-                              onOpenChange={(isOpen: boolean) => {
-                                setDropdownOpen(oldDropdownOpen => {
-                                  // eslint-disable-next-line standard/computed-property-even-spacing
-                                  oldDropdownOpen[role.name] = !oldDropdownOpen[
-                                    role.name
-                                  ];
-                                  return { ...oldDropdownOpen };
-                                });
-                              }}
-                            >
-                              <DropdownList>
-                                <DropdownItem
-                                  key="link"
-                                  onClick={(event: any) =>
-                                    event.preventDefault()
-                                  }
-                                >
-                                  Allow overriding for all variables
-                                </DropdownItem>
-                              </DropdownList>
-                            </Dropdown>
-                          </DataListAction> */}
-                          </DataListItemRow>
-                        </DataListItem>
-                      ))}
-                  </DataList>
-                </PanelMainBody>
-              </PanelMain>
-            </Panel>
+                            <Td dataLabel={_('Role')} modifier="breakWord">
+                              {role.name}
+                            </Td>
+                          </Tr>
+                        ))}
+                    </Tbody>
+                  </Table>
+                </InnerScrollContainer>
+              </OuterScrollContainer>
+            </div>
           </StackItem>
         </Stack>
       </GridItem>
-      <GridItem span={8}>
+      <GridItem span={9}>
         {selectedRole !== '' ? (
           <Stack>
             <StackItem>
@@ -257,134 +194,101 @@ export const AnsibleVariablesSelector = ({
             </StackItem>
             <StackItem>
               {availableVariables.length > 0 ? (
-                <Panel isScrollable>
-                  <PanelMain>
-                    <Permitted
-                      requiredPermissions={[
-                        AdPermissions.ansibleVariables.view,
-                      ]}
-                    >
-                      <PanelMainBody>
-                        <DataList
-                          aria-label="Simple data list example"
-                          isCompact
-                        >
-                          {availableVariables
-                            .filter(variable =>
-                              variable.name.startsWith(
-                                variableFilter.toLowerCase()
+                <Permitted
+                  requiredPermissions={[AdPermissions.ansibleVariables.view]}
+                >
+                  <div style={{ height: '70vh' }}>
+                    <OuterScrollContainer>
+                      <InnerScrollContainer>
+                        <Table variant="compact" isStickyHeader>
+                          <Thead>
+                            <Tr>
+                              <Th modifier="nowrap" width={30}>
+                                {_('Name')}
+                              </Th>
+                              <Th modifier="breakWord">{_('Default value')}</Th>
+                              <Th modifier="nowrap">{_('Type')}</Th>
+                              <Th modifier="nowrap">{_('Overridable?')}</Th>
+                              <Th modifier="nowrap" />
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {availableVariables
+                              .filter(variable =>
+                                variable.name.startsWith(
+                                  variableFilter.toLowerCase()
+                                )
                               )
-                            )
-                            .map(variable => (
-                              <DataListItem
-                                aria-labelledby="simple-item1"
-                                id={variable.name}
-                              >
-                                <DataListItemRow>
-                                  <DataListItemCells
-                                    dataListCells={[
-                                      <DataListCell
-                                        key={`${variable.name}-name`}
-                                        wrapModifier={
-                                          DataListWrapModifier.breakWord
+                              .map(variable => (
+                                <Tr key={variable.id}>
+                                  <Td
+                                    dataLabel={_('Variable name')}
+                                    modifier="breakWord"
+                                  >
+                                    {variable.name}
+                                  </Td>
+                                  <Td
+                                    dataLabel={_('Default value')}
+                                    modifier="breakWord"
+                                  >
+                                    {JSON.stringify(variable.default_value)}
+                                  </Td>
+                                  <Td dataLabel={_('Type')}>
+                                    <Label color="blue" isCompact>
+                                      {variable.type}
+                                    </Label>
+                                  </Td>
+                                  <Td dataLabel={_('Overridable?')}>
+                                    {variableUpdating === variable.id ? (
+                                      <Spinner
+                                        size="md"
+                                        aria-label="Contents of the medium example"
+                                      />
+                                    ) : (
+                                      <Switch
+                                        isChecked={
+                                          // eslint-disable-next-line standard/computed-property-even-spacing
+                                          overridableOverrides[variable.id] ||
+                                          variable.overridable
                                         }
-                                      >
-                                        <span id="simple-item1">
-                                          {variable.name}
-                                        </span>
-                                      </DataListCell>,
-                                      <DataListCell
-                                        key={`${variable.name}-default-value`}
-                                        wrapModifier={
-                                          DataListWrapModifier.breakWord
+                                        onChange={(event, checked) =>
+                                          onOverrideToggle(variable, checked)
                                         }
-                                      >
-                                        <span id="simple-item1">
-                                          {JSON.stringify(
-                                            variable.default_value
-                                          )}
-                                        </span>
-                                      </DataListCell>,
-                                      <DataListCell
-                                        key={`${variable.name}-type`}
-                                        wrapModifier={
-                                          DataListWrapModifier.breakWord
-                                        }
-                                        alignRight
-                                        isFilled={false}
-                                      >
-                                        <span id="simple-item1">
-                                          <Label color="blue">
-                                            {variable.type}
-                                          </Label>
-                                        </span>
-                                      </DataListCell>,
-                                      <DataListCell
-                                        key={`${variable.name}-override`}
-                                        alignRight
-                                        isFilled={false}
-                                      >
-                                        {variableUpdating === variable.id ? (
-                                          <Spinner
-                                            size="md"
-                                            aria-label="Contents of the medium example"
-                                          />
-                                        ) : (
-                                          <Switch
-                                            isChecked={
-                                              // eslint-disable-next-line standard/computed-property-even-spacing
-                                              overridableOverrides[
-                                                variable.id
-                                              ] || variable.overridable
-                                            }
-                                            onChange={(event, checked) =>
-                                              onOverrideToggle(
-                                                variable,
-                                                checked
-                                              )
-                                            }
-                                            isDisabled={!userCanEditVariables}
-                                          />
-                                        )}
-                                      </DataListCell>,
-                                      <DataListAction
-                                        aria-labelledby="single-action-item1 single-action-action1"
-                                        id="single-action-action1"
-                                        aria-label="Actions"
-                                        isPlainButtonAction
-                                      >
-                                        <PermittedButton
-                                          onClick={() => {
-                                            setSelectedVariable(variable);
-                                          }}
-                                          hasPopover={false}
-                                          key={`${variable.name}-action`}
-                                          variant="plain"
-                                          icon={<PencilAltIcon />}
-                                          requiredPermissions={[
-                                            AdPermissions.ansibleVariables.edit,
-                                            AdPermissions
-                                              .ansibleVariableOverrides.view,
-                                            AdPermissions
-                                              .ansibleVariableOverrides.destroy,
-                                            AdPermissions
-                                              .ansibleVariableOverrides.edit,
-                                          ]}
-                                        />
-                                      </DataListAction>,
-                                    ]}
-                                  />
-                                </DataListItemRow>
-                              </DataListItem>
-                            ))}
-                        </DataList>
-                      </PanelMainBody>
-                    </Permitted>
-                  </PanelMain>
-                </Panel>
+                                        isDisabled={!userCanEditVariables}
+                                      />
+                                    )}
+                                  </Td>
+                                  <Td>
+                                    <PermittedButton
+                                      onClick={() => {
+                                        setSelectedVariable(variable);
+                                      }}
+                                      hasPopover={false}
+                                      key={`${variable.name}-action`}
+                                      variant="plain"
+                                      icon={<PencilAltIcon />}
+                                      requiredPermissions={[
+                                        AdPermissions.ansibleVariables.edit,
+                                        AdPermissions.ansibleVariableOverrides
+                                          .view,
+                                        AdPermissions.ansibleVariableOverrides
+                                          .destroy,
+                                        AdPermissions.ansibleVariableOverrides
+                                          .edit,
+                                      ]}
+                                    />
+                                  </Td>
+                                </Tr>
+                              ))}
+                          </Tbody>
+                        </Table>
+                      </InnerScrollContainer>
+                    </OuterScrollContainer>
+                  </div>
+                </Permitted>
               ) : (
                 <Bullseye>
-                  <EmptyState>
+                  <EmptyState style={{ height: '70vh' }}>
                     <EmptyStateHeader
                       titleText={__(
                         _('%(role) does not have any variables defined.'),
@@ -400,7 +304,7 @@ export const AnsibleVariablesSelector = ({
           </Stack>
         ) : (
           <Bullseye>
-            <EmptyState>
+            <EmptyState style={{ height: '70vh' }}>
               <EmptyStateHeader
                 titleText={_('Select a role to see its variables')}
                 headingLevel="h4"
