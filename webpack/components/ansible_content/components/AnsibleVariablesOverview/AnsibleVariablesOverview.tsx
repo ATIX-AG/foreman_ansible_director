@@ -88,7 +88,7 @@ export const AnsibleVariablesOverview = ({
     return null;
   } else if (rolesRequest.status === 'PENDING') {
     return modal(
-      <EmptyState>
+      <EmptyState style={{ height: '70vh' }}>
         <EmptyStateHeader
           titleText={_('Loading Ansible roles...')}
           headingLevel="h4"
