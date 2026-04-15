@@ -3,10 +3,13 @@ import Permitted from 'foremanReact/components/Permitted';
 
 import AnsibleEnvironmentsPage from './AnsibleEnvironmentsPage';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
+import { ForceTaxonomy } from '../common/ForceTaxonomy';
 
 const AnsibleEnvironmentsPageWrapper: React.FC = () => (
   <Permitted requiredPermissions={[AdPermissions.ansibleLcePaths.view]}>
-    <AnsibleEnvironmentsPage />
+    <ForceTaxonomy organization>
+      <AnsibleEnvironmentsPage />
+    </ForceTaxonomy>
   </Permitted>
 );
 
