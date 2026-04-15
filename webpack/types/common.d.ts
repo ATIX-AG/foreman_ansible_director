@@ -26,3 +26,15 @@ export interface DefaultResponse<
   warnings: TWarning[];
   results: TResponse;
 }
+
+export interface Organization {
+  id: number;
+  title: string;
+}
+
+export interface Location {
+  id: number;
+  title: string;
+}
+
+export interface Taxon extends Organization, Location {}

@@ -1,9 +1,5 @@
-interface Organization {
-  id: number;
-  title: string;
-}
-
 declare module 'foremanReact/Root/Context/ForemanContext' {
+  import { Organization, Location } from '../../../common';
   // export declare function forceSingleton<T>(key: string, createFn: () => T): T | null;
 
   // export declare const getForemanContext: (
@@ -22,9 +18,9 @@ declare module 'foremanReact/Root/Context/ForemanContext' {
 
   // export declare const useForemanDocUrl: () => string | undefined;
 
-  export declare const useForemanOrganization: () => Organization | null;
+  export declare const useForemanOrganization: () => Organization | undefined;
 
-  // export declare const useForemanLocation: () => string | undefined;
+  export declare const useForemanLocation: () => Location | undefined;
 
   // export declare const useForemanUser: () => any;
 
