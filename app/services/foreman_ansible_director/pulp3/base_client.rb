@@ -10,9 +10,21 @@ module ForemanAnsibleDirector
             uri = URI.parse(::SmartProxy.first.url)
             config.host = uri.host
             config.scheme = uri.scheme
-            config.ssl_ca_file = ::ForemanAnsibleDirector::Cert::Certs.ca_cert_file
+            pulp3_ssl_configuration(config)
+          end
+        end
+
+        def pulp3_ssl_configuration(config, connection_adapter = Faraday.default_adapter)
+          config.ssl_ca_file = ::ForemanAnsibleDirector::Cert::Certs.ca_cert_file
+          case connection_adapter
+          when :excon
+            config.ssl_client_cert = ::ForemanAnsibleDirector::Cert::Certs.ssl_client_cert_file
+            config.ssl_client_key = ::ForemanAnsibleDirector::Cert::Certs.ssl_client_key_file
+          when :net_http
             config.ssl_client_cert = ::ForemanAnsibleDirector::Cert::Certs.ssl_client_cert
             config.ssl_client_key = ::ForemanAnsibleDirector::Cert::Certs.ssl_client_key
+          else
+            raise StandardError, "Connection adapter #{connection_adapter} not supported!"
           end
         end
 
