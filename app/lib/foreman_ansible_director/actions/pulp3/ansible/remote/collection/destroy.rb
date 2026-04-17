@@ -46,9 +46,9 @@ module ForemanAnsibleDirector
                   task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
                   { progress: task_status.progress }
+                else
+                  { progress: 1 }
                 end
-
-                { progress: 1 }
               end
 
               def task_output
