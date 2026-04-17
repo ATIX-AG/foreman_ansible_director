@@ -77,9 +77,9 @@ module ForemanAnsibleDirector
                 end
 
                 { progress: task_status.progress }
+              else
+                { progress: 1 }
               end
-
-              { progress: 1 }
             end
 
             def task_output
