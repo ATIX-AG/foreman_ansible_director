@@ -248,6 +248,10 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::LifecycleEnvironmentService.destroy_environment @lifecycle_environment
         end
 
+        def model_of_controller
+          resource_class
+        end
+
         def resource_scope
           ::ForemanAnsibleDirector::LifecycleEnvironment.all
         end
@@ -302,6 +306,10 @@ module ForemanAnsibleDirector
           @lifecycle_environment_path = ::ForemanAnsibleDirector::LifecycleEnvironmentPath.find(
             params[:lifecycle_environment_path_id]
           )
+        end
+
+        def resource_class
+          ::ForemanAnsibleDirector::LifecycleEnvironment
         end
       end
     end
