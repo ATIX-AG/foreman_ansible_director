@@ -66,7 +66,7 @@ export const GitRefInput: React.FC<VersionInputProps> = ({
             id="cu-source-input-01"
             data-testid="git-ref-input"
             type="text"
-            aria-label="content unit source input"
+            aria-label={_('content unit source input')}
           />
         </InputGroupItem>
         <InputGroupItem>
@@ -83,12 +83,12 @@ export const GitRefInput: React.FC<VersionInputProps> = ({
         <FormHelperText>
           <HelperText>
             <HelperTextItem>
-              {'Ref list does not conform to the pattern: "<Ref>, <Ref>"'}
+              {_('Ref list does not conform to the pattern: "<Ref>, <Ref>"')}
             </HelperTextItem>
           </HelperText>
         </FormHelperText>
       )}
-      <ChipGroup categoryName="Only import: " numChips={10}>
+      <ChipGroup categoryName={_('Only import: ')} numChips={10}>
         {gitRefs.map(unitVersion => (
           <Chip
             key={unitVersion}

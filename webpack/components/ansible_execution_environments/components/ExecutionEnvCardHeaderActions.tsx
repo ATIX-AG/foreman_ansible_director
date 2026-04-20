@@ -100,7 +100,7 @@ export const ExecutionEnvCardHeaderActions = ({
             bodyContent: <div>{statusMessage(executionEnvironment)}</div>,
           }}
           variant="plain"
-          aria-label="Action"
+          aria-label={_('View build status')}
           onClick={() => {
             const baseUrl = window.location.origin;
             window.open(
@@ -155,7 +155,7 @@ export const ExecutionEnvCardHeaderActions = ({
           ),
         }}
         variant="plain"
-        aria-label="Action"
+        aria-label={editMode ? _('Save changes') : _('Edit')}
         onClick={handleEdit}
         isDisabled={editMode && !inputValid}
       >

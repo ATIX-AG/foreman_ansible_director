@@ -43,11 +43,11 @@ export const OverrideGridWrapper = ({
       addToast({
         type: 'danger',
         key: `GET_${crnType}_${crnId}_ANSIBLE_VAR_OVERRIDES`,
-        message: 'Requesting Ansible variable overrides failed".',
+        message: _('Requesting Ansible variable overrides failed.'),
         sticky: false,
       })
     );
-    return <div>Placeholder error component</div>;
+    return <div>{_('Failed to load Ansible variable overrides.')}</div>;
   } else if (overridesRequest.status === 'RESOLVED') {
     return (
       <OverrideGrid

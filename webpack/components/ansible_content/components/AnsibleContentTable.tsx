@@ -112,13 +112,17 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
 
   return (
     <>
-      <Table aria-label="Simple table" isTreeTable variant="compact">
+      <Table
+        aria-label={_('Ansible content table')}
+        isTreeTable
+        variant="compact"
+      >
         <Thead>
           <Tr>
-            <Th dataLabel="Identifier">{_('Identifier')}</Th>
-            <Th dataLabel="Type">{_('Type')}</Th>
-            <Th dataLabel="Namespace">{_('Namespace')}</Th>
-            <Th dataLabel="Name">{_('Name')}</Th>
+            <Th dataLabel={_('Identifier')}>{_('Identifier')}</Th>
+            <Th dataLabel={_('Type')}>{_('Type')}</Th>
+            <Th dataLabel={_('Namespace')}>{_('Namespace')}</Th>
+            <Th dataLabel={_('Name')}>{_('Name')}</Th>
           </Tr>
         </Thead>
         <Tbody>{renderRows(apiResponse.results)}</Tbody>

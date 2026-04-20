@@ -155,7 +155,7 @@ export const ExecutionEnvEditCard = ({
             isRequired={editMode}
             labelIcon={
               <Popover
-                headerContent={<div>ansible-core version</div>}
+                headerContent={<div>{_('ansible-core version')}</div>}
                 bodyContent={
                   <div>
                     {_(

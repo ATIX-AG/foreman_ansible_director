@@ -54,8 +54,8 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
   ): React.ReactNode =>
     versions.map(version => (
       <Tr key={`${identifier}:${version.version}`}>
-        <Td dataLabel="Version">{version.version}</Td>
-        <Td dataLabel="Roles">
+        <Td dataLabel={_('Version')}>{version.version}</Td>
+        <Td dataLabel={_('Roles')}>
           <Button
             variant="link"
             isInline
@@ -174,11 +174,14 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
     <Tr isExpanded={isExpanded}>
       <Td colSpan={3}>
         <ExpandableRowContent>
-          <Table aria-label="Simple table" variant="compact">
+          <Table
+            aria-label={_('Ansible content versions table')}
+            variant="compact"
+          >
             <Thead>
               <Tr>
-                <Th dataLabel="Version">{_('Version')}</Th>
-                <Th dataLabel="Roles">{_('Roles')}</Th>
+                <Th dataLabel={_('Version')}>{_('Version')}</Th>
+                <Th dataLabel={_('Roles')}>{_('Roles')}</Th>
               </Tr>
             </Thead>
             <Tbody>{versionRows(nodeVersions)}</Tbody>

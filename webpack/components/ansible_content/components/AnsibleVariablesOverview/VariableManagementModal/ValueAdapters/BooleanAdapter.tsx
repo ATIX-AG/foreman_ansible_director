@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface BooleanAdapterProps {
   isEditMode: boolean;
@@ -14,13 +15,13 @@ export const BooleanAdapter = ({
 }: BooleanAdapterProps): ReactElement => (
   <ToggleGroup areAllGroupsDisabled={!isEditMode}>
     <ToggleGroupItem
-      text="True"
+      text={_('True')}
       buttonId="toggle-group-single-1"
       isSelected={value}
       onChange={(_event, selected) => selected && onChange(true)}
     />
     <ToggleGroupItem
-      text="False"
+      text={_('False')}
       buttonId="toggle-group-single-1"
       isSelected={!value}
       onChange={(_event, selected) => selected && onChange(false)}

@@ -12,6 +12,7 @@ import {
   TextInputGroupUtilities,
 } from '@patternfly/react-core';
 import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface MatcherSelectorProps {
   matcherOptions: SelectOptionProps[];
@@ -147,7 +148,7 @@ export const MatcherSelector = ({
     <MenuToggle
       ref={toggleRef}
       variant="typeahead"
-      aria-label="Typeahead menu toggle"
+      aria-label={_('Typeahead menu toggle')}
       onClick={onToggleClick}
       isExpanded={isMatcherValueSelectOpen}
       isFullWidth
@@ -160,7 +161,7 @@ export const MatcherSelector = ({
           id="typeahead-select-input"
           autoComplete="off"
           innerRef={textInputRef}
-          placeholder="Select a matcher value"
+          placeholder={_('Select a matcher value')}
           {...(activeItemId && { 'aria-activedescendant': activeItemId })}
           role="combobox"
           isExpanded={isMatcherValueSelectOpen}
@@ -173,7 +174,7 @@ export const MatcherSelector = ({
           <Button
             variant="plain"
             onClick={onClearButtonClick}
-            aria-label="Clear input value"
+            aria-label={_('Clear input value')}
           >
             <TimesIcon aria-hidden />
           </Button>

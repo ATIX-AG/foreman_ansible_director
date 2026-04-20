@@ -31,13 +31,13 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
         hasPopover
         popoverProps={{
           triggerAction: 'hover',
-          'aria-label': 'description popover',
+          'aria-label': _('Description popover'),
           headerComponent: 'h1',
-          headerContent: 'Description',
+          headerContent: _('Description'),
           bodyContent: <div>{lcePath.description}</div>,
         }}
         variant="plain"
-        aria-label="Action"
+        aria-label={_('View description')}
       >
         <Icon size="lg">
           <InfoCircleIcon />
@@ -49,13 +49,13 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
       hasPopover
       popoverProps={{
         triggerAction: 'hover',
-        'aria-label': 'destroy popover',
+        'aria-label': _('Delete popover'),
         headerComponent: 'h1',
         headerContent: _('Delete'),
         bodyContent: <div>{_('Delete this lifecycle environment path.')}</div>,
       }}
       variant="plain"
-      aria-label="Action"
+      aria-label={_('Delete lifecycle environment path')}
       onClick={() => handleDestroy(lcePath)}
     >
       <Icon size="lg">
@@ -67,13 +67,13 @@ export const AnsibleLcePathComponentHeaderActions: React.FC<AnsibleLcePathCompon
       hasPopover
       popoverProps={{
         triggerAction: 'hover',
-        'aria-label': 'edit popover',
+        'aria-label': _('Edit popover'),
         headerComponent: 'h1',
         headerContent: _('Edit'),
         bodyContent: <div>{_('Edit this lifecycle environment path.')}</div>,
       }}
       variant="plain"
-      aria-label="Action"
+      aria-label={editMode ? _('Save') : _('Edit')}
       onClick={handleEdit}
     >
       {editMode ? (

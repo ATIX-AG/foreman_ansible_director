@@ -128,7 +128,7 @@ export const AnsibleVariablesSelector = ({
         <Stack>
           <StackItem>
             <SearchInput
-              placeholder="Find by name"
+              placeholder={_('Find by name')}
               value={roleFilter}
               onChange={(_event, value) => {
                 setRoleFilter(value);
@@ -186,7 +186,7 @@ export const AnsibleVariablesSelector = ({
           <Stack>
             <StackItem>
               <SearchInput
-                placeholder="Find by name"
+                placeholder={_('Find by name')}
                 value={variableFilter}
                 onChange={(_event, value) => setVariableFilter(value)}
                 onClear={() => setVariableFilter('')}
@@ -242,7 +242,7 @@ export const AnsibleVariablesSelector = ({
                                     {variableUpdating === variable.id ? (
                                       <Spinner
                                         size="md"
-                                        aria-label="Contents of the medium example"
+                                        aria-label={_('Loading variable state')}
                                       />
                                     ) : (
                                       <Switch

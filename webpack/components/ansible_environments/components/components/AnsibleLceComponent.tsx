@@ -228,7 +228,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
               >
                 {lifecycleEnvironment.execution_environment
                   ? lifecycleEnvironment.execution_environment.name
-                  : 'None'}
+                  : _('None')}
               </Button>
             </div>
           </SplitItem>

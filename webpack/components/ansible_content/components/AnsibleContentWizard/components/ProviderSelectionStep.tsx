@@ -27,7 +27,7 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
       <FlexItem style={{ width: '30%' }}>
         {' '}
         <Tile
-          title="Ansible Galaxy"
+          title={_('Ansible Galaxy')}
           icon={<TopologyIcon />}
           isStacked
           isDisplayLarge

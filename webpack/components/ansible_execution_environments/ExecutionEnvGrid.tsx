@@ -25,6 +25,7 @@ import { PaginationProps } from 'foremanReact/common/hooks/API/APIHooks';
 import Pagination from 'foremanReact/components/Pagination';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import SearchBar from 'foremanReact/components/SearchBar';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';
 import { ExecutionEnvCreateCard } from './components/ExecutionEnvCreateCard';
@@ -124,11 +125,11 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
       <EmptyState variant={EmptyStateVariant.xl}>
         <EmptyStateHeader
           headingLevel="h4"
-          titleText="No Execution Environments"
+          titleText={_('No Execution Environments')}
           icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
         />
         <EmptyStateBody>
-          No Execution Environments found in this organization
+          {_('No Execution Environments found in this organization')}
         </EmptyStateBody>
         <EmptyStateFooter>
           <EmptyStateActions>

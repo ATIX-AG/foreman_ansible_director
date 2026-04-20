@@ -320,9 +320,9 @@ export const AnsibleLcePathComponent = ({
           hasPopover
           popoverProps={{
             triggerAction: 'hover',
-            'aria-label': 'destroy popover',
+            'aria-label': _('New lifecycle environment popover'),
             headerComponent: 'h1',
-            headerContent: 'New lifecycle environment',
+            headerContent: _('New lifecycle environment'),
             bodyContent: (
               <div>
                 {__(_('Insert new lifecycle environment after %(lce)s.'), {
@@ -332,7 +332,7 @@ export const AnsibleLcePathComponent = ({
             ),
           }}
           variant="plain"
-          aria-label="Action"
+          aria-label={_('Insert lifecycle environment')}
           onClick={() => insertEnv('after', env)}
         >
           <Icon size="lg">
@@ -351,7 +351,7 @@ export const AnsibleLcePathComponent = ({
             style={{ padding: '10px' }}
             popoverProps={{
               triggerAction: 'hover',
-              'aria-label': 'promote equivalent popover',
+              'aria-label': _('Equivalent environments popover'),
               headerComponent: 'h1',
               headerContent: (
                 <div>
@@ -366,7 +366,7 @@ export const AnsibleLcePathComponent = ({
               bodyContent: <div>{_('They provide the same content.')}</div>,
             }}
             variant="plain"
-            aria-label="Action"
+            aria-label={_('Equivalent environments')}
           >
             <Icon size="lg">
               <BarsIcon />
@@ -383,7 +383,7 @@ export const AnsibleLcePathComponent = ({
           style={{ padding: '10px' }}
           popoverProps={{
             triggerAction: 'hover',
-            'aria-label': 'promote popover',
+            'aria-label': _('Promote popover'),
             headerComponent: 'h1',
             headerContent: (
               <div>
@@ -409,7 +409,7 @@ export const AnsibleLcePathComponent = ({
             ),
           }}
           variant="plain"
-          aria-label="Action"
+          aria-label={_('Promote')}
           onClick={() => handlePromote(env.id, nextEnv.id)}
         >
           <Icon size="lg">

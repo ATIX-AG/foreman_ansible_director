@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Bullseye, NumberInput } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface RealAdapterProps {
   isEditMode: boolean;
@@ -29,9 +30,9 @@ export const RealAdapter = ({
       }}
       onPlus={() => onChange(value + 0.1)}
       inputName="input1"
-      inputAriaLabel="number input 1"
-      minusBtnAriaLabel="input 2 minus"
-      plusBtnAriaLabel="input 2 plus"
+      inputAriaLabel={_('number input 1')}
+      minusBtnAriaLabel={_('input 2 minus')}
+      plusBtnAriaLabel={_('input 2 plus')}
       widthChars={10}
     />
   </Bullseye>

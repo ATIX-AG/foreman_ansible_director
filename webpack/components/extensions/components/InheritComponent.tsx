@@ -5,6 +5,7 @@ import {
   EmptyStateHeader,
   EmptyStateIcon,
 } from '@patternfly/react-core';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import CheckIcon from '@patternfly/react-icons/dist/esm/icons/check-icon';
 /* eslint-disable camelcase */
 import global_success_color_100 from '@patternfly/react-tokens/dist/esm/global_success_color_100';
@@ -20,8 +21,13 @@ export const InheritComponent = ({
     <EmptyStateHeader
       titleText={
         hostgroupName
-          ? `Inheriting Ansible content from Hostgroup: "${hostgroupName}"`
-          : 'Inheriting Ansible content from Hostgroup'
+          ? __(
+              _(
+                'Inheriting Ansible content from Hostgroup: "%(hostgroupName)s"'
+              ),
+              { hostgroupName }
+            )
+          : _('Inheriting Ansible content from Hostgroup')
       }
       headingLevel="h4"
       icon={
@@ -29,7 +35,7 @@ export const InheritComponent = ({
       }
     />
     <EmptyStateBody>
-      This host will inherit Ansible content from the selected Hostgroup.
+      {_('This host will inherit Ansible content from the selected Hostgroup.')}
     </EmptyStateBody>
   </EmptyState>
 );

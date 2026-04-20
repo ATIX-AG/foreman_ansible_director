@@ -50,8 +50,8 @@ export const HostDetailsLceCard = ({
 }: HostDetailsLceCardProps): React.ReactElement | null => {
   const organization = useForemanOrganization();
 
-  const LCE_PATH_SELECTOR_PLACEHOLDER = 'Lifecycle environment path';
-  const LCE_SELECTOR_PLACEHOLDER = 'Lifecycle environment';
+  const LCE_PATH_SELECTOR_PLACEHOLDER = _('Lifecycle environment path');
+  const LCE_SELECTOR_PLACEHOLDER = _('Lifecycle environment');
 
   const [isEditMode, setIsEditMode] = React.useState<boolean>(false);
 
@@ -280,9 +280,9 @@ export const HostDetailsLceCard = ({
 
   return (
     <>
-      <Skeleton screenreaderText="Loading lce path" />
+      <Skeleton screenreaderText={_('Loading lifecycle environment path')} />
       <br />
-      <Skeleton screenreaderText="Loading lce" />
+      <Skeleton screenreaderText={_('Loading lifecycle environment')} />
     </>
   );
 };

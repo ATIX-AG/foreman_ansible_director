@@ -5,6 +5,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 import { InheritComponent } from '../components/InheritComponent';
 import { LifecycleEnvComponentWrapper } from '../components/LifecycleEnvComponentWrapper';
 
@@ -30,21 +31,21 @@ export const CreateHostAnsibleContentTab = () => {
   return (
     <Stack>
       <StackItem>
-        <ToggleGroup aria-label="Default with single selectable">
+        <ToggleGroup aria-label={_('Content source selector')}>
           <ToggleGroupItem
-            text="Direct assignment"
+            text={_('Direct assignment')}
             buttonId="toggle-group-single-1"
             isSelected={contentSource === 'direct'}
             onChange={() => setContentSource('direct')}
           />
           <ToggleGroupItem
-            text="Inherit from Hostgroup"
+            text={_('Inherit from Hostgroup')}
             buttonId="toggle-group-single-2"
             isSelected={contentSource === 'inherit'}
             onChange={() => setContentSource('inherit')}
           />
           <ToggleGroupItem
-            text="Lifecycle environment"
+            text={_('Lifecycle environment')}
             buttonId="toggle-group-single-3"
             isSelected={contentSource === 'lce'}
             onChange={() => setContentSource('lce')}
