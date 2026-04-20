@@ -22,9 +22,9 @@ import {
 } from '@patternfly/react-core';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
-import CodeBranchIcon from '@patternfly/react-icons/dist/esm/icons/code-branch-icon';
+// import CodeBranchIcon from '@patternfly/react-icons/dist/esm/icons/code-branch-icon';
 import CodeIcon from '@patternfly/react-icons/dist/esm/icons/code-icon';
-import TagIcon from '@patternfly/react-icons/dist/esm/icons/tag-icon';
+// import TagIcon from '@patternfly/react-icons/dist/esm/icons/tag-icon';
 import styles from '@patternfly/react-styles/css/components/Form/form';
 
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
@@ -204,7 +204,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
               validated={repoUrlValidation}
             />
           </InputGroupItem>
-          <InputGroupItem>
+          {/*          <InputGroupItem>
             <Button
               variant="control"
               aria-label="inspect repository"
@@ -212,7 +212,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
             >
               {_('Inspect repository')}
             </Button>
-          </InputGroupItem>
+          </InputGroupItem> */}
         </InputGroup>
         {repoUrlValidation === ValidatedOptions.error && (
           <FormHelperText>
@@ -268,7 +268,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
             }
             aria-label="filled tabs with icons content users"
           />
-          <Tab
+          {/*          <Tab
             eventKey={'branch' as refTabKeys}
             isDisabled={manualInputOnly}
             title={
@@ -291,7 +291,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
                 <TabTitleText>{_('Tag')}</TabTitleText>{' '}
               </>
             }
-          />
+          /> */}
         </Tabs>
       </FormGroup>
 
