@@ -56,7 +56,7 @@ module ForemanAnsibleDirector
           variables_filter_list = %w[]
           default_filter_list = %w[defaults/main.yml defaults/main.yaml]
 
-          roles = Hash.new { |h, k| h[k] = {} }
+          roles = Hash.new { |h, k| h[k] = { variables: [], defaults: [] } }
 
           tar_reader.each do |entry|
             next unless entry.file?
@@ -67,8 +67,6 @@ module ForemanAnsibleDirector
             next unless parts.size == 2
 
             role_name, file_name = parts
-
-            roles[role_name] ||= { variables: [], defaults: [] }
 
             if variables_filter_list.include?(file_name)
               roles[role_name][:variables] << entry.read
