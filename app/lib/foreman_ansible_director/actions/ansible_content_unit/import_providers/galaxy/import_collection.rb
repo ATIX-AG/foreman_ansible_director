@@ -34,10 +34,11 @@ module ForemanAnsibleDirector
                 requirements: unit.collection_file
               )
 
-              cleanup_check = plan_self(
+              cleanup_check = plan_action(
+                ::ForemanAnsibleDirector::Actions::Rescue::AnsibleContentUnit::Common::CleanupCheck,
                 repository_create_action: repository_create_action.output,
                 distribution_create_action: distribution_create_action.output,
-                collection_remote_create_action: collection_remote_create_action.output
+                remote_create_action: collection_remote_create_action.output
               )
 
               plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Galaxy::Rescue,
@@ -68,22 +69,6 @@ module ForemanAnsibleDirector
                 unit_namespace: unit.unit_namespace,
                 organization_id: organization_id
               )
-            end
-
-            def run
-              repository_create_action = input[:repository_create_action]
-              distribution_create_action = input[:distribution_create_action]
-              collection_remote_create_action = input[:collection_remote_create_action]
-
-              repository_success = repository_create_action[:success]
-              distribution_success = distribution_create_action[:success]
-              collection_remote_success = collection_remote_create_action[:success]
-
-              all_successful = repository_success && distribution_success && collection_remote_success
-
-              output.update(skip_repository_cleanup: all_successful || !repository_success,
-                skip_distribution_cleanup: all_successful || !distribution_success,
-                skip_remote_cleanup: all_successful || !collection_remote_success)
             end
           end
         end

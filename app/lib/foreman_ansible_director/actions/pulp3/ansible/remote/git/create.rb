@@ -21,7 +21,7 @@ module ForemanAnsibleDirector
 
               def run
                 if input[:skip]
-                  output.update(git_remote_create_response: { pulp_href: '' })
+                  output.update(git_remote_create_response: { pulp_href: '' }, success: true, error: nil)
                   return
                 end
 
@@ -34,8 +34,12 @@ module ForemanAnsibleDirector
                   git_ref: input[:git_ref],
                   pulp_labels: ::ForemanAnsibleDirector::Constants::PULP_OBJECT_LABELS,
                 })
-                response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
-                output.update(git_remote_create_response: response)
+                begin
+                  response = ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Git::Create.new(git_remote).request
+                  output.update(git_remote_create_response: response, success: true, error: nil)
+                rescue PulpAnsibleClient::ApiError => e
+                  output.update(git_remote_create_response: nil, success: false, error: e.message)
+                end
               end
 
               def task_output

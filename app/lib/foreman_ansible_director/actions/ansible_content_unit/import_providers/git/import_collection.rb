@@ -52,6 +52,21 @@ module ForemanAnsibleDirector
                 skip: false
               )
 
+              cleanup_check = plan_action(
+                ::ForemanAnsibleDirector::Actions::Rescue::AnsibleContentUnit::Common::CleanupCheck,
+                repository_create_action: repository_create_action.output,
+                distribution_create_action: distribution_create_action.output,
+                remote_create_action: git_remote_create_action.output
+              )
+
+              plan_action(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Git::Rescue,
+                repository_create_action: repository_create_action.output,
+                distribution_create_action: distribution_create_action.output,
+                git_remote_create_action: git_remote_create_action.output,
+                skip_repository_cleanup: cleanup_check.output[:skip_repository_cleanup],
+                skip_distribution_cleanup: cleanup_check.output[:skip_distribution_cleanup],
+                skip_remote_cleanup: cleanup_check.output[:skip_remote_cleanup])
+
               remote_href = git_remote_create_action.output['git_remote_create_response']['pulp_href']
 
               _snyc_action = plan_action(
