@@ -291,7 +291,7 @@ export const AnsibleVariablesSelector = ({
                   <EmptyState style={{ height: '70vh' }}>
                     <EmptyStateHeader
                       titleText={__(
-                        _('%(role) does not have any variables defined.'),
+                        _('%(role)s does not have any variables defined.'),
                         { role: selectedRole }
                       )}
                       headingLevel="h4"
