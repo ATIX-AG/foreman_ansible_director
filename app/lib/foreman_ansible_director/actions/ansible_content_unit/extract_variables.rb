@@ -95,7 +95,7 @@ module ForemanAnsibleDirector
 
         def key_type(variable)
           case variable
-          when TrueClass || FalseClass
+          when TrueClass, FalseClass
             'boolean'
           when String
             'string'
