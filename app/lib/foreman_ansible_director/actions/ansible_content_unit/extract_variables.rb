@@ -68,11 +68,11 @@ module ForemanAnsibleDirector
 
             role_name, file_name = parts
 
+            roles[role_name] ||= { variables: [], defaults: [] }
+
             if variables_filter_list.include?(file_name)
-              roles[role_name][:variables] ||= []
               roles[role_name][:variables] << entry.read
             elsif default_filter_list.include?(file_name)
-              roles[role_name][:defaults] ||= []
               roles[role_name][:defaults] << entry.read
             end
           end
@@ -82,7 +82,7 @@ module ForemanAnsibleDirector
 
           roles.transform_values! do |v|
             all_defaults = {}
-            v[:defaults].each do |defaults_yaml_str|
+            v[:defaults]&.each do |defaults_yaml_str|
               next unless (loaded = YAML.safe_load(defaults_yaml_str))
               all_defaults.merge!(loaded.transform_values do |variable|
                                     {
