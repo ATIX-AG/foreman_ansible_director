@@ -51,7 +51,7 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
             type: 'success',
             key: `IMPORT_CU_${contentUnits.length}_SUCC`,
             message:
-              'Sucessfully imported Ansible content units from YAML file"!',
+              'Successfully imported Ansible content units from YAML file"!',
             sticky: false,
           })
         );
@@ -89,7 +89,7 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
           addToast({
             type: 'success',
             key: `IMPORT_CU_${contentUnits.length}_SUCC`,
-            message: `Sucessfully imported ${
+            message: `Successfully imported ${
               contentUnits.length
             } Ansible content ${
               contentUnits.length === 1 ? 'unit' : 'units'
