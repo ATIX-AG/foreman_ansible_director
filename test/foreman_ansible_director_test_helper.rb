@@ -21,6 +21,14 @@ class ForemanAnsibleDirectorTestCase < ActiveSupport::TestCase
     ::ForemanAnsibleDirector::RequestCtx::RequestContext.current
   end
 
+  def with_setting_stub(setting:, value:)
+    original = Setting[setting]
+    Setting[setting] = value
+    yield
+  ensure
+    Setting[setting] = original
+  end
+
   setup do
     User.current = User.find_by(login: 'admin')
     @organization ||= Organization.find_by(name: 'Organization 1')
