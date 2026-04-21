@@ -67,6 +67,9 @@ module ForemanAnsibleDirector
             next unless parts.size == 2
 
             role_name, file_name = parts
+            # Ensuring the existence of the hash key, i.e. role.
+            # If this is not done, roles without variables will be ignored.
+            roles[role_name]
 
             if variables_filter_list.include?(file_name)
               roles[role_name][:variables] << entry.read
