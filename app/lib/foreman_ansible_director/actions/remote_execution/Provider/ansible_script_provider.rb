@@ -24,9 +24,9 @@ if defined? ForemanRemoteExecution
                   raise ActiveRecord::RecordNotFound if environment.nil?
                 end
 
-                raise "Host #{host.name} is not in any lifecycle environment" unless host.lifecycle_environment
-                unless host.lifecycle_environment.execution_environment
-                  raise "Lifecycle environment #{host.lifecycle_environment.name}
+                raise "Host #{host.name} is not in any lifecycle environment" unless host.ansible_lifecycle_environment
+                unless host.ansible_lifecycle_environment.execution_environment
+                  raise "Lifecycle environment #{host.ansible_lifecycle_environment.name}
                           does not provide an Execution Environment"
                 end
                 # As the templates currently do not have an execution environment input, this suffices
