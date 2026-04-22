@@ -25,12 +25,24 @@ module ForemanAnsibleDirector
 
             end
 
-            content << {
-              type: cu.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role',
-              identifier: cu.full_name,
-              version: cuv.version,
-              source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{host.organization_id}/#{cu.full_name}-#{cuv.source_type}",
-            }
+            content << begin
+              if cuv.source_type == 'git'
+                distribution_suffix = Base64.encode64(cuv.version[0, 16]).strip
+                {
+                  type: cu.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role',
+                  identifier: cu.full_name,
+                  version: cuv.version,
+                  source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{host.organization_id}/#{cu.full_name}-#{cuv.source_type}-#{distribution_suffix}",
+                }
+              else
+                {
+                  type: cu.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role',
+                  identifier: cu.full_name,
+                  version: cuv.version,
+                  source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{host.organization_id}/#{cu.full_name}-#{cuv.source_type}",
+                }
+              end
+            end
           end
 
           content
