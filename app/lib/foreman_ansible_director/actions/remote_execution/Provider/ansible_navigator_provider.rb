@@ -22,7 +22,7 @@ if defined? ForemanRemoteExecution
                 content = ForemanAnsibleDirector::Generators::ContentGenerator.generate host
                 variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate host
 
-                execution_environment = host.lifecycle_environment&.execution_environment
+                execution_environment = host.ansible_lifecycle_environment&.execution_environment
 
                 execution_environment ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
                   id: Setting[:ad_default_ee_internal]
@@ -33,7 +33,7 @@ if defined? ForemanRemoteExecution
                   raise StandardError
                 end
 
-                unless host.lifecycle_environment.execution_environment
+                unless host.ansible_lifecycle_environment.execution_environment
                   raise "Host #{host.name} is not in any lifecycle environment"
                 end
                 super(template_invocation, host).merge(

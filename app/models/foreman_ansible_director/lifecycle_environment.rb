@@ -10,6 +10,15 @@ module ForemanAnsibleDirector
     has_many :direct_content_unit_versions, through: :lifecycle_environment_content_unit_versions,
   source: :content_unit_version
 
+    has_many :hosts,
+      dependent: nil,
+      foreign_key: 'ansible_lifecycle_environment_id',
+      inverse_of: :ansible_lifecycle_environment
+    has_many :hostgroups,
+      dependent: nil,
+      foreign_key: 'ansible_lifecycle_environment_id',
+      inverse_of: :ansible_lifecycle_environment
+
     belongs_to :content_snapshot, optional: true
     has_many :snapshot_content_unit_versions, through: :content_snapshot, source: :content_unit_versions
 
