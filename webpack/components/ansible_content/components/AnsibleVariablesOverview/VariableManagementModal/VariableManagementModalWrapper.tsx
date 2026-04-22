@@ -25,11 +25,11 @@ export const VariableManagementModalWrapper = ({
   variable,
   setSelectedVariable,
 }: VariableManagementModalWrapperProps): ReactElement => {
-  const modal = (modalContent: ReactElement): ReactElement => (
+  const modal = (title: string, modalContent: ReactElement): ReactElement => (
     <React.Fragment>
       <Modal
         style={{ minHeight: '500px' }}
-        title={variable.name}
+        title={title}
         isOpen
         onClose={() => setSelectedVariable(undefined)}
         ouiaId="BasicModal"
@@ -50,6 +50,7 @@ export const VariableManagementModalWrapper = ({
 
   if (variableRequest.status === 'RESOLVED') {
     return modal(
+      variableRequest.response.name,
       <VariableManagementModalContent
         originalVariable={variableRequest.response}
         setSelectedVariable={setSelectedVariable}
@@ -61,6 +62,7 @@ export const VariableManagementModalWrapper = ({
   }
 
   return modal(
+    '',
     <EmptyState>
       <EmptyStateHeader
         titleText={_('Loading Ansible variable details...')}

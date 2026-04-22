@@ -5,6 +5,8 @@ import React, {
   SetStateAction,
   useEffect,
 } from 'react';
+import axios, { AxiosResponse } from 'axios';
+import { useDispatch } from 'react-redux';
 
 import {
   Button,
@@ -36,6 +38,8 @@ import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 
 import styles from '@patternfly/react-styles/css/components/Form/form';
 
+import { foremanUrl } from 'foremanReact/common/helpers';
+import { addToast } from 'foremanReact/components/ToastsList';
 import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
@@ -79,6 +83,56 @@ export const VariableManagementModalContent = ({
     'real',
     'yaml',
   ];
+
+  const dispatch = useDispatch();
+
+  const updateVariable = async (variable: AnsibleVariable): Promise<void> => {
+    try {
+      await axios.put(
+        `${foremanUrl('/api/v2/ansible_director/ansible_variables/')}/${
+          variable.id
+        }`,
+        {
+          ansible_variable: {
+            key: variable.name,
+            type: variable.type,
+            default_value: variable.default_value,
+            overridable: variable.overridable,
+          },
+        }
+      );
+      dispatch(
+        addToast({
+          type: 'success',
+          key: `UPDATE_ANSIBLE_VARIABLE_${variable.id}_SUCC`,
+          message: `Successfully edited override for "${variable.name}"!`,
+          sticky: false,
+        })
+      );
+      refreshRequest();
+    } catch (e) {
+      dispatch(
+        addToast({
+          type: 'danger',
+          key: `UPDATE_ANSIBLE_VARIABLE_${variable.id}_ERR`,
+          message: `Updating of Ansible variable "${
+            variable.name
+          }" failed with error code "${
+            (e as { response: AxiosResponse }).response.status
+          }".`,
+          sticky: false,
+        })
+      );
+    }
+  };
+
+  const handleEdit = async (): Promise<void> => {
+    if (isEditMode) {
+      ansibleVariable && (await updateVariable(ansibleVariable));
+    }
+
+    setIsEditMode(!isEditMode);
+  };
 
   useEffect(() => {
     setAnsibleVariable(originalVariable);
@@ -147,11 +201,7 @@ export const VariableManagementModalContent = ({
 
   const headerActions = (): ReactElement[] => {
     const baseVariableActions = [
-      <Button
-        variant="plain"
-        aria-label="Action"
-        onClick={() => setIsEditMode(!isEditMode)}
-      >
+      <Button variant="plain" aria-label="Action" onClick={handleEdit}>
         {isEditMode ? (
           <Icon size="lg">
             <SaveIcon />
@@ -168,7 +218,10 @@ export const VariableManagementModalContent = ({
         <Button
           variant="plain"
           aria-label="Action"
-          onClick={() => setIsEditMode(!isEditMode)}
+          onClick={() => {
+            setIsEditMode(false);
+            setAnsibleVariable(originalVariable);
+          }}
         >
           <Icon size="lg">
             <TimesIcon />
