@@ -187,6 +187,18 @@ module ForemanAnsibleDirectorTests
 
             @host.reload
             assert_equal @environment.id, @host.ansible_lifecycle_environment_id
+            assert_equal @environment, @host.ansible_lifecycle_environment
+          end
+
+          test 'hostgroup resolves ansible lifecycle environment association' do
+            hostgroup = FactoryBot.create(
+              :hostgroup,
+              organizations: [@organization],
+              ansible_lifecycle_environment: @environment
+            )
+
+            assert_equal @environment.id, hostgroup.ansible_lifecycle_environment_id
+            assert_equal @environment, hostgroup.ansible_lifecycle_environment
           end
         end
 
