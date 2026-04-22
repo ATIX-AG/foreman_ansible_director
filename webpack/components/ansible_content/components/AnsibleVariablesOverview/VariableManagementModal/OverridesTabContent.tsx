@@ -1,6 +1,10 @@
 import React, { ReactElement } from 'react';
 import {
+  Bullseye,
   Button,
+  Card,
+  CardBody,
+  CardHeader,
   EmptyState,
   EmptyStateActions,
   EmptyStateFooter,
@@ -9,6 +13,9 @@ import {
   Grid,
   GridItem,
 } from '@patternfly/react-core';
+
+import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
+
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
@@ -141,7 +148,32 @@ export const OverridesTabContent = ({
   };
 
   const gridItems = (): ReactElement[] => {
-    const items: ReactElement[] = [];
+    const items: ReactElement[] = [
+      <GridItem span={3}>
+        <Card
+          isCompact
+          isClickable
+          style={{
+            height: '100%',
+          }}
+        >
+          <CardHeader
+            selectableActions={{
+              onClickAction: () => {
+                initializeOverrideCreate();
+              },
+              selectableActionId: 'create-override-card-id',
+              name: 'create-override-card-name',
+            }}
+          />
+          <CardBody>
+            <Bullseye>
+              <PlusIcon style={{ width: '4vh', height: '4vh' }} />
+            </Bullseye>
+          </CardBody>
+        </Card>
+      </GridItem>,
+    ];
 
     variable.overrides.forEach(override => {
       items.push(
