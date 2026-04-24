@@ -12,16 +12,16 @@ import {
 interface AnsibleDirectorContext {
   settings: {
     // eslint-disable-next-line camelcase
-    ad_default_galaxy_url: string;
+    ansible_director_default_galaxy_url: string;
     // eslint-disable-next-line camelcase
-    ad_default_ansible_core_version: string;
+    ansible_director_default_ansible_core_version: string;
   };
 }
 
 const defaultContext: AnsibleDirectorContext = {
   settings: {
-    ad_default_galaxy_url: 'https://galaxy.ansible.com/',
-    ad_default_ansible_core_version: '2.19.3',
+    ansible_director_default_galaxy_url: 'https://galaxy.ansible.com/',
+    ansible_director_default_ansible_core_version: '2.19.3',
   },
 };
 

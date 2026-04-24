@@ -13,7 +13,7 @@ module ForemanAnsibleDirector
         @name = kwargs[:unit_name]
         @versions = kwargs[:unit_versions] || []
         @source_type = kwargs[:unit_source_type]
-        @source = kwargs[:unit_source] || Setting[:ad_default_galaxy_url]
+        @source = kwargs[:unit_source] || Setting[:ansible_director_default_galaxy_url]
         @type = kwargs[:unit_type]
         @src = kwargs[:unit_src]
         @scm = kwargs[:unit_scm]

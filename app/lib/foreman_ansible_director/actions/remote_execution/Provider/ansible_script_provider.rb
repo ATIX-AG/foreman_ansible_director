@@ -19,7 +19,7 @@ if defined? ForemanRemoteExecution
                 inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
                 begin
                   environment = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-                    id: Setting[:ad_default_ee_rex]
+                    id: Setting[:ansible_director_default_ee_rex]
                   )
                   raise ActiveRecord::RecordNotFound if environment.nil?
                 end
