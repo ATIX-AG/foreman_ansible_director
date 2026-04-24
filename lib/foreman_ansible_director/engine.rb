@@ -52,7 +52,6 @@ module ForemanAnsibleDirector
     # initializer "foreman_ansible_director.register_actions", :before => :finisher_hook do |_app|
     #  ForemanTasks.dynflow.require!
     #
-    #  action_paths = %W(#{ForemanPulsible::Engine.root}/app/lib/actions)
     #  ForemanTasks.dynflow.config.eager_load_paths.concat(action_paths)
     #  ForemanTasks.dynflow.eager_load_actions!
     # end
