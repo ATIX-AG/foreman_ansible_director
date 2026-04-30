@@ -14,6 +14,8 @@ import {
   FlexItem,
   GridItem,
 } from '@patternfly/react-core';
+
+import BundleIcon from '@patternfly/react-icons/dist/esm/icons/bundle-icon';
 import CatalogIcon from '@patternfly/react-icons/dist/esm/icons/catalog-icon';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
@@ -61,9 +63,7 @@ export const HostDetailsLceCard = ({
     LCE_SELECTOR_PLACEHOLDER
   );
 
-  const [isUsingLibrary, setIsUsingLibrary] = React.useState(
-    hostDetails.ansible_lifecycle_environment_id === null
-  );
+  const isUsingLibrary = hostDetails.ansible_lifecycle_environment_id === null;
 
   const dispatch = useDispatch();
 
@@ -116,13 +116,6 @@ export const HostDetailsLceCard = ({
     }
   };
 
-  const handleContentSourceSet = async (): Promise<void> => {
-    if (!isUsingLibrary) {
-      await setLce(true);
-    }
-    setIsUsingLibrary(!isUsingLibrary);
-  };
-
   if (status === 'RESOLVED') {
     return (
       <GridItem rowSpan={1} md={6} lg={4} xl2={3}>
@@ -134,7 +127,6 @@ export const HostDetailsLceCard = ({
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
                   isUsingLibrary={isUsingLibrary}
-                  handleContentSourceSet={handleContentSourceSet}
                 />
               ),
             }}
@@ -150,7 +142,10 @@ export const HostDetailsLceCard = ({
                   justifyContent={{ default: 'justifyContentSpaceBetween' }}
                 >
                   <FlexItem>
-                    <CardTitle>{_('Ansible environment')}</CardTitle>
+                    <CardTitle>
+                      {isUsingLibrary ? <CatalogIcon /> : <BundleIcon />}{' '}
+                      {_('Ansible environment')}
+                    </CardTitle>
                   </FlexItem>
                 </Flex>
               </FlexItem>

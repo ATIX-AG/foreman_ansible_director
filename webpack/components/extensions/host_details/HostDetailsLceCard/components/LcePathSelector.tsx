@@ -45,7 +45,7 @@ export const LcePathSelector = ({
       isDisabled={!isEditMode}
       style={
         {
-          width: '50%',
+          width: '100%',
         } as React.CSSProperties
       }
     >
@@ -58,14 +58,14 @@ export const LcePathSelector = ({
   ): ReactElement => (
     <MenuToggle
       ref={toggleRef}
-      onClick={() => setIsLceToggleOpen(!isLcePathToggleOpen)}
+      onClick={() => setIsLceToggleOpen(!isLceToggleOpen)}
       isExpanded={isLceToggleOpen}
       isDisabled={
         !isEditMode || selectedLcePath === LCE_PATH_SELECTOR_PLACEHOLDER
       }
       style={
         {
-          width: '50%',
+          width: '100%',
         } as React.CSSProperties
       }
     >
@@ -79,6 +79,7 @@ export const LcePathSelector = ({
           id="single-select"
           isOpen={isLcePathToggleOpen}
           selected={selectedLcePath}
+          style={{ width: '100%' }}
           onSelect={(event?, value?) => {
             setSelectedLcePath(value as string);
             setIsLcePathToggleOpen(false);
@@ -103,6 +104,7 @@ export const LcePathSelector = ({
           id="single-select"
           isOpen={isLceToggleOpen}
           selected={selectedLce}
+          style={{ width: '100%' }}
           onSelect={(event?, value?) => {
             setSelectedLce(value as string);
             setIsLceToggleOpen(false);
