@@ -30,6 +30,7 @@ export const LcePathSelector = ({
   setSelectedLce,
 }: LcePathSelectorProps): React.ReactElement => {
   const LCE_PATH_SELECTOR_PLACEHOLDER = 'Lifecycle environment path';
+  const LCE_SELECTOR_PLACEHOLDER = 'Lifecycle environment';
   const [isLcePathToggleOpen, setIsLcePathToggleOpen] = React.useState<boolean>(
     false
   );
@@ -81,8 +82,17 @@ export const LcePathSelector = ({
           selected={selectedLcePath}
           style={{ width: '100%' }}
           onSelect={(event?, value?) => {
+            const nextLcePath = lcePaths.find(
+              lcePath => lcePath.name === (value as string)
+            );
+
             setSelectedLcePath(value as string);
+            setSelectedLce(
+              nextLcePath?.lifecycle_environments[0]?.name ??
+                LCE_SELECTOR_PLACEHOLDER
+            );
             setIsLcePathToggleOpen(false);
+            setIsLceToggleOpen(false);
           }}
           onOpenChange={() => {
             setIsLcePathToggleOpen(!isLcePathToggleOpen);

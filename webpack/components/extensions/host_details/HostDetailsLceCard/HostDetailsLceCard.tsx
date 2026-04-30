@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import {
@@ -13,6 +13,7 @@ import {
   Flex,
   FlexItem,
   GridItem,
+  Skeleton,
 } from '@patternfly/react-core';
 
 import BundleIcon from '@patternfly/react-icons/dist/esm/icons/bundle-icon';
@@ -21,11 +22,13 @@ import CatalogIcon from '@patternfly/react-icons/dist/esm/icons/catalog-icon';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
+import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import Permitted from 'foremanReact/components/Permitted';
 import { translate as _ } from 'foremanReact/common/I18n';
+import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 
 import { HostDetailsLceCardHeaderActions } from './components/HostDetailsLceCardHeaderActions';
-import { LcePathSelectorWrapper } from './components/LcePathSelectorWrapper';
+import { LcePathSelector } from './components/LcePathSelector';
 import {
   AnsibleLcePath,
   SparseAnsibleLce,
@@ -41,11 +44,16 @@ interface HostDetailsLceCardProps {
     ansible_lifecycle_environment_id: number | null;
   };
 }
+interface LcePathsResponse extends IndexResponse {
+  results: AnsibleLcePath[];
+}
 
 export const HostDetailsLceCard = ({
   status,
   hostDetails,
 }: HostDetailsLceCardProps): React.ReactElement | null => {
+  const organization = useForemanOrganization();
+
   const LCE_PATH_SELECTOR_PLACEHOLDER = 'Lifecycle environment path';
   const LCE_SELECTOR_PLACEHOLDER = 'Lifecycle environment';
 
@@ -65,14 +73,87 @@ export const HostDetailsLceCard = ({
 
   const isUsingLibrary = hostDetails.ansible_lifecycle_environment_id === null;
 
+  const [initialLcePath, setInitialLcePath] = React.useState<string>(
+    LCE_PATH_SELECTOR_PLACEHOLDER
+  );
+
+  const [initialLce, setInitialLce] = React.useState<string>(
+    LCE_SELECTOR_PLACEHOLDER
+  );
+
+  const getLcePathsResponse = useAPI<LcePathsResponse>(
+    'get',
+    foremanUrl(
+      `/api/v2/ansible_director/lifecycle_environments/paths?order=name&${
+        organization ? `organization_id=${organization.id}&` : ''
+      }`
+    )
+  );
+
+  useEffect(() => {
+    if (getLcePathsResponse.status === 'RESOLVED') {
+      setAvailableLcePaths(getLcePathsResponse.response.results);
+
+      if (
+        selectedLcePath === LCE_PATH_SELECTOR_PLACEHOLDER &&
+        getLcePathsResponse.response.results.length !== 0
+      ) {
+        let lcePath: string = selectedLcePath;
+        let lce: string = selectedLce;
+
+        for (let i = 0; i < getLcePathsResponse.response.results.length; i++) {
+          const pathLces: SparseAnsibleLce[] =
+            getLcePathsResponse.response.results[i].lifecycle_environments;
+          for (let j = 0; j < pathLces.length; j++) {
+            if (
+              pathLces[j].id === hostDetails.ansible_lifecycle_environment_id
+            ) {
+              lcePath = getLcePathsResponse.response.results[i].name;
+              lce = pathLces[j].name;
+              break;
+            }
+          }
+          if (lcePath !== selectedLcePath) break;
+        }
+
+        setInitialLcePath(lcePath);
+        setInitialLce(lce);
+        setSelectedLcePath(lcePath);
+        setSelectedLce(lce);
+      }
+    }
+  }, [
+    getLcePathsResponse,
+    hostDetails.ansible_lifecycle_environment_id,
+    selectedLce,
+    selectedLcePath,
+  ]);
+
   const dispatch = useDispatch();
 
-  const handleEdit = (): void => {
+  const handleClose = (abort: boolean): void => {
     if (isEditMode) {
-      // eslint-disable-next-line no-void
-      void setLce();
+      if (!abort) {
+        // eslint-disable-next-line no-void
+        void setLce();
+        setInitialLce(selectedLce);
+        setInitialLcePath(selectedLcePath);
+      } else {
+        setSelectedLce(initialLce);
+        setSelectedLcePath(initialLcePath);
+      }
+      setIsEditMode(false);
+      return;
     }
-    setIsEditMode(!isEditMode);
+    setIsEditMode(true);
+  };
+
+  const handleAbort = (): void => {
+    handleClose(true);
+  };
+
+  const handleEdit = (): void => {
+    handleClose(false);
   };
 
   const lceForName = (
@@ -126,6 +207,7 @@ export const HostDetailsLceCard = ({
                 <HostDetailsLceCardHeaderActions
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
+                  handleAbort={handleAbort}
                   isUsingLibrary={isUsingLibrary}
                 />
               ),
@@ -159,15 +241,13 @@ export const HostDetailsLceCard = ({
               ]}
             >
               {!isUsingLibrary ? (
-                <LcePathSelectorWrapper
+                <LcePathSelector
+                  lcePaths={availableLcePaths}
                   isEditMode={isEditMode}
                   selectedLcePath={selectedLcePath}
                   setSelectedLcePath={setSelectedLcePath}
                   selectedLce={selectedLce}
                   setSelectedLce={setSelectedLce}
-                  availableLcePaths={availableLcePaths}
-                  setAvailableLcePaths={setAvailableLcePaths}
-                  hostDetails={hostDetails}
                 />
               ) : (
                 <EmptyState variant={EmptyStateVariant.xs}>
@@ -191,5 +271,11 @@ export const HostDetailsLceCard = ({
     return null; // TODO: Handle request error
   }
 
-  return null;
+  return (
+    <>
+      <Skeleton screenreaderText="Loading lce path" />
+      <br />
+      <Skeleton screenreaderText="Loading lce" />
+    </>
+  );
 };
