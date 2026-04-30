@@ -16,26 +16,43 @@ if defined? ForemanRemoteExecution
               end
 
               def proxy_command_options(template_invocation, host)
-                playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate host
-                inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
+                content_source, = ::ForemanAnsibleDirector::AssignmentService.content_source_for host
 
-                content = ForemanAnsibleDirector::Generators::ContentGenerator.generate host
-                variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate host
+                unless content_source
+                  raise format('Host %<host_name>s is not in any lifecycle environment',
+                    { host_name: host.name })
+                end
 
-                execution_environment = host.ansible_lifecycle_environment&.execution_environment
+                execution_environment = content_source.cs_execution_environment
 
                 execution_environment ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
                   id: Setting[:ad_default_ee_internal]
                 )
 
                 unless execution_environment
-                  # TODO: Actual error message
-                  raise StandardError
+                  raise format('Host %<host_name>s does not have an execution environment assigned to it.',
+                    { host_name: host.name })
                 end
 
-                unless host.ansible_lifecycle_environment.execution_environment
-                  raise "Host #{host.name} is not in any lifecycle environment"
-                end
+                _, resolved_assignments, = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
+                  target: host,
+                  resolve: true
+                )
+
+                playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate(
+                  resolved_host_content: resolved_assignments
+                )
+                inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
+
+                content = ForemanAnsibleDirector::Generators::ContentGenerator.generate(
+                  host: host,
+                  resolved_host_content: resolved_assignments
+                )
+                variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate(
+                  host: host,
+                  resolved_host_content: resolved_assignments
+                )
+
                 super(template_invocation, host).merge(
                   inventory: inventory,
                   playbook: playbook,

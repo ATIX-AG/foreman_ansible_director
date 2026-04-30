@@ -78,10 +78,15 @@ module ForemanAnsibleDirector
         end
       end
 
-      # TODO: TEST
-      def assign_library(target)
+      def assign_none(target:)
         ActiveRecord::Base.transaction do
-          target.update!(ansible_lifecycle_environment_id: nil)
+          target.update!(ansible_lifecycle_environment_id: nil, ansible_lifecycle_environment_state: 'none')
+        end
+      end
+
+      def assign_inherit(target:)
+        ActiveRecord::Base.transaction do
+          target.update!(ansible_lifecycle_environment_id: nil, ansible_lifecycle_environment_state: 'inherit')
         end
       end
 

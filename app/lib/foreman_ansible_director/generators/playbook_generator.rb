@@ -4,43 +4,38 @@ module ForemanAnsibleDirector
   module Generators
     class PlaybookGenerator
       class << self
-        def generate(host)
-          host_content = host.ansible_content_assignments
+        def generate(resolved_host_content:)
           tasks = []
 
-          host_content.each do |content_assignment|
-            next unless content_assignment.consumable.is_a? ::ForemanAnsibleDirector::AnsibleCollectionRole
+          resolved_host_content.each do |content_assignment|
+            consumable = content_assignment[:cuv]
+            next unless consumable
 
-            collection_role = content_assignment.consumable
-            collection_version = collection_role.ansible_collection_version
-            collection = collection_version.versionable
-
-            fqcn = "#{collection.namespace}.#{collection.name}.#{collection_role.name}"
+            if consumable.is_a? ForemanAnsibleDirector::AnsibleCollectionRole
+              acv = consumable.ansible_collection_version
+              ac = acv.versionable
+              fqrn = "#{ac.namespace}.#{ac.name}.#{consumable.name}"
+            else
+              ar = consumable.versionable
+              fqrn = "#{ar.namespace}.#{ar.name}"
+            end
 
             load_vars_block = {
-              name: "Load variables for #{collection.namespace}.#{collection.name}.#{collection_role.name}",
+              name: "Load variables for #{fqrn}",
               "ansible.builtin.include_vars": {
-                file: "#{fqcn}_vars.yaml",
+                file: "#{fqrn}_vars.yaml",
               },
             }
-            # debug_block = {
-            #  name: 'Display all variables for host',
-            #  debug: {
-            #    var: 'hostvars[inventory_hostname]',
-            #  },
-            # }
+
             load_role_block = {
-              name: "Run role #{collection.namespace}.#{collection.name}.#{collection_role.name}",
+              name: "Run role #{fqrn}",
               "ansible.builtin.include_role": {
-                name: fqcn,
+                name: fqrn,
               },
             }
 
             tasks << load_vars_block
-            # tasks << debug_block
             tasks << load_role_block
-
-            # else # content_assignment.consumable.is_a? AnsibleRole
           end
 
           [{

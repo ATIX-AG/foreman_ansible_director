@@ -65,8 +65,13 @@ module ForemanAnsibleDirector
 
       def get_overrides_for_target(target, include_overridable: false)
         matcher_value = matcher(target)
-        ids = target.ansible_content_assignments.pluck(:consumable_id)
-        return [] unless ids.length.positive?
+        _, resolved_assignments, = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
+          target: target,
+          resolve: true
+        )
+        cuvs = resolved_assignments.pluck(:cuv)
+        return [] unless cuvs.length.positive?
+        ids = cuvs.pluck(:id)
         sql = if include_overridable
                 <<-SQL
             SELECT lookup_keys.id,

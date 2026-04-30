@@ -2,6 +2,8 @@
 
 module ForemanAnsibleDirector
   class LifecycleEnvironment < ::ForemanAnsibleDirector::AnsibleDirectorModel
+    include ::ForemanAnsibleDirector::Abstract::ContentSource
+
     belongs_to :organization, inverse_of: :lifecycle_environments
 
     belongs_to :execution_environment, optional: true
@@ -44,6 +46,18 @@ module ForemanAnsibleDirector
       else
         direct_content_unit_versions
       end
+    end
+
+    def cs_content_unit_versions
+      content_unit_versions
+    end
+
+    def cs_name
+      "#{lifecycle_environment_path.name} > #{name}"
+    end
+
+    def cs_execution_environment
+      execution_environment
     end
 
     def assign_execution_environment!(execution_environment_id)

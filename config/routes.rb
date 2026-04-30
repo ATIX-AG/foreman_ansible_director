@@ -65,8 +65,7 @@ Rails.application.routes.draw do
           resources :assignments, only: [] do
             collection do
               get '/:target/:target_id', action: :assignments
-              post '/', action: :assign
-              post '/bulk', action: :assign_bulk
+              post '/:target/:target_id', action: :assign
             end
             member do
               delete '/', action: :destroy

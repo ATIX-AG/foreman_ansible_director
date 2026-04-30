@@ -6,13 +6,22 @@ module ForemanAnsibleDirectorTests
       class VariableServiceTest < ForemanAnsibleDirectorTestCase
 
         setup do
-          as_admin do
-            @host = FactoryBot.create(:host)
-            @host2 = FactoryBot.create(:host)
-          end
           @collection = FactoryBot.create(:ansible_collection, organization: @organization)
           @collection_version = FactoryBot.create(:content_unit_version, :for_collection, versionable: @collection)
           @collection_role = FactoryBot.create(:ansible_collection_role, ansible_collection_version: @collection_version)
+
+          @path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
+          @lifecycle_environment = FactoryBot.create(:lifecycle_environment, organization: @organization, lifecycle_environment_path: @path)
+          FactoryBot.create(
+            :lifecycle_environment_content_unit_version,
+            lifecycle_environment: @lifecycle_environment,
+            content_unit_version: @collection_version
+          )
+          as_admin do
+            @host = FactoryBot.create(:host, ansible_lifecycle_environment: @lifecycle_environment)
+            @host2 = FactoryBot.create(:host, ansible_lifecycle_environment: @lifecycle_environment)
+          end
+
         end
 
         describe '#create_variable' do
@@ -162,8 +171,20 @@ module ForemanAnsibleDirectorTests
         describe '#get_overrides_for_target' do
 
           setup do
-            FactoryBot.create(:ansible_content_assignment, consumable: @collection_role, assignable: @host)
-            FactoryBot.create(:ansible_content_assignment, consumable: @collection_role, assignable: @host2)
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host2,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
           end
 
           test 'returns overrides for host target' do
