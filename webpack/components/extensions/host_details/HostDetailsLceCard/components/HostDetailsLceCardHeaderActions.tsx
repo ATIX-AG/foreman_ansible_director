@@ -10,40 +10,37 @@ interface HostDetailsLceCardHeaderActionsProps {
   isEditMode: boolean;
   handleEdit: () => void;
   handleAbort: () => void;
-  isUsingLibrary: boolean;
 }
 
 export const HostDetailsLceCardHeaderActions: React.FC<HostDetailsLceCardHeaderActionsProps> = ({
   isEditMode,
   handleEdit,
   handleAbort,
-  isUsingLibrary,
-}) =>
-  !isUsingLibrary ? (
-    <>
-      <Tooltip content={isEditMode ? _('Submit') : _('Edit')}>
+}) => (
+  <>
+    <Tooltip content={isEditMode ? _('Submit') : _('Edit')}>
+      <PermittedButton
+        requiredPermissions={[AdPermissions.assignments.create]}
+        variant="plain"
+        aria-label={isEditMode ? _('Submit') : _('Edit')}
+        onClick={handleEdit}
+      >
+        <Icon>{isEditMode ? <CheckIcon /> : <PencilAltIcon />}</Icon>
+      </PermittedButton>
+    </Tooltip>
+    {isEditMode && (
+      <Tooltip content={_('Cancel')}>
         <PermittedButton
           requiredPermissions={[AdPermissions.assignments.create]}
           variant="plain"
-          aria-label={isEditMode ? _('Submit') : _('Edit')}
-          onClick={() => handleEdit}
+          aria-label={_('Cancel')}
+          onClick={handleAbort}
         >
-          <Icon>{isEditMode ? <CheckIcon /> : <PencilAltIcon />}</Icon>
+          <Icon>
+            <TimesIcon />
+          </Icon>
         </PermittedButton>
       </Tooltip>
-      {isEditMode && (
-        <Tooltip content={_('Cancel')}>
-          <PermittedButton
-            requiredPermissions={[AdPermissions.assignments.create]}
-            variant="plain"
-            aria-label={_('Cancel')}
-            onClick={() => handleAbort}
-          >
-            <Icon>
-              <TimesIcon />
-            </Icon>
-          </PermittedButton>
-        </Tooltip>
-      )}
-    </>
-  ) : null;
+    )}
+  </>
+);

@@ -6,10 +6,6 @@ import {
   CardBody,
   CardHeader,
   CardTitle,
-  EmptyState,
-  EmptyStateHeader,
-  EmptyStateIcon,
-  EmptyStateVariant,
   Flex,
   FlexItem,
   GridItem,
@@ -17,7 +13,6 @@ import {
 } from '@patternfly/react-core';
 
 import BundleIcon from '@patternfly/react-icons/dist/esm/icons/bundle-icon';
-import CatalogIcon from '@patternfly/react-icons/dist/esm/icons/catalog-icon';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
@@ -70,8 +65,6 @@ export const HostDetailsLceCard = ({
   const [selectedLce, setSelectedLce] = React.useState<string>(
     LCE_SELECTOR_PLACEHOLDER
   );
-
-  const isUsingLibrary = hostDetails.ansible_lifecycle_environment_id === null;
 
   const [initialLcePath, setInitialLcePath] = React.useState<string>(
     LCE_PATH_SELECTOR_PLACEHOLDER
@@ -163,12 +156,12 @@ export const HostDetailsLceCard = ({
       .filter(lcePath => lcePath.name === selectedLcePath)[0]
       .lifecycle_environments.filter(lce => lce.name === name)[0];
 
-  const setLce = async (library = false): Promise<void> => {
+  const setLce = async (): Promise<void> => {
     try {
       await axios.post(
         foremanUrl(
           `/api/v2/ansible_director/lifecycle_environments/${
-            library ? 'library' : lceForName(selectedLce).id
+            lceForName(selectedLce).id
           }/assign/HOST/${hostDetails.id}`
         ),
         {}
@@ -208,7 +201,6 @@ export const HostDetailsLceCard = ({
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
                   handleAbort={handleAbort}
-                  isUsingLibrary={isUsingLibrary}
                 />
               ),
             }}
@@ -225,8 +217,7 @@ export const HostDetailsLceCard = ({
                 >
                   <FlexItem>
                     <CardTitle>
-                      {isUsingLibrary ? <CatalogIcon /> : <BundleIcon />}{' '}
-                      {_('Ansible environment')}
+                      <BundleIcon /> {_('Ansible environment')}
                     </CardTitle>
                   </FlexItem>
                 </Flex>
@@ -240,26 +231,14 @@ export const HostDetailsLceCard = ({
                 AdPermissions.ansibleLcePaths.view,
               ]}
             >
-              {!isUsingLibrary ? (
-                <LcePathSelector
-                  lcePaths={availableLcePaths}
-                  isEditMode={isEditMode}
-                  selectedLcePath={selectedLcePath}
-                  setSelectedLcePath={setSelectedLcePath}
-                  selectedLce={selectedLce}
-                  setSelectedLce={setSelectedLce}
-                />
-              ) : (
-                <EmptyState variant={EmptyStateVariant.xs}>
-                  <EmptyStateHeader
-                    headingLevel="h4"
-                    titleText={_(
-                      'This host uses Ansible content from the Library environment.'
-                    )}
-                    icon={<EmptyStateIcon icon={CatalogIcon} />}
-                  />
-                </EmptyState>
-              )}
+              <LcePathSelector
+                lcePaths={availableLcePaths}
+                isEditMode={isEditMode}
+                selectedLcePath={selectedLcePath}
+                setSelectedLcePath={setSelectedLcePath}
+                selectedLce={selectedLce}
+                setSelectedLce={setSelectedLce}
+              />
             </Permitted>
           </CardBody>
         </Card>
