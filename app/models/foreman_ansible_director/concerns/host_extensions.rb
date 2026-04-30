@@ -4,6 +4,8 @@ module ForemanAnsibleDirector
   module Concerns
     module HostExtensions
       extend ActiveSupport::Concern
+      include ::ForemanAnsibleDirector::Abstract::ContentResolutionNode
+
       included do
         include ::ForemanAnsibleDirector::Concerns::ContentConsumer
 
@@ -30,6 +32,26 @@ module ForemanAnsibleDirector
           end
         end
         content.concat additions
+      end
+
+      def cr_immediate_predecessor
+        hostgroup
+      end
+
+      def cr_name
+        name
+      end
+
+      def cr_content_assignments
+        ::ForemanAnsibleDirector::AnsibleContentAssignment.where(consumable: self)
+      end
+
+      def cr_content_source
+        ansible_lifecycle_environment
+      end
+
+      def cr_content_source_state
+        ansible_lifecycle_environment_state
       end
     end
   end

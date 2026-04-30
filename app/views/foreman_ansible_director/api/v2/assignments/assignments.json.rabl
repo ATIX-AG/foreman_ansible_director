@@ -1,29 +1,60 @@
 # frozen_string_literal: true
 
-collection @assignments
+object @assignments
 
-attributes :id
+node(:results) do
+  {
+    assignments: @assignments.map do |assignment|
+      {
+        id: assignment.id,
+        assignable_namespace: assignment.assignable_namespace,
+        assignable_name: assignment.assignable_name,
+        **(
+          if assignment.assignable_type == 'ForemanAnsibleDirector::AnsibleCollectionRole'
+            { assignable_role_name: assignment.assignable_role_name }
+          else
+            {}
+          end
+        ),
+        assignable_type: assignment.assignable_type,
+        consumable_id: assignment.consumable_id,
+        consumable_type: if assignment.consumable_type == 'Host::Managed' || assignment.consumable_type == 'Host::Base'
+                           'Host'
+                         else
+                           assignment.consumable_type
+                         end,
+        consumable_name: assignment.consumable.name,
+        subtractive: assignment.subtractive,
+        resolved:
+          if @resolved_assignments
+            resolved = @resolved_assignments.find do |r|
+              r[:assignment] == assignment
+            end
 
-node :consumable_id do |assignment|
-  assignment.consumable.id
-end
-
-node :consumable_name do |assignment|
-  assignment.consumable.name
-end
-
-node :source_type do |assignment|
-  assignment.content_unit_version.content_unit_type
-end
-
-node :source_identifier do |assignment|
-  assignment.content_unit_version.versionable.full_name
-end
-
-node :source_id do |assignment|
-  assignment.content_unit_version.versionable.id
-end
-
-node :source_version do |assignment|
-  assignment.content_unit_version.version
+            unless resolved.nil?
+              if resolved[:type] == 'ForemanAnsibleDirector::AnsibleCollectionRole'
+                {
+                  version: resolved[:cuv].ansible_collection_version.version,
+                }
+              else
+                {
+                  version: resolved[:cuv].version,
+                }
+              end
+            end
+          end,
+      }
+    end,
+    hierarchy: @hierarchy.reverse!.map do |node|
+      {
+        id: node.id,
+        name: node.cr_name,
+        type: if node.instance_of?(Host::Managed) || node.instance_of?(Host::Base)
+                'Host'
+              else
+                node.class.name
+              end,
+      }
+    end,
+  }
 end

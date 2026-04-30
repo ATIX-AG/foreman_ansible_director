@@ -109,9 +109,13 @@ class AnsibleDirectorSchema < ActiveRecord::Migration[6.1]
       t.timestamps
     end
 
+    # ====== Assignments ======
     create_table :ad_ansible_content_assignments do |t|
-      t.references :assignable, polymorphic: true, null: false
       t.references :consumable, polymorphic: true, null: false
+      t.string :assignable_name, null: false
+      t.string :assignable_namespace, null: false
+      t.string :assignable_role_name, null: true
+      t.string :assignable_type, null: false
       t.boolean :subtractive, default: false
       t.timestamps
     end
@@ -266,13 +270,17 @@ class AnsibleDirectorSchema < ActiveRecord::Migration[6.1]
 
     # ======= Assignments =======
     add_index :ad_ansible_content_assignments,
-      %i[assignable_type assignable_id consumable_type consumable_id],
-      unique: true,
-      name: 'idx_ad_aca_unique'
+      %i[consumable_id consumable_type],
+      name: 'idx_ad_aca_consumable'
+    add_index :ad_ansible_content_assignments,
+      %i[assignable_name assignable_namespace assignable_role_name],
+      name: 'idx_ad_aca_assignable'
 
     # ====== Extensions ======
     add_reference :hosts, :ansible_lifecycle_environment, foreign_key: { to_table: :ad_lifecycle_environments }
+    add_column :hosts, :ansible_lifecycle_environment_state, :string, default: 'inherit'
     add_reference :hostgroups, :ansible_lifecycle_environment, foreign_key: { to_table: :ad_lifecycle_environments }
+    add_column :hostgroups, :ansible_lifecycle_environment_state, :string, default: 'inherit'
     add_reference :lookup_keys, :ownable, polymorphic: true, null: true, index: true
   end
 end

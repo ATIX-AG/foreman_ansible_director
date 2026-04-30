@@ -219,19 +219,22 @@ module ForemanAnsibleDirector
           required: true
         param :target_id,
           :number,
-          desc: N_('ID of the target entity.'),
+          desc: N_('ID of the target entity. Special values are "none" and "inherit".'),
           required: true
         # TRANSLATORS: ApiDoc, do not translate!
         example <<~EXAMPLE
           {
-            "target_type": "HOST",
+            "target_type": "host",
             "target_id": 7
           }
         EXAMPLE
         # endregion
         def assign
-          if params[:id] == 'library'
-            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_library @target
+          case params[:id]
+          when 'none'
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_none(target: @target)
+          when 'inherit'
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_inherit(target: @target)
           else
             lce = ::ForemanAnsibleDirector::LifecycleEnvironment.find_by(id: params[:id])
             ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign(

@@ -4,17 +4,22 @@ module ForemanAnsibleDirector
   module Generators
     class VariableGenerator
       class << self
-        def generate(host)
-          host_content = host.ansible_content_assignments
+        def generate(host:, resolved_host_content:)
           variables = {}
 
-          host_content.each do |content_assignment|
-            next unless content_assignment.consumable.is_a? ::ForemanAnsibleDirector::AnsibleCollectionRole
+          resolved_host_content.each do |content_assignment|
+            consumable = content_assignment[:cuv]
+            next unless consumable
+            resolved = consumable.ansible_variables.values_hash(host).raw
 
-            collection_role = content_assignment.consumable
-
-            resolved = collection_role.ansible_variables.values_hash(host).raw
-            collection = collection_role.ansible_collection_version.versionable
+            if consumable.is_a? ForemanAnsibleDirector::AnsibleCollectionRole
+              acv = consumable.ansible_collection_version
+              ac = acv.versionable
+              fqrn = "#{ac.namespace}.#{ac.name}.#{consumable.name}"
+            else
+              ar = consumable.versionable
+              fqrn = "#{ar.namespace}.#{ar.name}"
+            end
 
             role_variables = {}
             resolved.each do |_, resolved_variable_value|
@@ -23,9 +28,7 @@ module ForemanAnsibleDirector
               end
             end
 
-            variables["#{collection.namespace}.#{collection.name}.#{collection_role.name}"] = role_variables
-
-            # else # content_assignment.consumable.is_a? AnsibleRole
+            variables[fqrn] = role_variables
           end
 
           variables
