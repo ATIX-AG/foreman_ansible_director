@@ -1,7 +1,10 @@
+---
 name: Conventional Commits
 
+# yamllint disable-line rule:truthy
 on:
   pull_request:
+    types: [ready_for_review, review_requested]
 
 jobs:
   commit_check:

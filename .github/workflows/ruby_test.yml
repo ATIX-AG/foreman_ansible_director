@@ -1,8 +1,10 @@
 ---
 name: Ruby Testing
 
+# yamllint disable-line rule:truthy
 on:
   pull_request:
+    types: [ready_for_review, review_requested]
   push:
     branches:
       - 'main'
