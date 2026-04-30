@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon, Tooltip } from '@patternfly/react-core';
-import { CheckIcon, PencilAltIcon } from '@patternfly/react-icons';
+import { CheckIcon, TimesIcon, PencilAltIcon } from '@patternfly/react-icons';
 
 import { translate as _ } from 'foremanReact/common/I18n';
 import { PermittedButton } from '../../../../common/PermittedButton';
@@ -9,12 +9,14 @@ import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPe
 interface HostDetailsLceCardHeaderActionsProps {
   isEditMode: boolean;
   handleEdit: () => void;
+  handleAbort: () => void;
   isUsingLibrary: boolean;
 }
 
 export const HostDetailsLceCardHeaderActions: React.FC<HostDetailsLceCardHeaderActionsProps> = ({
   isEditMode,
   handleEdit,
+  handleAbort,
   isUsingLibrary,
 }) =>
   !isUsingLibrary ? (
@@ -24,10 +26,24 @@ export const HostDetailsLceCardHeaderActions: React.FC<HostDetailsLceCardHeaderA
           requiredPermissions={[AdPermissions.assignments.create]}
           variant="plain"
           aria-label={isEditMode ? _('Submit') : _('Edit')}
-          onClick={() => handleEdit(false)}
+          onClick={() => handleEdit}
         >
           <Icon>{isEditMode ? <CheckIcon /> : <PencilAltIcon />}</Icon>
         </PermittedButton>
       </Tooltip>
+      {isEditMode && (
+        <Tooltip content={_('Cancel')}>
+          <PermittedButton
+            requiredPermissions={[AdPermissions.assignments.create]}
+            variant="plain"
+            aria-label={_('Cancel')}
+            onClick={() => handleAbort}
+          >
+            <Icon>
+              <TimesIcon />
+            </Icon>
+          </PermittedButton>
+        </Tooltip>
+      )}
     </>
   ) : null;
