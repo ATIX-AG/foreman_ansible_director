@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-object @assignments
+extends 'api/v2/common/response', object: @ctx
 
 node(:results) do
   {

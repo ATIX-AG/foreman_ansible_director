@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class AssignmentService
+  class AssignmentService < AnsibleDirectorService
     class << self
       def destroy_assignment(assignment)
         ActiveRecord::Base.transaction do
@@ -173,7 +173,13 @@ module ForemanAnsibleDirector
                 cuv: collection_role,
               }
             else
-              # TODO: Log warning
+              ctx.add_warning(::ForemanAnsibleDirector::Issues::Warnings::NoResolutionCandidateForCollectionRole.new(
+                collection_name: name,
+                collection_namespace: namespace,
+                collection_role_identifier: role_name,
+                content_source: content_source,
+                assignment_id: assignment.id
+              ))
             end
 
           when 'ForemanAnsibleDirector::AnsibleRole'
@@ -186,7 +192,12 @@ module ForemanAnsibleDirector
                 cuv: cu_version,
               }
             else
-              # TODO: Log warning
+              ctx.add_warning(::ForemanAnsibleDirector::Issues::Warnings::NoResolutionCandidateForRole.new(
+                role_name: name,
+                role_namespace: namespace,
+                content_source: content_source,
+                assignment_id: assignment.id
+              ))
             end
           end
         end

@@ -7,6 +7,19 @@ module ForemanAnsibleDirector
         include ::Api::Version2
         include ::Foreman::Controller::AutoCompleteSearch
 
+        include ::ForemanAnsibleDirector::RequestCtx::RequestContextHelper
+
+        around_action :attach_request_ctx
+
+        def attach_request_ctx
+          ::ForemanAnsibleDirector::RequestCtx::RequestContext.with_context(
+            ::ForemanAnsibleDirector::RequestCtx::RequestContext.new(request.request_id)
+          ) do
+            @ctx = ctx
+            yield
+          end
+        end
+
         def find_organization
           @organization = Organization.current || find_optional_organization
           if @organization.nil?
