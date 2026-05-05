@@ -81,14 +81,17 @@ module ForemanAnsibleDirector
       end
 
       def add_created(record)
+        ::ForemanAnsibleDirector::Logging::CrudLogger.log_record_creation(record)
         @created << record
       end
 
       def add_updated(record)
+        ::ForemanAnsibleDirector::Logging::CrudLogger.log_record_update(record)
         @updated << record
       end
 
       def add_deleted(record)
+        ::ForemanAnsibleDirector::Logging::CrudLogger.log_record_deletion(record)
         @deleted << record
       end
     end

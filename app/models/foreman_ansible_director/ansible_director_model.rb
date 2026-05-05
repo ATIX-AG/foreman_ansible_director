@@ -5,6 +5,8 @@ module ForemanAnsibleDirector
     self.abstract_class = true
     self.table_name_prefix = 'ad_'
 
+    include ::ForemanAnsibleDirector::Logging::LoggableModel
+
     def self.table_name
       table_name = model_name.route_key
       "#{table_name_prefix}#{table_name}"
