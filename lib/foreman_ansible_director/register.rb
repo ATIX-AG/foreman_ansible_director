@@ -254,4 +254,6 @@ Foreman::Plugin.register :foreman_ansible_director do
 
   extend_rabl_template 'api/v2/hosts/main', '/api/v2/hosts/ansible_content_source'
   parameter_filter Host, :ansible_lifecycle_environment_id
+
+  logger :crud, enabled: true
 end
