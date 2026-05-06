@@ -54,18 +54,22 @@ import { BooleanAdapter } from './ValueAdapters/BooleanAdapter';
 import { IntegerAdapter } from './ValueAdapters/IntegerAdapter';
 import { RealAdapter } from './ValueAdapters/RealAdapter';
 import { OverridesTabContent } from './OverridesTabContent';
+import { BASE_VARIABLE_TAB_KEY, OVERRIDES_TAB_KEY } from './tabConstants';
 
 interface VariableManagementModalProps {
   originalVariable: AnsibleVariableDetail;
   setSelectedVariable: Dispatch<SetStateAction<AnsibleVariable | undefined>>;
   refreshRequest: () => void;
+  activeTabKey: string | number;
+  setActiveTabKey: Dispatch<SetStateAction<string | number>>;
 }
 export const VariableManagementModalContent = ({
   originalVariable,
   setSelectedVariable,
   refreshRequest,
+  activeTabKey,
+  setActiveTabKey,
 }: VariableManagementModalProps): ReactElement => {
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
   const [isEditMode, setIsEditMode] = React.useState<boolean>(false);
 
   const [ansibleVariable, setAnsibleVariable] = React.useState<
@@ -242,7 +246,7 @@ export const VariableManagementModalContent = ({
       role="region"
     >
       <Tab
-        eventKey={0}
+        eventKey={BASE_VARIABLE_TAB_KEY}
         title={
           <>
             <TabTitleIcon>
@@ -352,7 +356,7 @@ export const VariableManagementModalContent = ({
         </Card>
       </Tab>
       <Tab
-        eventKey={1}
+        eventKey={OVERRIDES_TAB_KEY}
         title={
           <>
             <TabTitleIcon>
@@ -365,6 +369,7 @@ export const VariableManagementModalContent = ({
         <OverridesTabContent
           variable={originalVariable}
           refreshRequest={refreshRequest}
+          setActiveTabKey={setActiveTabKey}
         />
       </Tab>
     </Tabs>

@@ -31,15 +31,18 @@ import {
 import { ConfirmationModal } from '../../../../../helpers/components/ConfirmationModal';
 import { OverrideCard } from './OverrideCard';
 import { OverrideManagementModal } from './OverrideManagementModal';
+import { OVERRIDES_TAB_KEY } from './tabConstants';
 
 interface OverridesTabContentProps {
   variable: AnsibleVariableDetail;
   refreshRequest: () => void;
+  setActiveTabKey: React.Dispatch<React.SetStateAction<string | number>>;
 }
 
 export const OverridesTabContent = ({
   variable,
   refreshRequest,
+  setActiveTabKey,
 }: OverridesTabContentProps): ReactElement => {
   const [selectedOverride, setSelectedOverride] = React.useState<
     AnsibleVariableOverride | AnsibleVariableOverrideCreate | undefined
@@ -192,6 +195,7 @@ export const OverridesTabContent = ({
       matcher: 'fqdn',
       matcher_value: '',
     };
+    setActiveTabKey(OVERRIDES_TAB_KEY);
     setSelectedOverride(newOverride);
   };
 
@@ -230,9 +234,11 @@ export const OverridesTabContent = ({
             override={override}
             variable={variable}
             onClick={() => {
+              setActiveTabKey(OVERRIDES_TAB_KEY);
               setSelectedOverride(override);
             }}
             onDelete={() => {
+              setActiveTabKey(OVERRIDES_TAB_KEY);
               setOverridePendingDelete(override);
             }}
           />
@@ -285,6 +291,7 @@ export const OverridesTabContent = ({
           overrideValue={overrideValue}
           overrideMatcherValue={overrideMatcherValue}
           onClose={() => {
+            setActiveTabKey(OVERRIDES_TAB_KEY);
             setSelectedOverride(undefined);
           }}
         />
