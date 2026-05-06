@@ -1,5 +1,6 @@
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import { Modal, ModalVariant, Button } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface ConfirmationModalProps {
   isConfirmationModalOpen: boolean;
@@ -24,6 +25,7 @@ export const ConfirmationModal = ({
 
   return (
     <Modal
+      aria-label={title}
       variant={ModalVariant.small}
       title={title}
       isOpen={isConfirmationModalOpen}
@@ -39,14 +41,14 @@ export const ConfirmationModal = ({
           }}
           isLoading={isConfirmButtonSpinning}
         >
-          Confirm
+          {_('Confirm')}
         </Button>,
         <Button
           key="cancel"
           variant="link"
           onClick={onAbort || (() => setIsConfirmationModalOpen(false))}
         >
-          Cancel
+          {_('Cancel')}
         </Button>,
       ]}
     >

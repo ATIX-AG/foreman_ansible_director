@@ -7,7 +7,11 @@ import {
   CardHeader,
   CardTitle,
   Label,
+  Tooltip,
 } from '@patternfly/react-core';
+import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
+import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
   AnsibleVariableDetail,
@@ -22,6 +26,7 @@ interface OverrideCardProps {
   override: AnsibleVariableOverride;
   variable: AnsibleVariableDetail;
   onClick: () => void;
+  onDelete: () => void;
 }
 
 const matcherNames: Record<AnsibleVariableOverride['matcher'], string> = {
@@ -40,6 +45,7 @@ export const OverrideCard = ({
   override,
   variable,
   onClick,
+  onDelete,
 }: OverrideCardProps): ReactElement => {
   const valueAdapter = (): ReactElement | null => {
     switch (variable.type) {
@@ -81,11 +87,31 @@ export const OverrideCard = ({
   };
 
   return (
-    <Card isCompact isClickable>
+    <Card isCompact>
       <CardHeader
-        selectableActions={{
-          onClickAction: onClick,
-          selectableActionId: `${override.id}-edit`,
+        actions={{
+          actions: (
+            <>
+              <Tooltip content={_('Edit')}>
+                <Button
+                  variant="plain"
+                  aria-label={_('Edit override')}
+                  onClick={onClick}
+                >
+                  <EditIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip content={_('Delete')}>
+                <Button
+                  variant="plain"
+                  aria-label={_('Delete override')}
+                  onClick={onDelete}
+                >
+                  <TrashIcon />
+                </Button>
+              </Tooltip>
+            </>
+          ),
         }}
       >
         <Label color="blue" isCompact>
