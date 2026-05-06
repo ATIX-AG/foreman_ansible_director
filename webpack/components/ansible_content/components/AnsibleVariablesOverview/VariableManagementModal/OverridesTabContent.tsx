@@ -18,6 +18,7 @@ import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
+import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { useDispatch } from 'react-redux';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
@@ -27,6 +28,7 @@ import {
   AnsibleVariableOverrideCreate,
 } from '../../../../../types/AnsibleVariableTypes';
 
+import { ConfirmationModal } from '../../../../../helpers/components/ConfirmationModal';
 import { OverrideCard } from './OverrideCard';
 import { OverrideManagementModal } from './OverrideManagementModal';
 
@@ -52,6 +54,9 @@ export const OverridesTabContent = ({
   const [overrideMatcherValue, setOverrideMatcherValue] = React.useState<
     string
   >('');
+  const [overridePendingDelete, setOverridePendingDelete] = React.useState<
+    AnsibleVariableOverride | undefined
+  >(undefined);
 
   const dispatch = useDispatch();
 
@@ -138,6 +143,49 @@ export const OverridesTabContent = ({
     }
   };
 
+  const handleOverrideDelete = async (
+    overrideToDelete: AnsibleVariableOverride
+  ): Promise<void> => {
+    if (isAnsibleVariableOverride(overrideToDelete)) {
+      try {
+        await axios.delete(
+          foremanUrl(
+            `/api/v2/ansible_director/ansible_variables/${variable.id}/overrides/${overrideToDelete.id}`
+          )
+        );
+        dispatch(
+          addToast({
+            type: 'success',
+            key: `DELETE_OVERRIDE_${overrideToDelete.id}_SUCC`,
+            message: __('Successfully deleted override for "%(name)s"!', {
+              name: variable.name,
+            }),
+            sticky: false,
+          })
+        );
+        refreshRequest();
+        setOverridePendingDelete(undefined);
+      } catch (e) {
+        dispatch(
+          addToast({
+            type: 'danger',
+            key: `DELETE_OVERRIDE_${overrideToDelete.id}_ERR`,
+            message: __(
+              _(
+                'Deletion of Ansible variable override "%(id)s" failed with error code "%(status)s".'
+              ),
+              {
+                id: overrideToDelete.id,
+                status: (e as { response: AxiosResponse }).response.status,
+              }
+            ),
+            sticky: false,
+          })
+        );
+      }
+    }
+  };
+
   const initializeOverrideCreate = (): void => {
     const newOverride: AnsibleVariableOverrideCreate = {
       value: '',
@@ -183,6 +231,9 @@ export const OverridesTabContent = ({
             variable={variable}
             onClick={() => {
               setSelectedOverride(override);
+            }}
+            onDelete={() => {
+              setOverridePendingDelete(override);
             }}
           />
         </GridItem>
@@ -233,6 +284,19 @@ export const OverridesTabContent = ({
           overrideMatcher={overrideMatcher}
           overrideValue={overrideValue}
           overrideMatcherValue={overrideMatcherValue}
+          onClose={() => {
+            setSelectedOverride(undefined);
+          }}
+        />
+      )}
+      {overridePendingDelete !== undefined && (
+        <ConfirmationModal
+          isConfirmationModalOpen
+          setIsConfirmationModalOpen={() => setOverridePendingDelete(undefined)}
+          title={_('Delete override')}
+          body={_('Are you sure you want to delete this override?')}
+          onConfirm={() => handleOverrideDelete(overridePendingDelete)}
+          onAbort={() => setOverridePendingDelete(undefined)}
         />
       )}
     </>

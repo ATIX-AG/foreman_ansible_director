@@ -43,6 +43,7 @@ interface OverrideManagementModalProps {
   variable: AnsibleVariableDetail;
   override: AnsibleVariableOverride | AnsibleVariableOverrideCreate;
   onSave: () => void;
+  onClose: () => void;
   setSelectedOverride: Dispatch<
     SetStateAction<
       AnsibleVariableOverride | AnsibleVariableOverrideCreate | undefined
@@ -89,6 +90,7 @@ export const OverrideManagementModal = ({
   variable,
   override,
   onSave,
+  onClose,
   setSelectedOverride,
   setOverrideMatcher,
   setOverrideValue,
@@ -198,7 +200,7 @@ export const OverrideManagementModal = ({
         title={_('Edit override')}
         style={{ minHeight: '400px' }}
         isOpen
-        onClose={() => setSelectedOverride(undefined)}
+        onClose={onClose}
         actions={[
           <Button
             key="confirm"
@@ -212,11 +214,7 @@ export const OverrideManagementModal = ({
           >
             {_('Submit')}
           </Button>,
-          <Button
-            key="cancel"
-            variant="link"
-            onClick={() => setSelectedOverride(undefined)}
-          >
+          <Button key="cancel" variant="link" onClick={onClose}>
             {_('Cancel')}
           </Button>,
         ]}
