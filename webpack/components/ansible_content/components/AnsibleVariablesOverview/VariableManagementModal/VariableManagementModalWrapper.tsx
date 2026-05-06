@@ -15,6 +15,7 @@ import {
   AnsibleVariableDetail,
 } from '../../../../../types/AnsibleVariableTypes';
 import { VariableManagementModalContent } from './VariableManagementModalContent';
+import { BASE_VARIABLE_TAB_KEY } from './tabConstants';
 
 interface VariableManagementModalWrapperProps {
   variable: AnsibleVariable;
@@ -25,6 +26,10 @@ export const VariableManagementModalWrapper = ({
   variable,
   setSelectedVariable,
 }: VariableManagementModalWrapperProps): ReactElement => {
+  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(
+    BASE_VARIABLE_TAB_KEY
+  );
+
   const modal = (title: string, modalContent: ReactElement): ReactElement => (
     <React.Fragment>
       <Modal
@@ -55,6 +60,8 @@ export const VariableManagementModalWrapper = ({
         originalVariable={variableRequest.response}
         setSelectedVariable={setSelectedVariable}
         refreshRequest={refreshRequest}
+        activeTabKey={activeTabKey}
+        setActiveTabKey={setActiveTabKey}
       />
     );
   } else if (variableRequest.status === 'ERROR') {
