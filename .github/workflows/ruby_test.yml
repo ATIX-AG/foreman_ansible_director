@@ -4,7 +4,11 @@ name: Ruby Testing
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    types: [ready_for_review, review_requested]
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
   push:
     branches:
       - 'main'
@@ -16,6 +20,7 @@ concurrency:
 jobs:
   rubocop:
     name: Rubocop
+    if: github.event.pull_request.draft == false
     uses: theforeman/actions/.github/workflows/rubocop.yml@v0
     with:
       command: bundle exec rubocop --parallel --format github
@@ -23,6 +28,7 @@ jobs:
 
   test_ruby:
     name: Ruby
+    if: github.event.pull_request.draft == false
     needs: rubocop
     uses: theforeman/actions/.github/workflows/foreman_plugin.yml@v0
     with:

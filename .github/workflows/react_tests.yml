@@ -4,7 +4,11 @@ name: React Tests
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    types: [ready_for_review, review_requested]
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
   push:
     branches:
       - 'main'
@@ -20,6 +24,7 @@ defaults:
 jobs:
   frontend-tests:
     runs-on: ubuntu-24.04
+    if: github.event.pull_request.draft == false
     continue-on-error: false
 
     steps:
