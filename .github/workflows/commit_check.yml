@@ -4,12 +4,16 @@ name: Conventional Commits
 # yamllint disable-line rule:truthy
 on:
   pull_request:
-    types: [ready_for_review, review_requested]
-
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 jobs:
   commit_check:
     name: Conventional Commits
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v3
 
