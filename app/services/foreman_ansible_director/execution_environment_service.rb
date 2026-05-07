@@ -49,6 +49,9 @@ module ForemanAnsibleDirector
       end
 
       def build_execution_environment(execution_environment)
+        proxy = ::SmartProxy.with_features(::ForemanAnsibleDirector::PROXY_FEATURE).first
+        raise "No smart proxy with '#{::ForemanAnsibleDirector::PROXY_FEATURE}' feature found" unless proxy
+
         env_definition = {
           id: execution_environment.id,
           content: {
@@ -71,6 +74,7 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
           task_args: {
             proxy_task_id: SecureRandom.uuid,
+            smart_proxy_id: proxy.id,
             execution_environment_definition: env_definition,
             execution_environment_id: execution_environment.id,
           },
