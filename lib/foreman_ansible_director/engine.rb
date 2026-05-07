@@ -5,6 +5,7 @@ require 'foreman_ansible_director/remote_execution'
 
 module ForemanAnsibleDirector
   DYNFLOW_QUEUE = :foreman_ansible_director
+  PROXY_FEATURE = 'Ansible_Director'
   class Engine < ::Rails::Engine
     isolate_namespace ForemanAnsibleDirector
     engine_name 'foreman_ansible_director'

@@ -87,21 +87,27 @@ module ForemanAnsibleDirectorTests
 
         test 'creates execution environment with explicit organization when no current organization is set' do
           Organization.current = nil
+          proxy = FactoryBot.build_stubbed(:smart_proxy)
+          fake_task = Struct.new(:id).new(1234)
 
-          assert_difference(
-            '::ForemanAnsibleDirector::ExecutionEnvironment.where(organization_id: @organization.id).count',
-            1
-          ) do
-            post :create,
-              params: {
-                organization_id: @organization.id,
-                execution_environment: {
-                  name: 'created-ee',
-                  base_image_url: 'quay.io/fedora/fedora:42',
-                  ansible_version: '2.20.0',
-                },
-              },
-              session: set_session_user
+          ::SmartProxy.stub(:with_features, [proxy]) do
+            ::ForemanAnsibleDirector::ActionService.stub(:trigger, fake_task) do
+              assert_difference(
+                '::ForemanAnsibleDirector::ExecutionEnvironment.where(organization_id: @organization.id).count',
+                1
+              ) do
+                post :create,
+                  params: {
+                    organization_id: @organization.id,
+                    execution_environment: {
+                      name: 'created-ee',
+                      base_image_url: 'quay.io/fedora/fedora:42',
+                      ansible_version: '2.20.0',
+                    },
+                  },
+                  session: set_session_user
+              end
+            end
           end
 
           assert_response :success
