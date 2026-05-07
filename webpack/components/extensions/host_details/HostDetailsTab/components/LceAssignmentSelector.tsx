@@ -24,9 +24,9 @@ import {
 import AngleLeftIcon from '@patternfly/react-icons/dist/esm/icons/angle-left-icon';
 import AngleRightIcon from '@patternfly/react-icons/dist/esm/icons/angle-right-icon';
 import SearchIcon from '@patternfly/react-icons/dist/esm/icons/search-icon';
-import { Link, LinkProps } from 'react-router-dom';
 
-import { translate as _ } from 'foremanReact/common/I18n';
+import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
+import { foremanUrl } from 'foremanReact/common/helpers';
 
 import {
   AnsibleCollectionRole,
@@ -167,7 +167,9 @@ export const InnerLceAssignmentSelector = ({
       text: `${node.identifier}@${node.version}`,
       isChecked,
       parent: undefined,
-      checkProps: { 'aria-label': `Select ${node.identifier}` },
+      checkProps: {
+        'aria-label': __(_('Select %(name)s'), { name: node.identifier }),
+      },
       hasBadge: true,
       badgeProps: { isRead: true },
       defaultExpanded: false,
@@ -212,7 +214,9 @@ export const InnerLceAssignmentSelector = ({
       id: node.id,
       text: node.name,
       isChecked,
-      checkProps: { 'aria-label': `Select ${node.name}` },
+      checkProps: {
+        'aria-label': __(_('Select %(name)s'), { name: node.name }),
+      },
       hasBadge: false,
       parent,
     };
@@ -243,11 +247,11 @@ export const InnerLceAssignmentSelector = ({
             <Button
               variant="link"
               onClick={() => {}}
-              component={(props: LinkProps) => (
-                <Link {...props} to="/ansible/content" />
+              component={props => (
+                <a {...props} href={foremanUrl('/ansible/content')} />
               )}
             >
-              Import Ansible content
+              {_('Import Ansible content')}
             </Button>
           </EmptyStateActions>
         </EmptyStateFooter>
@@ -291,14 +295,14 @@ export const InnerLceAssignmentSelector = ({
         <DualListSelectorControl
           isDisabled={Object.keys(selectedRoles).length === 0}
           onClick={() => moveChecked(true)}
-          aria-label="Add selected"
+          aria-label={_('Add selected')}
         >
           <AngleRightIcon />
         </DualListSelectorControl>
         <DualListSelectorControl
           onClick={() => moveChecked(false)}
           isDisabled={Object.keys(selectedRoles).length === 0}
-          aria-label="Remove selected"
+          aria-label={_('Remove selected')}
         >
           <AngleLeftIcon />
         </DualListSelectorControl>
