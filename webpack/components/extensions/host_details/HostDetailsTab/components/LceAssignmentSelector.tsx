@@ -209,7 +209,7 @@ export const InnerLceAssignmentSelector = ({
       : true;
 
     const treeNode: ContentUnitTreeItemData = {
-      id: node.id,
+      id: node.id.toString(),
       text: node.name,
       isChecked,
       checkProps: { 'aria-label': `Select ${node.name}` },

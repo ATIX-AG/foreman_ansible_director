@@ -23,10 +23,10 @@ import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissi
 
 interface AnsibleContentTableSecondaryRowProps {
   identifier: string; // Needed for keys
-  nodeId: string;
+  nodeId: number;
   nodeVersions: AnsibleContentVersionWithCount[];
   isExpanded: boolean;
-  setSelectedVersionId: Dispatch<SetStateAction<string>>;
+  setSelectedVersionId: Dispatch<SetStateAction<number>>;
   setSelectedIdentifier: Dispatch<SetStateAction<string>>;
   setSelectedVersion: Dispatch<SetStateAction<string>>;
   setIsConfirmationModalOpen: Dispatch<React.SetStateAction<boolean>>;

@@ -40,7 +40,7 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     setExpandedDetailsNodeNames,
   ] = React.useState<string[]>([]);
 
-  const [selectedVersionId, setSelectedVersionId] = React.useState<string>('');
+  const [selectedVersionId, setSelectedVersionId] = React.useState<number>(-1);
   const [selectedIdentifier, setSelectedIdentifier] = React.useState<string>(
     ''
   );
@@ -126,13 +126,13 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
         <Tbody>{renderRows(apiResponse.results)}</Tbody>
       </Table>
       <Pagination itemCount={apiResponse.total} onChange={onPagination} />
-      {selectedVersionId !== '' && (
+      {selectedVersionId !== -1 && (
         <>
           <AnsibleVariablesOverview
             selectedVersionId={selectedVersionId}
             selectedIdentifier={selectedIdentifier}
             selectedVersion={selectedVersion}
-            onClose={() => setSelectedVersionId('')}
+            onClose={() => setSelectedVersionId(-1)}
             setSelectedVariable={setSelectedVariable}
           />
           {selectedVariable && (
