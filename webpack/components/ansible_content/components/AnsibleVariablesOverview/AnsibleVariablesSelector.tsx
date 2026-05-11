@@ -64,7 +64,7 @@ export const AnsibleVariablesSelector = ({
   const [roleFilter, setRoleFilter] = React.useState<string>('');
   const [variableFilter, setVariableFilter] = React.useState<string>('');
 
-  const [variableUpdating, setVariableUpdating] = React.useState<string>('');
+  const [variableUpdating, setVariableUpdating] = React.useState<number>(-1);
 
   const userCanEditVariables: boolean = usePermissions([
     AdPermissions.ansibleVariables.edit,
@@ -118,7 +118,7 @@ export const AnsibleVariablesSelector = ({
         })
       );
     } finally {
-      setVariableUpdating('');
+      setVariableUpdating(-1);
     }
   };
 

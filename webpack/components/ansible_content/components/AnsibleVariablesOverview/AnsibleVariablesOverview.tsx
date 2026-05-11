@@ -17,7 +17,7 @@ import { AnsibleVariablesSelector } from './AnsibleVariablesSelector';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 
 interface AnsibleVariablesDetailProps {
-  selectedVersionId: string;
+  selectedVersionId: number;
   selectedVersion: string;
   selectedIdentifier: string;
   onClose: () => void;

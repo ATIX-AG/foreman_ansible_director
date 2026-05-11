@@ -1,7 +1,7 @@
 import { AnsibleContentUnitAssignment } from './AnsibleContentTypes';
 
 export interface Identifiable {
-  id: string;
+  id: number;
 }
 
 export interface AnsibleExecutionEnvBase {
