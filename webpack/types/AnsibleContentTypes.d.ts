@@ -1,5 +1,6 @@
 import { Identifiable } from './AnsibleExecutionEnvTypes';
 import { AnsibleVariable } from './AnsibleVariableTypes';
+import { ContentResolutionNode } from './AnsibleContentAssignmentTypes';
 
 export interface AnsibleContentUnitCreateBase {
   type: 'collection' | 'role';
@@ -53,6 +54,8 @@ export interface AnsibleContentVersionFull
   roles: AnsibleCollectionRole[];
 }
 
+// TODO: Split this into Role and Collection types.
+// As is, the UI has to rely on the fact that the roles key only exists for Collection roles.
 export interface AnsibleContentUnitAssignment extends Identifiable {
   type: 'collection' | 'role';
   identifier: string;
@@ -62,4 +65,10 @@ export interface AnsibleContentUnitAssignment extends Identifiable {
 export interface FullAnsibleContentUnitAssignment
   extends AnsibleContentUnitAssignment {
   roles: AnsibleCollectionRole[];
+}
+
+export interface AnsibleContentSource extends Identifiable {
+  type: 'ForemanAnsibleDirector::LifecycleEnvironment';
+  inherited: boolean;
+  hierarchy: ContentResolutionNode[];
 }
