@@ -13,22 +13,28 @@ import { useDispatch } from 'react-redux';
 
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
 import { OverrideGrid } from './OverrideGrid';
+import { ContentResolutionNodeType } from '../../../../../types/AnsibleContentAssignmentTypes';
+import { crnTypeUrlMap } from '../../../../common/AnsibleContentAssignment/helpers';
 
 interface OverrideGridWrapperProps {
-  hostId: number;
-  fqdn: string;
+  crnType: ContentResolutionNodeType;
+  crnId: number;
+  matcherName: string;
+  matcherType: string;
 }
 
 export const OverrideGridWrapper = ({
-  hostId,
-  fqdn,
+  crnType,
+  crnId,
+  matcherType,
+  matcherName,
 }: OverrideGridWrapperProps): ReactElement => {
   const dispatch = useDispatch();
 
   const overridesRequest = useAPI<MergedVariableOverride[]>(
     'get',
     foremanUrl(
-      `/api/v2/ansible_director/ansible_variables/overrides/HOST/${hostId}?include_overridable=1`
+      `/api/v2/ansible_director/ansible_variables/overrides/${crnTypeUrlMap[crnType]}/${crnId}?include_overridable=1`
     )
   );
 
@@ -36,7 +42,7 @@ export const OverrideGridWrapper = ({
     dispatch(
       addToast({
         type: 'danger',
-        key: `GET_HOST_${hostId}_ANSIBLE_VAR_OVERRIDES`,
+        key: `GET_${crnType}_${crnId}_ANSIBLE_VAR_OVERRIDES`,
         message: 'Requesting Ansible variable overrides failed".',
         sticky: false,
       })
@@ -50,7 +56,9 @@ export const OverrideGridWrapper = ({
             ? []
             : overridesRequest.response
         }
-        fqdn={fqdn}
+        matcherType={matcherType}
+        matcherName={matcherName}
+        crnType={crnType}
       />
     );
   }

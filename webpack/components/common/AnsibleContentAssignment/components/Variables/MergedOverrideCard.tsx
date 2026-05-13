@@ -21,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
 import { StringAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/StringAdapter';
@@ -31,15 +32,21 @@ import { RealAdapter } from '../../../../ansible_content/components/AnsibleVaria
 import { YamlEditor } from '../../../../common/YamlEditor';
 import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
 import { PermittedButton } from '../../../../common/PermittedButton';
+import { crnTypeUiString } from '../../helpers';
+import { ContentResolutionNodeType } from '../../../../../types/AnsibleContentAssignmentTypes';
 
 interface MergedOverrideCardProps {
   mergedOverride: MergedVariableOverride;
-  fqdn: string;
+  matcherName: string;
+  matcherType: string;
+  crnType: ContentResolutionNodeType;
 }
 
 export const MergedOverrideCard = ({
   mergedOverride,
-  fqdn,
+  matcherName,
+  matcherType,
+  crnType,
 }: MergedOverrideCardProps): ReactElement => {
   const [override, setOverride] = React.useState<
     MergedVariableOverride | undefined
@@ -128,7 +135,9 @@ export const MergedOverrideCard = ({
             addToast({
               type: 'success',
               key: `EDIT_OVERRIDE_${mergedOverride.override_id}_SUCC`,
-              message: `Successfully edited override for "${mergedOverride.key}"!`,
+              message: __(_('Successfully edited override for "%(key)s"!'), {
+                key: mergedOverride.key,
+              }),
               sticky: false,
             })
           );
@@ -137,11 +146,15 @@ export const MergedOverrideCard = ({
             addToast({
               type: 'danger',
               key: `UPDATE_OVERRIDE_${mergedOverride.override_id}_ERR`,
-              message: `Updating of Ansible variable override for "${
-                mergedOverride.key
-              }" failed with error code "${
-                (e as { response: AxiosResponse }).response.status
-              }".`,
+              message: __(
+                _(
+                  'Updating of Ansible variable override for "%(key)s" failed with error code "%(error)s".'
+                ),
+                {
+                  key: mergedOverride.key,
+                  error: (e as { response: AxiosResponse }).response.status,
+                }
+              ),
               sticky: false,
             })
           );
@@ -158,8 +171,8 @@ export const MergedOverrideCard = ({
             {
               override: {
                 value: overrideValue,
-                matcher: 'fqdn',
-                matcher_value: fqdn,
+                matcher: matcherType,
+                matcher_value: matcherName,
               },
             }
           );
@@ -192,7 +205,7 @@ export const MergedOverrideCard = ({
     setIsEditMode(!isEditMode);
   };
 
-  const editAction = (): ReactElement => (
+  const editAction = (overrideObject: MergedVariableOverride): ReactElement => (
     <PermittedButton
       requiredPermissions={[AdPermissions.ansibleVariableOverrides.edit]}
       hasPopover
@@ -200,15 +213,24 @@ export const MergedOverrideCard = ({
         triggerAction: 'hover',
         'aria-label': 'destroy popover',
         headerComponent: 'h1',
-        headerContent: 'Edit variable override',
+        headerContent: _('Edit variable override'),
         bodyContent: (
-          <div>Edit the value of variable {override?.key} for this host</div>
+          <div>
+            {__(
+              _('Edit the value of variable %(key)s for this %(targetType)s'),
+              {
+                key: overrideObject.key,
+                targetType: crnTypeUiString[crnType],
+              }
+            )}
+          </div>
         ),
       }}
       variant="plain"
       aria-label="Action"
       onClick={() => onAction()}
       isInline
+      key={`${mergedOverride.variable_id}-${mergedOverride.override_id}`}
     >
       {isEditMode ? (
         <Icon size="md">
@@ -230,7 +252,7 @@ export const MergedOverrideCard = ({
             <>
               <CardHeader
                 actions={{
-                  actions: [...[editAction()]],
+                  actions: [...[editAction(override)]],
                 }}
               >
                 <Label color="blue" isCompact>
@@ -262,13 +284,13 @@ export const MergedOverrideCard = ({
       )}
       {mergedOverride.type === 'yaml' && isEditMode && (
         <Modal
-          title="Edit override"
+          title={_('Edit override')}
           style={{ minHeight: '400px' }}
           isOpen
           onClose={() => setIsEditMode(false)}
           actions={[
             <Button key="confirm" variant="primary" onClick={() => onAction()}>
-              Confirm
+              {_('Confirm')}
             </Button>,
           ]}
           ouiaId="BasicModal"

@@ -12,24 +12,38 @@ import {
   GridItem,
 } from '@patternfly/react-core';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
 import { MergedOverrideCard } from './MergedOverrideCard';
+import { ContentResolutionNodeType } from '../../../../../types/AnsibleContentAssignmentTypes';
+import { crnTypeUiString } from '../../helpers';
 
 interface OverrideGridProps {
   overrides: MergedVariableOverride[];
-  fqdn: string;
+  matcherName: string;
+  matcherType: string;
+  crnType: ContentResolutionNodeType;
 }
 
 export const OverrideGrid = ({
   overrides,
-  fqdn,
+  matcherName,
+  matcherType,
+  crnType,
 }: OverrideGridProps): ReactElement => (
   <div style={{ padding: '20px' }}>
     {overrides.length > 0 ? (
       <Gallery hasGutter>
         {overrides.map(mergedOverride => (
-          <GridItem>
-            <MergedOverrideCard mergedOverride={mergedOverride} fqdn={fqdn} />
+          <GridItem
+            key={`${mergedOverride.variable_id}-${mergedOverride.override_id}`}
+          >
+            <MergedOverrideCard
+              mergedOverride={mergedOverride}
+              matcherName={matcherName}
+              matcherType={matcherType}
+              crnType={crnType}
+            />
           </GridItem>
         ))}
       </Gallery>
@@ -37,12 +51,18 @@ export const OverrideGrid = ({
       <EmptyState variant={EmptyStateVariant.xl}>
         <EmptyStateHeader
           headingLevel="h4"
-          titleText="No variable overrides for this host"
+          titleText={__(_('No variable overrides for this %(crnType)s'), {
+            crnType: crnTypeUiString[crnType],
+          })}
           icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
         />
         <EmptyStateBody>
-          This host has no variable overrides configured. Default values
-          declared in content will be used.
+          {__(
+            _(
+              'This %(crnType)s has no variable overrides configured. Default values declared in content will be used.'
+            ),
+            { crnType: crnTypeUiString[crnType] }
+          )}
         </EmptyStateBody>
         <EmptyStateFooter>
           <EmptyStateActions>
@@ -50,7 +70,7 @@ export const OverrideGrid = ({
               variant="link"
               onClick={() => window.open('/ansible/content')}
             >
-              Manage variable overrides
+              {_('Manage variable overrides')}
             </Button>
           </EmptyStateActions>
         </EmptyStateFooter>

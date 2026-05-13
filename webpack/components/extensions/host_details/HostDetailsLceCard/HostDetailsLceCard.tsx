@@ -29,6 +29,7 @@ import {
   SparseAnsibleLce,
 } from '../../../../types/AnsibleEnvironmentsTypes';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
+import { AnsibleContentSource } from '../../../../types/AnsibleContentTypes';
 
 interface HostDetailsLceCardProps {
   status: 'RESOLVED' | 'PENDING' | 'ERROR';
@@ -36,7 +37,7 @@ interface HostDetailsLceCardProps {
     id: number;
     name: string;
     // eslint-disable-next-line camelcase
-    ansible_lifecycle_environment_id: number | null;
+    ansible_content_source: AnsibleContentSource | null;
   };
 }
 interface LcePathsResponse extends IndexResponse {
@@ -98,9 +99,7 @@ export const HostDetailsLceCard = ({
           const pathLces: SparseAnsibleLce[] =
             getLcePathsResponse.response.results[i].lifecycle_environments;
           for (let j = 0; j < pathLces.length; j++) {
-            if (
-              pathLces[j].id === hostDetails.ansible_lifecycle_environment_id
-            ) {
+            if (pathLces[j].id === hostDetails.ansible_content_source?.id) {
               lcePath = getLcePathsResponse.response.results[i].name;
               lce = pathLces[j].name;
               break;
@@ -117,7 +116,7 @@ export const HostDetailsLceCard = ({
     }
   }, [
     getLcePathsResponse,
-    hostDetails.ansible_lifecycle_environment_id,
+    hostDetails.ansible_content_source,
     selectedLce,
     selectedLcePath,
   ]);
@@ -128,7 +127,7 @@ export const HostDetailsLceCard = ({
     if (isEditMode) {
       if (!abort) {
         // eslint-disable-next-line no-void
-        void setLce();
+        void setLce(lceForName(selectedLce).id);
         setInitialLce(selectedLce);
         setInitialLcePath(selectedLcePath);
       } else {
@@ -156,13 +155,13 @@ export const HostDetailsLceCard = ({
       .filter(lcePath => lcePath.name === selectedLcePath)[0]
       .lifecycle_environments.filter(lce => lce.name === name)[0];
 
-  const setLce = async (): Promise<void> => {
+  const setLce = async (
+    lceIdentifier: number | 'inherit' | 'none'
+  ): Promise<void> => {
     try {
       await axios.post(
         foremanUrl(
-          `/api/v2/ansible_director/lifecycle_environments/${
-            lceForName(selectedLce).id
-          }/assign/HOST/${hostDetails.id}`
+          `/api/v2/ansible_director/lifecycle_environments/${lceIdentifier}/assign/HOST/${hostDetails.id}`
         ),
         {}
       );
@@ -201,23 +200,52 @@ export const HostDetailsLceCard = ({
                   isEditMode={isEditMode}
                   handleEdit={handleEdit}
                   handleAbort={handleAbort}
+                  handleInherit={async () => {
+                    await setLce('inherit');
+                    setIsEditMode(false);
+                  }}
+                  handleUnset={async () => {
+                    await setLce('none');
+                    setSelectedLce(LCE_SELECTOR_PLACEHOLDER);
+                    setSelectedLcePath(LCE_PATH_SELECTOR_PLACEHOLDER);
+                    setIsEditMode(false);
+                  }}
                 />
               ),
             }}
           >
             <Flex
-              alignItems={{ default: 'alignItemsCenter' }}
-              justifyContent={{ default: 'justifyContentSpaceBetween' }}
-              style={{ width: '100%' }}
+              alignItems={{
+                default: 'alignItemsCenter',
+              }}
+              justifyContent={{
+                default: 'justifyContentSpaceBetween',
+              }}
+              style={{
+                width: '100%',
+              }}
             >
               <FlexItem>
                 <Flex
-                  alignItems={{ default: 'alignItemsCenter' }}
-                  justifyContent={{ default: 'justifyContentSpaceBetween' }}
+                  alignItems={{
+                    default: 'alignItemsCenter',
+                  }}
+                  justifyContent={{
+                    default: 'justifyContentSpaceBetween',
+                  }}
                 >
                   <FlexItem>
                     <CardTitle>
-                      <BundleIcon /> {_('Ansible environment')}
+                      {hostDetails.ansible_content_source &&
+                      hostDetails.ansible_content_source.inherited ? (
+                        <>
+                          <BundleIcon /> {_('Ansible environment (inherited)')}
+                        </>
+                      ) : (
+                        <>
+                          <BundleIcon /> {_('Ansible environment')}
+                        </>
+                      )}
                     </CardTitle>
                   </FlexItem>
                 </Flex>
