@@ -18,14 +18,27 @@ module ForemanAnsibleDirectorTests
 
         describe '#create_assignment' do
           test 'creates an assignment with valid params' do
-            assignment = ::ForemanAnsibleDirector::AssignmentService.create_assignment(
-              consumable: @collection_role,
-              assignable: @lifecycle_environment
+            acr_assignment = ::ForemanAnsibleDirector::AssignmentService.create_assignment(
+              target: @host,
+              assignment: {
+                assignable_type: "ForemanAnsibleDirector::AnsibleCollectionRole",
+                assignable_namespace: "manala",
+                assignable_name: "roles",
+                assignable_role_name: "motd"
+              }
             )
 
-            assert_not_nil assignment
-            assert_equal @collection_role, assignment.consumable
-            assert_equal @lifecycle_environment, assignment.assignable
+            ac_assignment = ::ForemanAnsibleDirector::AssignmentService.create_assignment(
+              target: @host,
+              assignment: {
+                assignable_type: "ForemanAnsibleDirector::AnsibleRole",
+                assignable_namespace: "geerlinguy",
+                assignable_name: "redis",
+              }
+            )
+
+            assert_not_nil acr_assignment
+            assert_not_nil ac_assignment
           end
         end
 
@@ -33,8 +46,7 @@ module ForemanAnsibleDirectorTests
           setup do
             @assignment = FactoryBot.create(
               :ansible_content_assignment,
-              consumable: @collection_role,
-              assignable: @lifecycle_environment
+              consumable: @host
             )
           end
 
@@ -48,92 +60,247 @@ module ForemanAnsibleDirectorTests
         end
 
         describe '#create_bulk_assignments' do
-          test 'creates multiple assignments in a single transaction' do
-            collection2 = FactoryBot.create(:ansible_collection, organization: @organization)
-            collection_version2 = FactoryBot.create(:content_unit_version, :for_collection, versionable: collection2)
-            collection_role2 = FactoryBot.create(:ansible_collection_role, ansible_collection_version: collection_version2)
+          test 'creates multiple assignments for a target' do
 
             assignments = [
-              { source: { type: 'ACR', id: @collection_role.id }, target: { type: 'HOST', id: @host.id } },
-              { source: { type: 'ACR', id: collection_role2.id }, target: { type: 'HOST', id: @host.id } }
+              {
+                assignable_type: "ForemanAnsibleDirector::AnsibleCollectionRole",
+                assignable_namespace: "manala",
+                assignable_name: "roles",
+                assignable_role_name: "motd"
+              },
+              {
+                assignable_type: "ForemanAnsibleDirector::AnsibleRole",
+                assignable_namespace: "geerlingguy",
+                assignable_name: "redis",
+              }
             ]
 
-            ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(assignments: assignments)
+            ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(target: @host, assignments: assignments)
 
             target_assignments = ::ForemanAnsibleDirector::AnsibleContentAssignment.where(
-              assignable: @host
-            )
-            assert_equal 2, target_assignments.count
-          end
-
-          test 'clears existing assignments for a target before creating new ones' do
-            FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: @collection_role,
-              assignable: @lifecycle_environment
-            )
-            assert_equal 1, ::ForemanAnsibleDirector::AnsibleContentAssignment.where(assignable: @lifecycle_environment).count
-
-            collection2 = FactoryBot.create(:ansible_collection, organization: @organization)
-            collection_version2 = FactoryBot.create(:content_unit_version, :for_collection, versionable: collection2)
-            collection_role2 = FactoryBot.create(:ansible_collection_role, ansible_collection_version: collection_version2)
-
-            FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: @collection_role,
-              assignable: @host
-            )
-
-            assignments = [
-              { source: { type: 'ACR', id: collection_role2.id }, target: { type: 'HOST', id: @host.id } }
-            ]
-
-            ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(assignments: assignments)
-
-            target_assignments = ::ForemanAnsibleDirector::AnsibleContentAssignment.where(
-              assignable: @host
-            )
-            assert_equal 1, target_assignments.count
-            assert_equal collection_role2, target_assignments.first.consumable
-          end
-
-          test 'only clears a target once when it appears in multiple assignments' do
-            collection2 = FactoryBot.create(:ansible_collection, organization: @organization)
-            collection_version2 = FactoryBot.create(:content_unit_version, :for_collection, versionable: collection2)
-            collection_role2 = FactoryBot.create(:ansible_collection_role, ansible_collection_version: collection_version2)
-
-            assignments = [
-              { source: { type: 'ACR', id: @collection_role.id }, target: { type: 'HOST', id: @host.id } },
-              { source: { type: 'ACR', id: collection_role2.id }, target: { type: 'HOST', id: @host.id } }
-            ]
-
-            ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(assignments: assignments)
-
-            target_assignments = ::ForemanAnsibleDirector::AnsibleContentAssignment.where(
-              assignable: @host
+              consumable: @host
             )
             assert_equal 2, target_assignments.count
           end
         end
 
+        describe "#content_source_for" do
+
+          setup do
+            @lifecycle_environment_path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
+            @lifecycle_environment = FactoryBot.create(
+              :lifecycle_environment,
+              organization: @organization,
+              lifecycle_environment_path: @lifecycle_environment_path
+            )
+
+            as_admin do
+              @target_hostgroup = FactoryBot.create(
+                :hostgroup, organizations: [@organization],
+                ansible_lifecycle_environment: @lifecycle_environment,
+              )
+              @target_host = FactoryBot.create(
+                :host,
+                hostgroup: @target_hostgroup
+              )
+            end
+          end
+
+          test 'recursively resolves content source' do
+
+            content_source, hieararchy = ::ForemanAnsibleDirector::AssignmentService.content_source_for(@target_host)
+
+            assert_equal @lifecycle_environment, content_source
+            assert_equal [@target_host, @target_hostgroup], hieararchy
+
+          end
+        end
+
+        describe '#assignments_for' do
+
+          setup do
+            @lifecycle_environment_path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
+            @lifecycle_environment = FactoryBot.create(
+              :lifecycle_environment,
+              organization: @organization,
+              lifecycle_environment_path: @lifecycle_environment_path
+            )
+
+            as_admin do
+              @target_parent_hostgroup = FactoryBot.create(:hostgroup, organizations: [@organization])
+              @target_child_hostgroup = FactoryBot.create(:hostgroup, organizations: [@organization])
+              @target_child_hostgroup.update(parent: @target_parent_hostgroup)
+              @target_child_hostgroup.reload
+              @target_host = FactoryBot.create(
+                :host,
+                ansible_lifecycle_environment: @lifecycle_environment,
+                hostgroup: @target_child_hostgroup
+              )
+            end
+
+            @assignment = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host
+            )
+            @collection_1 = FactoryBot.create(:ansible_collection, organization: @organization)
+            @collection_2 = FactoryBot.create(:ansible_collection, organization: @organization)
+            @collection_version_1_1 = FactoryBot.create(:content_unit_version, :for_collection, versionable: @collection_1)
+            @collection_version_2_1 = FactoryBot.create(:content_unit_version, :for_collection, versionable: @collection_2)
+            @collection_role_1_1_1 = FactoryBot.create(:ansible_collection_role, ansible_collection_version: @collection_version_1_1)
+            @collection_role_2_1_1 = FactoryBot.create(:ansible_collection_role, ansible_collection_version: @collection_version_2_1)
+
+            @role_1 = FactoryBot.create(:ansible_role, organization: @organization)
+            @role_version_1_1 = FactoryBot.create(:content_unit_version, :for_role, versionable: @role_1)
+
+          end
+
+          test 'recursively queries assignments for target with no parent' do
+
+            @assignment_1 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_host,
+              assignable_namespace: @collection_1.namespace,
+              assignable_name: @collection_1.name,
+              assignable_role_name: @collection_role_1_1_1.name
+            )
+
+            @assignment_2 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_host,
+              assignable_namespace: @collection_2.namespace,
+              assignable_name: @collection_2.name,
+              assignable_role_name: @collection_role_2_1_1.name
+            )
+
+            assignments, = ::ForemanAnsibleDirector::AssignmentService.assignments_for(target: @target_host, resolve: false)
+
+            assert_equal 2, assignments.length
+          end
+
+          test 'recursively queries assignments for target with parents' do
+
+            @assignment_1 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_parent_hostgroup,
+              assignable_namespace: @collection_1.namespace,
+              assignable_name: @collection_1.name,
+              assignable_role_name: @collection_role_1_1_1.name
+            )
+
+            @assignment_2 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_child_hostgroup,
+              assignable_namespace: @collection_2.namespace,
+              assignable_name: @collection_2.name,
+              assignable_role_name: @collection_role_2_1_1.name
+            )
+
+            @assignment_3 = FactoryBot.create(
+              :ansible_content_assignment,
+              :for_role,
+              consumable: @target_host,
+              assignable_namespace: @role_1.namespace,
+              assignable_name: @role_1.name
+            )
+
+            # For some reason, FactoryBot does not want to build @target_child_hostgroup with @target_parent_hostgroup
+            # as its parent.
+            @target_child_hostgroup.stub(:parent, -> { @target_parent_hostgroup }) do
+              assignments, = ::ForemanAnsibleDirector::AssignmentService.assignments_for(target: @target_host, resolve: false)
+              assert_equal 3, assignments.length
+            end
+          end
+
+          test 'resolves concrete content units for assignments' do
+
+            FactoryBot.create(
+              :lifecycle_environment_content_unit_version,
+              lifecycle_environment: @lifecycle_environment,
+              content_unit_version: @collection_version_1_1
+            )
+            FactoryBot.create(
+              :lifecycle_environment_content_unit_version,
+              lifecycle_environment: @lifecycle_environment,
+              content_unit_version: @collection_version_2_1
+            )
+            FactoryBot.create(
+              :lifecycle_environment_content_unit_version,
+              lifecycle_environment: @lifecycle_environment,
+              content_unit_version: @role_version_1_1
+            )
+
+            @assignment_1 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_parent_hostgroup,
+              assignable_namespace: @collection_1.namespace,
+              assignable_name: @collection_1.name,
+              assignable_role_name: @collection_role_1_1_1.name
+            )
+
+            @assignment_2 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_child_hostgroup,
+              assignable_namespace: @collection_2.namespace,
+              assignable_name: @collection_2.name,
+              assignable_role_name: @collection_role_2_1_1.name
+            )
+
+            @assignment_3 = FactoryBot.create(
+              :ansible_content_assignment,
+              :for_role,
+              consumable: @target_host,
+              assignable_namespace: @role_1.namespace,
+              assignable_name: @role_1.name
+            )
+
+            # For some reason, FactoryBot does not want to build @target_child_hostgroup with @target_parent_hostgroup
+            # as its parent.
+            @target_child_hostgroup.stub(:parent, -> { @target_parent_hostgroup }) do
+              assignments, resolved_assignments, hierarchy = ::ForemanAnsibleDirector::AssignmentService.assignments_for(target: @target_host, resolve: true)
+              assert_equal 3, assignments.length
+              assert_equal [@assignment_1, @assignment_2, @assignment_3], assignments
+
+              assert_equal 3, resolved_assignments.length
+              assert_equal [@collection_role_1_1_1, @collection_role_2_1_1, @role_version_1_1], resolved_assignments.pluck(:cuv)
+
+              assert_equal 3, hierarchy.length
+              assert_equal [@target_host, @target_child_hostgroup, @target_parent_hostgroup], hierarchy
+            end
+          end
+
+          test 'issues warning when an unresolvable assignment is encountered' do
+            @assignment_2 = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @target_child_hostgroup,
+              assignable_namespace: @collection_2.namespace,
+              assignable_name: @collection_2.name,
+              assignable_role_name: @collection_role_2_1_1.name
+            )
+
+            @assignment_3 = FactoryBot.create(
+              :ansible_content_assignment,
+              :for_role,
+              consumable: @target_host,
+              assignable_namespace: @role_1.namespace,
+              assignable_name: @role_1.name
+            )
+
+            ::ForemanAnsibleDirector::AssignmentService.assignments_for(target: @target_host, resolve: true)
+            assert_equal 2, ctx.warnings.length
+          end
+
+        end
+
         describe '#finder' do
-          test 'returns AnsibleCollectionRole for ACR type' do
-            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'ACR')
-            assert_equal ::ForemanAnsibleDirector::AnsibleCollectionRole, result
+
+          test 'returns Host for "host" type' do
+            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'host')
+            assert_equal Host, result
           end
 
-          test 'returns ContentUnitVersion for CONTENT type' do
-            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'CONTENT')
-            assert_equal ::ForemanAnsibleDirector::ContentUnitVersion, result
-          end
-
-          test 'returns Host::Managed for HOST type' do
-            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'HOST')
-            assert_equal Host::Managed, result
-          end
-
-          test 'returns Hostgroup for HOSTGROUP type' do
-            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'HOSTGROUP')
+          test 'returns Hostgroup for "hostgroup" type' do
+            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'hostgroup')
             assert_equal Hostgroup, result
           end
 
@@ -146,44 +313,24 @@ module ForemanAnsibleDirectorTests
 
         describe '#find_target' do
 
-          test 'finds an ACR target' do
+          test 'finds a "host" target' do
             result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'ACR',
-              target_id: @collection_role.id
-            )
-
-            assert_equal @collection_role, result
-          end
-
-          test 'finds a CONTENT target' do
-            result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'CONTENT',
-              target_id: @collection_version.id
-            )
-
-            assert_equal @collection_version, result
-          end
-
-
-          test 'finds a HOST target' do
-            result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'HOST',
+              target_type: 'host',
               target_id: @host.id
             )
 
             assert_equal @host, result
           end
 
-
-          test 'finds a HOSTGROUP target' do
+          test 'finds a "hostgroup" target' do
 
             as_admin do
               @hostgroup = FactoryBot.create(:hostgroup, organizations: [@organization])
 
-            result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'HOSTGROUP',
-              target_id: @hostgroup.id
-            )
+              result = ::ForemanAnsibleDirector::AssignmentService.find_target(
+                target_type: 'hostgroup',
+                target_id: @hostgroup.id
+              )
               assert_equal @hostgroup, result
             end
 
@@ -191,7 +338,7 @@ module ForemanAnsibleDirectorTests
 
           test 'returns nil for non-existent target' do
             result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'CONTENT',
+              target_type: 'hostgroup',
               target_id: -1
             )
 
