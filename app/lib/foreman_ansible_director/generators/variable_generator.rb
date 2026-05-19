@@ -10,7 +10,8 @@ module ForemanAnsibleDirector
           resolved_host_content.each do |content_assignment|
             consumable = content_assignment[:cuv]
             next unless consumable
-            resolved = consumable.ansible_variables.values_hash(host).raw
+            resolved = consumable.ansible_variables.values_hash(host)
+            role_variables = consumable.ansible_variables.to_a
 
             if consumable.is_a? ForemanAnsibleDirector::AnsibleCollectionRole
               acv = consumable.ansible_collection_version
@@ -21,14 +22,13 @@ module ForemanAnsibleDirector
               fqrn = "#{ar.namespace}.#{ar.name}"
             end
 
-            role_variables = {}
-            resolved.each do |_, resolved_variable_value|
-              resolved_variable_value.each do |key, value|
-                role_variables[key] = value[:value]
-              end
+            host_role_variables = {}
+            role_variables.each do |variable|
+              value = resolved[variable]
+              host_role_variables[variable.key] = value unless value.nil?
             end
 
-            variables[fqrn] = role_variables
+            variables[fqrn] = host_role_variables
           end
 
           variables
