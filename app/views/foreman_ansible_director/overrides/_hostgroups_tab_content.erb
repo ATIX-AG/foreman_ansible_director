@@ -1,0 +1,11 @@
+<%= webpacked_plugins_js_for :foreman_ansible_director %>
+
+<div class='tab-pane' id='ansible_director'>
+  <%= react_component('AnsibleContentAssignmentMain', {
+    crnType: "Hostgroup",
+    crnId: f.object.id,
+    crnName: f.object.name,
+    contentSource: ::ForemanAnsibleDirector::AssignmentService.content_source_for(f.object)[0],
+  }) %>
+</div>
+
