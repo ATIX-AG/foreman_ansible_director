@@ -253,7 +253,18 @@ Foreman::Plugin.register :foreman_ansible_director do
   register_report_origin 'Ansible', 'ConfigReport'
 
   extend_rabl_template 'api/v2/hosts/main', '/api/v2/hosts/ansible_content_source'
+  extend_rabl_template 'api/v2/hostgroups/main', '/api/v2/hosts/ansible_content_source'
+
   parameter_filter Host, :ansible_lifecycle_environment_id
+  parameter_filter Hostgroup, :ansible_lifecycle_environment_id
+  parameter_filter Hostgroup, :ansible_lifecycle_environment_state
 
   logger :crud, enabled: true
+
+  extend_page 'hostgroups/_form' do |cx|
+    cx.add_pagelet :main_tab_fields,
+      id: :ansible_director_fields,
+      resource_type: :hostgroup,
+      partial: 'foreman_ansible_director/overrides/hostgroups_main_fields'
+  end
 end

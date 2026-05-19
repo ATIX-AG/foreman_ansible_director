@@ -1,7 +1,7 @@
 import componentRegistry from 'foremanReact/components/componentRegistry';
-import { CreateHostAnsibleContentTab } from './components/extensions/create_host_tab/CreateHostAnsibleContentTab';
+import { AnsibleContentAssignmentMain } from './components/common/AnsibleContentAssignment/AnsibleContentAssignmentMain';
 
 componentRegistry.register({
-  name: 'CreateHostAnsibleContentTab',
-  type: CreateHostAnsibleContentTab,
+  name: 'AnsibleContentAssignmentMain',
+  type: AnsibleContentAssignmentMain,
 });
