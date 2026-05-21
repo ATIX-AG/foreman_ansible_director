@@ -17,16 +17,19 @@ node :content do |object|
   if object.content_unit_versions.empty?
     []
   else
-    object.content_unit_versions.map do |lcecu|
+    object.content_unit_versions
+          .sort_by { |cuv| cuv.versionable.full_name }
+          .map do |lcecu|
       {
         id: lcecu.versionable.id,
         type: lcecu.content_unit_type,
         identifier: lcecu.versionable.full_name,
         version: lcecu.version,
         roles: if lcecu.content_unit_type == 'collection'
-                 (lcecu.ansible_collection_roles.map do |role|
-                    { id: role.id, name: role.name }
-                  end)
+                 lcecu.ansible_collection_roles
+                      .to_a
+                      .sort_by(&:name)
+                      .map { |role| { id: role.id, name: role.name } }
                else
                  []
                end,
