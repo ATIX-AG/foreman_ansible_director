@@ -8,7 +8,7 @@ node :name, &:key
 
 node :type, &:key_type
 
-node :overriable, &:overridable?
+node :overridable, &:overridable?
 
 child lookup_values: :overrides do
   attributes :id, :value
