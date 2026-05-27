@@ -65,7 +65,8 @@ module ForemanAnsibleDirector
                 git_remote_create_action: git_remote_create_action.output,
                 skip_repository_cleanup: cleanup_check.output[:skip_repository_cleanup],
                 skip_distribution_cleanup: cleanup_check.output[:skip_distribution_cleanup],
-                skip_remote_cleanup: cleanup_check.output[:skip_remote_cleanup])
+                skip_remote_cleanup: cleanup_check.output[:skip_remote_cleanup],
+                pulp_failure: cleanup_check.output[:pulp_failure])
 
               remote_href = git_remote_create_action.output['git_remote_create_response']['pulp_href']
 
