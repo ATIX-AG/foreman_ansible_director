@@ -65,9 +65,10 @@ module ForemanAnsibleDirector
       def to_hash
         {
           unit_type: @unit_type,
-          name: @name,
+          unit_name: @name,
           versions: @versions,
           source: @source,
+          source_type: @source_type,
           type: @type,
           src: @src,
           scm: @scm,
