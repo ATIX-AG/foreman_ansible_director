@@ -8,8 +8,6 @@ module ForemanAnsibleDirector
 
     has_many :execution_environment_content_units, dependent: :destroy
 
-    has_many :ansible_content_assignments, as: :consumable, dependent: :destroy
-
     has_many :content_unit_revisions, dependent: :destroy, class_name: 'ContentUnitRevision',
                                          inverse_of: :content_unit_version
 
