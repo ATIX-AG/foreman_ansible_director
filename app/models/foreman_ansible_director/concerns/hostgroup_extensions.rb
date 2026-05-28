@@ -25,7 +25,7 @@ module ForemanAnsibleDirector
       end
 
       def cr_content_assignments
-        ::ForemanAnsibleDirector::AnsibleContentAssignment.where(consumable: self)
+        ansible_content_assignments
       end
 
       def cr_content_source
