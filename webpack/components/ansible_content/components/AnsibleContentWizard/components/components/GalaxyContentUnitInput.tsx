@@ -35,7 +35,8 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
 }) => {
   const ctx = useAdContext();
 
-  const defaultGalaxy: string = ctx.settings.ad_default_galaxy_url;
+  const defaultGalaxy: string =
+    ctx.settings.ansible_director_default_galaxy_url;
 
   const [contentUnitName, setContentUnitName] = React.useState<string>('');
   const [contentUnitValidation, setContentUnitValidation] = React.useState<

@@ -29,7 +29,7 @@ if defined? ForemanRemoteExecution
                   execution_environment = content_source.cs_execution_environment
 
                   execution_environment ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-                    id: Setting[:ad_default_ee_internal]
+                    id: Setting[:ansible_director_default_ee_internal]
                   )
 
                   unless execution_environment

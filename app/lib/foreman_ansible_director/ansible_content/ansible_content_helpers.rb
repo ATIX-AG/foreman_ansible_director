@@ -121,7 +121,7 @@ module ForemanAnsibleDirector
         end
 
         def valid_unit_source!(unit_source)
-          unit_source || Setting[:ad_default_galaxy_url]
+          unit_source || Setting[:ansible_director_default_galaxy_url]
         end
 
         def valid_unit_versions!(unit_versions)

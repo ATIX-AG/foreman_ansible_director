@@ -17,8 +17,8 @@ module ForemanAnsibleDirector
         def context
           @context = {
             settings: {
-              ad_default_galaxy_url: Setting[:ad_default_galaxy_url],
-              ad_default_ansible_core_version: Setting[:ad_default_ansible_core_version],
+              ansible_director_default_galaxy_url: Setting[:ansible_director_default_galaxy_url],
+              ansible_director_default_ansible_core_version: Setting[:ansible_director_default_ansible_core_version],
             },
           }
         end

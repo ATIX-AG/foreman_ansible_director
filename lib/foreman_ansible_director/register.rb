@@ -185,26 +185,26 @@ Foreman::Plugin.register :foreman_ansible_director do
 
   settings do
     category :ansible_director, 'Ansible Director' do
-      setting 'ad_default_galaxy_url',
+      setting 'ansible_director_default_galaxy_url',
         type: :string,
         description: 'Default URL used when importing content from an Ansible Galaxy instance.',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_GALAXY_URL,
         full_name: 'Content - Default Ansible Galaxy URL'
-      setting 'ad_content_import_override',
+      setting 'ansible_director_content_import_override',
         type: :boolean,
         description: 'When enabled, the content importer will override any existing content that matches the identifier
                        of a content unit scheduled for import, ensuring the new content replaces the existing version
                        rather than being skipped.',
         default: false,
         full_name: 'Content - Force override of existing content'
-      setting 'ad_default_ansible_core_version',
+      setting 'ansible_director_default_ansible_core_version',
         type: :string,
         description: 'Default Ansible-Core version used for Execution Environments.
                        Must match an available release from PyPI
                        (check history: https://pypi.org/project/ansible-core/#history).',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_ANSIBLE_VERSION,
         full_name: 'Execution Environments - Default ansible-core version'
-      setting 'ad_default_ee_rex',
+      setting 'ansible_director_default_ee_rex',
         type: :integer,
         description: 'Default Execution Environment used for execution of Remote Execution jobs.',
         default: nil,
@@ -218,7 +218,7 @@ Foreman::Plugin.register :foreman_ansible_director do
                              )
                       ]
                     }
-      setting 'ad_default_ee_internal',
+      setting 'ansible_director_default_ee_internal',
         type: :integer,
         description: 'Default Execution Environment used for execution of default Ansible jobs.',
         default: nil,
@@ -232,14 +232,14 @@ Foreman::Plugin.register :foreman_ansible_director do
                              )
                       ]
                     }
-      setting 'ad_lce_path_force_incremental',
+      setting 'ansible_director_lce_path_force_incremental',
         type: :boolean,
         description: 'When enabled, lifecycle environment promotions must follow the defined path incrementally
                       (e.g., DEV → TEST → PROD). When disabled, promotions can skip intermediate environments
                       (e.g., DEV → PROD directly, with implicit promotion of DEV → TEST).',
         default: true,
         full_name: 'Lifecycle environments - Force incremental promotion of lifecycle environments'
-      setting 'ad_lce_path_prevent_destruction_if_used',
+      setting 'ansible_director_lce_path_prevent_destruction_if_used',
         type: :boolean,
         description: 'When enabled, lifecycle environment paths can only be deleted if none of its lifecycle
                             environments is referenced anywhere.',

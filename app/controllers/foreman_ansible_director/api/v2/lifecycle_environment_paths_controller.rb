@@ -105,7 +105,7 @@ module ForemanAnsibleDirector
         # TRANSLATORS: ApiDoc, do not translate!
         description <<~DESC
           Promote content between environments in a lifecycle path.
-          If the 'ad_lce_path_force_incremental' setting is false, 'target_environment' must be the immediate successor to 'source_environment'.
+          If the 'ansible_director_lce_path_force_incremental' setting is false, 'target_environment' must be the immediate successor to 'source_environment'.
         DESC
         param :promote, Hash, desc: N_('Promotion parameters'), required: true do
           param :source_environment_id,

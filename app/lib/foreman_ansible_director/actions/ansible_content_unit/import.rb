@@ -62,7 +62,7 @@ module ForemanAnsibleDirector
         # | 1 | 1 | 1 | :update |
         # TODO: Unit test this
         def operation_type(existing_unit, unit)
-          force_override = Setting[:ad_content_import_override]
+          force_override = Setting[:ansible_director_content_import_override]
 
           return :import unless existing_unit
 
