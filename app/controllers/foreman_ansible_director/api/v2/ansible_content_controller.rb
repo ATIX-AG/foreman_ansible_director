@@ -127,6 +127,14 @@ module ForemanAnsibleDirector
               resolved_content_units: resolved)
         end
 
+        # region ApiDoc: POST /api/v2/ansible_director/ansible_content/consistency_check
+        api :POST, '/v2/ansible_director/ansible_content/consistency_check',
+          N_('Run a consistency check to clean up the database after a failed content import.')
+        # endregion
+        def consistency_check
+          @consistency_check = ForemanTasks.async_task(::ForemanAnsibleDirector::Actions::ConsistencyCheck::Perform)
+        end
+
         def model_of_controller
           resource_class
         end

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
               delete '/', action: :destroy_units
               get 'auto_complete_search'
               get '/:version', action: :version_detail
+              post '/consistency_check', action: :consistency_check
             end
           end
           resources :execution_environments, only: [] do

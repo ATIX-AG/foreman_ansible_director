@@ -9,6 +9,7 @@ import {
   EmptyStateHeader,
   EmptyStateIcon,
   EmptyStateVariant,
+  ToolbarItem,
 } from '@patternfly/react-core';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
 
@@ -36,6 +37,7 @@ import {
 import { Page } from '../../common/Page';
 import { PermittedButton } from '../../common/PermittedButton';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
+import { ConsistencyCheckModal } from './ConsistencyCheckModal';
 
 interface AnsibleContentTableWrapperProps {
   initialSearch: string;
@@ -59,6 +61,11 @@ const AnsibleContentTableWrapper = ({
   const [isContentWizardOpen, setIsContentWizardOpen] = React.useState<boolean>(
     false
   );
+
+  const [
+    isConsistencyCheckModalOpen,
+    setIsConsistencyCheckModalOpen,
+  ] = React.useState<boolean>(false);
 
   const organization = useForemanOrganization();
 
@@ -95,13 +102,24 @@ const AnsibleContentTableWrapper = ({
       <Page
         header={_('Ansible content')}
         customToolbarItems={[
-          hasResults ? (
+          <ToolbarItem>
             <PermittedButton
-              onClick={() => setIsContentWizardOpen(true)}
-              requiredPermissions={[AdPermissions.ansibleContent.create]}
+              variant="secondary"
+              onClick={() => setIsConsistencyCheckModalOpen(true)}
+              requiredPermissions={[AdPermissions.ansibleContent.destroy]}
             >
-              {_('Import Ansible content')}
+              {_('Perform consistency check')}
             </PermittedButton>
+          </ToolbarItem>,
+          hasResults ? (
+            <ToolbarItem>
+              <PermittedButton
+                onClick={() => setIsContentWizardOpen(true)}
+                requiredPermissions={[AdPermissions.ansibleContent.create]}
+              >
+                {_('Import Ansible content')}
+              </PermittedButton>
+            </ToolbarItem>
           ) : (
             <></>
           ),
@@ -159,6 +177,12 @@ const AnsibleContentTableWrapper = ({
             setIsContentWizardOpen={setIsContentWizardOpen}
             refreshRequest={refreshRequest}
           />
+          {isConsistencyCheckModalOpen && (
+            <ConsistencyCheckModal
+              onAbort={() => setIsConsistencyCheckModalOpen(false)}
+              onTriggered={() => setIsConsistencyCheckModalOpen(false)}
+            />
+          )}
         </>
       </Page>
     );
