@@ -44,7 +44,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     # Edit
     # Destroy
     permission :destroy_ansible_content,
-      { 'foreman_ansible_director/api/v2/ansible_content': [:destroy_units] },
+      { 'foreman_ansible_director/api/v2/ansible_content': %i[destroy_units consistency_check] },
       resource_type: 'ForemanAnsibleDirector::ContentUnit'
     ## Ansible Variables
     # View
@@ -245,6 +245,12 @@ Foreman::Plugin.register :foreman_ansible_director do
                             environments is referenced anywhere.',
         default: true,
         full_name: 'Lifecycle environments - Prevent path deletion if lifecycle environment is in use.'
+      setting 'ansible_director_pulp_batch_size',
+        type: :integer,
+        description: 'Run Pulp API calls in batches of size N.
+                      The batch size is a trade-off between execution time and resource usage.',
+        default: 200,
+        full_name: 'Pulp API batch size'
     end
   end
 
