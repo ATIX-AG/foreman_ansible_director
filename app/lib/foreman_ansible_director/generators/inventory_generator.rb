@@ -4,12 +4,13 @@ module ForemanAnsibleDirector
   module Generators
     class InventoryGenerator
       class << self
-        def generate(host)
+        def generate(host:,
+                     ansible_user:)
           {
             "#{host.name}": {
               hosts: {
                 "#{host.fqdn}": {
-                  ansible_user: 'root',
+                  ansible_user: ansible_user,
                 },
               },
             },
