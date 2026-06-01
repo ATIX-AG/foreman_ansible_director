@@ -45,7 +45,11 @@ if defined? ForemanRemoteExecution
                   playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate(
                     resolved_host_content: resolved_assignments
                   )
-                  inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
+                  inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate(
+                    host: host,
+                    ansible_user: template_invocation.job_invocation&.ssh_user ||
+                      host.host_param('remote_execution_ssh_user')
+                  )
 
                   content = ForemanAnsibleDirector::Generators::ContentGenerator.generate(
                     host: host,
