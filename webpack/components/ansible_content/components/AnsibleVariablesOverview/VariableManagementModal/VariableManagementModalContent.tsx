@@ -40,7 +40,7 @@ import styles from '@patternfly/react-styles/css/components/Form/form';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
-import { translate as _ } from 'foremanReact/common/I18n';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import {
   AnsibleVariable,
@@ -109,7 +109,9 @@ export const VariableManagementModalContent = ({
         addToast({
           type: 'success',
           key: `UPDATE_ANSIBLE_VARIABLE_${variable.id}_SUCC`,
-          message: `Successfully edited override for "${variable.name}"!`,
+          message: __(_('Successfully edited variable "%(key)s"!'), {
+            key: variable.name,
+          }),
           sticky: false,
         })
       );
@@ -119,11 +121,15 @@ export const VariableManagementModalContent = ({
         addToast({
           type: 'danger',
           key: `UPDATE_ANSIBLE_VARIABLE_${variable.id}_ERR`,
-          message: `Updating of Ansible variable "${
-            variable.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
+          message: __(
+            _(
+              'Updating of Ansible variable "%(key)s" failed with error code "%(error)s".'
+            ),
+            {
+              key: variable.name,
+              error: (e as { response: AxiosResponse }).response.status,
+            }
+          ),
           sticky: false,
         })
       );
@@ -205,7 +211,11 @@ export const VariableManagementModalContent = ({
 
   const headerActions = (): ReactElement[] => {
     const baseVariableActions = [
-      <Button variant="plain" aria-label="Action" onClick={handleEdit}>
+      <Button
+        variant="plain"
+        aria-label={isEditMode ? _('Save variable') : _('Edit variable')}
+        onClick={handleEdit}
+      >
         {isEditMode ? (
           <Icon size="lg">
             <SaveIcon />
@@ -221,7 +231,7 @@ export const VariableManagementModalContent = ({
       baseVariableActions.push(
         <Button
           variant="plain"
-          aria-label="Action"
+          aria-label={_('Cancel editing')}
           onClick={() => {
             setIsEditMode(false);
             setAnsibleVariable(originalVariable);
@@ -242,7 +252,7 @@ export const VariableManagementModalContent = ({
       activeKey={activeTabKey}
       onSelect={(event, tabIndex) => setActiveTabKey(tabIndex)}
       isBox
-      aria-label="Tabs in the filled with icons example"
+      aria-label={_('Variable and override edit tabs')}
       role="region"
     >
       <Tab
@@ -255,7 +265,7 @@ export const VariableManagementModalContent = ({
             <TabTitleText>{_('Base variable')}</TabTitleText>{' '}
           </>
         }
-        aria-label="filled tabs with icons content users"
+        aria-label={_('Base variable edit tab')}
       >
         <Card ouiaId="BasicCard" isFullHeight>
           <CardHeader
@@ -286,16 +296,20 @@ export const VariableManagementModalContent = ({
                       label={_('Type')}
                       labelIcon={
                         <Popover
-                          headerContent={<div>Variable type</div>}
+                          headerContent={<div>{_('Variable type')}</div>}
                           bodyContent={
-                            <div>Bla bla regarding type checking</div>
+                            <div>
+                              {_(
+                                'Select the value type used to validate this variable, such as string, boolean, integer, real, or YAML.'
+                              )}
+                            </div>
                           }
                         >
                           <button
                             type="button"
-                            aria-label="More info for unit id field"
+                            aria-label={_('More info for variable type')}
                             onClick={e => e.preventDefault()}
-                            aria-describedby="content-unit-identifier-field-01"
+                            aria-describedby="variable-type-identifier-field"
                             className={styles.formGroupLabelHelp}
                           >
                             <HelpIcon />
@@ -365,6 +379,7 @@ export const VariableManagementModalContent = ({
             <TabTitleText>{_('Overrides')}</TabTitleText>
           </>
         }
+        aria-label={_('Variable overrides tab')}
       >
         <OverridesTabContent
           variable={originalVariable}
