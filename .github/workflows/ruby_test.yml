@@ -33,5 +33,5 @@ jobs:
     uses: theforeman/actions/.github/workflows/foreman_plugin.yml@v0
     with:
       plugin: foreman_ansible_director
-      foreman_repository: "ATIX-AG/foreman"
-      foreman_version: 'develop_with_ts'
+      foreman_repository: "theforeman/foreman"
+      foreman_version: 'develop'
