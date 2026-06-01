@@ -10,7 +10,6 @@ module ForemanAnsibleDirector
               hosts: {
                 "#{host.fqdn}": {
                   ansible_user: 'root',
-                  ansible_ssh_private_key_file: '/runner/.ssh/id_rsa_foreman_proxy',
                 },
               },
             },
