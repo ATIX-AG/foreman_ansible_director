@@ -213,7 +213,7 @@ module ForemanAnsibleDirector
                     cr_variables.each do |variable_name, variable_value|
                       ::ForemanAnsibleDirector::VariableService.create_variable(
                         key: variable_name,
-                        type: 'yaml',
+                        type: variable[:type],
                         default_value: variable_value,
                         owner: collection_role_record
                       )

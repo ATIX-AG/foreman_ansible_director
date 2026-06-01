@@ -8,7 +8,7 @@ module ForemanAnsibleDirector
     def default_value=(value)
       super(
         if value.is_a?(ActiveSupport::HashWithIndifferentAccess)
-          value.to_h
+          value.to_hash
         else
           value
         end
