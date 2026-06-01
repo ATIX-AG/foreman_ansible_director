@@ -40,13 +40,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
-      # Temporarily using this custom branch until the changes are merged into Foreman
       - name: Checkout foreman
         uses: actions/checkout@v6
         with:
-          repository: ATIX-AG/foreman
+          repository: theforeman/foreman
           path: ${{ github.workspace }}/foreman
-          ref: develop_with_ts
+          ref: develop
 
       - name: Install Foreman dependencies
         working-directory: ${{ github.workspace }}/foreman
