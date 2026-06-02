@@ -38,6 +38,7 @@ interface ExecutionEnvEditCardProps {
   onBaseImageUrlChange: (baseImageUrl: string) => void;
   onNameChange: (name: string) => void;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  handleAbort: () => void;
 }
 
 export const ExecutionEnvEditCard = ({
@@ -49,6 +50,7 @@ export const ExecutionEnvEditCard = ({
   onBaseImageUrlChange,
   onNameChange,
   setIsContentUnitModalOpen,
+  handleAbort,
 }: ExecutionEnvEditCardProps): React.ReactElement => {
   const getDefaultState = (value: string): ValidationState => {
     if (editMode) return value === '' ? 'default' : 'success';
@@ -120,6 +122,7 @@ export const ExecutionEnvEditCard = ({
               handleDestroy={handleDestroy}
               handleEdit={handleEdit}
               executionEnvironment={executionEnvironment}
+              handleAbort={handleAbort}
             />
           ),
         }}
