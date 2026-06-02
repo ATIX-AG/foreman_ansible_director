@@ -2,18 +2,12 @@ import React, { Dispatch, SetStateAction, useEffect } from 'react';
 
 import { ExecutionEnvEditCard } from './ExecutionEnvEditCard';
 
-import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
-} from '../../../types/AnsibleExecutionEnvTypes';
+import { AnsibleExecutionEnv } from '../../../types/AnsibleExecutionEnvTypes';
 
 interface ExecutionEnvCardProps {
   executionEnv: AnsibleExecutionEnv;
   handleDestroy: (env: AnsibleExecutionEnv) => void;
   handleUpdate: (env: AnsibleExecutionEnv) => void;
-  setSelectedEnv: Dispatch<
-    SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
-  >;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -21,7 +15,6 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
   executionEnv,
   handleDestroy,
   handleUpdate,
-  setSelectedEnv,
   setIsContentUnitModalOpen,
 }) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
@@ -34,20 +27,17 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
   }, [executionEnv]);
 
   const askConfirmUpdate = async (): Promise<void> => {
-    setSelectedEnv(executionEnvironment);
     if (editMode) {
       if (
         JSON.stringify(executionEnv) !== JSON.stringify(executionEnvironment)
       ) {
-        executionEnvironment && handleUpdate(executionEnv);
+        executionEnvironment && handleUpdate(executionEnvironment);
+      } else {
+        setEditMode(false);
       }
+    } else {
+      setEditMode(true);
     }
-    setEditMode(!editMode);
-  };
-
-  const askConfirmDestroy = (): void => {
-    setSelectedEnv(executionEnv);
-    handleDestroy(executionEnv);
   };
 
   if (!executionEnvironment) {
@@ -59,7 +49,7 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
       editMode={editMode}
       executionEnvironment={executionEnvironment}
       handleEdit={askConfirmUpdate}
-      handleDestroy={askConfirmDestroy}
+      handleDestroy={() => handleDestroy(executionEnvironment)}
       onNameChange={(name: string) => {
         setExecutionEnvironment({
           ...executionEnvironment,

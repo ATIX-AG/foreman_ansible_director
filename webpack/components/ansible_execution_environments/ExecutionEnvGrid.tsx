@@ -21,15 +21,11 @@ import React, {
   SetStateAction,
   useEffect,
 } from 'react';
-import {
-  APIOptions,
-  PaginationProps,
-} from 'foremanReact/common/hooks/API/APIHooks';
+import { PaginationProps } from 'foremanReact/common/hooks/API/APIHooks';
 import Pagination from 'foremanReact/components/Pagination';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import SearchBar from 'foremanReact/components/SearchBar';
 
-import { ExecutionEnvCard } from './components/ExecutionEnvCard';
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';
 import { ExecutionEnvCreateCard } from './components/ExecutionEnvCreateCard';
 import {
@@ -37,39 +33,30 @@ import {
   AnsibleExecutionEnvCreate,
 } from '../../types/AnsibleExecutionEnvTypes';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
+import { ExecutionEnvCardWrapper } from './components/ExecutionEnvCardWrapper';
 
 interface ExecutionEnvGridProps {
   apiResponse: GetAnsibleExecutionEnvResponse;
-  setAPIOptions: Dispatch<SetStateAction<APIOptions>>;
   onPagination: (newPagination: PaginationProps) => void;
   search: string;
   onSearch: (search: string) => void;
-  setConfirmationModalMode: Dispatch<SetStateAction<'destroy' | 'update'>>;
-  setIsConfirmationModalOpen: Dispatch<SetStateAction<boolean>>;
-  setConfirmationModalTitle: Dispatch<SetStateAction<string>>;
-  setConfirmationModalBody: Dispatch<SetStateAction<string>>;
-  selectedEnv: AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined;
   setSelectedEnv: Dispatch<
     SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
   >;
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
   setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  refreshRequest: () => void;
 }
 
 export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   apiResponse,
-  setAPIOptions,
   onPagination,
   search,
   onSearch,
-  setConfirmationModalMode,
-  setIsConfirmationModalOpen,
-  setConfirmationModalTitle,
-  setConfirmationModalBody,
-  selectedEnv,
   setSelectedEnv,
   createEnvAction,
   setIsContentUnitModalOpen,
+  refreshRequest,
 }) => {
   const [executionEnvironments, setExecutionEnvironments] = React.useState<
     Array<AnsibleExecutionEnv>
@@ -85,22 +72,6 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
     setExecutionEnvironments(apiResponse.results);
     setTotalItemsCount(apiResponse.total);
   }, [apiResponse]);
-
-  const destroyEnv = (env: AnsibleExecutionEnv): void => {
-    setConfirmationModalTitle(`Confirm deletion of ${env?.name}`);
-    setConfirmationModalBody(`Are you sure you want to delete ${env?.name}?`);
-    setConfirmationModalMode('destroy');
-    setIsConfirmationModalOpen(true);
-  };
-
-  const updateEnv = (env: AnsibleExecutionEnv): void => {
-    setConfirmationModalTitle(`Confirm update of ${env?.name}`);
-    setConfirmationModalBody(
-      `Are you sure you want to update ${env?.name}? This will require a rebuild of the associated image.`
-    );
-    setConfirmationModalMode('update');
-    setIsConfirmationModalOpen(true);
-  };
 
   const grid = (content: ReactElement | ReactElement[]): ReactElement => (
     <div style={{ padding: '15px' }}>
@@ -135,12 +106,10 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
         ...(userCanCreate ? [createCard()] : []),
         ...executionEnvironments.map(ee => (
           <GalleryItem key={ee.id}>
-            <ExecutionEnvCard
+            <ExecutionEnvCardWrapper
               executionEnv={ee}
-              handleDestroy={destroyEnv}
-              handleUpdate={updateEnv}
-              setSelectedEnv={setSelectedEnv}
               setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+              onDestroy={() => refreshRequest()}
             />
           </GalleryItem>
         )),
