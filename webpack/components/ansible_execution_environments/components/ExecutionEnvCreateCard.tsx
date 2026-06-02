@@ -130,6 +130,7 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
         });
       }}
       setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+      handleAbort={resetEditForm}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { Icon } from '@patternfly/react-core';
+import { Button, Icon, Popover } from '@patternfly/react-core';
 import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
 import SaveIcon from '@patternfly/react-icons/dist/esm/icons/save-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
@@ -6,6 +6,7 @@ import ExclamationCircleIcon from '@patternfly/react-icons/dist/esm/icons/exclam
 import CheckCircleIcon from '@patternfly/react-icons/dist/esm/icons/check-circle-icon';
 import InProgressIcon from '@patternfly/react-icons/dist/esm/icons/in-progress-icon';
 import PendingIcon from '@patternfly/react-icons/dist/esm/icons/pending-icon';
+import { TimesIcon } from '@patternfly/react-icons';
 
 import React, { ReactElement } from 'react';
 
@@ -27,6 +28,7 @@ interface ExecutionEnvCardHeaderActionsProps {
     executionEnvironment: AnsibleExecutionEnv | AnsibleExecutionEnvCreate
   ) => void;
   executionEnvironment: AnsibleExecutionEnv | AnsibleExecutionEnvCreate;
+  handleAbort: () => void;
 }
 
 export const ExecutionEnvCardHeaderActions = ({
@@ -35,6 +37,7 @@ export const ExecutionEnvCardHeaderActions = ({
   handleEdit,
   handleDestroy,
   executionEnvironment,
+  handleAbort,
 }: ExecutionEnvCardHeaderActionsProps): ReactElement => {
   const statusIcon = (env: AnsibleExecutionEnv): ReactElement => {
     switch (env.build_status) {
@@ -82,14 +85,14 @@ export const ExecutionEnvCardHeaderActions = ({
 
   return (
     <>
-      {isAnsibleExecutionEnv(executionEnvironment) && (
+      {isAnsibleExecutionEnv(executionEnvironment) && !editMode && (
         <PermittedButton
           // TODO: Probably should require foreman-tasks permission too
           requiredPermissions={[AdPermissions.executionEnvironments.view]}
           hasPopover
           popoverProps={{
             triggerAction: 'hover',
-            'aria-label': 'build status popover',
+            'aria-label': _('build status popover'),
             headerComponent: 'h1',
             headerContent: __(_('Build %(status)s'), {
               status: executionEnvironment.build_status,
@@ -109,33 +112,41 @@ export const ExecutionEnvCardHeaderActions = ({
           {statusIcon(executionEnvironment)}
         </PermittedButton>
       )}
-      <PermittedButton
-        requiredPermissions={[AdPermissions.executionEnvironments.destroy]}
-        hasPopover
-        popoverProps={{
-          triggerAction: 'hover',
-          'aria-label': 'destroy popover',
-          headerComponent: 'h1',
-          headerContent: _('Delete'),
-          bodyContent: <div>{_('Delete this Execution Environment.')}</div>,
-        }}
-        variant="plain"
-        aria-label="Action"
-        onClick={() => handleDestroy(executionEnvironment)}
-      >
-        <Icon size="lg">
-          <TrashIcon />
-        </Icon>
-      </PermittedButton>
+      {!editMode && (
+        <PermittedButton
+          requiredPermissions={[AdPermissions.executionEnvironments.destroy]}
+          hasPopover
+          popoverProps={{
+            triggerAction: 'hover',
+            'aria-label': _('destroy popover'),
+            headerComponent: 'h1',
+            headerContent: _('Delete'),
+            bodyContent: <div>{_('Delete this Execution Environment.')}</div>,
+          }}
+          variant="plain"
+          aria-label={_('Delete Execution Environment')}
+          onClick={() => handleDestroy(executionEnvironment)}
+        >
+          <Icon size="lg">
+            <TrashIcon />
+          </Icon>
+        </PermittedButton>
+      )}
       <PermittedButton
         requiredPermissions={[AdPermissions.executionEnvironments.edit]}
         hasPopover
         popoverProps={{
           triggerAction: 'hover',
-          'aria-label': 'edit popover',
+          'aria-label': _('edit popover'),
           headerComponent: 'h1',
-          headerContent: _('Edit'),
-          bodyContent: (
+          headerContent: editMode ? _('Save changes') : _('Edit'),
+          bodyContent: editMode ? (
+            <div>
+              {_(
+                'Save changes made to this Execution Environment. Foreman will rebuild the Execution Environment.'
+              )}
+            </div>
+          ) : (
             <div>
               {_(
                 'Edit this Execution Environment. If you make a change, Foreman will rebuild the Execution Environment.'
@@ -158,6 +169,25 @@ export const ExecutionEnvCardHeaderActions = ({
           </Icon>
         )}
       </PermittedButton>
+      {editMode && (
+        <Popover
+          triggerAction="hover"
+          aria-label={_('abort popover')}
+          headerComponent="h1"
+          headerContent={_('Cancel')}
+          bodyContent={null}
+        >
+          <Button
+            variant="plain"
+            aria-label={_('Cancel')}
+            onClick={handleAbort}
+          >
+            <Icon size="lg">
+              <TimesIcon />
+            </Icon>
+          </Button>
+        </Popover>
+      )}
     </>
   );
 };

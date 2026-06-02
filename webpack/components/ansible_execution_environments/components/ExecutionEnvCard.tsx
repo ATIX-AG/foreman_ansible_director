@@ -69,6 +69,10 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
         });
       }}
       setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+      handleAbort={() => {
+        setExecutionEnvironment(executionEnv);
+        setEditMode(false);
+      }}
     />
   );
 };
