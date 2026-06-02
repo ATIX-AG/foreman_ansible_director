@@ -1,19 +1,17 @@
-import React, { Dispatch, ReactElement, SetStateAction } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import { Modal, ModalVariant, Button } from '@patternfly/react-core';
 import { translate as _ } from 'foremanReact/common/I18n';
 
 interface ConfirmationModalProps {
   isConfirmationModalOpen: boolean;
-  setIsConfirmationModalOpen: Dispatch<SetStateAction<boolean>>;
   title: string;
   body: string;
-  onConfirm: () => void;
-  onAbort?: () => void;
+  onConfirm: () => void | Promise<void>;
+  onAbort: () => void;
 }
 
 export const ConfirmationModal = ({
   isConfirmationModalOpen,
-  setIsConfirmationModalOpen,
   title,
   body,
   onConfirm,
@@ -22,6 +20,15 @@ export const ConfirmationModal = ({
   const [isConfirmButtonSpinning, setIsConfirmButtonSpinning] = React.useState<
     boolean
   >(false);
+
+  const isMountedRef = useRef(true);
+
+  useEffect(
+    () => () => {
+      isMountedRef.current = false;
+    },
+    []
+  );
 
   return (
     <Modal
@@ -35,19 +42,16 @@ export const ConfirmationModal = ({
           variant="primary"
           onClick={async () => {
             setIsConfirmButtonSpinning(true);
-            onConfirm();
-            setIsConfirmButtonSpinning(false);
-            setIsConfirmationModalOpen(false);
+            await onConfirm();
+            if (isMountedRef.current) {
+              setIsConfirmButtonSpinning(false);
+            }
           }}
           isLoading={isConfirmButtonSpinning}
         >
           {_('Confirm')}
         </Button>,
-        <Button
-          key="cancel"
-          variant="link"
-          onClick={onAbort || (() => setIsConfirmationModalOpen(false))}
-        >
+        <Button key="cancel" variant="link" onClick={onAbort}>
           {_('Cancel')}
         </Button>,
       ]}

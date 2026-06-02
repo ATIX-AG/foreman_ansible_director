@@ -145,10 +145,12 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
       )}
       <ConfirmationModal
         isConfirmationModalOpen={isConfirmationModalOpen}
-        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
         title={confirmationModalTitle}
         body={confirmationModalBody}
-        onConfirm={confirmationModalOnConfirm}
+        onConfirm={() => {
+          confirmationModalOnConfirm();
+          setIsConfirmationModalOpen(false);
+        }}
         onAbort={() => setIsConfirmationModalOpen(false)}
       />
     </>

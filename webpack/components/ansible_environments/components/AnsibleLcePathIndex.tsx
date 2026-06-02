@@ -98,11 +98,13 @@ export const AnsibleLcePathIndex: React.FC<AnsibleLcePathIndexProps> = ({
       )}
       <ConfirmationModal
         isConfirmationModalOpen={isConfirmationModalOpen}
-        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
         title={confirmationModalTitle}
         body={confirmationModalBody}
-        onConfirm={confirmationModalOnConfirm}
-        onAbort={() => {}}
+        onConfirm={() => {
+          confirmationModalOnConfirm();
+          setIsConfirmationModalOpen(false);
+        }}
+        onAbort={() => setIsConfirmationModalOpen(false)}
       />
     </>
   );

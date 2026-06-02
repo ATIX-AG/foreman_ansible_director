@@ -299,10 +299,12 @@ export const OverridesTabContent = ({
       {overridePendingDelete !== undefined && (
         <ConfirmationModal
           isConfirmationModalOpen
-          setIsConfirmationModalOpen={() => setOverridePendingDelete(undefined)}
           title={_('Delete override')}
           body={_('Are you sure you want to delete this override?')}
-          onConfirm={() => handleOverrideDelete(overridePendingDelete)}
+          onConfirm={async () => {
+            await handleOverrideDelete(overridePendingDelete);
+            setOverridePendingDelete(undefined);
+          }}
           onAbort={() => setOverridePendingDelete(undefined)}
         />
       )}

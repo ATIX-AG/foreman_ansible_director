@@ -11,13 +11,11 @@ import { ConfirmationModal } from '../ConfirmationModal';
 describe('ConfirmationModal', () => {
   const mockOnConfirm = jest.fn();
   const mockOnAbort = jest.fn();
-  const setIsConfirmationModalOpen = jest.fn();
 
   const renderModal = (propsOverrides = {}): RenderResult =>
     render(
       <ConfirmationModal
         isConfirmationModalOpen
-        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
         title="Test Title"
         body="Test body content"
         onConfirm={mockOnConfirm}
@@ -41,7 +39,6 @@ describe('ConfirmationModal', () => {
     render(
       <ConfirmationModal
         isConfirmationModalOpen={false}
-        setIsConfirmationModalOpen={setIsConfirmationModalOpen}
         title="Test Title"
         body="Test body content"
         onConfirm={mockOnConfirm}
@@ -69,28 +66,6 @@ describe('ConfirmationModal', () => {
 
     await waitFor(() => {
       expect(mockOnConfirm).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('hides modal after confirm', async () => {
-    renderModal();
-
-    const confirmButton = screen.getByRole('button', { name: /confirm/i });
-    fireEvent.click(confirmButton);
-
-    await waitFor(() => {
-      expect(setIsConfirmationModalOpen).toHaveBeenCalledWith(false);
-    });
-  });
-
-  it('hides modal after cancel if onAbort is not given', async () => {
-    renderModal({ onAbort: null });
-
-    const confirmButton = screen.getByRole('button', { name: /cancel/i });
-    fireEvent.click(confirmButton);
-
-    await waitFor(() => {
-      expect(setIsConfirmationModalOpen).toHaveBeenCalledWith(false);
     });
   });
 
