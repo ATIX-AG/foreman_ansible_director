@@ -26,6 +26,7 @@ Rails.application.routes.draw do
               get 'auto_complete_search'
             end
             member do
+              get '/', action: :show
               patch '/', action: :update
               delete '/', action: :destroy
             end
