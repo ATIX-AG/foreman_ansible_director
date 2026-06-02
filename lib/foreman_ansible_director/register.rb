@@ -251,6 +251,12 @@ Foreman::Plugin.register :foreman_ansible_director do
                       The batch size is a trade-off between execution time and resource usage.',
         default: 200,
         full_name: 'Pulp API batch size'
+      setting 'ansible_director_ui_refresh_interval',
+        type: :integer,
+        description: 'Refresh the UI every N seconds.
+                            By default, Foreman updates the UI based on the state of running tasks every 5 seconds.',
+        default: 5,
+        full_name: 'UI - Refresh interval for running tasks'
     end
   end
 

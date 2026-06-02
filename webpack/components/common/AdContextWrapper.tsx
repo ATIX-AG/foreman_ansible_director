@@ -15,6 +15,8 @@ interface AnsibleDirectorContext {
     ansible_director_default_galaxy_url: string;
     // eslint-disable-next-line camelcase
     ansible_director_default_ansible_core_version: string;
+    // eslint-disable-next-line camelcase
+    ansible_director_ui_refresh_interval: number;
   };
 }
 
@@ -22,6 +24,7 @@ const defaultContext: AnsibleDirectorContext = {
   settings: {
     ansible_director_default_galaxy_url: 'https://galaxy.ansible.com/',
     ansible_director_default_ansible_core_version: '2.19.3',
+    ansible_director_ui_refresh_interval: 5,
   },
 };
 

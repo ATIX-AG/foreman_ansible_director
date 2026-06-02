@@ -16,7 +16,6 @@ import { translate as _ } from 'foremanReact/common/I18n';
 import { useDispatch } from 'react-redux';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { ExecutionEnvGrid } from '../ExecutionEnvGrid';
-import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
 import {
   AnsibleExecutionEnv,
   AnsibleExecutionEnvCreate,
@@ -34,21 +33,6 @@ interface ExecutionEnvGridWrapperProps {
 const ExecutionEnvGridWrapper = ({
   initialSearch,
 }: ExecutionEnvGridWrapperProps): ReactElement | null => {
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = React.useState<
-    boolean
-  >(false);
-
-  const [confirmationModalMode, setConfirmationModalMode] = React.useState<
-    'update' | 'destroy'
-  >('destroy');
-
-  const [confirmationModalTitle, setConfirmationModalTitle] = React.useState<
-    string
-  >('');
-  const [confirmationModalBody, setConfirmationModalBody] = React.useState<
-    string
-  >('');
-
   const [selectedEnv, setSelectedEnv] = React.useState<
     AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined
   >();
@@ -66,7 +50,7 @@ const ExecutionEnvGridWrapper = ({
     apiUrl: foremanUrl(
       `/api/v2/ansible_director/execution_environments${
         organization ? `?organization_id=${organization.id}&` : ''
-      }${`search=${initialSearch}&`}`
+      }search=${initialSearch}&`
     ),
   });
 
@@ -85,81 +69,6 @@ const ExecutionEnvGridWrapper = ({
 
   const refreshRequest = (): void => {
     executionEnvResponse.setAPIOptions(options => ({ ...options }));
-  };
-
-  const destroyEnvAction = async (): Promise<void> => {
-    if (selectedEnv && 'id' in selectedEnv) {
-      try {
-        await axios.delete(
-          `${foremanUrl('/api/v2/ansible_director/execution_environments')}/${
-            selectedEnv.id
-          }`
-        );
-        dispatch(
-          addToast({
-            type: 'success',
-            key: `DESTROY_EE_${selectedEnv.name}_SUCC`,
-            message: `Successfully deleted Ansible Execution Environment "${selectedEnv.name}"!`,
-            sticky: false,
-          })
-        );
-        refreshRequest();
-      } catch (e) {
-        dispatch(
-          addToast({
-            type: 'danger',
-            key: `DESTROY_EE_${selectedEnv.name}_ERR`,
-            message: `Deletion of Ansible Execution Environment "${
-              selectedEnv.name
-            }" failed with error code "${
-              (e as { response: AxiosResponse }).response.status
-            }".`,
-            sticky: false,
-          })
-        );
-      }
-    }
-  };
-
-  const updateEnvAction = async (): Promise<void> => {
-    if (selectedEnv && 'id' in selectedEnv) {
-      try {
-        await axios.patch(
-          foremanUrl(
-            `/api/v2/ansible_director/execution_environments/${selectedEnv.id}`
-          ),
-          {
-            execution_environment: {
-              name: selectedEnv.name,
-              base_image_url: selectedEnv.base_image_url,
-              ansible_version: selectedEnv.ansible_version,
-              content: selectedEnv.content,
-            },
-          }
-        );
-        dispatch(
-          addToast({
-            type: 'success',
-            key: `UPDATE_EE_${selectedEnv.name}_SUCC`,
-            message: `Successfully updated Ansible Execution Environment "${selectedEnv.name}"!`,
-            sticky: false,
-          })
-        );
-      } catch (e) {
-        dispatch(
-          addToast({
-            type: 'danger',
-            key: `UPDATE_EE_${selectedEnv.name}_ERR`,
-            message: `Updating of Ansible Execution Environment "${
-              selectedEnv.name
-            }" failed with error code "${
-              (e as { response: AxiosResponse }).response.status
-            }".`,
-            sticky: false,
-          })
-        );
-      }
-    }
   };
 
   const createEnvAction = async (
@@ -202,44 +111,19 @@ const ExecutionEnvGridWrapper = ({
     }
   };
 
-  const performAction = (): void => {
-    // eslint-disable-next-line default-case
-    switch (confirmationModalMode) {
-      case 'destroy':
-        destroyEnvAction();
-        break;
-      case 'update':
-        updateEnvAction();
-        break;
-    }
-    setIsConfirmationModalOpen(false);
-  };
-
   if (executionEnvResponse.status === 'RESOLVED') {
     if (executionEnvResponse.response.results.length > -1) {
       return (
         <>
           <ExecutionEnvGrid
             apiResponse={executionEnvResponse.response}
-            setAPIOptions={executionEnvResponse.setAPIOptions}
             onPagination={onPagination}
             search={params.search as string}
             onSearch={onSearch}
-            setConfirmationModalMode={setConfirmationModalMode}
-            setIsConfirmationModalOpen={setIsConfirmationModalOpen}
-            setConfirmationModalTitle={setConfirmationModalTitle}
-            setConfirmationModalBody={setConfirmationModalBody}
-            selectedEnv={selectedEnv}
             setSelectedEnv={setSelectedEnv}
             createEnvAction={createEnvAction}
             setIsContentUnitModalOpen={setIsIsContentUnitModalOpen}
-          />
-          <ConfirmationModal
-            isConfirmationModalOpen={isConfirmationModalOpen}
-            setIsConfirmationModalOpen={setIsConfirmationModalOpen}
-            title={confirmationModalTitle}
-            body={confirmationModalBody}
-            onConfirm={performAction}
+            refreshRequest={refreshRequest}
           />
           {selectedEnv && (
             <ContentUnitModal

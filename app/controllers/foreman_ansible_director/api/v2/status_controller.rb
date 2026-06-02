@@ -19,6 +19,7 @@ module ForemanAnsibleDirector
             settings: {
               ansible_director_default_galaxy_url: Setting[:ansible_director_default_galaxy_url],
               ansible_director_default_ansible_core_version: Setting[:ansible_director_default_ansible_core_version],
+              ansible_director_ui_refresh_interval: Setting[:ansible_director_ui_refresh_interval],
             },
           }
         end
