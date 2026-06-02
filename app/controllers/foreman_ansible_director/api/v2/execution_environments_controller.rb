@@ -6,7 +6,7 @@ module ForemanAnsibleDirector
       class ExecutionEnvironmentsController < AnsibleDirectorApiController
         include ::Api::Version2
 
-        before_action :find_resource, only: %i[update destroy]
+        before_action :find_resource, only: %i[show update destroy]
         before_action :find_organization, only: %i[create]
 
         resource_description { resource_id 'AD Ansible Execution Environments' }
@@ -18,6 +18,13 @@ module ForemanAnsibleDirector
         # endregion
         def index
           @execution_environments = resource_scope_for_index
+        end
+
+        # region ApiDoc: GET /api/v2/ansible_director/execution_environments/:id
+        api :GET, '/v2/ansible_director/execution_environments/:id', N_('Show details of an execution environment')
+        param :id, :number, desc: N_('Execution Environment identifier.'), required: true
+        # endregion
+        def show
         end
 
         # region ApiDoc: POST /api/v2/ansible_director/execution_environments
