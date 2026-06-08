@@ -23,6 +23,7 @@ interface OverrideGridProps {
   matcherName: string;
   matcherType: string;
   crnType: ContentResolutionNodeType;
+  onUpdated: () => void;
 }
 
 export const OverrideGrid = ({
@@ -30,6 +31,7 @@ export const OverrideGrid = ({
   matcherName,
   matcherType,
   crnType,
+  onUpdated,
 }: OverrideGridProps): ReactElement => (
   <div style={{ padding: '20px' }}>
     {overrides.length > 0 ? (
@@ -43,6 +45,7 @@ export const OverrideGrid = ({
               matcherName={matcherName}
               matcherType={matcherType}
               crnType={crnType}
+              onUpdated={onUpdated}
             />
           </GridItem>
         ))}

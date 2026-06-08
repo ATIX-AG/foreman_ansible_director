@@ -24,22 +24,19 @@ import { addToast } from 'foremanReact/components/ToastsList';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { MergedVariableOverride } from '../../../../../types/AnsibleVariableTypes';
-import { StringAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/StringAdapter';
-import { BooleanAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/BooleanAdapter';
-import { IntegerAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/IntegerAdapter';
-import { RealAdapter } from '../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/RealAdapter';
-
 import { YamlEditor } from '../../../../common/YamlEditor';
 import { AdPermissions } from '../../../../../constants/foremanAnsibleDirectorPermissions';
 import { PermittedButton } from '../../../../common/PermittedButton';
 import { crnTypeUiString } from '../../helpers';
 import { ContentResolutionNodeType } from '../../../../../types/AnsibleContentAssignmentTypes';
+import { MergedOverrideValueAdapter } from './MergedOverrideValueAdapter';
 
 interface MergedOverrideCardProps {
   mergedOverride: MergedVariableOverride;
   matcherName: string;
   matcherType: string;
   crnType: ContentResolutionNodeType;
+  onUpdated: () => void;
 }
 
 export const MergedOverrideCard = ({
@@ -47,6 +44,7 @@ export const MergedOverrideCard = ({
   matcherName,
   matcherType,
   crnType,
+  onUpdated,
 }: MergedOverrideCardProps): ReactElement => {
   const [override, setOverride] = React.useState<
     MergedVariableOverride | undefined
@@ -59,7 +57,7 @@ export const MergedOverrideCard = ({
 
   useEffect(() => {
     setOverride(mergedOverride);
-    let v = mergedOverride.override_value || mergedOverride.default_value;
+    let v = mergedOverride.override_value ?? mergedOverride.default_value;
     if (mergedOverride.type === 'yaml') {
       v = JSON.stringify(v);
     }
@@ -68,61 +66,21 @@ export const MergedOverrideCard = ({
 
   const dispatch = useDispatch();
 
-  const valueAdapter = (): ReactElement | null => {
-    if (override !== undefined) {
-      switch (override.type) {
-        case 'string':
-          return (
-            <StringAdapter
-              isEditMode={isEditMode}
-              value={overrideValue as string}
-              onChange={value => setOverrideValue(value)}
-            />
-          );
-        case 'boolean':
-          return (
-            <BooleanAdapter
-              isEditMode={isEditMode}
-              value={overrideValue as boolean}
-              onChange={value => setOverrideValue(value)}
-            />
-          );
-        case 'integer':
-          return (
-            <IntegerAdapter
-              isEditMode={isEditMode}
-              value={overrideValue as number}
-              onChange={value => setOverrideValue(value)}
-            />
-          );
-        case 'real':
-          return (
-            <RealAdapter
-              isEditMode={isEditMode}
-              value={overrideValue as number}
-              onChange={value => setOverrideValue(value)}
-            />
-          );
-        default:
-          return null;
-      }
-    }
-    return null;
-  };
-
   const onAction = async (): Promise<void> => {
-    if (isEditMode) {
-      if (mergedOverride.override_id !== null) {
+    if (isEditMode && override !== undefined) {
+      const updatedMatcher = `${matcherType}=${matcherName}`;
+
+      if (override.override_id !== null) {
         // The override actually exists
 
         try {
           setIsCardLoading(true);
           // @ts-ignore TS18047 If override_id is not null, neither is this
-          const splitMatcher = mergedOverride.override_matcher.split('=');
+          const splitMatcher = override.override_matcher.split('=');
           await axios.put(
             `${foremanUrl('/api/v2/ansible_director/ansible_variables/')}/${
-              mergedOverride.variable_id
-            }/overrides/${mergedOverride.override_id}`,
+              override.variable_id
+            }/overrides/${override.override_id}`,
             {
               override: {
                 value: overrideValue,
@@ -131,12 +89,17 @@ export const MergedOverrideCard = ({
               },
             }
           );
+          setOverride({
+            ...override,
+            override_value: overrideValue ?? null,
+          });
+          onUpdated();
           dispatch(
             addToast({
               type: 'success',
-              key: `EDIT_OVERRIDE_${mergedOverride.override_id}_SUCC`,
+              key: `EDIT_OVERRIDE_${override.override_id}_SUCC`,
               message: __(_('Successfully edited override for "%(key)s"!'), {
-                key: mergedOverride.key,
+                key: override.key,
               }),
               sticky: false,
             })
@@ -145,13 +108,13 @@ export const MergedOverrideCard = ({
           dispatch(
             addToast({
               type: 'danger',
-              key: `UPDATE_OVERRIDE_${mergedOverride.override_id}_ERR`,
+              key: `UPDATE_OVERRIDE_${override.override_id}_ERR`,
               message: __(
                 _(
                   'Updating of Ansible variable override for "%(key)s" failed with error code "%(error)s".'
                 ),
                 {
-                  key: mergedOverride.key,
+                  key: override.key,
                   error: (e as { response: AxiosResponse }).response.status,
                 }
               ),
@@ -166,7 +129,7 @@ export const MergedOverrideCard = ({
           setIsCardLoading(true);
           await axios.post(
             foremanUrl(
-              `/api/v2/ansible_director/ansible_variables/${mergedOverride.variable_id}/overrides/`
+              `/api/v2/ansible_director/ansible_variables/${override.variable_id}/overrides/`
             ),
             {
               override: {
@@ -176,11 +139,17 @@ export const MergedOverrideCard = ({
               },
             }
           );
+          setOverride({
+            ...override,
+            override_matcher: updatedMatcher,
+            override_value: overrideValue ?? null,
+          });
+          onUpdated();
           dispatch(
             addToast({
               type: 'success',
-              key: `CREATE_OVERRIDE_FOR_${mergedOverride.variable_id}_SUCC`,
-              message: `Successfully created override for "${mergedOverride.key}"!`,
+              key: `CREATE_OVERRIDE_FOR_${override.variable_id}_SUCC`,
+              message: `Successfully created override for "${override.key}"!`,
               sticky: false,
             })
           );
@@ -188,9 +157,9 @@ export const MergedOverrideCard = ({
           dispatch(
             addToast({
               type: 'danger',
-              key: `CREATE_OVERRIDE_${mergedOverride.variable_id}_ERR`,
+              key: `CREATE_OVERRIDE_${override.variable_id}_ERR`,
               message: `Creation of Ansible variable override for variable"${
-                mergedOverride.key
+                override.key
               }" failed with error code "${
                 (e as { response: AxiosResponse }).response.status
               }".`,
@@ -230,7 +199,7 @@ export const MergedOverrideCard = ({
       aria-label="Action"
       onClick={() => onAction()}
       isInline
-      key={`${mergedOverride.variable_id}-${mergedOverride.override_id}`}
+      key={`${overrideObject.variable_id}-${overrideObject.override_id}`}
     >
       {isEditMode ? (
         <Icon size="md">
@@ -256,13 +225,20 @@ export const MergedOverrideCard = ({
                 }}
               >
                 <Label color="blue" isCompact>
-                  {mergedOverride.type}
+                  {override.type}
                 </Label>
               </CardHeader>
-              <CardTitle>{mergedOverride.key}</CardTitle>
-              {mergedOverride.type !== 'yaml' && (
+              <CardTitle>{override.key}</CardTitle>
+              {override.type !== 'yaml' && (
                 <CardBody>
-                  <Bullseye>{valueAdapter()}</Bullseye>
+                  <Bullseye>
+                    <MergedOverrideValueAdapter
+                      override={override}
+                      isEditMode={isEditMode}
+                      overrideValue={overrideValue}
+                      setOverrideValue={setOverrideValue}
+                    />
+                  </Bullseye>
                 </CardBody>
               )}
             </>
@@ -282,7 +258,7 @@ export const MergedOverrideCard = ({
           )}
         </Card>
       )}
-      {mergedOverride.type === 'yaml' && isEditMode && (
+      {override?.type === 'yaml' && isEditMode && (
         <Modal
           title={_('Edit override')}
           style={{ minHeight: '400px' }}
