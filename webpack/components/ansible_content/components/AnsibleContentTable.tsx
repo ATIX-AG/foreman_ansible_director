@@ -88,7 +88,6 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           setConfirmationModalTitle={setConfirmationModalTitle}
           setConfirmationModalBody={setConfirmationModalBody}
           setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
-          refreshRequest={refreshRequest}
         />,
         <AnsibleContentTableSecondaryRow
           identifier={identifier}
@@ -103,7 +102,6 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           setConfirmationModalTitle={setConfirmationModalTitle}
           setConfirmationModalBody={setConfirmationModalBody}
           setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
-          refreshRequest={refreshRequest}
         />
       );
       posInset++;

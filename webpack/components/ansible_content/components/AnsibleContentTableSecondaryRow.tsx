@@ -20,6 +20,7 @@ import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import { useDispatch } from 'react-redux';
 import { AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
+import { DefaultResponse, Task } from '../../../types/common';
 
 interface AnsibleContentTableSecondaryRowProps {
   identifier: string; // Needed for keys
@@ -33,7 +34,6 @@ interface AnsibleContentTableSecondaryRowProps {
   setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
-  refreshRequest: () => void;
 }
 
 const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowProps> = ({
@@ -48,7 +48,6 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
   setConfirmationModalTitle,
   setConfirmationModalBody,
   setConfirmationModalOnConfirm,
-  refreshRequest,
 }) => {
   const versionRows = (
     versions: AnsibleContentVersionWithCount[]
@@ -97,7 +96,11 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
       );
       setConfirmationModalOnConfirm(() => async () => {
         try {
-          await axios.delete(
+          const triggeredTask: AxiosResponse<DefaultResponse<
+            never,
+            never,
+            { task: Task }
+          >> = await axios.delete(
             foremanUrl('/api/v2/ansible_director/ansible_content'),
             {
               data: {
@@ -114,7 +117,28 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             addToast({
               type: 'success',
               key: `DESTROY_CUV_${identifier}_${version.version}_SUCC`,
-              message: `Sucessfully deleted Ansible content unit version "${identifier}:${version.version}"!`,
+              message: (
+                <span>
+                  {__(
+                    _(
+                      'A task to delete Ansible content unit version "%(identifier)s" was started successfully!'
+                    ),
+                    {
+                      identifier: `${identifier}:${version.version}`,
+                    }
+                  )}
+                  <br />
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={foremanUrl(
+                      `/foreman_tasks/tasks/${triggeredTask.data.results.task.id}`
+                    )}
+                  >
+                    {_('View the task page for more details.')}
+                  </a>
+                </span>
+              ),
               sticky: false,
             })
           );
@@ -123,17 +147,20 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             addToast({
               type: 'danger',
               key: `DESTROY_CUV_${identifier}_${version.version}_ERR`,
-              message: `Destroying Ansible content unit version "${identifier}:${
-                version.version
-              }" failed with error code "${
-                (e as { response: AxiosResponse }).response.status
-              }".`,
+              message: __(
+                _(
+                  'Starting of task to delete Ansible content unit version "%(identifier)s" failed with error code "%(error)s".'
+                ),
+                {
+                  identifier: `${identifier}:${version.version}`,
+                  error: (e as { response: AxiosResponse }).response.status,
+                }
+              ),
               sticky: false,
             })
           );
         } finally {
           setIsConfirmationModalOpen(false);
-          refreshRequest();
         }
       });
     },

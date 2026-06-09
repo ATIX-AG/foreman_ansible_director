@@ -265,6 +265,7 @@ Foreman::Plugin.register :foreman_ansible_director do
   parameter_filter Hostgroup, :ansible_lifecycle_environment_state
 
   logger :crud, enabled: true
+  logger :action, enabled: true
 
   extend_page 'hostgroups/_form' do |cx|
     cx.add_pagelet :main_tab_fields,

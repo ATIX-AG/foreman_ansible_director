@@ -5,12 +5,13 @@ import { WizardFooter, useWizardContext } from '@patternfly/react-core';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { useDispatch } from 'react-redux';
 import { addToast } from 'foremanReact/components/ToastsList';
-import { translate as _ } from 'foremanReact/common/I18n';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import {
   AnsibleContentUnitCreateType,
   isAnsibleGalaxyContentUnitCreate,
   isAnsibleGitContentUnitCreate,
 } from '../../AnsibleContentWizard';
+import { DefaultResponse, Task } from '../../../../../../types/common';
 
 interface FinishFooterProps {
   isFinishDisabled: boolean;
@@ -18,7 +19,6 @@ interface FinishFooterProps {
   contentUnits: AnsibleContentUnitCreateType[];
   yamlFile: string;
   setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
-  refreshRequest: () => void;
   resetWizard: () => void;
 }
 
@@ -28,7 +28,6 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
   contentUnits,
   yamlFile,
   setIsContentWizardOpen,
-  refreshRequest,
   resetWizard,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -56,7 +55,11 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
           })
         );
       } else if (provider === 'galaxy') {
-        await axios.post(
+        const triggeredTask: AxiosResponse<DefaultResponse<
+          never,
+          never,
+          { task: Task }
+        >> = await axios.post(
           foremanUrl('/api/v2/ansible_director/ansible_content'),
           {
             organization_id: organization?.id,
@@ -89,9 +92,30 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
           addToast({
             type: 'success',
             key: `IMPORT_CU_${contentUnits.length}_SUCC`,
-            message: `Successfully imported ${
-              contentUnits.length
-            } Ansible content ${contentUnits.length === 1 ? 'unit' : 'units'}!`,
+            message: (
+              <span>
+                {__(
+                  _(
+                    'A task to import %(count)s Ansible content unit%(plural)s was started successfully!'
+                  ),
+                  {
+                    count: contentUnits.length,
+                    plural: contentUnits.length === 1 ? '' : 's',
+                  }
+                )}
+                <br />
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={foremanUrl(
+                    `/foreman_tasks/tasks/${triggeredTask.data.results.task.id}`
+                  )}
+                >
+                  {_('View the task page for more details.')}
+                </a>
+              </span>
+            ),
+
             sticky: false,
           })
         );
@@ -101,18 +125,22 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
         addToast({
           type: 'danger',
           key: `IMPORT_CU_${contentUnits.length}_ERR`,
-          message: `Importing of ${
-            contentUnits.length
-          } Ansible content units failed with error code "${
-            (err as { response: AxiosResponse }).response.status
-          }".`,
+          message: __(
+            _(
+              'Starting of task to import %(count)s Ansible content unit%(plural)s failed with error code "%(error)s".'
+            ),
+            {
+              count: contentUnits.length,
+              plural: contentUnits.length === 1 ? '' : 's',
+              error: (err as { response: AxiosResponse }).response.status,
+            }
+          ),
           sticky: false,
         })
       );
     } finally {
       setLoading(false);
       setIsContentWizardOpen(false);
-      refreshRequest();
       resetWizard();
     }
   }, [
@@ -120,7 +148,6 @@ const FinishFooter: React.FC<FinishFooterProps> = ({
     dispatch,
     organization,
     provider,
-    refreshRequest,
     setIsContentWizardOpen,
     yamlFile,
     resetWizard,

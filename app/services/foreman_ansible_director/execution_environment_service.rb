@@ -67,21 +67,15 @@ module ForemanAnsibleDirector
 
         execution_environment.update!(build_status: 'running')
 
-        if Rails.env.development?
-          ForemanTasks.sync_task(
-            ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
+        ::ForemanAnsibleDirector::ActionService.trigger(
+          ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
+          task_args: {
             proxy_task_id: SecureRandom.uuid,
             execution_environment_definition: env_definition,
-            execution_environment_id: execution_environment.id
-          )
-        else
-          ForemanTasks.async_task(
-            ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
-            proxy_task_id: SecureRandom.uuid,
-            execution_environment_definition: env_definition,
-            execution_environment_id: execution_environment.id
-          )
-        end
+            execution_environment_id: execution_environment.id,
+          },
+          mode: :async
+        )
       end
     end
   end

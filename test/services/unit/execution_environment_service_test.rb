@@ -203,9 +203,10 @@ module ForemanAnsibleDirectorTests
             env_def = nil
             action_name = nil
 
-            ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
-            action_name = action.name
-            env_def = args[:execution_environment_definition]
+            ::ForemanAnsibleDirector::ActionService.stub(:trigger, ->(action_class, task_args: {}, mode: :auto) {
+              task_called = true
+              action_name = action_class.name
+              env_def = task_args[:execution_environment_definition]
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment(@execution_environment)
             end
@@ -238,8 +239,9 @@ module ForemanAnsibleDirectorTests
             task_called = false
             env_def = nil
 
-            ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
-            env_def = args[:execution_environment_definition]
+            ::ForemanAnsibleDirector::ActionService.stub(:trigger, ->(action_class, task_args: {}, mode: :auto) {
+              task_called = true
+              env_def = task_args[:execution_environment_definition]
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment(@execution_environment)
             end
@@ -250,32 +252,6 @@ module ForemanAnsibleDirectorTests
             types = env_def[:content][:content_units].map { |cu| cu[:type] }
             assert_includes types, 'collection'
             assert_includes types, 'role'
-          end
-
-          test 'uses async task in production environment' do
-            Rails.env.stub(:development?, false) do
-              task_called = false
-
-              ForemanTasks.stub(:async_task, ->(action, **args) { task_called = true
-              }) do
-                ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment(@execution_environment)
-              end
-
-              assert task_called
-            end
-          end
-
-          test 'uses sync task in development environment' do
-            Rails.env.stub(:development?, true) do
-              task_called = false
-
-              ForemanTasks.stub(:sync_task, ->(action, **args) { task_called = true
-              }) do
-                ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment(@execution_environment)
-              end
-
-              assert task_called
-            end
           end
 
         end

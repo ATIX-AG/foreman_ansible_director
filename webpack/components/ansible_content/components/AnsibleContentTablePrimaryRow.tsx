@@ -9,6 +9,7 @@ import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import { useDispatch } from 'react-redux';
 import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
+import { DefaultResponse, Task } from '../../../types/common';
 
 interface AnsibleContentTablePrimaryRowProps {
   node: AnsibleContentUnit;
@@ -22,7 +23,6 @@ interface AnsibleContentTablePrimaryRowProps {
   setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalOnConfirm: Dispatch<React.SetStateAction<() => void>>;
-  refreshRequest: () => void;
 }
 
 const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps> = ({
@@ -37,7 +37,6 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
   setConfirmationModalTitle,
   setConfirmationModalBody,
   setConfirmationModalOnConfirm,
-  refreshRequest,
 }) => {
   const treeRow = {
     onCollapse: () =>
@@ -85,7 +84,11 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
       );
       setConfirmationModalOnConfirm(() => async () => {
         try {
-          await axios.delete(
+          const triggeredTask: AxiosResponse<DefaultResponse<
+            never,
+            never,
+            { task: Task }
+          >> = await axios.delete(
             foremanUrl('/api/v2/ansible_director/ansible_content'),
             {
               data: {
@@ -101,7 +104,28 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
             addToast({
               type: 'success',
               key: `DESTROY_CU_${node.id}_SUCC`,
-              message: `Sucessfully deleted Ansible content unit "${identifier}"!`,
+              message: (
+                <span>
+                  {__(
+                    _(
+                      'A task to delete Ansible content unit "%(identifier)s" was started successfully!'
+                    ),
+                    {
+                      identifier,
+                    }
+                  )}
+                  <br />
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={foremanUrl(
+                      `/foreman_tasks/tasks/${triggeredTask.data.results.task.id}`
+                    )}
+                  >
+                    {_('View the task page for more details.')}
+                  </a>
+                </span>
+              ),
               sticky: false,
             })
           );
@@ -110,14 +134,18 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
             addToast({
               type: 'danger',
               key: `DESTROY_CU_${node.id}_ERR`,
-              message: `Deleting Ansible content unit "${identifier}" failed with error code "${
-                (e as { response: AxiosResponse }).response.status
-              }".`,
+              message: __(
+                _(
+                  'Starting of task to delete Ansible content unit "%(identifier)s" failed with error code "%(error)s".'
+                ),
+                {
+                  identifier,
+                  error: (e as { response: AxiosResponse }).response.status,
+                }
+              ),
               sticky: false,
             })
           );
-        } finally {
-          refreshRequest();
         }
       });
     },

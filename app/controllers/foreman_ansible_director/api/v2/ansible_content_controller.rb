@@ -59,10 +59,12 @@ module ForemanAnsibleDirector
           resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_import_payload(
             params[:units]
           )
-          @bulk_create_task = ForemanTasks.sync_task(
+          @bulk_create_task = ::ForemanAnsibleDirector::ActionService.trigger(
             ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Import,
-            resolved_content_units: resolved,
-            organization_id: @organization.id
+            task_args: {
+              resolved_content_units: resolved,
+              organization_id: @organization.id,
+            }
           )
         end
 
@@ -122,9 +124,12 @@ module ForemanAnsibleDirector
           resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload(
             destroy_params
           )
-          @bulk_destroy_task =
-            ForemanTasks.sync_task(::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Destroy,
-              resolved_content_units: resolved)
+          @bulk_destroy_task = ::ForemanAnsibleDirector::ActionService.trigger(
+            ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Bulk::Destroy,
+            task_args: {
+              resolved_content_units: resolved,
+            }
+          )
         end
 
         # region ApiDoc: POST /api/v2/ansible_director/ansible_content/consistency_check
@@ -132,7 +137,9 @@ module ForemanAnsibleDirector
           N_('Run a consistency check to clean up the database after a failed content import.')
         # endregion
         def consistency_check
-          @consistency_check = ForemanTasks.async_task(::ForemanAnsibleDirector::Actions::ConsistencyCheck::Perform)
+          @consistency_check = ::ForemanAnsibleDirector::ActionService.trigger(
+            ::ForemanAnsibleDirector::Actions::ConsistencyCheck::Perform
+          )
         end
 
         def model_of_controller
