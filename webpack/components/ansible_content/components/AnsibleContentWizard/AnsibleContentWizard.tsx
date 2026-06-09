@@ -28,7 +28,6 @@ import { GitContentUnitInput } from './components/components/GitContentUnitInput
 interface AnsibleContentWizardProps {
   isContentWizardOpen: boolean;
   setIsContentWizardOpen: Dispatch<SetStateAction<boolean>>;
-  refreshRequest: () => void;
 }
 
 export type AnsibleContentUnitCreateType =
@@ -58,7 +57,6 @@ export const contentUnitCreateType = (
 const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
   isContentWizardOpen,
   setIsContentWizardOpen,
-  refreshRequest,
 }) => {
   const [contentUnits, setContentUnits] = React.useState<
     Array<AnsibleContentUnitCreateType>
@@ -121,7 +119,6 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                   contentUnits={contentUnits}
                   yamlFile={yamlFile}
                   setIsContentWizardOpen={setIsContentWizardOpen}
-                  refreshRequest={refreshRequest}
                   resetWizard={resetWizard}
                 />
               }
@@ -181,11 +178,11 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
               footer={
                 <FinishFooter
                   isFinishDisabled={contentUnits.length < 1}
+                  // TODO: FinishFooter must accept "git" too and perform the same action as for "galaxy"
                   provider="galaxy"
                   contentUnits={contentUnits}
                   yamlFile={yamlFile}
                   setIsContentWizardOpen={setIsContentWizardOpen}
-                  refreshRequest={refreshRequest}
                   resetWizard={resetWizard}
                 />
               }
@@ -217,7 +214,6 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 contentUnits={contentUnits}
                 yamlFile={yamlFile}
                 setIsContentWizardOpen={setIsContentWizardOpen}
-                refreshRequest={refreshRequest}
                 resetWizard={resetWizard}
               />
             }

@@ -175,7 +175,6 @@ const AnsibleContentTableWrapper = ({
           <AnsibleContentWizard
             isContentWizardOpen={isContentWizardOpen}
             setIsContentWizardOpen={setIsContentWizardOpen}
-            refreshRequest={refreshRequest}
           />
           {isConsistencyCheckModalOpen && (
             <ConsistencyCheckModal
