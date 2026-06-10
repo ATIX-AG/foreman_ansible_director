@@ -26,10 +26,61 @@ jobs:
       command: bundle exec rubocop --parallel --format github
       ruby: 3.0
 
+  access_permissions:
+    name: Run AccessPermissionsTest
+    if: github.event.pull_request.draft == false
+    needs: rubocop
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: false
+    services:
+      postgres:
+        image: postgres:13
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        env:
+          POSTGRES_PASSWORD: password
+    env:
+      RAILS_ENV: test
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:password@localhost/test
+      DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: true
+      BUNDLE_WITHOUT: "console:development:journald:libvirt"
+    steps:
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev
+      - name: "Check out Foreman@develop"
+        uses: actions/checkout@v6
+        with:
+          repository: "theforeman/foreman"
+          ref: "develop"
+      - name: Check out plugin
+        uses: actions/checkout@v6
+        with:
+          repository: "ATIX-AG/foreman_ansible_director"
+          path: "foreman_ansible_director"
+      - name: Set up plugin in Foreman
+        run: |
+          echo "gemspec name: 'foreman_ansible_director', path: 'foreman_ansible_director'" > "bundler.d/foreman_ansible_director.local.rb"
+          if [ -d foreman_ansible_director/gemfile.d ] ; then
+            cat foreman_ansible_director/gemfile.d/*.rb >> bundler.d/foreman_ansible_director.local.rb
+          fi
+      - name: "Set up Ruby 3.0.0"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.0
+          bundler-cache: true
+      - name: Prepare test env
+        run: |
+          bundle exec rake db:create
+          bundle exec rake db:migrate
+      - name: Run access_permissions_test
+        run: bundle exec rake test:foreman_ansible_director:access_permissions_test
+
   test_ruby:
     name: Ruby
     if: github.event.pull_request.draft == false
-    needs: rubocop
+    needs: [rubocop, access_permissions]
     uses: theforeman/actions/.github/workflows/foreman_plugin.yml@v0
     with:
       plugin: foreman_ansible_director
