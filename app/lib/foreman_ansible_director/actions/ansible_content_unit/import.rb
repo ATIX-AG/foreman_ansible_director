@@ -14,7 +14,7 @@ module ForemanAnsibleDirector
           organization_id = args[:organization_id]
           existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit.unit_namespace,
             name: unit.unit_name)
-          op_type = operation_type existing_unit, unit
+          op_type = operation_type! existing_unit, unit
 
           case op_type
           when :import
@@ -42,42 +42,27 @@ module ForemanAnsibleDirector
             else
               raise NotImplementedError
             end
-          else
-            raise NotImplementedError
           end
         end
 
         private
 
-        # Helper method to decide the operation type:
-        # e = Unit exists; v = Unit.version exists; s = Force override
-        # | e | v | s | operation |
-        # | 0 | 0 | 0 | :import |
-        # | 0 | 0 | 1 | :import |
-        # | 0 | 1 | 0 | INVALID |
-        # | 0 | 1 | 1 | INVALID |
-        # | 1 | 0 | 0 | :update |
-        # | 1 | 0 | 1 | :update |
-        # | 1 | 1 | 0 | NOOP    |
-        # | 1 | 1 | 1 | :update |
-        # TODO: Unit test this
-        def operation_type(existing_unit, unit)
-          force_override = Setting[:ansible_director_content_import_override]
-
+        # This function also mutates the versions array of unit to filter out existing units
+        def operation_type!(existing_unit, unit)
           return :import unless existing_unit
 
-          existing_unit_versions = existing_unit.content_unit_versions.select do |x|
-            unit.versions.include? x.version
+          existing_versions = existing_unit.content_unit_versions.map(&:version).map(&:to_s)
+
+          unit.versions = unit.versions.map(&:to_s) - existing_versions
+
+          if unit.versions.empty?
+            :noop
+            # Also import if source_type = :galaxy and no galaxy version exists
+          elsif unit.source_type == :git || !(existing_unit.content_unit_versions.pluck(:source_type).include? 'galaxy')
+            :import
+          else
+            :update
           end
-
-          filtered_versions = existing_unit_versions.select do |x|
-            unit.source_type == x.source_type
-          end
-
-          return :import if filtered_versions.empty?
-
-          return :noop if !existing_unit_versions.empty? && !force_override
-          :update
         end
       end
     end

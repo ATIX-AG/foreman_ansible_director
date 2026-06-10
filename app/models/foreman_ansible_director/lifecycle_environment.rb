@@ -76,15 +76,9 @@ module ForemanAnsibleDirector
       existing_version = lifecycle_environment_content_unit_versions
                          .find_by(content_unit_version_id: content_unit_version.id)
 
-      replace = Setting[:ansible_director_content_import_override]
-
       if existing_version
-        if replace
-          existing_version.destroy!
-        else
-          raise ArgumentError, "LifecycleEnvironment already has ContentUnit #{content_unit_version.versionable_id} " \
-            "(existing version: #{existing_version.id}, attempted: #{content_unit_version.id})"
-        end
+        raise ArgumentError, "LifecycleEnvironment already has ContentUnit #{content_unit_version.versionable_id} " \
+          "(existing version: #{existing_version.id}, attempted: #{content_unit_version.id})"
       end
 
       # Create the association

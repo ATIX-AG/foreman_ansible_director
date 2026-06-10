@@ -181,10 +181,18 @@ module ForemanAnsibleDirector
                 existing_unit_versions.include?(unit_version[:version])
               end
 
-              source = existing_unit.content_unit_versions.first.source
-              repository_href = existing_unit.content_unit_versions.first.pulp_repository_href
-              remote_href = existing_unit.content_unit_versions.first.pulp_remote_href
-              distribution_href = existing_unit.content_unit_versions.first.pulp_distribution_href
+              source = existing_unit.content_unit_versions
+                                    .where(source_type: 'galaxy')
+                                    .first.source
+              repository_href = existing_unit.content_unit_versions
+                                             .where(source_type: 'galaxy')
+                                             .first.pulp_repository_href
+              remote_href = existing_unit.content_unit_versions
+                                         .where(source_type: 'galaxy')
+                                         .first.pulp_remote_href
+              distribution_href = existing_unit.content_unit_versions
+                                               .where(source_type: 'galaxy')
+                                               .first.pulp_distribution_href
 
               new_unit_versions.each do |new_version|
                 collection_version = ::ForemanAnsibleDirector::ContentService.create_ansible_content_unit_version(
@@ -210,11 +218,11 @@ module ForemanAnsibleDirector
                   next if cr_variables.nil?
 
                   ActiveRecord::Base.transaction do
-                    cr_variables.each do |variable_name, variable_value|
+                    cr_variables.each do |variable_name, variable|
                       ::ForemanAnsibleDirector::VariableService.create_variable(
                         key: variable_name,
                         type: variable[:type],
-                        default_value: variable_value,
+                        default_value: variable[:value],
                         owner: collection_role_record
                       )
                     end

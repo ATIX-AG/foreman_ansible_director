@@ -18,9 +18,19 @@ module ForemanAnsibleDirector
               organization_id = args[:organization_id]
 
               # For collections coming from Ansible Galaxy, we can reuse the existing Pulp objects
-              repository_href = existing_unit.content_unit_versions.first.pulp_repository_href
-              remote_href = existing_unit.content_unit_versions.first.pulp_remote_href
-              distribution_href = existing_unit.content_unit_versions.first.pulp_distribution_href
+              repository_href = existing_unit
+                                .content_unit_versions
+                                .where(source_type: 'galaxy')
+                                .first
+                                .pulp_repository_href
+              remote_href = existing_unit.content_unit_versions
+                                         .where(source_type: 'galaxy')
+                                         .first
+                                         .pulp_remote_href
+              distribution_href = existing_unit.content_unit_versions
+                                               .where(source_type: 'galaxy')
+                                               .first
+                                               .pulp_distribution_href
 
               sequence do
                 _remote_update_action = plan_action(
