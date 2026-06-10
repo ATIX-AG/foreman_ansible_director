@@ -114,7 +114,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible Execution Environments
     # View
     permission :view_ansible_execution_environments,
-      { 'foreman_ansible_director/api/v2/execution_environments': %i[index auto_complete_search] },
+      { 'foreman_ansible_director/api/v2/execution_environments': %i[index auto_complete_search show] },
       resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Create
     permission :create_ansible_execution_environments,
