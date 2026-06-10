@@ -190,13 +190,6 @@ Foreman::Plugin.register :foreman_ansible_director do
         description: 'Default URL used when importing content from an Ansible Galaxy instance.',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_GALAXY_URL,
         full_name: 'Content - Default Ansible Galaxy URL'
-      setting 'ansible_director_content_import_override',
-        type: :boolean,
-        description: 'When enabled, the content importer will override any existing content that matches the identifier
-                       of a content unit scheduled for import, ensuring the new content replaces the existing version
-                       rather than being skipped.',
-        default: false,
-        full_name: 'Content - Force override of existing content'
       setting 'ansible_director_default_ansible_core_version',
         type: :string,
         description: 'Default Ansible-Core version used for Execution Environments.
