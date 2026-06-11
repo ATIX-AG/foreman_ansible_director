@@ -186,7 +186,7 @@ export const OverrideManagementModal = ({
         }));
       case 'hostgroup':
         return (apiResponse as HostGroupsResponse).results.map(matcher => ({
-          value: matcher.name,
+          value: matcher.title,
           children: matcher.title,
         }));
       default:
