@@ -61,7 +61,6 @@ Rails.application.routes.draw do
           resources :status, only: [] do
             collection do
               get '/content', action: :content
-              get '/context', action: :context
             end
           end
           resources :assignments, only: [] do

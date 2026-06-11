@@ -14,7 +14,7 @@ import {
   AnsibleExecutionEnvCreate,
 } from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvEditCard } from './ExecutionEnvEditCard';
-import { useAdContext } from '../../common/AdContextWrapper';
+import { useAdContext } from '../../../helpers/adContext';
 
 interface ExecutionEnvCreateCardProps {
   createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;

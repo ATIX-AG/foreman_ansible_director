@@ -35,7 +35,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     # View
     permission :view_ansible_content,
       { 'foreman_ansible_director/api/v2/ansible_content': %i[index version_detail auto_complete_search],
-        'foreman_ansible_director/api/v2/status': %i[content context] },
+        'foreman_ansible_director/api/v2/status': %i[content] },
       resource_type: 'ForemanAnsibleDirector::ContentUnit'
     # Create
     permission :create_ansible_content,
@@ -252,6 +252,14 @@ Foreman::Plugin.register :foreman_ansible_director do
         full_name: 'UI - Refresh interval for running tasks'
     end
   end
+
+  ::Foreman::Plugin.app_metadata_registry.register(:foreman_ansible_director, {
+    settings: {
+      ansible_director_default_galaxy_url: Setting[:ansible_director_default_galaxy_url],
+      ansible_director_default_ansible_core_version: Setting[:ansible_director_default_ansible_core_version],
+      ansible_director_ui_refresh_interval: Setting[:ansible_director_ui_refresh_interval],
+    },
+  })
 
   register_global_js_file 'global'
 

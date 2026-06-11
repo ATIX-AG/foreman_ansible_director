@@ -6,7 +6,27 @@ declare module 'foremanReact/Root/Context/ForemanContext' {
   //  contextData: any
   // ) => React.Context<any>;
 
-  // export declare const useForemanContext: () => any;
+  interface AnsibleDirectorContext {
+    settings: {
+      // eslint-disable-next-line camelcase
+      ansible_director_default_galaxy_url: string;
+      // eslint-disable-next-line camelcase
+      ansible_director_default_ansible_core_version: string;
+      // eslint-disable-next-line camelcase
+      ansible_director_ui_refresh_interval: number;
+    };
+  }
+
+  export interface ForemanContext {
+    metadata: {
+      organization: Organization | null;
+      location: Location | null;
+      // eslint-disable-next-line camelcase
+      foreman_ansible_director: AnsibleDirectorContext;
+    } | null;
+  }
+
+  export declare const useForemanContext: () => ForemanContext;
 
   // export declare const useForemanSetContext: () => any;
 
