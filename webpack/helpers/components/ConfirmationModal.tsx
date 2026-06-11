@@ -34,6 +34,7 @@ export const ConfirmationModal = ({
     <Modal
       aria-label={title}
       variant={ModalVariant.small}
+      onClose={onAbort}
       title={title}
       isOpen={isConfirmationModalOpen}
       actions={[
