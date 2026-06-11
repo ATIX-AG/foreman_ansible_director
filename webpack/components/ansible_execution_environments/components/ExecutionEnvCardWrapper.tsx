@@ -27,7 +27,7 @@ import { DefaultResponse } from '../../../types/common';
 import { AnsibleExecutionEnv } from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvCard } from './ExecutionEnvCard';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
-import { useAdContext } from '../../common/AdContextWrapper';
+import { useAdContext } from '../../../helpers/adContext';
 
 interface ExecutionEnvCardWrapperProps {
   executionEnv: AnsibleExecutionEnv;

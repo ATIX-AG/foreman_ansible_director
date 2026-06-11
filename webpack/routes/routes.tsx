@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
-import { WrappedAnsibleContentPage } from '../components/ansible_content';
-import { WrappedAnsibleExecutionEnvPage } from '../components/ansible_execution_environments';
-import { WrappedAnsibleEnvironmentsPage } from '../components/ansible_environments';
+import AnsibleContentPageWrapper from '../components/ansible_content/AnsibleContentPageWrapper';
+import AnsibleExecutionEnvPageWrapper from '../components/ansible_execution_environments/AnsibleExecutionEnvPageWrapper';
+import AnsibleEnvironmentsPageWrapper from '../components/ansible_environments/AnsibleEnvironmentsPageWrapper';
 
 interface RouteConfig {
   path: string;
@@ -13,17 +13,17 @@ interface RouteConfig {
 const routes: RouteConfig[] = [
   {
     path: '/ansible/content/',
-    render: props => <WrappedAnsibleContentPage {...props} />,
+    render: props => <AnsibleContentPageWrapper {...props} />,
     exact: true,
   },
   {
     path: '/ansible/execution_environments/',
-    render: props => <WrappedAnsibleExecutionEnvPage {...props} />,
+    render: props => <AnsibleExecutionEnvPageWrapper {...props} />,
     exact: true,
   },
   {
     path: '/ansible/environments/',
-    render: props => <WrappedAnsibleEnvironmentsPage {...props} />,
+    render: props => <AnsibleEnvironmentsPageWrapper {...props} />,
     exact: true,
   },
 ];

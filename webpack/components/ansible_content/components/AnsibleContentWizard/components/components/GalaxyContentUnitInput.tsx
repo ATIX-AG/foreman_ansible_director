@@ -19,7 +19,7 @@ import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import { AnsibleGalaxyContentUnitCreate } from '../../../../../../types/AnsibleContentTypes';
 import { VersionInput } from './components/VersionInput';
 import { AnsibleContentUnitCreateType } from '../../AnsibleContentWizard';
-import { useAdContext } from '../../../../../common/AdContextWrapper';
+import { useAdContext } from '../../../../../../helpers/adContext';
 import { IdentifierInput } from './components/IdentifierInput';
 
 interface GalaxyContentUnitInputProps {
