@@ -171,6 +171,13 @@ module ForemanAnsibleDirectorTests
         describe '#get_overrides_for_target' do
 
           setup do
+            @hostgroup = FactoryBot.create(
+              :hostgroup,
+              organizations: [@organization],
+              ansible_lifecycle_environment: @lifecycle_environment
+            )
+            @host.update!(hostgroup: @hostgroup)
+
             FactoryBot.create(
               :ansible_content_assignment,
               consumable: @host,
@@ -190,7 +197,12 @@ module ForemanAnsibleDirectorTests
           test 'returns overrides for host target' do
 
             as_admin do
-              @variables = FactoryBot.create_list(:ansible_variable, 4, :for_collection_role, ownable: @collection_role)
+              @variables = FactoryBot.create_list(
+                :ansible_variable, 4, :for_collection_role,
+                ownable: @collection_role,
+                override: true,
+                path: 'fqdn'
+              )
             end
 
             override1 = FactoryBot.create(:lookup_value, lookup_key: @variables[0], match: "fqdn=#{@host.fqdn}")
@@ -202,22 +214,256 @@ module ForemanAnsibleDirectorTests
             results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
 
             assert_equal 2, results.length
-            assert_equal override1.value, results[0][:override_value]
-            assert_equal override2.value, results[1][:override_value]
+            assert_equal [override1.value, override2.value].sort, results.pluck(:override_value).sort
 
             results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host2)
 
             assert_equal 2, results.length
-            assert_equal override3.value, results[0][:override_value]
-            assert_equal override4.value, results[1][:override_value]
+            assert_equal [override3.value, override4.value].sort, results.pluck(:override_value).sort
+          end
+
+          test 'selects the correct override for one variable across host and hostgroup matchers' do
+            other_hostgroup = FactoryBot.create(
+              :hostgroup,
+              organizations: [@organization],
+              ansible_lifecycle_environment: @lifecycle_environment
+            )
+            @host2.update!(hostgroup: other_hostgroup)
+
+            as_admin do
+              @host3 = FactoryBot.create(:host, ansible_lifecycle_environment: @lifecycle_environment, hostgroup: @hostgroup)
+            end
+
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host3,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+
+            as_admin do
+              @variable = FactoryBot.create(
+                :ansible_variable, :for_collection_role,
+                ownable: @collection_role,
+                override: true,
+                path: "fqdn\nhostgroup"
+              )
+            end
+
+            host_override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "fqdn=#{@host.fqdn}",
+              value: 'host override value'
+            )
+            other_host_override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "fqdn=#{@host2.fqdn}",
+              value: 'other host override value'
+            )
+            hostgroup_override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "hostgroup=#{@hostgroup.to_label}",
+              value: 'hostgroup override value',
+              host_or_hostgroup: @hostgroup
+            )
+            other_hostgroup_override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "hostgroup=#{other_hostgroup.to_label}",
+              value: 'other hostgroup override value',
+              host_or_hostgroup: other_hostgroup
+            )
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
+            result = results.find { |entry| entry[:variable_id] == @variable.id }
+
+            refute_nil result
+            assert_equal host_override.match, result[:override_matcher]
+            assert_equal host_override.value, result[:override_value]
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host2)
+            result = results.find { |entry| entry[:variable_id] == @variable.id }
+
+            refute_nil result
+            assert_equal other_host_override.match, result[:override_matcher]
+            assert_equal other_host_override.value, result[:override_value]
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host3)
+            result = results.find { |entry| entry[:variable_id] == @variable.id }
+
+            refute_nil result
+            assert_equal hostgroup_override.match, result[:override_matcher]
+            assert_equal hostgroup_override.value, result[:override_value]
+
+            refute_equal other_hostgroup_override.match, result[:override_matcher]
+          end
+
+          test 'returns host resolved inherited overrides for host target' do
+            nested_hostgroup = FactoryBot.create(
+              :hostgroup,
+              organizations: [@organization],
+              ansible_lifecycle_environment: @lifecycle_environment,
+              parent: @hostgroup
+            )
+            @host.hostgroup = nested_hostgroup
+
+            as_admin do
+              @variable = FactoryBot.create(
+                :ansible_variable, :for_collection_role,
+                ownable: @collection_role,
+                override: true,
+                path: 'hostgroup'
+              )
+            end
+
+            override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "hostgroup=#{nested_hostgroup.to_label}",
+              value: 'hostgroup value',
+              host_or_hostgroup: nested_hostgroup
+            )
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
+
+            assert_equal 1, results.length
+            assert_equal override.match, results[0][:override_matcher]
+            assert_equal override.value, results[0][:override_value]
+          end
+
+          test 'returns overrides for hostgroup target' do
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @hostgroup,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+
+            as_admin do
+              @variable = FactoryBot.create(
+                :ansible_variable, :for_collection_role,
+                ownable: @collection_role,
+                override: true,
+                path: 'hostgroup'
+              )
+            end
+
+            override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "hostgroup=#{@hostgroup.to_label}",
+              value: 'hostgroup value'
+            )
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@hostgroup)
+
+            assert_equal 1, results.length
+            assert_equal override.match, results[0][:override_matcher]
+            assert_equal override.value, results[0][:override_value]
+          end
+
+          test 'returns overrides for nested hostgroup target' do
+            parent_hostgroup = FactoryBot.create(
+              :hostgroup,
+              organizations: [@organization],
+              ansible_lifecycle_environment: @lifecycle_environment
+            )
+            nested_hostgroup = FactoryBot.create(
+              :hostgroup,
+              organizations: [@organization],
+              ansible_lifecycle_environment: @lifecycle_environment,
+              parent: parent_hostgroup
+            )
+
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: nested_hostgroup,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+
+            as_admin do
+              @variable = FactoryBot.create(
+                :ansible_variable, :for_collection_role,
+                ownable: @collection_role,
+                override: true,
+                path: 'hostgroup'
+              )
+            end
+
+            override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "hostgroup=#{nested_hostgroup.to_label}",
+              value: 'nested hostgroup value'
+            )
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(nested_hostgroup)
+
+            assert_equal 1, results.length
+            assert_equal override.match, results[0][:override_matcher]
+            assert_equal override.value, results[0][:override_value]
+          end
+
+          test 'returns overrides for standalone ansible role target' do
+            role = FactoryBot.create(:ansible_role, organization: @organization)
+            role_version = FactoryBot.create(:content_unit_version, :for_role, versionable: role)
+            FactoryBot.create(
+              :lifecycle_environment_content_unit_version,
+              lifecycle_environment: @lifecycle_environment,
+              content_unit_version: role_version
+            )
+            FactoryBot.create(
+              :ansible_content_assignment,
+              :for_role,
+              consumable: @host,
+              assignable_namespace: role.namespace,
+              assignable_name: role.name
+            )
+
+            as_admin do
+              @variable = FactoryBot.create(
+                :ansible_variable, :for_ansible_role,
+                ownable: role,
+                override: true,
+                path: 'fqdn'
+              )
+            end
+
+            override = FactoryBot.create(
+              :lookup_value,
+              lookup_key: @variable,
+              match: "fqdn=#{@host.fqdn}",
+              value: 'standalone role value'
+            )
+
+            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
+            result = results.find { |entry| entry[:variable_id] == @variable.id }
+
+            refute_nil result
+            assert_equal override.match, result[:override_matcher]
+            assert_equal override.value, result[:override_value]
           end
 
           test 'includes overridable variables when flag is true' do
 
             as_admin do
-              vars1 = FactoryBot.create_list(:ansible_variable, 2, :for_collection_role, ownable: @collection_role)
-              vars2 = FactoryBot.create_list(:ansible_variable, 2, :for_collection_role, :with_override, ownable: @collection_role)
-              @variables = [*vars1, *vars2]
+              variables_without_override_flag = FactoryBot.create_list(
+                :ansible_variable, 2, :for_collection_role, ownable: @collection_role
+              )
+              variables_with_override_flag = FactoryBot.create_list(
+                :ansible_variable, 2, :for_collection_role,
+                ownable: @collection_role,
+                override: true,
+                path: 'fqdn'
+              )
+              @variables = [*variables_without_override_flag, *variables_with_override_flag]
             end
 
             results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, include_overridable: true)

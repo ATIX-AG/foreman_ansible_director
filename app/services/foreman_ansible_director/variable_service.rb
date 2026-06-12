@@ -64,90 +64,76 @@ module ForemanAnsibleDirector
       end
 
       def get_overrides_for_target(target, include_overridable: false)
-        matcher_value = matcher(target)
+        case target
+        when Host::Managed
+          host = target
+        when Hostgroup
+          host = Host.new
+          host.hostgroup = target
+        else
+          raise NotImplementedError, "Unexpected class #{target.class}"
+        end
+
         _, resolved_assignments, = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
           target: target,
           resolve: true
         )
-        cuvs = resolved_assignments.pluck(:cuv)
-        return [] unless cuvs.length.positive?
-        ids = cuvs.pluck(:id)
-        sql = if include_overridable
-                <<-SQL
-            SELECT lookup_keys.id,
-                   lookup_keys.key,
-                   lookup_keys.key_type,
-                   lookup_keys.default_value,
-                   lookup_keys.override,
-                   lv.id,
-                   lv.match,
-                   lv.value
-            FROM lookup_keys
-            LEFT OUTER JOIN lookup_values lv ON lookup_keys.id = lv.lookup_key_id
-            WHERE (lv.match = '#{ActiveRecord::Base.sanitize_sql(matcher_value)}'
-                   OR lookup_keys.override = true)
-              AND lookup_keys.ownable_id IN (#{ids.join(',')})
-                SQL
+        return [] if resolved_assignments.blank?
 
-              else
-                <<-SQL
-            SELECT lookup_keys.id,
-                   lookup_keys.key,
-                   lookup_keys.key_type,
-                   lookup_keys.default_value,
-                   lookup_keys.override,
-                   lv.id,
-                   lv.match,
-                   lv.value
-            FROM lookup_keys
-            LEFT OUTER JOIN lookup_values lv ON lookup_keys.id = lv.lookup_key_id
-            WHERE lv.match = '#{ActiveRecord::Base.sanitize_sql(matcher_value)}'
-              AND lookup_keys.ownable_id IN (#{ids.join(',')})
-                SQL
+        variables = []
+        resolved_assignments.each do |content_assignment|
+          consumable = content_assignment[:cuv]
+          next unless consumable
 
-              end
-        assignment_overrides = ActiveRecord::Base.connection.select_all(sql)
-        assignment_overrides.rows.map do |row|
-          default_value = if row[3].nil?
-                            row[3]
-                          elsif row[2] != 'yaml'
-                            Foreman::Parameters::Caster.new(nil, value: YAML.safe_load(row[3]), to: row[2]).cast
-                          else
-                            Foreman::Parameters::Caster.new(nil, value: row[3], to: row[2]).cast
-                          end
+          variable_owner = variable_owner_for(consumable)
+          next unless variable_owner
 
-          override_value = if row[7].nil?
-                             row[7]
-                           elsif row[2] != 'yaml'
-                             Foreman::Parameters::Caster.new(nil, value: YAML.safe_load(row[7]),
-to: row[2]).cast
-                           else
-                             Foreman::Parameters::Caster.new(nil, value: row[7], to: row[2]).cast
-                           end
-          {
-            variable_id: row[0],
-            key: row[1],
-            key_type: row[2],
-            default_value: default_value,
-            overridable: row[4],
-            override_id: row[5],
-            override_matcher: row[6],
-            override_value: override_value,
-          }
+          overridables = ::ForemanAnsibleDirector::AnsibleVariable.where(
+            ownable_type: variable_owner.class.name,
+            ownable_id: variable_owner.id
+          ).overridables
+          overrides = overridables.values_hash(host).raw
+
+          overridables.each do |variable|
+            resolved_override = overrides.dig(variable.id, variable.key)
+            next if resolved_override.nil? && !include_overridable
+
+            override_matcher = matcher_for(resolved_override)
+
+            variables << {
+              variable_id: variable.id,
+              key: variable.key,
+              key_type: variable.key_type,
+              default_value: variable.default_value,
+              overridable: variable.overridable?,
+              override_id: LookupValue.find_by(match: override_matcher, lookup_key_id: variable.id)&.id,
+              override_matcher: override_matcher,
+              override_value: resolved_override&.dig(:value),
+            }
+          end
         end
+
+        variables
       end
 
       private
 
-      def matcher(target)
-        case target
-        when Host::Managed
-          "fqdn=#{target.fqdn}"
-        when Hostgroup
-          "hostgroup=#{target.name}"
+      def variable_owner_for(consumable)
+        if consumable.is_a?(::ForemanAnsibleDirector::ContentUnitVersion)
+          consumable.versionable
         else
-          raise NotImplementedError, "Unexpected class #{target.class}"
+          consumable
         end
+      end
+
+      def matcher_for(resolved_override)
+        return if resolved_override.blank?
+
+        element = resolved_override[:element]
+        element_name = resolved_override[:element_name]
+        return if element.blank? || element_name.blank?
+
+        "#{element}=#{element_name}"
       end
     end
   end
