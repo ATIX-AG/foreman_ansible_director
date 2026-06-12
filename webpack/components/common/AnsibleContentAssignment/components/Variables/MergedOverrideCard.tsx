@@ -112,7 +112,10 @@ export const MergedOverrideCard = ({
 
   const onAction = async (): Promise<void> => {
     if (isEditMode) {
-      if (mergedOverride.override_id !== null) {
+      if (
+        mergedOverride.override_id !== null &&
+        mergedOverride.override_matcher === `${matcherType}=${matcherName}`
+      ) {
         // The override actually exists
 
         try {
