@@ -40,7 +40,6 @@ module ForemanAnsibleDirector
                 'name' => @name,
                 'version' => version,
                 'source' => @source,
-                'type' => @type,
               }.compact
             end }
           )
@@ -59,7 +58,8 @@ module ForemanAnsibleDirector
 
       def role_url
         return unless @unit_type == :role
-        "#{source}api/v1/roles/?namespace=#{unit_namespace}&name=#{unit_name}" # TODO: version restriction
+        source_with_slash = source.end_with?('/') ? source : "#{source}/"
+        "#{source_with_slash}api/v1/roles/?namespace=#{unit_namespace}&name=#{unit_name}"
       end
 
       def to_hash
