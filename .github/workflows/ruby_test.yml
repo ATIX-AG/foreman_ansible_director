@@ -21,7 +21,7 @@ jobs:
   rubocop:
     name: Rubocop
     if: github.event.pull_request.draft == false
-    uses: theforeman/actions/.github/workflows/rubocop.yml@v0
+    uses: theforeman/actions/.github/workflows/rubocop.yml@v1
     with:
       command: bundle exec rubocop --parallel --format github
       ruby: 3.0
