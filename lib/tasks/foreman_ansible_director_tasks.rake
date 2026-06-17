@@ -13,6 +13,17 @@ namespace :test do
     t.verbose = true
     t.warning = false
   end
+
+  namespace :foreman_ansible_director do
+    # Subtask for execution of the Foreman(!) AccessPermissionsTest
+    desc 'AccessPermissionsTest'
+    Rake::TestTask.new(:access_permissions_test) do |t|
+      t.libs << 'test'
+      t.test_files = [Rails.root.join('test/unit/foreman/access_permissions_test.rb')]
+      t.verbose = true
+      t.warning = false
+    end
+  end
 end
 
 Rake::Task[:test].enhance ['test:foreman_ansible_director']
