@@ -125,7 +125,7 @@ export const OverrideCard = ({
           component="span"
           onClick={() => {
             window.open(
-              `${matcherUrls[override.matcher]}?search=name++%3D++${
+              `${matcherUrls[override.matcher]}?search=title++%3D++${
                 override.matcher_value
               }`
             );
