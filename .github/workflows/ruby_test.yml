@@ -30,7 +30,7 @@ jobs:
     name: Ruby
     if: github.event.pull_request.draft == false
     needs: rubocop
-    uses: theforeman/actions/.github/workflows/foreman_plugin.yml@v0
+    uses: theforeman/actions/.github/workflows/foreman_plugin.yml@v1
     with:
       plugin: foreman_ansible_director
       foreman_repository: "theforeman/foreman"
