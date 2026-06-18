@@ -193,6 +193,8 @@ export const MatcherSelector = ({
           !isOpen && closeMenu();
         }}
         toggle={toggle}
+        isScrollable
+        maxMenuHeight="25vh"
       >
         <SelectList id="select-typeahead-listbox">
           {selectOptions.map((option, index) => (
