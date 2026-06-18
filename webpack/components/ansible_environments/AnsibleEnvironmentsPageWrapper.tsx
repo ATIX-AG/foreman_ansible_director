@@ -1,5 +1,5 @@
 import React from 'react';
-import Permitted from 'foremanReact/components/Permitted';
+import { Permitted } from '../common/Permitted';
 
 import AnsibleEnvironmentsPage from './AnsibleEnvironmentsPage';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';

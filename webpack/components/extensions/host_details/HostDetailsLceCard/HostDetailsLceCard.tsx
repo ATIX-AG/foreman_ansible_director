@@ -18,7 +18,6 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
 
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
-import Permitted from 'foremanReact/components/Permitted';
 import { translate as _ } from 'foremanReact/common/I18n';
 import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 
@@ -30,6 +29,7 @@ import {
 } from '../../../../types/AnsibleEnvironmentsTypes';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 import { AnsibleContentSource } from '../../../../types/AnsibleContentTypes';
+import { Permitted } from '../../../common/Permitted';
 
 interface HostDetailsLceCardProps {
   status: 'RESOLVED' | 'PENDING' | 'ERROR';

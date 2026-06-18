@@ -22,6 +22,8 @@ declare module 'foremanReact/Root/Context/ForemanContext' {
 
   export declare const useForemanLocation: () => Location | undefined;
 
+  export const useForemanPermissions: () => Set<string>;
+
   // export declare const useForemanUser: () => any;
 
   // export declare const getHostsPageUrl: (displayNewHostsPage: boolean) => string;

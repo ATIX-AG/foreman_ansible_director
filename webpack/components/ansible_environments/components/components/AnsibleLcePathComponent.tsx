@@ -27,7 +27,6 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { addToast } from 'foremanReact/components/ToastsList';
 
-import Permitted from 'foremanReact/components/Permitted';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import {
@@ -40,6 +39,7 @@ import { AnsibleLcePathEmptyState } from './AnsibleLcePathEmptyState';
 import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 import { PermittedButton } from '../../../common/PermittedButton';
+import { Permitted } from '../../../common/Permitted';
 
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;

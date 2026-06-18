@@ -32,7 +32,6 @@ import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-ico
 import axios, { AxiosResponse } from 'axios';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { addToast } from 'foremanReact/components/ToastsList';
-import Permitted from 'foremanReact/components/Permitted';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
@@ -41,6 +40,7 @@ import { AnsibleRole } from '../../../../types/AnsibleContentTypes';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 import { PermittedButton } from '../../../common/PermittedButton';
+import { Permitted } from '../../../common/Permitted';
 
 interface AnsibleVariablesSelectorProps {
   ansibleRoles: AnsibleRole[];
