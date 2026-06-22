@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout foreman_ansible_director
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: ${{ github.workspace }}/foreman_ansible_director
 
@@ -41,7 +41,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
 
       - name: Checkout foreman
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: theforeman/foreman
           path: ${{ github.workspace }}/foreman
