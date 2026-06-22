@@ -17,3 +17,5 @@ export const ANSIBLE_VERSIONS: FormSelectOptionProps[] = [
   { label: 'v11.4.0', value: 'v11.4.0' },
   { label: 'v11.5.0', value: 'v11.5.0' },
 ];
+
+export const DEBOUNCE_DELAY_MS = 600;

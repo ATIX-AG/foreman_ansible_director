@@ -39,6 +39,17 @@ export interface Location {
   title: string;
 }
 
+export interface HostGroup {
+  id: string;
+  name: string;
+  title: string;
+}
+
+export interface Host {
+  id: string;
+  name: string;
+}
+
 export interface Taxon extends Organization, Location {}
 
 export interface Task extends Identifiable {

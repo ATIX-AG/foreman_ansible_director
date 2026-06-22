@@ -21,10 +21,8 @@ import {
   MenuToggleElement,
   MenuToggle,
   Dropdown,
-  SelectOptionProps,
 } from '@patternfly/react-core';
 import OutlinedQuestionCircleIcon from '@patternfly/react-icons/dist/esm/icons/outlined-question-circle-icon';
-import { IndexResponse, useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import {
@@ -59,13 +57,6 @@ interface OverrideManagementModalProps {
   overrideMatcherValue: string;
 }
 
-interface HostGroupsResponse extends IndexResponse {
-  results: { id: string; name: string; title: string }[];
-}
-interface HostsResponse extends IndexResponse {
-  results: { id: string; name: string }[];
-}
-
 const matcherNames: Record<AnsibleVariableOverride['matcher'], string> = {
   fqdn: 'FQDN',
   hostgroup: 'Hostgroup',
@@ -75,16 +66,6 @@ const matcherTypes: AnsibleVariableOverride['matcher'][] = [
   'fqdn',
   'hostgroup',
 ];
-
-const urlMap: Record<AnsibleVariableOverride['matcher'], string> = {
-  fqdn: '/api/v2/hosts',
-  hostgroup: '/api/v2/hostgroups',
-};
-
-type ApiResponseMap = {
-  fqdn: HostsResponse;
-  hostgroup: HostGroupsResponse;
-};
 
 export const OverrideManagementModal = ({
   variable,
@@ -106,11 +87,6 @@ export const OverrideManagementModal = ({
   const [isSimpleMatcherCreation, setIsSimpleMatcherCreation] = React.useState<
     boolean
   >(true);
-
-  const matcherRequest = useAPI<ApiResponseMap[typeof overrideMatcher]>( // TODO: Ideally, this request should not fire if isSimpleMatcherCreation is false
-    'get',
-    urlMap[overrideMatcher]
-  );
 
   useEffect(() => {
     setOverrideMatcher(override.matcher);
@@ -168,29 +144,6 @@ export const OverrideManagementModal = ({
         );
       default:
         return null;
-    }
-  };
-
-  if (matcherRequest.status === 'ERROR') {
-    // TODO: Handle request error
-  }
-
-  const matcherOptions = (
-    apiResponse: ApiResponseMap[typeof overrideMatcher]
-  ): SelectOptionProps[] => {
-    switch (overrideMatcher) {
-      case 'fqdn':
-        return (apiResponse as HostsResponse).results.map(matcher => ({
-          value: matcher.name,
-          children: matcher.name,
-        }));
-      case 'hostgroup':
-        return (apiResponse as HostGroupsResponse).results.map(matcher => ({
-          value: matcher.title,
-          children: matcher.title,
-        }));
-      default:
-        return [];
     }
   };
 
@@ -307,13 +260,13 @@ export const OverrideManagementModal = ({
                 </FormSelect>
               </FormGroup>
               <FormGroup label={_('Matcher value')}>
-                {matcherRequest.status === 'RESOLVED' && (
-                  <MatcherSelector
-                    matcherOptions={matcherOptions(matcherRequest.response)}
-                    matcherValue={overrideMatcherValue}
-                    setMatcherValue={setOverrideMatcherValue}
-                  />
-                )}
+                <MatcherSelector
+                  matcherValue={overrideMatcherValue}
+                  onMatcherSelect={matcherValue => {
+                    setOverrideMatcherValue(matcherValue);
+                  }}
+                  overrideMatcherType={overrideMatcher}
+                />
               </FormGroup>
             </>
           ) : (
