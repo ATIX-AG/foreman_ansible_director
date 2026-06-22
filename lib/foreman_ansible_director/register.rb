@@ -250,6 +250,12 @@ Foreman::Plugin.register :foreman_ansible_director do
                             By default, Foreman updates the UI based on the state of running tasks every 5 seconds.',
         default: 5,
         full_name: 'UI - Refresh interval for running tasks'
+      setting 'ansible_director_ui_search_cache_size',
+        type: :integer,
+        description: 'Certain search bars use a prefetched cache to reduce the time needed to perform a search.
+                            This setting dictates the number of items prefetched into this cache.',
+        default: 100,
+        full_name: 'UI - Search cache size'
     end
   end
 
@@ -258,6 +264,7 @@ Foreman::Plugin.register :foreman_ansible_director do
       ansible_director_default_galaxy_url: Setting[:ansible_director_default_galaxy_url],
       ansible_director_default_ansible_core_version: Setting[:ansible_director_default_ansible_core_version],
       ansible_director_ui_refresh_interval: Setting[:ansible_director_ui_refresh_interval],
+      ansible_director_ui_search_cache_size: Setting[:ansible_director_ui_search_cache_size],
     },
   })
 

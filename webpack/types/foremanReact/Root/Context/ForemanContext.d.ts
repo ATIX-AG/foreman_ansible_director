@@ -14,6 +14,8 @@ declare module 'foremanReact/Root/Context/ForemanContext' {
       ansible_director_default_ansible_core_version: string;
       // eslint-disable-next-line camelcase
       ansible_director_ui_refresh_interval: number;
+      // eslint-disable-next-line camelcase
+      ansible_director_ui_search_cache_size: number;
     };
   }
 

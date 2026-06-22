@@ -7,73 +7,89 @@ import {
   SelectList,
   SelectOption,
   SelectOptionProps,
+  Spinner,
   TextInputGroup,
   TextInputGroupMain,
   TextInputGroupUtilities,
 } from '@patternfly/react-core';
 import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+import { AnsibleVariableOverride } from '../../../../../types/AnsibleVariableTypes';
+import { useHybridSearch } from '../../../../../helpers/hooks/useHybridSearch';
+import { Host, HostGroup } from '../../../../../types/common';
 
 interface MatcherSelectorProps {
-  matcherOptions: SelectOptionProps[];
   matcherValue: string; // Because lookup_keys validate existence of a matcher value, this should never make trouble
-  setMatcherValue: (matcherValue: string) => void;
+  onMatcherSelect: (matcherValue: string) => void;
+  overrideMatcherType: 'fqdn' | 'hostgroup';
 }
 
+const urlMap: Record<AnsibleVariableOverride['matcher'], string> = {
+  fqdn: '/api/v2/hosts',
+  hostgroup: '/api/v2/hostgroups',
+};
+
+type ApiResponseMap = {
+  fqdn: Host;
+  hostgroup: HostGroup;
+};
+
 export const MatcherSelector = ({
-  matcherOptions,
   matcherValue,
-  setMatcherValue,
-}: MatcherSelectorProps): ReactElement => {
+  onMatcherSelect,
+  overrideMatcherType,
+}: MatcherSelectorProps): ReactElement | null => {
   const [
     isMatcherValueSelectOpen,
     setIsMatcherValueSelectOpen,
   ] = React.useState(false);
   const [inputValue, setInputValue] = React.useState<string>('');
-  const [filterValue, setFilterValue] = React.useState<string>('');
 
-  const [selectOptions, setSelectOptions] = React.useState<SelectOptionProps[]>(
-    matcherOptions
-  );
   const [focusedItemIndex, setFocusedItemIndex] = React.useState<number | null>(
     null
   );
   const [activeItemId, setActiveItemId] = React.useState<string | null>(null);
 
-  const textInputRef = React.useRef<HTMLInputElement>(null);
-
-  const NO_RESULTS = 'no results';
-
   useEffect(() => {
     setInputValue(matcherValue);
   }, [matcherValue]);
 
-  React.useEffect(() => {
-    let newSelectOptions: SelectOptionProps[] = matcherOptions;
-
-    if (filterValue) {
-      newSelectOptions = matcherOptions.filter(menuItem =>
-        String(menuItem.children)
-          .toLowerCase()
-          .includes(filterValue.toLowerCase())
-      );
-
-      if (!newSelectOptions.length) {
-        newSelectOptions = [
-          {
-            isAriaDisabled: true,
-            children: `No results found for "${filterValue}"`,
-            value: NO_RESULTS,
-          },
-        ];
+  const matcherRequest = useHybridSearch<
+    ApiResponseMap[typeof overrideMatcherType],
+    SelectOptionProps
+  >({
+    url: urlMap[overrideMatcherType],
+    localSearchFn: (items, term) => {
+      switch (overrideMatcherType) {
+        case 'fqdn':
+          return (items as Host[]).filter(i => i.name.includes(term));
+        case 'hostgroup':
+          return (items as HostGroup[]).filter(i => i.title.includes(term));
+        default:
+          return [];
       }
-
-      if (!isMatcherValueSelectOpen) {
-        setIsMatcherValueSelectOpen(true);
+    },
+    transformationFn: items => {
+      switch (overrideMatcherType) {
+        case 'fqdn':
+          return (items as Host[]).map(matcher => ({
+            value: matcher.name,
+            children: matcher.name,
+          }));
+        case 'hostgroup':
+          return (items as HostGroup[]).map(matcher => ({
+            value: matcher.title,
+            children: matcher.title,
+          }));
+        default:
+          return [];
       }
-    }
+    },
+    debounce: true,
+    search: inputValue,
+  });
 
-    setSelectOptions(newSelectOptions);
-  }, [filterValue, isMatcherValueSelectOpen, matcherOptions]);
+  const textInputRef = React.useRef<HTMLInputElement>(null);
 
   const closeMenu = (): void => {
     setIsMatcherValueSelectOpen(false);
@@ -89,13 +105,9 @@ export const MatcherSelector = ({
     }
   };
 
-  const selectOption = (
-    value: string | number,
-    content: string | number
-  ): void => {
-    setInputValue(String(content));
-    setFilterValue('');
-    setMatcherValue(String(value));
+  const selectOption = (value: string): void => {
+    setInputValue(value);
+    onMatcherSelect(String(value));
     closeMenu();
   };
 
@@ -103,26 +115,7 @@ export const MatcherSelector = ({
     _event: React.MouseEvent<Element, MouseEvent> | undefined,
     value: string | number | undefined
   ): void => {
-    if (value && value !== NO_RESULTS) {
-      const optionText = selectOptions.find(option => option.value === value)
-        ?.children;
-      selectOption(value, optionText as string);
-    }
-  };
-
-  const onTextInputChange = (
-    _event: React.FormEvent<HTMLInputElement>,
-    value: string
-  ): void => {
-    setInputValue(value);
-    setFilterValue(value);
-
-    setFocusedItemIndex(null);
-    setActiveItemId(null);
-
-    if (value !== matcherValue) {
-      setMatcherValue('');
-    }
+    value && selectOption(value as string);
   };
 
   const onToggleClick = (): void => {
@@ -133,9 +126,8 @@ export const MatcherSelector = ({
   };
 
   const onClearButtonClick = (): void => {
-    setMatcherValue('');
+    onMatcherSelect('');
     setInputValue('');
-    setFilterValue('');
     setFocusedItemIndex(null);
     setActiveItemId(null);
     if (textInputRef?.current) {
@@ -147,20 +139,40 @@ export const MatcherSelector = ({
     <MenuToggle
       ref={toggleRef}
       variant="typeahead"
-      aria-label="Typeahead menu toggle"
+      aria-label={_('Typeahead matcher select toggle')}
       onClick={onToggleClick}
       isExpanded={isMatcherValueSelectOpen}
       isFullWidth
+      isDisabled={matcherRequest.status === 'PENDING'}
+      badge={
+        matcherRequest.status === 'PENDING' && (
+          <Spinner
+            style={{ margin: 'auto' }}
+            isInline
+            size="md"
+            aria-label={_('API loading')}
+          />
+        )
+      }
     >
-      <TextInputGroup isPlain>
+      <TextInputGroup
+        isPlain
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            matcherRequest.triggerApiSearch();
+          }
+        }}
+      >
         <TextInputGroupMain
           value={inputValue}
           onClick={onInputClick}
-          onChange={onTextInputChange}
+          onChange={(_event, v) => {
+            setInputValue(v);
+          }}
           id="typeahead-select-input"
           autoComplete="off"
           innerRef={textInputRef}
-          placeholder="Select a matcher value"
+          placeholder={_('Select a matcher value')}
           {...(activeItemId && { 'aria-activedescendant': activeItemId })}
           role="combobox"
           isExpanded={isMatcherValueSelectOpen}
@@ -173,7 +185,7 @@ export const MatcherSelector = ({
           <Button
             variant="plain"
             onClick={onClearButtonClick}
-            aria-label="Clear input value"
+            aria-label={_('Clear input value')}
           >
             <TimesIcon aria-hidden />
           </Button>
@@ -182,33 +194,64 @@ export const MatcherSelector = ({
     </MenuToggle>
   );
 
-  return (
-    <>
-      <Select
-        id="typeahead-select"
-        isOpen={isMatcherValueSelectOpen}
-        selected={matcherValue}
-        onSelect={onSelect}
-        onOpenChange={isOpen => {
-          !isOpen && closeMenu();
-        }}
-        toggle={toggle}
-        isScrollable
-        maxMenuHeight="25vh"
-      >
-        <SelectList id="select-typeahead-listbox">
-          {selectOptions.map((option, index) => (
-            <SelectOption
-              key={option.value || option.children}
-              isFocused={focusedItemIndex === index}
-              className={option.className}
-              id={`select-typeahead-${option.value}`}
-              {...option}
-              ref={null}
-            />
-          ))}
-        </SelectList>
-      </Select>
-    </>
-  );
+  if (matcherRequest.status === 'ERROR') {
+    // TOOD: Handle error
+  } else if (
+    matcherRequest.status === 'RESOLVED' ||
+    matcherRequest.status === 'PENDING'
+  ) {
+    let renderOptions = [...matcherRequest.options];
+
+    if (matcherRequest.options.length === 0) {
+      renderOptions = [
+        {
+          isAriaDisabled: true,
+          children: __('No results found for "%(inputValue)s"', { inputValue }),
+          value: 'no_results',
+        },
+      ];
+    } else if (matcherRequest.overflow) {
+      renderOptions.push({
+        isAriaDisabled: true,
+        children: __(
+          '%(overflowCount)s results are hidden due to the search cache size limit (%(effectiveCacheSize)s). Increase this limit in the settings or refine your search.',
+          {
+            overflowCount: matcherRequest.overflowCount,
+            effectiveCacheSize: matcherRequest.effectiveCacheSize,
+          }
+        ),
+        value: 'overflow',
+      });
+    }
+
+    return (
+      <>
+        <Select
+          id="typeahead-select"
+          isOpen={isMatcherValueSelectOpen}
+          selected={matcherValue}
+          onSelect={onSelect}
+          onOpenChange={isOpen => {
+            !isOpen && closeMenu();
+          }}
+          toggle={toggle}
+          isScrollable
+          maxMenuHeight="25vh"
+        >
+          <SelectList id="select-typeahead-listbox">
+            {renderOptions.map((option, index) => (
+              <SelectOption
+                key={option.value || option.children}
+                isFocused={focusedItemIndex === index}
+                className={option.className}
+                id={`select-typeahead-${option.value}`}
+                {...option}
+              />
+            ))}
+          </SelectList>
+        </Select>
+      </>
+    );
+  }
+  return null;
 };
