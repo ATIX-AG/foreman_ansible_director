@@ -48,29 +48,29 @@ Foreman::Plugin.register :foreman_ansible_director do
       resource_type: 'ForemanAnsibleDirector::ContentUnit'
     ## Ansible Variables
     # View
-    permission :view_ansible_variables,
+    permission :view_ansible_director_variables,
       { 'foreman_ansible_director/api/v2/ansible_variables': %i[show index] },
       resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Edit
-    permission :edit_ansible_variables,
+    permission :edit_ansible_director_variables,
       { 'foreman_ansible_director/api/v2/ansible_variables': [:update] },
       resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Destroy
     ## Ansible Variable Overrides
     # View
-    permission :view_ansible_variable_overrides,
+    permission :view_ansible_director_variable_overrides,
       { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:index_for_target] },
       resource_type: 'LookupValue'
     # Create
-    permission :create_ansible_variable_overrides,
+    permission :create_ansible_director_variable_overrides,
       { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:create] },
       resource_type: 'LookupValue'
     # Edit
-    permission :edit_ansible_variable_overrides,
+    permission :edit_ansible_director_variable_overrides,
       { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:update] },
       resource_type: 'LookupValue'
     # Destroy
-    permission :destroy_ansible_variable_overrides,
+    permission :destroy_ansible_director_variable_overrides,
       { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:destroy] },
       resource_type: 'LookupValue'
     # Ansible lifecycle environments
@@ -145,8 +145,8 @@ Foreman::Plugin.register :foreman_ansible_director do
 
     role 'AnsibleDirector Viewer', %i[
       view_ansible_content
-      view_ansible_variables
-      view_ansible_variable_overrides
+      view_ansible_director_variables
+      view_ansible_director_variable_overrides
       view_ansible_lifecycle_environments
       view_ansible_lifecycle_environment_paths
       view_ansible_execution_environments
@@ -157,11 +157,11 @@ Foreman::Plugin.register :foreman_ansible_director do
       view_ansible_content
       create_ansible_content
       destroy_ansible_content
-      view_ansible_variables
-      edit_ansible_variables
-      view_ansible_variable_overrides
-      create_ansible_variable_overrides
-      destroy_ansible_variable_overrides
+      view_ansible_director_variables
+      edit_ansible_director_variables
+      view_ansible_director_variable_overrides
+      create_ansible_director_variable_overrides
+      destroy_ansible_director_variable_overrides
       view_ansible_lifecycle_environments
       create_ansible_lifecycle_environments
       edit_ansible_lifecycle_environments

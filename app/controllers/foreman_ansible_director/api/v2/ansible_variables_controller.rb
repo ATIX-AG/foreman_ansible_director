@@ -78,6 +78,10 @@ module ForemanAnsibleDirector
         def resource_class
           ::ForemanAnsibleDirector::AnsibleVariable
         end
+
+        def controller_permission
+          'ansible_director_variables'
+        end
       end
     end
   end

@@ -193,6 +193,10 @@ module ForemanAnsibleDirector
             }
           )
         end
+
+        def controller_permission
+          'ansible_director_variable_overrides'
+        end
       end
     end
   end
