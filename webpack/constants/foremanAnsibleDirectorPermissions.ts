@@ -5,14 +5,14 @@ export const AdPermissions = {
     destroy: 'destroy_ansible_content',
   },
   ansibleVariables: {
-    view: 'view_ansible_variables',
-    edit: 'edit_ansible_variables',
+    view: 'view_ansible_director_variables',
+    edit: 'edit_ansible_director_variables',
   },
   ansibleVariableOverrides: {
-    view: 'view_ansible_variable_overrides',
-    create: 'create_ansible_variable_overrides',
-    edit: 'edit_ansible_variable_overrides',
-    destroy: 'destroy_ansible_variable_overrides',
+    view: 'view_ansible_director_variable_overrides',
+    create: 'create_ansible_director_variable_overrides',
+    edit: 'edit_ansible_director_variable_overrides',
+    destroy: 'destroy_ansible_director_variable_overrides',
   },
   ansibleLce: {
     view: 'view_ansible_lifecycle_environments',
