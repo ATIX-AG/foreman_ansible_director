@@ -3,7 +3,7 @@
 module ForemanAnsibleDirector
   module Constants
     PLUGIN_NAME = 'foreman_ansible_director'
-    PLUGIN_VERSION = '0.5.0'
+    PLUGIN_VERSION = '0.6.0'
 
     DEFAULT_GALAXY_URL = 'https://galaxy.ansible.com/'
     DEFAULT_ANSIBLE_VERSION = '2.19.3'
