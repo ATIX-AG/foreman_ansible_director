@@ -3,7 +3,6 @@ import React, { ReactElement } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 
-import Permitted from 'foremanReact/components/Permitted';
 import { addToast } from 'foremanReact/components/ToastsList';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
@@ -51,6 +50,7 @@ import { assignmentFqrn, crnTypeMatcherMap } from './helpers';
 import { AssignmentSelectorWrapper } from './components/AssignmentSelectorWrapper';
 import { ResolutionWarning } from '../../../types/issues/warnings';
 import { OverrideGridWrapper } from './components/Variables/OverrideGridWrapper';
+import { Permitted } from '../Permitted';
 
 interface AnsibleContentAssignmentCompProps {
   crnId: number;
