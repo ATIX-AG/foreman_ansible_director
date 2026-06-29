@@ -138,14 +138,14 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
               onChange={handleUnitSourceChange}
               id="cu-source-input-01"
               type="text"
-              aria-label="content unit source input"
+              aria-label={_('content unit source input')}
               validated={contentUnitSourceValidation}
             />
           </InputGroupItem>
           <InputGroupItem>
             <Button
               variant="control"
-              aria-label="popover for input"
+              aria-label={_('popover for input')}
               onClick={
                 () => {
                   setContentUnitSource(defaultGalaxy);

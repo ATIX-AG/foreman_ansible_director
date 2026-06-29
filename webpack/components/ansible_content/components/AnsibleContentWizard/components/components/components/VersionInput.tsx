@@ -74,7 +74,7 @@ export const VersionInput: React.FC<VersionInputProps> = ({
         >
           <button
             type="button"
-            aria-label="More info for unit id field"
+            aria-label={_('More info for unit id field')}
             onClick={e => e.preventDefault()}
             aria-describedby="content-unit-identifier-field-01"
             className={styles.formGroupLabelHelp}
@@ -98,7 +98,7 @@ export const VersionInput: React.FC<VersionInputProps> = ({
             }
             id="cu-source-input-01"
             type="text"
-            aria-label="content unit source input"
+            aria-label={_('content unit source input')}
           />
         </InputGroupItem>
         <InputGroupItem>

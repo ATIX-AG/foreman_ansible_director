@@ -91,7 +91,7 @@ export const IdentifierInput = ({
         >
           <button
             type="button"
-            aria-label="More info for repo url field"
+            aria-label={_('More info for identifier field')}
             onClick={e => e.preventDefault()}
             aria-describedby="content-unit-identifier-field-01"
             className={styles.formGroupLabelHelp}

@@ -152,7 +152,7 @@ const AnsibleContentTableWrapper = ({
             <EmptyState variant={EmptyStateVariant.xl}>
               <EmptyStateHeader
                 headingLevel="h4"
-                titleText="No Ansible content in this organization"
+                titleText={_('No Ansible content in this organization')}
                 icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
               />
               <EmptyStateBody>

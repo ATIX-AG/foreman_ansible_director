@@ -5,6 +5,7 @@ import { addToast } from 'foremanReact/components/ToastsList';
 import { useDispatch } from 'react-redux';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
   Button,
@@ -84,7 +85,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
   return (
     <React.Fragment>
       <Modal
-        title="Execution environments"
+        title={_('Execution environments')}
         isOpen
         onClose={() => {
           setIsExecutionEnvModalOpen(false);
@@ -92,7 +93,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
         ouiaId="BasicModal"
         variant={ModalVariant.large}
       >
-        <DataList aria-label="single action data list example ">
+        <DataList aria-label={_('Execution environments list')}>
           {executionEnvironments.map(executionEnvironment => (
             <DataListItem aria-labelledby="single-action-item1">
               <DataListItemRow>
@@ -111,7 +112,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
                 <DataListAction
                   aria-labelledby="single-action-item1 single-action-action1"
                   id="single-action-action1"
-                  aria-label="Actions"
+                  aria-label={_('Actions')}
                 >
                   <Button
                     onClick={async () => {
@@ -124,7 +125,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
                     key="delete-action"
                     isLoading={isButtonSpinning}
                   >
-                    Assign
+                    {_('Assign')}
                   </Button>
                 </DataListAction>
               </DataListItemRow>

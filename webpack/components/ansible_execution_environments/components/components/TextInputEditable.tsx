@@ -1,5 +1,6 @@
 import React, { FormEvent } from 'react';
 import { TextInput } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface TextInputEditableProps {
   validated?: 'success' | 'warning' | 'error' | 'default';
@@ -20,6 +21,6 @@ export const TextInputEditable: React.FC<TextInputEditableProps> = ({
     value={value}
     type="text"
     onChange={setValue}
-    aria-label="text input example"
+    aria-label={_('Text input')}
   />
 );

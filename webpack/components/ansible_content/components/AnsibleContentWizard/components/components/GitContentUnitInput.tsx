@@ -183,7 +183,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
           >
             <button
               type="button"
-              aria-label="More info for repo url field"
+              aria-label={_('More info for repo url field')}
               onClick={e => e.preventDefault()}
               aria-describedby="content-unit-identifier-field-01"
               className={styles.formGroupLabelHelp}
@@ -207,7 +207,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
           {/*          <InputGroupItem>
             <Button
               variant="control"
-              aria-label="inspect repository"
+              aria-label={_('inspect repository')}
               onClick={() => {}}
             >
               {_('Inspect repository')}
@@ -238,7 +238,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
           >
             <button
               type="button"
-              aria-label="More info for git ref field"
+              aria-label={_('More info for git ref field')}
               onClick={e => e.preventDefault()}
               aria-describedby="git-ref-field-01"
               className={styles.formGroupLabelHelp}
@@ -266,7 +266,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
                 <TabTitleText>{_('Commit or manual input')}</TabTitleText>{' '}
               </>
             }
-            aria-label="filled tabs with icons content users"
+            aria-label={_('filled tabs with icons content users')}
           />
           {/*          <Tab
             eventKey={'branch' as refTabKeys}
@@ -297,7 +297,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
 
       <GitRefInput gitRefs={gitRefs} setGitRefs={setGitRefs} />
 
-      <ChipGroup categoryName="Only import: " numChips={10}>
+      <ChipGroup categoryName={_('Only import: ')} numChips={10}>
         {contentUnitVersions.map(unitVersion => (
           <Chip
             key={unitVersion}

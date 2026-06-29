@@ -16,6 +16,7 @@ import {
 } from '@patternfly/react-core';
 import TopologyIcon from '@patternfly/react-icons/dist/esm/icons/topology-icon';
 import CodeBranchIcon from '@patternfly/react-icons/dist/esm/icons/code-branch-icon';
+import { translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleContentUnitCreateType,
   isAnsibleGalaxyContentUnitCreate,
@@ -104,7 +105,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <DataListAction
                 aria-labelledby="single-action-item1 single-action-action1"
                 id="single-action-action1"
-                aria-label="Actions"
+                aria-label={_('Actions')}
               >
                 <Button
                   onClick={() => {
@@ -168,7 +169,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               <DataListAction
                 aria-labelledby="single-action-item1 single-action-action1"
                 id="single-action-action1"
-                aria-label="Actions"
+                aria-label={_('Actions')}
               >
                 <Button
                   onClick={() => {
@@ -190,7 +191,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
   return (
     <React.Fragment>
-      <DataList aria-label="single action data list example">
+      <DataList aria-label={_('single action data list example')}>
         {listItems()}
       </DataList>
     </React.Fragment>

@@ -260,7 +260,7 @@ export const OverridesTabContent = ({
       ) : (
         <EmptyState>
           <EmptyStateHeader
-            titleText="Variable does not have any overrides defined."
+            titleText={_('Variable does not have any overrides defined.')}
             headingLevel="h4"
             icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
           />

@@ -214,7 +214,7 @@ export const MergedOverrideCard = ({
       hasPopover
       popoverProps={{
         triggerAction: 'hover',
-        'aria-label': 'destroy popover',
+        'aria-label': _('Edit variable override popover'),
         headerComponent: 'h1',
         headerContent: _('Edit variable override'),
         bodyContent: (
@@ -230,7 +230,7 @@ export const MergedOverrideCard = ({
         ),
       }}
       variant="plain"
-      aria-label="Action"
+      aria-label={isEditMode ? _('Save override') : _('Edit override')}
       onClick={() => onAction()}
       isInline
       key={`${mergedOverride.variable_id}-${mergedOverride.override_id}`}

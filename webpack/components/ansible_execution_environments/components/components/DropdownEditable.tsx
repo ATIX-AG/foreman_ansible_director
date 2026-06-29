@@ -4,6 +4,7 @@ import {
   FormSelectOption,
   FormSelectOptionProps,
 } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 interface DropdownEditableProps {
   isEditable: boolean;
@@ -26,7 +27,7 @@ export const DropdownEditable = ({
       isDisabled={!isEditable}
       value={value}
       onChange={setValue}
-      aria-label="FormSelect Input"
+      aria-label={_('Select input')}
       ouiaId="BasicFormSelect"
       data-testid="dropdown-editable-select"
     >

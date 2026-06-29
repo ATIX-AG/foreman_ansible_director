@@ -157,12 +157,12 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
 
   return (
     <Tr>
-      <Td dataLabel="Identifier" treeRow={treeRow}>
+      <Td dataLabel={_('Identifier')} treeRow={treeRow}>
         {identifier}
       </Td>
-      <Td dataLabel="Type">{node.type}</Td>
-      <Td dataLabel="Namespace">{node.namespace}</Td>
-      <Td dataLabel="Name">{node.name}</Td>
+      <Td dataLabel={_('Type')}>{node.type}</Td>
+      <Td dataLabel={_('Namespace')}>{node.namespace}</Td>
+      <Td dataLabel={_('Name')}>{node.name}</Td>
       <Td isActionCell>
         <ActionsColumn items={rowActions} />
       </Td>

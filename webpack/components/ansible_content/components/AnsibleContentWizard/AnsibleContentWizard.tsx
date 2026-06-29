@@ -258,7 +258,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
                 setIsContentWizardOpen(false);
                 resetWizard();
               }}
-              closeButtonAriaLabel="Close wizard"
+              closeButtonAriaLabel={_('Close wizard')}
             />
           }
           onClose={() => {

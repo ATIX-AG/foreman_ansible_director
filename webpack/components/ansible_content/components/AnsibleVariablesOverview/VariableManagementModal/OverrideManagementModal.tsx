@@ -236,7 +236,7 @@ export const OverrideManagementModal = ({
                   }
                 />
                 <Popover
-                  aria-label="Basic popover"
+                  aria-label={_('Basic popover')}
                   headerContent={<div>Matcher creation type</div>}
                   bodyContent={
                     <div>
@@ -253,7 +253,7 @@ export const OverrideManagementModal = ({
                     </div>
                   }
                 >
-                  <Button variant="plain" aria-label="Action" isInline>
+                  <Button variant="plain" aria-label={_('Action')} isInline>
                     <OutlinedQuestionCircleIcon />
                   </Button>
                 </Popover>
@@ -295,7 +295,7 @@ export const OverrideManagementModal = ({
                   }}
                   id="horizontal-form-title"
                   name="horizontal-form-title"
-                  aria-label="Your title"
+                  aria-label={_('Your title')}
                 >
                   {matcherTypes.map((option, index) => (
                     <FormSelectOption

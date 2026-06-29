@@ -210,7 +210,9 @@ export const ContentAssignmentTable = ({
                         )}
                       </div>
                     ),
-                    ariaLabel: 'More information on fqrn',
+                    ariaLabel: _(
+                      'More information on fully qualified role name'
+                    ),
                     popoverProps: {
                       headerContent: _('Fully qualified role name.'),
                     },

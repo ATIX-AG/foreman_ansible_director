@@ -282,14 +282,14 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
         <DualListSelectorControl
           isDisabled={Object.keys(selectedVersions).length === 0}
           onClick={() => moveChecked(true)}
-          aria-label="Add selected"
+          aria-label={_('Add selected')}
         >
           <AngleRightIcon />
         </DualListSelectorControl>
         <DualListSelectorControl
           onClick={() => moveChecked(false)}
           isDisabled={Object.keys(selectedVersions).length === 0}
-          aria-label="Remove selected"
+          aria-label={_('Remove selected')}
         >
           <AngleLeftIcon />
         </DualListSelectorControl>
