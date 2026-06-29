@@ -174,7 +174,12 @@ export const OverrideManagementModal = ({
         ouiaId="BasicModal"
         variant={ModalVariant.large}
       >
-        <Form isHorizontal>
+        <Form
+          isHorizontal
+          onSubmit={event => {
+            event.preventDefault();
+          }}
+        >
           <Split hasGutter>
             <SplitItem>
               <FormGroup fieldId="override-name" isRequired>
