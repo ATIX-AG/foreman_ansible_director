@@ -260,12 +260,18 @@ Foreman::Plugin.register :foreman_ansible_director do
   end
 
   ::Foreman::Plugin.app_metadata_registry.register(:foreman_ansible_director, {
-    settings: {
-      ansible_director_default_galaxy_url: Setting[:ansible_director_default_galaxy_url],
-      ansible_director_default_ansible_core_version: Setting[:ansible_director_default_ansible_core_version],
-      ansible_director_ui_refresh_interval: Setting[:ansible_director_ui_refresh_interval],
-      ansible_director_ui_search_cache_size: Setting[:ansible_director_ui_search_cache_size],
-    },
+    settings: lambda {
+                {
+                  ansible_director_default_galaxy_url:
+                    Setting[:ansible_director_default_galaxy_url],
+                  ansible_director_default_ansible_core_version:
+                    Setting[:ansible_director_default_ansible_core_version],
+                  ansible_director_ui_refresh_interval:
+                    Setting[:ansible_director_ui_refresh_interval],
+                  ansible_director_ui_search_cache_size:
+                    Setting[:ansible_director_ui_search_cache_size],
+                }
+              },
   })
 
   register_global_js_file 'global'
