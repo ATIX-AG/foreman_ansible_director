@@ -12,8 +12,11 @@ module ForemanAnsibleDirector
         def plan(args)
           unit = args[:unit]
           organization_id = args[:organization_id]
-          existing_unit = ::ForemanAnsibleDirector::ContentUnit.find_by(namespace: unit.unit_namespace,
-            name: unit.unit_name)
+          existing_unit = content_unit_class(unit).find_by(
+            namespace: unit.unit_namespace,
+            name: unit.unit_name,
+            organization_id: organization_id
+          )
           op_type = operation_type! existing_unit, unit
 
           case op_type
@@ -46,6 +49,17 @@ module ForemanAnsibleDirector
         end
 
         private
+
+        def content_unit_class(unit)
+          case unit.unit_type
+          when :collection
+            ::ForemanAnsibleDirector::AnsibleCollection
+          when :role
+            ::ForemanAnsibleDirector::AnsibleRole
+          else
+            raise NotImplementedError
+          end
+        end
 
         # This function also mutates the versions array of unit to filter out existing units
         def operation_type!(existing_unit, unit)

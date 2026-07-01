@@ -13,7 +13,10 @@ module ForemanAnsibleDirector
             end
 
             def plan(args)
-              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by(id: args[:content_unit_id])
+              existing_unit = ::ForemanAnsibleDirector::AnsibleCollection.find_by!(
+                id: args[:content_unit_id],
+                organization_id: args[:organization_id]
+              )
               new_unit = args[:unit]
               organization_id = args[:organization_id]
 
