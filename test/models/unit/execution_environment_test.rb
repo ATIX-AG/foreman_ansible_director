@@ -29,6 +29,30 @@ module ForemanAnsibleDirectorTests
             assert_not ee.valid?
             assert_includes ee.errors[:name], 'is too long (maximum is 255 characters)'
           end
+
+          test 'must be unique within an organization' do
+            duplicate = described_class.new(
+              name: @execution_environment.name,
+              base_image_url: 'quay.io/ansible/another-ee:latest',
+              ansible_version: '2.20.0',
+              organization: @organization
+            )
+
+            assert_not duplicate.valid?
+            assert_includes duplicate.errors[:name], 'has already been taken'
+          end
+
+          test 'can be reused in another organization' do
+            other_organization = Organization.find_by(name: 'Organization 2')
+            duplicate = described_class.new(
+              name: @execution_environment.name,
+              base_image_url: 'quay.io/ansible/another-ee:latest',
+              ansible_version: '2.20.0',
+              organization: other_organization
+            )
+
+            assert duplicate.valid?
+          end
         end
 
         describe '#base_image_url' do
@@ -58,6 +82,19 @@ module ForemanAnsibleDirectorTests
             )
             assert_not ee.valid?
             assert_includes ee.errors[:ansible_version], 'Ansible Version cannot be blank.'
+          end
+        end
+
+        describe '#organization_id' do
+          test 'must not be empty' do
+            ee = described_class.create(
+              name: 'MyEE',
+              base_image_url: 'https://quay.io/fedora/fedora:42',
+              ansible_version: '2.20.0'
+            )
+
+            assert_not ee.valid?
+            assert_includes ee.errors[:organization_id], "can't be blank"
           end
         end
 
