@@ -5,10 +5,6 @@ module ForemanAnsibleDirector
     has_many :content_unit_versions, as: :versionable, dependent: :destroy
     has_many :ansible_collection_roles, through: :content_unit_versions
 
-    validates :name, presence: true
-    validates :namespace, presence: true
-    validates :namespace, uniqueness: { scope: :name }
-
     def requirements_file(simple_content_unit = nil, subtractive: false)
       units = []
       content_unit_versions.where(source_type: 'galaxy').find_each do |content_version|

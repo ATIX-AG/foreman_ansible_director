@@ -21,6 +21,9 @@ module ForemanAnsibleDirector
     has_many :content_unit_versions, as: :versionable, dependent: :destroy
 
     validates :name, presence: true
+    validates :namespace, presence: true,
+                          uniqueness: { scope: %i[name organization_id type] }
+    validates :organization_id, presence: true
     validates :type, presence: true
 
     def collection?
