@@ -9,11 +9,15 @@ module ForemanAnsibleDirector
     has_many :content_unit_versions, through: :execution_environment_content_units
     has_many :lifecycle_environments, dependent: :nullify
 
-    validates :name, presence: { message: 'Execution Environment name cannot be blank.' }, length: { maximum: 255 }
+    validates :name,
+      presence: { message: 'Execution Environment name cannot be blank.' },
+      length: { maximum: 255 },
+      uniqueness: { scope: :organization_id }
     validates :base_image_url, presence: { message: 'Execution Environment base image URL cannot be blank.' },
               length: { maximum: 255 }
 
     validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
+    validates :organization_id, presence: true
 
     scoped_search on: :name, complete_value: true
     scoped_search on: :base_image_url, complete_value: true
