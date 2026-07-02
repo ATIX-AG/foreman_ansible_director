@@ -1,5 +1,4 @@
 import React, { ReactElement } from 'react';
-import axios, { AxiosResponse } from 'axios';
 import {
   IndexResponse,
   PaginationProps,
@@ -10,10 +9,8 @@ import {
   useSetParamsAndApiAndSearch,
   useTableIndexAPIResponse,
 } from 'foremanReact/components/PF4/TableIndexPage/Table/TableIndexHooks';
-import { addToast } from 'foremanReact/components/ToastsList';
 import { translate as _ } from 'foremanReact/common/I18n';
 
-import { useDispatch } from 'react-redux';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
 import { ExecutionEnvGrid } from '../ExecutionEnvGrid';
 import {
@@ -21,6 +18,8 @@ import {
   AnsibleExecutionEnvCreate,
 } from '../../../types/AnsibleExecutionEnvTypes';
 import { ContentUnitModal } from './ContentUnitModal';
+import { ExecutionEnvironment } from '../../../resources/clients/ExecutionEnvironment';
+import { useToasts } from '../../../helpers/toasts/useToasts';
 
 export interface GetAnsibleExecutionEnvResponse extends IndexResponse {
   results: AnsibleExecutionEnv[];
@@ -42,7 +41,7 @@ const ExecutionEnvGridWrapper = ({
   >(false);
 
   const organization = useForemanOrganization();
-  const dispatch = useDispatch();
+  const { withToast } = useToasts();
 
   const executionEnvResponse = useTableIndexAPIResponse<
     GetAnsibleExecutionEnvResponse
@@ -74,41 +73,19 @@ const ExecutionEnvGridWrapper = ({
   const createEnvAction = async (
     env: AnsibleExecutionEnvCreate
   ): Promise<void> => {
-    try {
-      await axios.post(
-        foremanUrl('/api/v2/ansible_director/execution_environments/'),
-        {
-          execution_environment: {
-            name: env.name,
-            base_image_url: env.base_image_url,
-            ansible_version: env.ansible_version,
-            content: env.content,
-          },
-        }
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `CREATE_EE_${env.name}_SUCC`,
-          message: `Successfully created Ansible Execution Environment "${env.name}"!`,
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `CREATE_EE_${env.name}_ERR`,
-          message: `Creation of Ansible Execution Environment "${
-            env.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'create',
+      resource: 'execution_environment',
+      func: ExecutionEnvironment.create({
+        organization_id: organization.id,
+        execution_environment: {
+          name: env.name,
+          base_image_url: env.base_image_url,
+          ansible_version: env.ansible_version,
+        },
+      }),
+    });
+    refreshRequest();
   };
 
   if (executionEnvResponse.status === 'RESOLVED') {
