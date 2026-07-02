@@ -13,7 +13,7 @@ node(:warnings) do
 end
 
 node(:updated) do
-  @ctx.updated
+  @ctx.response_updated
 end
 
 node(:created) do

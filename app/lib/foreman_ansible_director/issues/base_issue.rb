@@ -14,13 +14,6 @@ module ForemanAnsibleDirector
         raise NotImplementedError
       end
 
-      def render_for_response
-        {
-          title: title,
-          message: message,
-        }
-      end
-
       def render_for_logs
         render_for_response
       end
