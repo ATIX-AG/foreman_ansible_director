@@ -3,12 +3,15 @@ import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions
 import AnsibleContentPage from './AnsibleContentPage';
 import { ForceTaxonomy } from '../common/ForceTaxonomy';
 import { Permitted } from '../common/Permitted';
+import { AlertModalProvider } from '../common/Alerts/AlertContext';
 
 const AnsibleContentPageWrapper: React.FC = () => (
   <Permitted requiredPermissions={[AdPermissions.ansibleContent.view]}>
-    <ForceTaxonomy organization>
-      <AnsibleContentPage />
-    </ForceTaxonomy>
+    <AlertModalProvider>
+      <ForceTaxonomy organization>
+        <AnsibleContentPage />
+      </ForceTaxonomy>
+    </AlertModalProvider>
   </Permitted>
 );
 
