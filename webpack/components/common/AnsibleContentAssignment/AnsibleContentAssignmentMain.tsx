@@ -4,6 +4,7 @@ import { ContentResolutionNodeType } from '../../../types/AnsibleContentAssignme
 import { AnsibleContentAssignmentWrapper } from './AnsibleContentAssignmentWrapper';
 import { AnsibleContentSource } from '../../../types/AnsibleContentTypes';
 import { AssignmentContextWrapper } from './AssignmentContext';
+import { AlertModalProvider } from '../Alerts/AlertContext';
 
 interface AnsibleContentAssignmentWrapperWrapperProps {
   dataInterface: 'api' | 'dom';
@@ -21,13 +22,15 @@ export const AnsibleContentAssignmentMain = ({
 }: AnsibleContentAssignmentWrapperWrapperProps): ReactElement => {
 
   return (
-    <AssignmentContextWrapper
-      dataInterface={dataInterface}
-      crnType={crnType}
-      crnName={crnName}
-      crnId={crnId}
-    >
-      <AnsibleContentAssignmentWrapper />
-    </AssignmentContextWrapper>
+    <AlertModalProvider>
+      <AssignmentContextWrapper
+        dataInterface={dataInterface}
+        crnType={crnType}
+        crnName={crnName}
+        crnId={crnId}
+      >
+        <AnsibleContentAssignmentWrapper />
+      </AssignmentContextWrapper>
+    </AlertModalProvider>
   );
 };
