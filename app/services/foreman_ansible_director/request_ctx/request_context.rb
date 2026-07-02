@@ -30,7 +30,6 @@ module ForemanAnsibleDirector
 
       def response_status
         return 'error' if @errors.any?
-        return 'warning' if @warnings.any?
         'success'
       end
 
@@ -44,31 +43,19 @@ module ForemanAnsibleDirector
 
       def response_created
         @created.group_by { |k| k.class.name.demodulize.underscore }.transform_values do |items|
-          items.map do |item|
-            {
-              id: item.id,
-            }
-          end
+          items.map(&:render_for_api)
         end
       end
 
       def response_updated
         @updated.group_by { |k| k.class.name.demodulize.underscore }.transform_values do |items|
-          items.map do |item|
-            {
-              id: item.id,
-            }
-          end
+          items.map(&:render_for_api)
         end
       end
 
       def response_deleted
         @deleted.group_by { |k| k.class.name.demodulize.underscore }.transform_values do |items|
-          items.map do |item|
-            {
-              id: item.id,
-            }
-          end
+          items.map(&:render_for_api)
         end
       end
 
