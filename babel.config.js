@@ -1,3 +1,7 @@
 module.exports = {
-  presets: ['@theforeman/builder/babel'],
+  presets: [
+    [require.resolve('@babel/preset-env'), { modules: 'commonjs' }],
+    require.resolve('@babel/preset-react'),
+  ],
+  plugins: []
 };
