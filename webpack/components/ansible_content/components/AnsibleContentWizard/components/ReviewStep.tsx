@@ -189,10 +189,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     });
 
   return (
-    <React.Fragment>
+    <>
       <DataList aria-label="single action data list example">
         {listItems()}
       </DataList>
-    </React.Fragment>
+    </>
   );
 };

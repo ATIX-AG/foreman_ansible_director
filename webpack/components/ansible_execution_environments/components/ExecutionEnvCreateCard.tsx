@@ -66,71 +66,73 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
     resetEditForm();
   };
 
-  return !createMode ? (
-    <Tooltip content={<div>{_('Create new Execution Environment')}</div>}>
-      <Card ouiaId="BasicCard" isClickable isRounded isLarge>
-        <CardHeader>
-          <div className="pf-v5-c-card__actions">
-            <div className="pf-v5-c-card__selectable-actions">
-              <div className="pf-v5-c-radio pf-m-standalone">
-                <input
-                  type="radio"
-                  id="card-select-mode"
-                  className="pf-v5-c-radio__input"
-                  onClick={e => {
-                    e.stopPropagation();
-                    setCreateMode(true);
-                  }}
-                  style={{
-                    position: 'absolute',
-                    clipPath: 'inset(100%)',
-                  }}
-                />
-                <label
-                  className="pf-v5-c-radio__label"
-                  onClick={e => {
-                    e.stopPropagation();
-                    setCreateMode(true);
-                  }}
-                />
+  return !createMode
+    ? (
+      <Tooltip content={<div>{_('Create new Execution Environment')}</div>}>
+        <Card ouiaId="BasicCard" isClickable isRounded isLarge>
+          <CardHeader>
+            <div className="pf-v5-c-card__actions">
+              <div className="pf-v5-c-card__selectable-actions">
+                <div className="pf-v5-c-radio pf-m-standalone">
+                  <input
+                    type="radio"
+                    id="card-select-mode"
+                    className="pf-v5-c-radio__input"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setCreateMode(true);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      clipPath: 'inset(100%)',
+                    }}
+                  />
+                  <label
+                    className="pf-v5-c-radio__label"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setCreateMode(true);
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardBody>
-          <Bullseye>
-            <PlusIcon style={{ width: '100px', height: '100px' }} />
-          </Bullseye>
-        </CardBody>
-        <CardFooter />
-      </Card>
-    </Tooltip>
-  ) : (
-    <ExecutionEnvEditCard
-      editMode
-      executionEnvironment={executionEnvironment}
-      handleEdit={createExecutionEnv}
-      handleDestroy={resetEditForm}
-      onNameChange={(name: string) => {
-        setExecutionEnvironment({
-          ...executionEnvironment,
-          name,
-        });
-      }}
-      onBaseImageUrlChange={(baseImageUrl: string) => {
-        setExecutionEnvironment({
-          ...executionEnvironment,
-          base_image_url: baseImageUrl,
-        });
-      }}
-      onAnsibleVersionChange={(ansibleVersion: string) => {
-        setExecutionEnvironment({
-          ...executionEnvironment,
-          ansible_version: ansibleVersion,
-        });
-      }}
-      setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-      handleAbort={resetEditForm}
-    />
-  );
+          </CardHeader>
+          <CardBody>
+            <Bullseye>
+              <PlusIcon style={{ width: '100px', height: '100px' }} />
+            </Bullseye>
+          </CardBody>
+          <CardFooter />
+        </Card>
+      </Tooltip>
+    )
+    : (
+      <ExecutionEnvEditCard
+        editMode
+        executionEnvironment={executionEnvironment}
+        handleEdit={createExecutionEnv}
+        handleDestroy={resetEditForm}
+        onNameChange={(name: string) => {
+          setExecutionEnvironment({
+            ...executionEnvironment,
+            name,
+          });
+        }}
+        onBaseImageUrlChange={(baseImageUrl: string) => {
+          setExecutionEnvironment({
+            ...executionEnvironment,
+            base_image_url: baseImageUrl,
+          });
+        }}
+        onAnsibleVersionChange={(ansibleVersion: string) => {
+          setExecutionEnvironment({
+            ...executionEnvironment,
+            ansible_version: ansibleVersion,
+          });
+        }}
+        setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+        handleAbort={resetEditForm}
+      />
+    );
 };

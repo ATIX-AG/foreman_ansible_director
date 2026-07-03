@@ -36,7 +36,6 @@ interface HostDetailsLceCardProps {
   hostDetails: {
     id: number;
     name: string;
-    // eslint-disable-next-line camelcase
     ansible_content_source: AnsibleContentSource | null;
   };
 }
@@ -126,7 +125,6 @@ export const HostDetailsLceCard = ({
   const handleClose = (abort: boolean): void => {
     if (isEditMode) {
       if (!abort) {
-        // eslint-disable-next-line no-void
         void setLce(lceForName(selectedLce).id);
         setInitialLce(selectedLce);
         setInitialLcePath(selectedLcePath);
@@ -238,14 +236,14 @@ export const HostDetailsLceCard = ({
                     <CardTitle>
                       {hostDetails.ansible_content_source &&
                       hostDetails.ansible_content_source.inherited ? (
-                        <>
-                          <BundleIcon /> {_('Ansible environment (inherited)')}
-                        </>
-                      ) : (
-                        <>
-                          <BundleIcon /> {_('Ansible environment')}
-                        </>
-                      )}
+                          <>
+                            <BundleIcon /> {_('Ansible environment (inherited)')}
+                          </>
+                        ) : (
+                          <>
+                            <BundleIcon /> {_('Ansible environment')}
+                          </>
+                        )}
                     </CardTitle>
                   </FlexItem>
                 </Flex>

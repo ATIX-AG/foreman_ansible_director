@@ -112,13 +112,13 @@ export const AssignmentSelector = ({
     const childRows =
       node.roles && node.roles.length
         ? renderAcrRows(
-            node.roles,
-            node,
-            level + 1,
-            1,
-            rowIndex + 1,
-            !isExpanded || isHidden
-          )
+          node.roles,
+          node,
+          level + 1,
+          1,
+          rowIndex + 1,
+          !isExpanded || isHidden
+        )
         : [];
 
     return [
@@ -258,20 +258,20 @@ export const AssignmentSelector = ({
   ): void => {
     isChecked
       ? onChange([
-          ...selected.filter(
-            assignable =>
-              assignmentFqrn(assignable) !== `${acu.identifier}.${acr.name}`
-          ),
-        ])
+        ...selected.filter(
+          assignable =>
+            assignmentFqrn(assignable) !== `${acu.identifier}.${acr.name}`
+        ),
+      ])
       : onChange([
-          ...selected,
-          {
-            assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
-            assignable_namespace: acu.identifier.split('.')[0],
-            assignable_name: acu.identifier.split('.')[1],
-            assignable_role_name: acr.name,
-          } as AnsibleContentAssignmentCreate<AnsibleCollectionRoleAssignment>,
-        ]);
+        ...selected,
+        {
+          assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+          assignable_namespace: acu.identifier.split('.')[0],
+          assignable_name: acu.identifier.split('.')[1],
+          assignable_role_name: acr.name,
+        } as AnsibleContentAssignmentCreate<AnsibleCollectionRoleAssignment>,
+      ]);
   };
 
   return (

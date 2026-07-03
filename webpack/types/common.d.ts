@@ -54,6 +54,6 @@ export interface Taxon extends Organization, Location {}
 
 export interface Task extends Identifiable {
   label: string;
-  // eslint-disable-next-line camelcase
+
   started_at: string;
 }

@@ -7,7 +7,6 @@ export interface AnsibleLcePath {
   id: number;
   name: string;
   description: string;
-  // eslint-disable-next-line camelcase
   lifecycle_environments: SparseAnsibleLce[];
 }
 
@@ -16,15 +15,12 @@ export interface SparseAnsibleLce {
   name: string;
   description: string;
   position: number;
-  // eslint-disable-next-line camelcase
   content_hash: string;
-  // eslint-disable-next-line camelcase
   execution_environment?: ExecutionEnvironment;
 }
 
 export interface AnsibleLce extends SparseAnsibleLce {
   content: AnsibleContentUnitAssignment[];
-  // eslint-disable-next-line camelcase
 }
 
 export interface DenseAnsibleLce extends SparseAnsibleLce {

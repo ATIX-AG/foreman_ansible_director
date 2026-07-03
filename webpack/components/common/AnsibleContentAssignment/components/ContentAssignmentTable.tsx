@@ -127,8 +127,7 @@ export const ContentAssignmentTable = ({
   let sortedAssignments = assignments;
   if (activeSortKey !== undefined) {
     sortedAssignments = assignments.sort((a, b) =>
-      sortPredicate(activeSortKey, activeSortDirection)(a, b)
-    );
+      sortPredicate(activeSortKey, activeSortDirection)(a, b));
   }
 
   const getSortParams = (
@@ -232,17 +231,17 @@ export const ContentAssignmentTable = ({
                     <Icon>
                       {assignment.assignable_type ===
                       'ForemanAnsibleDirector::AnsibleRole' ? (
-                        <Popover bodyContent={_('Role')} triggerAction="hover">
-                          <CubeIcon />
-                        </Popover>
-                      ) : (
-                        <Popover
-                          bodyContent={_('Collection')}
-                          triggerAction="hover"
-                        >
-                          <CubesIcon />
-                        </Popover>
-                      )}
+                          <Popover bodyContent={_('Role')} triggerAction="hover">
+                            <CubeIcon />
+                          </Popover>
+                        ) : (
+                          <Popover
+                            bodyContent={_('Collection')}
+                            triggerAction="hover"
+                          >
+                            <CubesIcon />
+                          </Popover>
+                        )}
                     </Icon>
                   </Td>
                   <Td dataLabel={columnNames.fqrn}>

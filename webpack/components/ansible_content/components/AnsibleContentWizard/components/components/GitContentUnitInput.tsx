@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { Dispatch, SetStateAction } from 'react';
 import {
   ActionGroup,
@@ -71,7 +70,6 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
   );
 
   // TODO: Implement repo inspect
-  // eslint-disable-next-line no-unused-vars
   const [manualInputOnly, setManualInputOnly] = React.useState(true);
 
   const [activeRefTab, setActiveRefTab] = React.useState<refTabKeys>('commit');
@@ -79,7 +77,6 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
   const [gitRefs, setGitRefs] = React.useState<string[]>([]);
 
   // TODO: Do I still need this
-  // eslint-disable-next-line no-unused-vars
   const handleUnitTypeChange = (
     _event: React.FormEvent<HTMLInputElement>
   ): void => {
@@ -252,8 +249,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
           isFilled
           activeKey={activeRefTab}
           onSelect={(_event, eventKey) =>
-            setActiveRefTab(eventKey as refTabKeys)
-          }
+            setActiveRefTab(eventKey as refTabKeys)}
           role="region"
         >
           <Tab
@@ -262,8 +258,10 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
               <>
                 <TabTitleIcon>
                   <CodeIcon />
-                </TabTitleIcon>{' '}
-                <TabTitleText>{_('Commit or manual input')}</TabTitleText>{' '}
+                </TabTitleIcon>
+                {' '}
+                <TabTitleText>{_('Commit or manual input')}</TabTitleText>
+                {' '}
               </>
             }
             aria-label="filled tabs with icons content users"
@@ -303,9 +301,7 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
             key={unitVersion}
             onClick={() =>
               setContentUnitVersions(oldVersions =>
-                oldVersions.filter(v => v !== unitVersion)
-              )
-            }
+                oldVersions.filter(v => v !== unitVersion))}
           >
             {unitVersion}
           </Chip>
@@ -324,8 +320,10 @@ export const GitContentUnitInput: React.FunctionComponent<GitContentUnitInputPro
         >
           {__(_('Add Ansible %(uType)s to batch'), {
             uType: unitType,
-          })}{' '}
-        </Button>{' '}
+          })}
+          {' '}
+        </Button>
+        {' '}
       </ActionGroup>
     </Form>
   );

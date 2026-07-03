@@ -57,7 +57,7 @@ export const AnsibleVariablesOverview = ({
     }
 
     return (
-      <React.Fragment>
+      <>
         <Modal
           title={__(_('Collection overview: %(id)s'), {
             id: `${selectedIdentifier}:${selectedVersion}`,
@@ -71,7 +71,7 @@ export const AnsibleVariablesOverview = ({
         >
           {modalContent}
         </Modal>
-      </React.Fragment>
+      </>
     );
   };
 

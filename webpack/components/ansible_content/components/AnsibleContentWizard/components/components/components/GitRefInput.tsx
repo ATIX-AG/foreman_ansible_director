@@ -61,8 +61,7 @@ export const GitRefInput: React.FC<VersionInputProps> = ({
               event.key === 'Enter' &&
               refInputValidation === ValidatedOptions.success
                 ? handleGitRefAdd()
-                : null
-            }
+                : null}
             id="cu-source-input-01"
             data-testid="git-ref-input"
             type="text"
@@ -94,9 +93,7 @@ export const GitRefInput: React.FC<VersionInputProps> = ({
             key={unitVersion}
             onClick={() =>
               setGitRefs(oldVersions =>
-                oldVersions.filter(v => v !== unitVersion)
-              )
-            }
+                oldVersions.filter(v => v !== unitVersion))}
           >
             {unitVersion}
           </Chip>

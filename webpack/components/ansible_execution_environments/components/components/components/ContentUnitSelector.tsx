@@ -266,8 +266,7 @@ export const InnerContentUnitSelector: React.FC<InnerContentUnitSelectorProps> =
             <DualListSelectorTree
               data={options}
               onOptionCheck={(e, isChecked, itemData) =>
-                onOptionCheck(e, isChecked, itemData as ContentUnitTreeItemData)
-              }
+                onOptionCheck(e, isChecked, itemData as ContentUnitTreeItemData)}
             />
           </DualListSelectorList>
         )}

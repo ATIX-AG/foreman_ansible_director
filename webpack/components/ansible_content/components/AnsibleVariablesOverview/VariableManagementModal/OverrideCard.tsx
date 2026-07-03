@@ -34,8 +34,6 @@ const matcherNames: Record<AnsibleVariableOverride['matcher'], string> = {
   hostgroup: 'Hostgroup',
 };
 
-// TODO: Do I still need this?
-// eslint-disable-next-line no-unused-vars
 const matcherUrls: Record<AnsibleVariableOverride['matcher'], string> = {
   fqdn: '/new/hosts',
   hostgroup: '/hostgroups',

@@ -6,15 +6,10 @@ export interface Identifiable {
 
 export interface AnsibleExecutionEnvBase {
   name: string;
-  // eslint-disable-next-line camelcase
   base_image_url: string;
-  // eslint-disable-next-line camelcase
   ansible_version: string;
-  // eslint-disable-next-line camelcase
   image_hash?: string;
-  // eslint-disable-next-line camelcase
   image_url?: string;
-  // eslint-disable-next-line camelcase
   content: AnsibleContentUnitAssignment[];
 }
 
@@ -24,12 +19,8 @@ export interface ExecutionEnvContentUnit extends Identifiable {
   version: string;
 }
 
-export interface AnsibleExecutionEnv
-  extends Identifiable,
-    AnsibleExecutionEnvBase {
-  // eslint-disable-next-line camelcase
+export interface AnsibleExecutionEnv extends Identifiable, AnsibleExecutionEnvBase {
   build_status: 'pending' | 'running' | 'success' | 'failed';
-  // eslint-disable-next-line camelcase
   build_job: string;
 }
 

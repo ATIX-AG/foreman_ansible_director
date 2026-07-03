@@ -94,8 +94,7 @@ export const VersionInput: React.FC<VersionInputProps> = ({
               event.key === 'Enter' &&
               versionInputValidation === ValidatedOptions.success
                 ? handleVersionAdd()
-                : null
-            }
+                : null}
             id="cu-source-input-01"
             type="text"
             aria-label="content unit source input"
@@ -122,9 +121,7 @@ export const VersionInput: React.FC<VersionInputProps> = ({
             key={unitVersion}
             onClick={() =>
               setContentUnitVersions(oldVersions =>
-                oldVersions.filter(v => v !== unitVersion)
-              )
-            }
+                oldVersions.filter(v => v !== unitVersion))}
           >
             {unitVersion}
           </Chip>

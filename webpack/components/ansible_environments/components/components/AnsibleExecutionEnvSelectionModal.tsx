@@ -82,7 +82,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         title="Execution environments"
         isOpen
@@ -132,6 +132,6 @@ export const AnsibleExecutionEnvSelectionModal = ({
           ))}
         </DataList>
       </Modal>
-    </React.Fragment>
+    </>
   );
 };

@@ -236,7 +236,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         variant={ModalVariant.large}
         showClose={false}
@@ -292,7 +292,7 @@ const AnsibleContentWizard: React.FC<AnsibleContentWizardProps> = ({
           {wizardSteps()}
         </Wizard>
       </Modal>
-    </React.Fragment>
+    </>
   );
 };
 

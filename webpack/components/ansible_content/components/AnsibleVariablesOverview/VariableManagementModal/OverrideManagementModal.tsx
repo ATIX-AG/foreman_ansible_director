@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, {
   Dispatch,
   ReactElement,
@@ -190,19 +189,20 @@ export const OverrideManagementModal = ({
                   isChecked={isSimpleMatcherCreation}
                   hasCheckIcon
                   onChange={() =>
-                    setIsSimpleMatcherCreation(!isSimpleMatcherCreation)
-                  }
+                    setIsSimpleMatcherCreation(!isSimpleMatcherCreation)}
                 />
                 <Popover
                   aria-label="Basic popover"
                   headerContent={<div>Matcher creation type</div>}
                   bodyContent={
                     <div>
-                      <strong>{_('Simple matcher creation')}</strong>{' '}
+                      <strong>{_('Simple matcher creation')}</strong>
+                      {' '}
                       {_(
                         'mode allows you to set a matcher and its type from a dropdown, while'
                       )}
-                      <strong>{_('custom matcher creation')}</strong>{' '}
+                      <strong>{_('custom matcher creation')}</strong>
+                      {' '}
                       {_(
                         'mode allows you to set a matcher and its type manually. Custom matcher creation mode' +
                           ' is useful when you want to set a matcher that uses advanced functionality' +
