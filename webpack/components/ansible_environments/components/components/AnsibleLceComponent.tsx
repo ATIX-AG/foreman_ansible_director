@@ -113,7 +113,6 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   };
 
   // TODO: implement
-  // eslint-disable-next-line no-unused-vars
   const destroyLce = async (lceRef: AnsibleLce): Promise<void> => {
     try {
       await axios.delete(
@@ -165,6 +164,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     setIsExecutionEnvModalOpen(true);
   };
 
+  // eslint-disable-next-line @stylistic/multiline-ternary
   return lifecycleEnvironment ? (
     <Card
       style={{

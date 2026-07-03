@@ -14,7 +14,6 @@ import { AnsibleContentSource } from '../../../../types/AnsibleContentTypes';
 
 interface HostDetailsTabProps
   extends UseAPIReturn<{
-    // eslint-disable-next-line camelcase
     ansible_content_source: AnsibleContentSource | null;
     id: number;
     name: string;

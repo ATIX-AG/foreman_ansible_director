@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 import {
   Bullseye,
@@ -151,8 +150,7 @@ export const AnsibleVariablesSelector = ({
                     <Tbody>
                       {ansibleRoles
                         .filter(role =>
-                          role.name.startsWith(roleFilter.toLowerCase())
-                        )
+                          role.name.startsWith(roleFilter.toLowerCase()))
                         .map(role => (
                           <Tr
                             key={role.name}
@@ -217,8 +215,7 @@ export const AnsibleVariablesSelector = ({
                               .filter(variable =>
                                 variable.name.startsWith(
                                   variableFilter.toLowerCase()
-                                )
-                              )
+                                ))
                               .map(variable => (
                                 <Tr key={variable.id}>
                                   <Td
@@ -247,13 +244,11 @@ export const AnsibleVariablesSelector = ({
                                     ) : (
                                       <Switch
                                         isChecked={
-                                          // eslint-disable-next-line standard/computed-property-even-spacing
                                           overridableOverrides[variable.id] ||
                                           variable.overridable
                                         }
                                         onChange={(event, checked) =>
-                                          onOverrideToggle(variable, checked)
-                                        }
+                                          onOverrideToggle(variable, checked)}
                                         isDisabled={!userCanEditVariables}
                                       />
                                     )}

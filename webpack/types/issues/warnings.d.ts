@@ -4,6 +4,5 @@ export interface AnsibleDirectorWarning {
 }
 
 export interface ResolutionWarning extends AnsibleDirectorWarning {
-  // eslint-disable-next-line camelcase
   assignment_id: number;
 }

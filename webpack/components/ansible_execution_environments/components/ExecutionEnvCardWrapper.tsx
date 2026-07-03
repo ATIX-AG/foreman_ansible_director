@@ -233,8 +233,7 @@ export const ExecutionEnvCardWrapper = ({
               onAbort: () => {
                 setActionPendingConfirmation(null);
               },
-            })
-          }
+            })}
           handleUpdate={env =>
             setActionPendingConfirmation({
               title: __(_('Confirm update of %(name)s'), { name: env.name }),
@@ -252,8 +251,7 @@ export const ExecutionEnvCardWrapper = ({
               onAbort: () => {
                 setActionPendingConfirmation(null);
               },
-            })
-          }
+            })}
           setIsContentUnitModalOpen={setIsContentUnitModalOpen}
         />
       </>

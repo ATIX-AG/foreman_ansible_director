@@ -21,9 +21,7 @@ export interface AnsibleGitContentUnitCreate
   gitRefs: string[];
 }
 
-export interface AnsibleContentUnit
-  extends AnsibleContentUnitBase,
-    Identifiable {
+export interface AnsibleContentUnit extends AnsibleContentUnitBase, Identifiable {
   name: string;
   namespace: string;
 }
@@ -50,7 +48,7 @@ export interface AnsibleRole {
 
 export interface AnsibleContentVersionFull
   extends AnsibleContentVersion,
-    Identifiable {
+  Identifiable {
   roles: AnsibleCollectionRole[];
 }
 

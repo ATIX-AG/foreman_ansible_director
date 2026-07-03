@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { ReactElement } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
@@ -159,8 +158,7 @@ export const AnsibleContentAssignmentComp = ({
         ),
         ...filtered,
       ].filter(assignment =>
-        assignmentFqrn(assignment).includes(fqrnFilter.toLowerCase())
-      );
+        assignmentFqrn(assignment).includes(fqrnFilter.toLowerCase()));
     });
 
     return filtered;
@@ -197,8 +195,8 @@ export const AnsibleContentAssignmentComp = ({
             titleText={
               assignments.length > 0
                 ? _(
-                    'No content found for these filters. Clear all filters and try again.'
-                  )
+                  'No content found for these filters. Clear all filters and try again.'
+                )
                 : _('No content assigned to this host.')
             }
             headingLevel="h1"

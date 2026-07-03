@@ -31,7 +31,7 @@ export const VariableManagementModalWrapper = ({
   );
 
   const modal = (title: string, modalContent: ReactElement): ReactElement => (
-    <React.Fragment>
+    <>
       <Modal
         style={{ minHeight: '500px' }}
         title={title}
@@ -42,7 +42,7 @@ export const VariableManagementModalWrapper = ({
       >
         {modalContent}
       </Modal>
-    </React.Fragment>
+    </>
   );
 
   const variableRequest: UseAPIReturn<AnsibleVariableDetail> = useAPI<

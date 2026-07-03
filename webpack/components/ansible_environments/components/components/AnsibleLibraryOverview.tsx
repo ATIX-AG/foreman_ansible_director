@@ -24,7 +24,6 @@ import ExternalLinkSquareAltIcon from '@patternfly/react-icons/dist/esm/icons/ex
 interface GetAnsibleLibraryResponse {
   roles: number;
   collections: number;
-  // eslint-disable-next-line camelcase
   execution_environments: number;
 }
 
@@ -75,7 +74,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
                 }}
               >
                 {_('Roles')}
-              </Button>{' '}
+              </Button>
             </FlexItem>
             <Divider
               component="div"
@@ -97,7 +96,7 @@ export const AnsibleLibraryOverview: React.FC = () => {
                 }}
               >
                 {_('Collections')}
-              </Button>{' '}
+              </Button>
             </FlexItem>
             <Divider
               component="div"
@@ -119,8 +118,8 @@ export const AnsibleLibraryOverview: React.FC = () => {
                 }}
               >
                 {_('Execution Environments')}
-              </Button>{' '}
-            </FlexItem>{' '}
+              </Button>
+            </FlexItem>
             <Divider
               component="div"
               orientation={{

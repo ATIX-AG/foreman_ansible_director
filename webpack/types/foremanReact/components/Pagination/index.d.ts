@@ -11,7 +11,6 @@ declare module 'foremanReact/components/Pagination' {
     perPage?: number;
     noSidePadding?: boolean;
     variant?: PaginationVariant;
-    // eslint-disable-next-line camelcase
     onChange?: (params: { page: number; per_page: number }) => void;
     updateParamsByUrl?: boolean;
   }

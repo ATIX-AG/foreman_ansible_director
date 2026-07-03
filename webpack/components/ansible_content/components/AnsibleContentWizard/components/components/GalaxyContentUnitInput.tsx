@@ -61,7 +61,6 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
   );
 
   // TODO: Do I still need this
-  // eslint-disable-next-line no-unused-vars
   const handleUnitTypeChange = (
     _event: React.FormEvent<HTMLInputElement>
   ): void => {
@@ -160,9 +159,11 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
         {contentUnitSourceValidation === ValidatedOptions.error && (
           <FormHelperText>
             <HelperText>
-              <HelperTextItem>{`${
-                unitType === 'collection' ? 'Collection' : 'Role'
-              } source does not match /^https?:\\/\\/.*\\/$/!`}</HelperTextItem>
+              <HelperTextItem>
+                {`${
+                  unitType === 'collection' ? 'Collection' : 'Role'
+                } source does not match /^https?:\\/\\/.*\\/$/!`}
+              </HelperTextItem>
             </HelperText>
           </FormHelperText>
         )}
@@ -187,7 +188,7 @@ export const GalaxyContentUnitInput: React.FunctionComponent<GalaxyContentUnitIn
           {__(_('Add Ansible %(uType)s to batch'), {
             uType: unitType,
           })}
-        </Button>{' '}
+        </Button>
       </ActionGroup>
     </Form>
   );

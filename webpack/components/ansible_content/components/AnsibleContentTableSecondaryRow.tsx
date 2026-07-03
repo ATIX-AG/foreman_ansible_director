@@ -183,7 +183,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
             </Thead>
             <Tbody>{versionRows(nodeVersions)}</Tbody>
           </Table>
-        </ExpandableRowContent>{' '}
+        </ExpandableRowContent>
       </Td>
     </Tr>
   );

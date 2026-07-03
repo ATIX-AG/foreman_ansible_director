@@ -8,13 +8,9 @@ declare module 'foremanReact/Root/Context/ForemanContext' {
 
   interface AnsibleDirectorContext {
     settings: {
-      // eslint-disable-next-line camelcase
       ansible_director_default_galaxy_url: string;
-      // eslint-disable-next-line camelcase
       ansible_director_default_ansible_core_version: string;
-      // eslint-disable-next-line camelcase
       ansible_director_ui_refresh_interval: number;
-      // eslint-disable-next-line camelcase
       ansible_director_ui_search_cache_size: number;
     };
   }
@@ -23,7 +19,6 @@ declare module 'foremanReact/Root/Context/ForemanContext' {
     metadata: {
       organization: Organization | null;
       location: Location | null;
-      // eslint-disable-next-line camelcase
       foreman_ansible_director: AnsibleDirectorContext;
     } | null;
   }

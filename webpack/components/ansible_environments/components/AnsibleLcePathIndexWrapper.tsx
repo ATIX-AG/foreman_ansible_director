@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import axios from 'axios';
+
 import {
   IndexResponse,
   PaginationProps,
@@ -73,7 +74,6 @@ const AnsibleContentTableWrapper = ({
     setAPIOptions: contentRequest.setAPIOptions,
   });
 
-  // eslint-disable-next-line no-unused-vars
   const onPagination = (newPagination: PaginationProps): void => {
     setParamsAndAPI({ ...params, ...newPagination });
   };

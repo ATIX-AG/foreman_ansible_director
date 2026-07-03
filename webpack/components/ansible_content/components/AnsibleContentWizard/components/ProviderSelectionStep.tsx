@@ -43,10 +43,14 @@ const ProviderSelectionStep: React.FC<ProviderSelectionStepProps> = ({
           <List>
             <ListItem>
               {' '}
-              <strong>Ansible Galaxy</strong> -{' '}
+              <strong>Ansible Galaxy</strong>
+              {' '}
+              -
+              {' '}
               <a href="https://galaxy.ansible.com">
                 https://galaxy.ansible.com
-              </a>{' '}
+              </a>
+              {' '}
               {_('- The official community repository')}
             </ListItem>
             <ListItem>

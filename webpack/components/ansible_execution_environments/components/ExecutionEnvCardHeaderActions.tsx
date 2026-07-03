@@ -140,19 +140,21 @@ export const ExecutionEnvCardHeaderActions = ({
           'aria-label': _('edit popover'),
           headerComponent: 'h1',
           headerContent: editMode ? _('Save changes') : _('Edit'),
-          bodyContent: editMode ? (
-            <div>
-              {_(
-                'Save changes made to this Execution Environment. Foreman will rebuild the Execution Environment.'
-              )}
-            </div>
-          ) : (
-            <div>
-              {_(
-                'Edit this Execution Environment. If you make a change, Foreman will rebuild the Execution Environment.'
-              )}
-            </div>
-          ),
+          bodyContent: editMode
+            ? (
+              <div>
+                {_(
+                  'Save changes made to this Execution Environment. Foreman will rebuild the Execution Environment.'
+                )}
+              </div>
+            )
+            : (
+              <div>
+                {_(
+                  'Edit this Execution Environment. If you make a change, Foreman will rebuild the Execution Environment.'
+                )}
+              </div>
+            ),
         }}
         variant="plain"
         aria-label="Action"

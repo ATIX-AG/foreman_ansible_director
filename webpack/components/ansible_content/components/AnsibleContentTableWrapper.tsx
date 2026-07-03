@@ -44,7 +44,6 @@ interface AnsibleContentTableWrapperProps {
 }
 
 export interface AnsibleContentVersionWithCount extends AnsibleContentVersion {
-  // eslint-disable-next-line camelcase
   roles_count: number;
 }
 export interface AnsibleContentUnitWithCounts extends AnsibleContentUnit {
@@ -111,18 +110,20 @@ const AnsibleContentTableWrapper = ({
               {_('Perform consistency check')}
             </PermittedButton>
           </ToolbarItem>,
-          hasResults ? (
-            <ToolbarItem>
-              <PermittedButton
-                onClick={() => setIsContentWizardOpen(true)}
-                requiredPermissions={[AdPermissions.ansibleContent.create]}
-              >
-                {_('Import Ansible content')}
-              </PermittedButton>
-            </ToolbarItem>
-          ) : (
-            <></>
-          ),
+          hasResults
+            ? (
+              <ToolbarItem>
+                <PermittedButton
+                  onClick={() => setIsContentWizardOpen(true)}
+                  requiredPermissions={[AdPermissions.ansibleContent.create]}
+                >
+                  {_('Import Ansible content')}
+                </PermittedButton>
+              </ToolbarItem>
+            )
+            : (
+              <></>
+            ),
         ]}
         hasDocumentation={false}
         searchBar={

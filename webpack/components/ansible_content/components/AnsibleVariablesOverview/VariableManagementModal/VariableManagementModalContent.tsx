@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, {
   Dispatch,
   ReactElement,
@@ -261,8 +260,10 @@ export const VariableManagementModalContent = ({
           <>
             <TabTitleIcon>
               <CodeIcon />
-            </TabTitleIcon>{' '}
-            <TabTitleText>{_('Base variable')}</TabTitleText>{' '}
+            </TabTitleIcon>
+            {' '}
+            <TabTitleText>{_('Base variable')}</TabTitleText>
+            {' '}
           </>
         }
         aria-label={_('Base variable edit tab')}
@@ -326,16 +327,14 @@ export const VariableManagementModalContent = ({
                           });
                         }}
                         onOpenChange={(isOpen: boolean) =>
-                          setIsTypeDropdownOpen(isOpen)
-                        }
+                          setIsTypeDropdownOpen(isOpen)}
                         toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
                           <MenuToggle
                             isDisabled={!isEditMode}
                             ref={toggleRef}
                             isFullWidth
                             onClick={() =>
-                              setIsTypeDropdownOpen(!isTypeDropdownOpen)
-                            }
+                              setIsTypeDropdownOpen(!isTypeDropdownOpen)}
                             isExpanded={isTypeDropdownOpen}
                           >
                             {ansibleVariable?.type.charAt(0).toUpperCase() +
@@ -375,7 +374,8 @@ export const VariableManagementModalContent = ({
           <>
             <TabTitleIcon>
               <CodeBranchIcon />
-            </TabTitleIcon>{' '}
+            </TabTitleIcon>
+            {' '}
             <TabTitleText>{_('Overrides')}</TabTitleText>
           </>
         }

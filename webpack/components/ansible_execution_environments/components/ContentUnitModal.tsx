@@ -21,10 +21,10 @@ interface ContentUnitModalProps {
   target: AnsibleExecutionEnv | AnsibleExecutionEnvCreate | AnsibleLce;
   setTarget:
     | Dispatch<
-        SetStateAction<
+      SetStateAction<
           AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined
-        >
       >
+    >
     | Dispatch<SetStateAction<AnsibleLce | undefined>>;
   refreshRequest: () => void;
 }
@@ -118,7 +118,7 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         variant={ModalVariant.medium}
         title={_('Manage content units')}
@@ -145,6 +145,6 @@ export const ContentUnitModal: React.FC<ContentUnitModalProps> = ({
           setChosenUnits={setChosenUnits}
         />
       </Modal>
-    </React.Fragment>
+    </>
   );
 };
