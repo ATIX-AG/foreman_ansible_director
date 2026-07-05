@@ -70,9 +70,9 @@ module ForemanAnsibleDirector
       def infer_name_from_source
         case @unit_type
         when :role
-          split = @src.split('/')[-1].strip('.git')
+          split = @src.split('/')[-1].delete_suffix('.git')
         when :collection
-          split = @source.split('/')[-1].strip('.git')
+          split = @source.split('/')[-1].delete_suffix('.git')
         end
         split
       end
