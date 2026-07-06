@@ -6,6 +6,9 @@ module ForemanAnsibleDirector
       class ExecutionEnvironmentsController < AnsibleDirectorApiController
         include ::Api::Version2
 
+        # rubocop:disable Rails/LexicallyScopedActionFilter
+        before_action :find_optional_organization, only: %i[index auto_complete_search]
+        # rubocop:enable Rails/LexicallyScopedActionFilter
         before_action :find_resource, only: %i[show update destroy]
         before_action :find_organization, only: %i[create]
 
@@ -133,6 +136,10 @@ module ForemanAnsibleDirector
 
         def model_of_controller
           resource_class
+        end
+
+        def resource_scope
+          organization_scoped_resource_scope
         end
 
         private
