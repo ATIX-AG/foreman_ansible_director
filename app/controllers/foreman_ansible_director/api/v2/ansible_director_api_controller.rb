@@ -5,7 +5,7 @@ module ForemanAnsibleDirector
     module V2
       class AnsibleDirectorApiController < ::Api::V2::BaseController
         include ::Api::Version2
-        include ::Foreman::Controller::AutoCompleteSearch
+        include ::ForemanAnsibleDirector::Concerns::FilteredAutoCompleteSearch
 
         include ::ForemanAnsibleDirector::RequestCtx::RequestContextHelper
 
@@ -21,7 +21,7 @@ module ForemanAnsibleDirector
         end
 
         def find_organization
-          @organization = Organization.current || find_optional_organization
+          @organization = find_optional_organization || Organization.current
           if @organization.nil?
             render_error(
               'custom_error',
@@ -32,6 +32,13 @@ module ForemanAnsibleDirector
             )
           end
           @organization
+        end
+
+        def organization_scoped_resource_scope(scope = resource_class.all)
+          organization = @organization || Organization.current
+          return scope unless organization
+
+          scope.where(organization_id: organization.id)
         end
 
         private
@@ -50,7 +57,7 @@ module ForemanAnsibleDirector
 
           @organization = get_organization(org_id)
           if @organization.nil?
-            render_error('custom_error', status: :unprocessable_entity,
+            render_error('custom_error', status: :not_found,
                           locals: { message: "Couldn't find organization #{org_id}" })
           end
           @organization

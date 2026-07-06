@@ -7,6 +7,9 @@ module ForemanAnsibleDirector
         include ::Api::Version2
 
         before_action :find_resource, only: %i[promote update destroy]
+        # rubocop:disable Rails/LexicallyScopedActionFilter
+        before_action :find_optional_organization, only: %i[index auto_complete_search]
+        # rubocop:enable Rails/LexicallyScopedActionFilter
         before_action :find_organization, only: %i[create]
 
         resource_description { resource_id 'AD Ansible Lifecycle Environment Paths' }
@@ -141,6 +144,10 @@ module ForemanAnsibleDirector
 
         def model_of_controller
           resource_class
+        end
+
+        def resource_scope
+          organization_scoped_resource_scope
         end
 
         private

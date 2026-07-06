@@ -8,9 +8,11 @@ module ForemanAnsibleDirector
 
         def content
           @global_content = {
-            roles: ::ForemanAnsibleDirector::AnsibleRole.count,
-            collections: ::ForemanAnsibleDirector::AnsibleCollection.count,
-            execution_environments: ::ForemanAnsibleDirector::ExecutionEnvironment.count,
+            roles: ::ForemanAnsibleDirector::AnsibleRole.where(organization_id: @organization.id).count,
+            collections: ::ForemanAnsibleDirector::AnsibleCollection.where(organization_id: @organization.id).count,
+            execution_environments: ::ForemanAnsibleDirector::ExecutionEnvironment.where(
+              organization_id: @organization.id
+            ).count,
           }
         end
       end

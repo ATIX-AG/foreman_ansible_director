@@ -5,7 +5,9 @@ module ForemanAnsibleDirector
     module V2
       class AnsibleContentController < AnsibleDirectorApiController
         before_action :find_organization, only: %i[create_units]
-        before_action :find_optional_organization, only: %i[index]
+        # rubocop:disable Rails/LexicallyScopedActionFilter
+        before_action :find_optional_organization, only: %i[index auto_complete_search]
+        # rubocop:enable Rails/LexicallyScopedActionFilter
 
         resource_description { resource_id 'AD Ansible Content' }
 
@@ -74,12 +76,7 @@ module ForemanAnsibleDirector
         param_group :search_and_pagination, ::Api::V2::BaseController
         # endregion
         def index
-          scope = resource_scope_for_index
-          @ansible_content_units = if @organization
-                                     scope.where(organization_id: @organization.id)
-                                   else
-                                     scope
-                                   end
+          @ansible_content_units = resource_scope_for_index
         end
 
         # region ApiDoc: GET /api/v2/ansible_director/ansible_content/:content_unit_id/versions/:content_unit_version_id
@@ -146,6 +143,10 @@ module ForemanAnsibleDirector
           resource_class
         end
 
+        def resource_scope
+          organization_scoped_resource_scope
+        end
+
         private
 
         def destroy_params
@@ -164,11 +165,6 @@ module ForemanAnsibleDirector
 
         def resource_class
           ::ForemanAnsibleDirector::ContentUnit
-        end
-
-        def index_relation
-          units = AnsibleContentUnit
-          units.where organization_id: (params[:organization_id] || @organization.id)
         end
       end
     end
