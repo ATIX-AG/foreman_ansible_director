@@ -40,7 +40,7 @@ module ForemanAnsibleDirector
             target_id: params[:target_id]
           )
           # TODO: Null check target
-          @assignments, @resolved_assignments, @hierarchy = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
+          @assignments, @resolved_assignments, @hierarchy, @effective_content_source = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
             target: target,
             resolve: ::Foreman::Cast.to_bool(params[:resolve])
           )
