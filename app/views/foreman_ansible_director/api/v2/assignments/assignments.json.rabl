@@ -56,5 +56,9 @@ node(:results) do
               end,
       }
     end,
+    content_source: {
+      id: @effective_content_source.id,
+      type: @effective_content_source.class.name,
+    },
   }
 end
