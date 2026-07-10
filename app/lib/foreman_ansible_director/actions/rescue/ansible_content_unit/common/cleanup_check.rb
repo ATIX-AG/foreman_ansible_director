@@ -25,7 +25,8 @@ module ForemanAnsibleDirector
 
               output.update(skip_repository_cleanup: all_successful || !repository_success,
                 skip_distribution_cleanup: all_successful || !distribution_success,
-                skip_remote_cleanup: all_successful || !collection_remote_success)
+                skip_remote_cleanup: all_successful || !collection_remote_success,
+                pulp_failure: !all_successful)
             end
           end
         end

@@ -14,6 +14,7 @@ module ForemanAnsibleDirector
               param :skip_repository_cleanup, Boolean
               param :skip_distribution_cleanup, Boolean
               param :skip_remote_cleanup, Boolean
+              param :pulp_failure, Boolean
             end
 
             def plan(args)
@@ -36,20 +37,15 @@ module ForemanAnsibleDirector
                 skip: args[:skip_remote_cleanup])
 
               plan_self(
-                skip_repository_cleanup: args[:skip_repository_cleanup],
-                skip_distribution_cleanup: args[:skip_distribution_cleanup],
-                skip_remote_cleanup: args[:skip_remote_cleanup]
+                pulp_failure: args[:pulp_failure]
               )
             end
 
             def run
-              skip_repository_cleanup = input[:skip_repository_cleanup]
-              skip_distribution_cleanup = input[:skip_distribution_cleanup]
-              skip_remote_cleanup = input[:skip_remote_cleanup]
+              pulp_failure = input[:pulp_failure]
 
-              skip_all = skip_repository_cleanup && skip_distribution_cleanup && skip_remote_cleanup
               # Raising an exception to mark this execution plan as failed
-              raise 'A preceeding action failed. Artifacts were cleaned up successfully.' unless skip_all
+              raise 'A preceding action failed. Artifacts were cleaned up successfully.' if pulp_failure
             end
 
             def rescue_strategy_for_self
