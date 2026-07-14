@@ -74,6 +74,7 @@ module ForemanAnsibleDirector
         api :GET, '/v2/ansible_director/ansible_content', N_('List Ansible content units')
         param :organization_id, :number, desc: N_('Organization identifier'), required: false
         param_group :search_and_pagination, ::Api::V2::BaseController
+        add_scoped_search_description_for(::ForemanAnsibleDirector::ContentUnit)
         # endregion
         def index
           @ansible_content_units = resource_scope_for_index
