@@ -41,6 +41,15 @@ module ForemanAnsibleDirector
           scope.where(organization_id: organization.id)
         end
 
+        def action_permission
+          case params[:action]
+          when 'auto_complete_search'
+            :view
+          else
+            super
+          end
+        end
+
         private
 
         def organization_id_keys

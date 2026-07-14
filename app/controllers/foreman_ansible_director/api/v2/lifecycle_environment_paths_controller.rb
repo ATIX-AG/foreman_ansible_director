@@ -18,6 +18,7 @@ module ForemanAnsibleDirector
         api :GET, '/v2/ansible_director/lifecycle_environments/paths', N_('List lifecycle environment paths')
         param :organization_id, :number, desc: N_('Organization identifier.'), required: false
         param_group :search_and_pagination, ::Api::V2::BaseController
+        add_scoped_search_description_for(::ForemanAnsibleDirector::LifecycleEnvironmentPath)
         # endregion
         def index
           @lifecycle_environment_paths = resource_scope_for_index

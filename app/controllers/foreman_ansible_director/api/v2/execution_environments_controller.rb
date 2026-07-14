@@ -18,6 +18,7 @@ module ForemanAnsibleDirector
         api :GET, '/v2/ansible_director/execution_environments', N_('List all execution environments')
         param :organization_id, :number, desc: N_('Organization identifier.'), required: false
         param_group :search_and_pagination, ::Api::V2::BaseController
+        add_scoped_search_description_for(::ForemanAnsibleDirector::ExecutionEnvironment)
         # endregion
         def index
           @execution_environments = resource_scope_for_index
