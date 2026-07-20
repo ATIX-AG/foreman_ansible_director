@@ -1,82 +1,78 @@
-import React, { ReactElement } from 'react';
-
-import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
+import React, { ReactElement, useContext } from 'react';
+import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
 import {
   EmptyState,
+  EmptyStateBody,
   EmptyStateHeader,
   EmptyStateIcon,
-  Spinner,
+  EmptyStateVariant, Spinner,
 } from '@patternfly/react-core';
-import { translate as _ } from 'foremanReact/common/I18n';
-import {
-  AnsibleContentAssignment,
-  ContentResolutionNode,
-  ContentResolutionNodeType,
-  ResolvedAssignment,
-} from '../../../types/AnsibleContentAssignmentTypes';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+
+import { AssignmentContext } from './AssignmentContext';
+
+import { crnTypeUiString } from './helpers';
+
 import { AnsibleContentAssignmentComp } from './AnsibleContentAssignment';
-import { DefaultResponse } from '../../../types/common';
-import { AnsibleDirectorError } from '../../../types/issues/errors';
-import { ResolutionWarning } from '../../../types/issues/warnings';
-import { crnTypeUrlMap } from './helpers';
 
-interface AnsibleContentAssignmentWrapperProps {
-  crnId: number;
-  crnType: ContentResolutionNodeType;
-  crnName: string;
-  csId: number;
-}
+export const AnsibleContentAssignmentWrapper = (): ReactElement | null => {
 
-interface GetCrnAssignmentsResponse {
-  assignments: ResolvedAssignment<AnsibleContentAssignment>[];
-  hierarchy: ContentResolutionNode[];
-}
+  const assignmentCtx = useContext(AssignmentContext);
 
-export const AnsibleContentAssignmentWrapper = ({
-  crnType,
-  crnId,
-  crnName,
-  csId,
-}: AnsibleContentAssignmentWrapperProps): ReactElement => {
-  const getCrnAssignmentsRequest = useAPI<
-    DefaultResponse<
-      AnsibleDirectorError,
-      ResolutionWarning,
-      GetCrnAssignmentsResponse
-    >
-  >(
-    'get',
-    `/api/v2/ansible_director/assignments/${crnTypeUrlMap[crnType]}/${crnId}?resolve=true`
-  );
+  if (!assignmentCtx) {
+    return null;
+  }
 
-  const refreshRequest = (): void => {
-    getCrnAssignmentsRequest.setAPIOptions(options => ({ ...options }));
-  };
-
-  if (getCrnAssignmentsRequest.status === 'ERROR') {
-    // TODO: Handle
-  } else if (getCrnAssignmentsRequest.status === 'RESOLVED') {
+  if (assignmentCtx.requestStatus.getAssignments === 'PENDING') {
     return (
-      <AnsibleContentAssignmentComp
-        crnId={crnId}
-        crnType={crnType}
-        crnName={crnName}
-        csId={csId}
-        hierarchy={getCrnAssignmentsRequest.response.results.hierarchy}
-        assignments={getCrnAssignmentsRequest.response.results.assignments}
-        warnings={getCrnAssignmentsRequest.response.warnings}
-        onResolveClick={() => refreshRequest()}
-      />
+      <EmptyState>
+        <EmptyStateHeader
+          titleText={_('Loading assignments...')}
+          headingLevel="h4"
+          icon={<EmptyStateIcon icon={Spinner} />}
+        />
+      </EmptyState>
+    );
+  }
+
+  if (assignmentCtx.csId === null) {
+    return (
+      <EmptyState variant={EmptyStateVariant.lg}>
+        <EmptyStateHeader
+          titleText={_('No lifecycle environment selected')}
+          headingLevel="h4"
+          icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
+        />
+        <EmptyStateBody>
+          {__(
+            _(
+              'To manage Ansible content assignments for this %(crnType)s, you must assign an Ansible environment. You can select an Ansible environment for a host group or a host.'
+            ),
+            { crnType: crnTypeUiString[assignmentCtx.crnType] }
+          )}
+        </EmptyStateBody>
+      </EmptyState>
     );
   }
 
   return (
-    <EmptyState>
-      <EmptyStateHeader
-        titleText={_('Loading Ansible content assignments...')}
-        headingLevel="h4"
-        icon={<EmptyStateIcon icon={Spinner} />}
+    <>
+      {assignmentCtx.dataInterface === 'dom' && (
+        <input
+          type="hidden"
+          name={`${assignmentCtx.crnType.toLowerCase()}[ansible_director_assignment_data]`}
+          id="ansible_director_assignment_data"
+          value={JSON.stringify(assignmentCtx.domAssignments)}
+        />)}
+      <AnsibleContentAssignmentComp
+        crnId={assignmentCtx.crnId}
+        crnType={assignmentCtx.crnType}
+        crnName={assignmentCtx.crnName}
+        csId={assignmentCtx.csId}
+        hierarchy={assignmentCtx.hierarchy}
+        assignments={assignmentCtx.assignments}
+        resolutionWarnings={assignmentCtx.resolutionWarnings}
       />
-    </EmptyState>
+    </>
   );
 };

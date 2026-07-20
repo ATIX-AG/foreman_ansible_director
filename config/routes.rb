@@ -66,7 +66,9 @@ Rails.application.routes.draw do
           resources :assignments, only: [] do
             collection do
               get '/:target/:target_id', action: :assignments
+              get '/:target/:target_id/:cs_id_override', action: :assignments
               post '/:target/:target_id', action: :assign
+              post '/preresolve', action: :preresolve
             end
             member do
               delete '/', action: :destroy

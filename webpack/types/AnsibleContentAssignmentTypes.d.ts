@@ -5,20 +5,19 @@ export interface AnsibleContentAssignmentHierarchy {}
 export interface AssignableBase extends Identifiable {
   assignable_name: string;
   assignable_namespace: string;
+  subtractive: boolean;
+}
+
+export interface ApiAssignment extends AssignableBase {
   consumable_id: number;
   consumable_type: ContentResolutionNodeType;
-  subtractive: boolean;
-  resolved: null;
 }
 
 export type AnsibleContentAssignment =
   | AnsibleRoleAssignment
   | AnsibleCollectionRoleAssignment;
 
-export type ResolvedAssignment<T extends AnsibleContentAssignment> = Omit<
-  T,
-  'resolved'
-> & {
+export type ResolvedAssignment<T extends AnsibleContentAssignment> = T & {
   resolved: AssignmentResolution;
 };
 
@@ -27,10 +26,10 @@ export type Fqrnable =
   | AnsibleContentAssignmentCreate<AnsibleContentAssignment>
   | ResolvedAssignment<AnsibleContentAssignment>;
 
-export interface AnsibleRoleAssignment extends AssignableBase {
+export interface AnsibleRoleAssignment extends ApiAssignment {
   assignable_type: 'ForemanAnsibleDirector::AnsibleRole';
 }
-export interface AnsibleCollectionRoleAssignment extends AssignableBase {
+export interface AnsibleCollectionRoleAssignment extends ApiAssignment {
   assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole';
   assignable_role_name: string;
 }

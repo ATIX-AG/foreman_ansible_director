@@ -336,13 +336,13 @@ module ForemanAnsibleDirectorTests
 
           end
 
-          test 'returns nil for non-existent target' do
-            result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'hostgroup',
-              target_id: -1
-            )
-
-            assert_nil result
+          test 'raises exception for non-existent target' do
+            assert_raises(ActiveRecord::RecordNotFound) do
+              ::ForemanAnsibleDirector::AssignmentService.find_target(
+                target_type: 'hostgroup',
+                target_id: -1
+              )
+            end
           end
         end
 
