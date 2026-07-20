@@ -39,6 +39,9 @@ module ForemanAnsibleDirector
       ::Hostgroup.include ::ForemanAnsibleDirector::Concerns::HostgroupExtensions
       ::LookupKey.include ::ForemanAnsibleDirector::Concerns::LookupKeysExtensions
       ::ConfigReportImporter.include ForemanAnsibleDirector::AnsibleReportImporter
+
+      ::HostgroupsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostgroupExtensions
+
       ReportImporter.register_smart_proxy_feature('Ansible')
     end
 

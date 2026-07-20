@@ -26,6 +26,7 @@ export const HostDetailsTab = ({
   if (status === 'RESOLVED') {
     return (
       <AnsibleContentAssignmentMain
+        dataInterface={'api'}
         crnId={response.id}
         crnType="Host"
         crnName={response.name}

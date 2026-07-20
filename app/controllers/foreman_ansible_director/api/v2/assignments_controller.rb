@@ -39,11 +39,53 @@ module ForemanAnsibleDirector
             target_type: params[:target],
             target_id: params[:target_id]
           )
-          # TODO: Null check target
-          @assignments, @resolved_assignments, @hierarchy, @effective_content_source = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
-            target: target,
-            resolve: ::Foreman::Cast.to_bool(params[:resolve])
+          content_source_override = ::ForemanAnsibleDirector::LifecycleEnvironment.find_by(
+            id: params[:cs_id_override]
           )
+
+          @assignments,
+            @resolved_assignments,
+            @hierarchy,
+            @effective_content_source = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
+              target: target,
+              content_source_override: content_source_override,
+              resolve: ::Foreman::Cast.to_bool(params[:resolve])
+            )
+        end
+
+        def preresolve
+          node_params = preresolve_params
+
+          parent = if node_params[:parent].nil?
+                     nil
+                   else
+                     ::ForemanAnsibleDirector::AssignmentService.find_target(
+                       target_type: node_params[:parent][:parent_type],
+                       target_id: node_params[:parent][:parent_id]
+                     )
+                   end
+
+          assignments = node_params[:assignments]
+
+          node_content_source = if node_params[:content_source].nil?
+                                  nil
+                                else
+                                  ::ForemanAnsibleDirector::LifecycleEnvironment.find_by(
+                                    id: node_params[:content_source][:cs_id]
+                                  )
+                                end
+
+          @node_type = node_params[:type]
+
+          @assignments,
+            @resolved_assignments,
+            @hierarchy,
+            @effective_content_source = ::ForemanAnsibleDirector::AssignmentService.assignment_preresolve(
+              parent: parent,
+              node_assignments: assignments,
+              node_cs: node_content_source,
+              resolve: true
+            )
         end
 
         # region ApiDoc: POST /api/v2/ansible_director/assignments/:target/:target_id
@@ -128,6 +170,20 @@ module ForemanAnsibleDirector
           params.require(:assignment).permit(
             source: %i[type id],
             target: %i[type id]
+          )
+        end
+
+        def preresolve_params
+          params.require(:node).permit(
+            :type,
+            parent: %i[parent_type parent_id],
+            content_source: %i[cs_type cs_id],
+            assignments: %i[
+              assignable_type
+              assignable_namespace
+              assignable_name
+              assignable_role_name
+            ]
           )
         end
 

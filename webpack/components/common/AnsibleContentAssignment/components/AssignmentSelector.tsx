@@ -25,13 +25,11 @@ import {
   AnsibleContentAssignment,
   AnsibleContentAssignmentCreate,
   AnsibleRoleAssignment,
-  ResolvedAssignment,
 } from '../../../../types/AnsibleContentAssignmentTypes';
 import { assignmentFqrn } from '../helpers';
 
 interface AssignmentSelectorProps {
   availableContent: FullAnsibleContentUnitAssignment[];
-  excludeAssignments: ResolvedAssignment<AnsibleContentAssignment>[];
   selected: AnsibleContentAssignmentCreate<AnsibleContentAssignment>[];
   onChange: (
     newAssignables: AnsibleContentAssignmentCreate<AnsibleContentAssignment>[]
@@ -40,7 +38,6 @@ interface AssignmentSelectorProps {
 
 export const AssignmentSelector = ({
   availableContent,
-  excludeAssignments,
   selected,
   onChange,
 }: AssignmentSelectorProps): ReactElement => {
@@ -50,11 +47,6 @@ export const AssignmentSelector = ({
   const assignableFqrns = useMemo(
     () => selected.map(assignable => assignmentFqrn(assignable)),
     [selected]
-  );
-
-  const excludeFqrns = useMemo(
-    () => excludeAssignments.map(assignment => assignmentFqrn(assignment)),
-    [excludeAssignments]
   );
 
   const renderAcuRows = (
@@ -177,7 +169,7 @@ export const AssignmentSelector = ({
         key={node.id}
         aria-level={level}
         aria-posinset={posinset}
-        isHidden={isHidden || excludeFqrns.includes(fqrn)}
+        isHidden={isHidden}
         isClickable
         onRowClick={() => onAcrSelect(isChecked, parent, node)}
       >

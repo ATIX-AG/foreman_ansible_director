@@ -2,6 +2,7 @@
 
 <div class='tab-pane' id='ansible_director'>
   <%= react_component('AnsibleContentAssignmentMain', {
+    dataInterface: f.object.persisted? ? 'api': 'dom',
     crnType: "Hostgroup",
     crnId: f.object.id,
     crnName: f.object.name,

@@ -1,10 +1,6 @@
-import React, { ReactElement } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { useDispatch } from 'react-redux';
-
-import { addToast } from 'foremanReact/components/ToastsList';
+import React, { ReactElement, useContext } from 'react';
 import { foremanUrl } from 'foremanReact/common/helpers';
-import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
   Button,
@@ -48,8 +44,9 @@ import { AlertModal } from '../AlertModal';
 import { assignmentFqrn, crnTypeMatcherMap } from './helpers';
 import { AssignmentSelectorWrapper } from './components/AssignmentSelectorWrapper';
 import { ResolutionWarning } from '../../../types/issues/warnings';
-import { OverrideGridWrapper } from './components/Variables/OverrideGridWrapper';
 import { Permitted } from '../Permitted';
+import { AssignmentContext } from './AssignmentContext';
+import { OverrideGridWrapper } from './components/Variables/OverrideGridWrapper';
 
 interface AnsibleContentAssignmentCompProps {
   crnId: number;
@@ -58,8 +55,7 @@ interface AnsibleContentAssignmentCompProps {
   csId: number;
   hierarchy: ContentResolutionNode[];
   assignments: ResolvedAssignment<AnsibleContentAssignment>[];
-  warnings: ResolutionWarning[];
-  onResolveClick: () => void;
+  resolutionWarnings: ResolutionWarning[];
 }
 
 const hierarchyIconMap: Record<ContentResolutionNodeType, ReactElement> = {
@@ -74,9 +70,8 @@ export const AnsibleContentAssignmentComp = ({
   csId,
   hierarchy,
   assignments,
-  warnings,
-  onResolveClick,
-}: AnsibleContentAssignmentCompProps): ReactElement => {
+  resolutionWarnings,
+}: AnsibleContentAssignmentCompProps): ReactElement | null => {
   const [
     selectedAlert,
     setSelectedAlert,
@@ -89,6 +84,12 @@ export const AnsibleContentAssignmentComp = ({
 
   const [fqrnFilter, setFqrnFilter] = React.useState<string>('');
 
+  const assignmentCtx = useContext(AssignmentContext);
+
+  if (assignmentCtx === null) {
+    return null;
+  }
+
   const [selectedHierarchyNode, setSelectedHierarchyNode] = React.useState<
     ContentResolutionNode
   >({
@@ -96,45 +97,6 @@ export const AnsibleContentAssignmentComp = ({
     id: crnId,
     name: crnName,
   });
-
-  const dispatch = useDispatch();
-
-  const handleUnassign = async (
-    assignment: ResolvedAssignment<AnsibleContentAssignment>
-  ): Promise<void> => {
-    const fqrn = assignmentFqrn(assignment);
-    try {
-      await axios.delete(
-        foremanUrl(`/api/v2/ansible_director/assignments/${assignment.id}`),
-        {}
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `DELETE_ASSIGNMENT_${assignment.id}_SUCC`,
-          message: __(_('Successfully unassigned "%(fqrn)s"!'), { fqrn }),
-          sticky: false,
-        })
-      );
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `DELETE_ASSIGNMENT_${assignment.id}_ERR`,
-          message: __(
-            _(
-              'Unassigning Ansible role "%(fqrn)s" failed with error code "%(error)s".'
-            ),
-            {
-              fqrn,
-              error: (e as { response: AxiosResponse }).response.status,
-            }
-          ),
-          sticky: false,
-        })
-      );
-    }
-  };
 
   const filteredAssignments = (): ResolvedAssignment<
     AnsibleContentAssignment
@@ -176,14 +138,16 @@ export const AnsibleContentAssignmentComp = ({
           hierarchyIconMap={hierarchyIconMap}
           hierarchy={hierarchy}
           onBadAssignmentClick={assignment => {
-            const warning = warnings.find(
+            const warning = resolutionWarnings.find(
               w => w.assignment_id === assignment.id
             );
             setSelectedAlert(warning === undefined ? null : warning);
           }}
           onAssignmentRemove={async assignment => {
-            await handleUnassign(assignment);
-            onResolveClick();
+            await assignmentCtx.handleAssignmentDestroy(assignment);
+            assignmentCtx.dataInterface === 'api'
+              ? assignmentCtx.refreshAssignments()
+              : setIsAssignmentModalOpen(false);
           }}
         />
       );
@@ -197,7 +161,7 @@ export const AnsibleContentAssignmentComp = ({
                 ? _(
                   'No content found for these filters. Clear all filters and try again.'
                 )
-                : _('No content assigned to this host.')
+                : _(`No content assigned to this ${crnType}.`)
             }
             headingLevel="h1"
             icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
@@ -326,27 +290,33 @@ export const AnsibleContentAssignmentComp = ({
             )}
             {isAssignmentModalOpen && (
               <AssignmentSelectorWrapper
-                crnId={crnId}
                 crnType={crnType}
-                crnName={crnName}
                 csId={csId}
-                excludeAssignments={assignments}
                 onClose={() => setIsAssignmentModalOpen(false)}
                 onAbort={() => setIsAssignmentModalOpen(false)}
-                onSuccess={onResolveClick}
+                onSuccess={assignmentCtx.dataInterface === 'api' ? () => {
+                  assignmentCtx.refreshAssignments();
+                  setIsAssignmentModalOpen(false);
+                } : () => {
+                  setIsAssignmentModalOpen(false);
+                }}
               />
             )}
           </div>
         </Permitted>
       </Tab>
-      <Tab title={_('Ansible variables')} eventKey={1}>
-        <OverrideGridWrapper
-          crnType={crnType}
-          crnId={crnId}
-          matcherType={crnTypeMatcherMap[crnType]}
-          matcherName={crnName}
-        />
-      </Tab>
+      {
+        assignmentCtx.dataInterface === 'api' && (
+          <Tab title={_('Ansible variables')} eventKey={1}>
+            <OverrideGridWrapper
+              crnType={crnType}
+              crnId={crnId}
+              matcherType={crnTypeMatcherMap[crnType]}
+              matcherName={crnName}
+            />
+          </Tab>
+        )
+      }
     </Tabs>
   );
 };

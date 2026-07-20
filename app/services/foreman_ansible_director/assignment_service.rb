@@ -46,20 +46,37 @@ module ForemanAnsibleDirector
       end
 
       def find_target(target_type:, target_id:)
-        # TODO: Null check target
         finder = finder(type: target_type)
-        finder.find_by(id: target_id)
+        finder.find_by!(id: target_id)
       end
 
-      def assignments_for(target:, resolve: false)
-        content_source, = content_source_for(target)
+      def assignments_for(target:, content_source_override: nil, resolve: false)
+        content_source, = content_source_override || content_source_for(target)
         resolved_assignments, hierarchy = recurse_content_assignments(target)
+
+        return [resolved_assignments, nil, hierarchy, nil] unless resolve && content_source
+
+        resolved = resolve_content_units(content_source, resolved_assignments)
+
+        [resolved_assignments, resolved, hierarchy, content_source]
+      end
+
+      def assignment_preresolve(parent: nil, node_assignments: [], node_cs: nil, resolve: false)
+        resolved_assignments = node_assignments
+        hierarchy = []
+        content_source = node_cs
+
+        if parent
+          parent_assignments, hierarchy = recurse_content_assignments(parent)
+          resolved_assignments = merge_assignments parent_assignments, resolved_assignments
+          content_source, = content_source_for(parent) unless content_source
+        end
 
         return resolved_assignments, nil, hierarchy unless resolve && content_source
 
         resolved = resolve_content_units(content_source, resolved_assignments)
 
-        [resolved_assignments, resolved, hierarchy]
+        [resolved_assignments, resolved, hierarchy, content_source]
       end
 
       def content_source_for(target, hierarchy = [])
@@ -98,23 +115,23 @@ module ForemanAnsibleDirector
 
         preceding_assignments.each do |assignment|
           assignment_key = [
-            assignment.assignable_namespace,
-            assignment.assignable_name,
-            assignment.assignable_role_name,
-            assignment.assignable_type,
+            assignment[:assignable_namespace],
+            assignment[:assignable_name],
+            assignment[:assignable_role_name],
+            assignment[:assignable_type],
           ]
           merged_hash[assignment_key] = assignment
         end
 
         assignments.each do |assignment|
           assignment_key = [
-            assignment.assignable_namespace,
-            assignment.assignable_name,
-            assignment.assignable_role_name,
-            assignment.assignable_type,
+            assignment[:assignable_namespace],
+            assignment[:assignable_name],
+            assignment[:assignable_role_name],
+            assignment[:assignable_type],
           ]
 
-          if assignment.subtractive
+          if assignment[:subtractive]
             merged_hash.delete(assignment_key)
           else
             merged_hash[assignment_key] = assignment
@@ -154,10 +171,10 @@ module ForemanAnsibleDirector
         matched = []
 
         assignments.each do |assignment|
-          namespace = assignment.assignable_namespace
-          name = assignment.assignable_name
-          role_name = assignment.assignable_role_name
-          type = assignment.assignable_type
+          namespace = assignment[:assignable_namespace]
+          name = assignment[:assignable_name]
+          role_name = assignment[:assignable_role_name]
+          type = assignment[:assignable_type]
 
           case type
           when 'ForemanAnsibleDirector::AnsibleCollectionRole'
@@ -178,7 +195,7 @@ module ForemanAnsibleDirector
                 collection_namespace: namespace,
                 collection_role_identifier: role_name,
                 content_source: content_source,
-                assignment_id: assignment.id
+                assignment_id: assignment.respond_to?(:id) ? assignment.id : 'preresolved'
               ))
             end
 
@@ -196,7 +213,7 @@ module ForemanAnsibleDirector
                 role_name: name,
                 role_namespace: namespace,
                 content_source: content_source,
-                assignment_id: assignment.id
+                assignment_id: assignment.respond_to?(:id) ? assignment.id : 'preresolved'
               ))
             end
           end

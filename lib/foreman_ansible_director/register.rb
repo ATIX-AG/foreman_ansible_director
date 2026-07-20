@@ -131,7 +131,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible assignments
     # View
     permission :view_ansible_assignments,
-      { 'foreman_ansible_director/api/v2/assignments': [:assignments] },
+      { 'foreman_ansible_director/api/v2/assignments': %w[assignments preresolve] },
       resource_type: 'ForemanAnsibleDirector::AnsibleContentAssignment'
     # Create
     permission :create_ansible_assignments,

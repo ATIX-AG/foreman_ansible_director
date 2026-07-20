@@ -21,6 +21,8 @@
 
   html_opts = { label: _('Ansible Environment'),
                 required: false}
+
+  html_opts[:'meta-lce-id'] = inherited_lce.id if inherited_lce.present?
 %>
 
 <%= select_f form,
