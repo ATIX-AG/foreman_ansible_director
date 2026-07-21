@@ -22,7 +22,7 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: GET /api/v2/ansible_director/lifecycle_environments/paths/:id
         api :GET, '/v2/ansible_director/lifecycle_environments/paths/:id',
-            N_('Show details of a Lifecycle Environment Path')
+          N_('Show details of a Lifecycle Environment Path')
         param :id, :number, desc: N_('Lifecycle Environment Path identifier.'), required: true
         # endregion
         def show
