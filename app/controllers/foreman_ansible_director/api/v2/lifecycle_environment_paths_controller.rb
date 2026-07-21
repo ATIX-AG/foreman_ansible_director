@@ -6,7 +6,7 @@ module ForemanAnsibleDirector
       class LifecycleEnvironmentPathsController < AnsibleDirectorApiController
         include ::Api::Version2
 
-        before_action :find_resource, only: %i[promote update destroy]
+        before_action :find_resource, only: %i[promote update destroy show]
         before_action :find_organization, only: %i[create]
 
         resource_description { resource_id 'AD Ansible Lifecycle Environment Paths' }
@@ -18,6 +18,14 @@ module ForemanAnsibleDirector
         # endregion
         def index
           @lifecycle_environment_paths = resource_scope_for_index
+        end
+
+        # region ApiDoc: GET /api/v2/ansible_director/lifecycle_environments/paths/:id
+        api :GET, '/v2/ansible_director/lifecycle_environments/paths/:id',
+            N_('Show details of a Lifecycle Environment Path')
+        param :id, :number, desc: N_('Lifecycle Environment Path identifier.'), required: true
+        # endregion
+        def show
         end
 
         # region ApiDoc: POST /api/v2/ansible_director/lifecycle_environments/paths
