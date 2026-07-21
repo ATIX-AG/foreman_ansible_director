@@ -23,6 +23,7 @@ import {
 } from '../../../../types/AnsibleContentAssignmentTypes';
 import { crnTypeUiString, crnTypeUrlMap } from '../helpers';
 import { AssignmentContext } from '../AssignmentContext';
+import { DefaultResponse } from '../../../../types/common';
 
 interface AssignmentSelectorWrapperProps {
   crnType: ContentResolutionNodeType;
@@ -49,8 +50,8 @@ export const AssignmentSelectorWrapper = ({
     return null;
   }
 
-  const getAvailableContentRequest: UseAPIReturn<DenseAnsibleLce> = useAPI<
-    DenseAnsibleLce
+  const getAvailableContentRequest: UseAPIReturn<DefaultResponse<never, never, DenseAnsibleLce>> = useAPI<
+    DefaultResponse<never, never, DenseAnsibleLce>
   >(
     'get',
     foremanUrl(`/api/v2/ansible_director/lifecycle_environments/${csId}/`)
@@ -82,7 +83,7 @@ export const AssignmentSelectorWrapper = ({
         ]}
       >
         <AssignmentSelector
-          availableContent={getAvailableContentRequest.response.content}
+          availableContent={getAvailableContentRequest.response.results.content}
           selected={selectedAssignables}
           onChange={newAssignables => setSelectedAssignables(newAssignables)}
         />
