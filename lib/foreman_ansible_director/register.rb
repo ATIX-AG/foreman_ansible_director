@@ -93,7 +93,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible lifecycle environment paths
     # View
     permission :view_ansible_lifecycle_environment_paths,
-      { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search] },
+      { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search show] },
       resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     # Create
     permission :create_ansible_lifecycle_environment_paths,
