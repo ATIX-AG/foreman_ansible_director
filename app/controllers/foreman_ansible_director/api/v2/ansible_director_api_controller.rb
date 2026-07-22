@@ -11,6 +11,19 @@ module ForemanAnsibleDirector
 
         around_action :attach_request_ctx
 
+        rescue_from StandardError do |error|
+          @ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::InternalError.new(
+            exception: error,
+            coincidence_id: @ctx.coincidence_id
+          ))
+          render_default_response
+        end
+
+        rescue_from ActiveRecord::RecordNotFound do |error|
+          @ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::RecordNotFound.new(exception: error))
+          render_default_response
+        end
+
         def attach_request_ctx
           ::ForemanAnsibleDirector::RequestCtx::RequestContext.with_context(
             ::ForemanAnsibleDirector::RequestCtx::RequestContext.new(request.request_id)
@@ -18,6 +31,11 @@ module ForemanAnsibleDirector
             @ctx = ctx
             yield
           end
+        end
+
+        def render_default_response
+          return if performed?
+          render template: 'foreman_ansible_director/api/v2/common/response', status: @ctx.response_status_code
         end
 
         def find_organization

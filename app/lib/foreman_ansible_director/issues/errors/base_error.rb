@@ -4,6 +4,10 @@ module ForemanAnsibleDirector
   module Issues
     module Errors
       class BaseError < BaseIssue
+        def status_code
+          500
+        end
+
         def render_for_response
           {
             type: 'error',
