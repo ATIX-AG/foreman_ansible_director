@@ -10,22 +10,41 @@ import {
   crudSuccess,
   crudSuccessWarn,
 } from './crudToasts';
+import { promoteError, promoteSuccess, promoteSuccessWarn } from './promoteToasts';
 import { resourceIdentifier } from '../../resources/utils';
 import { AlertContext } from '../../components/common/Alerts/AlertContext';
 
-type ToastType = crudOperation;
-
-interface WithToastOptions<
+interface CrudToastOptions<
   TCreated,
   TUpdated,
   TDeleted,
   TWarning extends AnsibleDirectorWarning,
   TError extends AnsibleDirectorError
 > {
-  type: ToastType;
+  type: crudOperation;
   resource: resourceIdentifier;
   func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>>;
 }
+
+interface PromoteToastOptions<
+  TCreated,
+  TUpdated,
+  TDeleted,
+  TWarning extends AnsibleDirectorWarning,
+  TError extends AnsibleDirectorError
+> {
+  type: 'promote';
+  func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>>;
+}
+
+type WithToastOptions<
+  TCreated,
+  TUpdated,
+  TDeleted,
+  TWarning extends AnsibleDirectorWarning,
+  TError extends AnsibleDirectorError
+> = CrudToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>
+  | PromoteToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>;
 
 interface UseToastsReturn {
   withToast: <
@@ -54,7 +73,7 @@ export const useToasts = (): UseToastsReturn => {
     >(
       options: WithToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>
     ): Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>> => {
-      const { type, resource, func } = options;
+      const { type, func } = options;
       const response = await func;
 
       let params: toastParams | null = null;
@@ -62,19 +81,49 @@ export const useToasts = (): UseToastsReturn => {
       switch (type) {
         case 'create':
         case 'update':
-        case 'delete':
+        case 'delete': {
+          const crudOptions = options satisfies CrudToastOptions<
+            TCreated,
+            TUpdated,
+            TDeleted,
+            TWarning,
+            TError
+          >;
           if (response.ok) {
             if (response.warnings.length > 0) {
-              params = crudSuccessWarn(type, resource, response.warnings, () =>
-                context?.showAlert(response.warnings));
+              params = crudSuccessWarn(
+                type,
+                crudOptions.resource,
+                response.warnings,
+                () => context?.showAlert(response.warnings)
+              );
             } else {
-              params = crudSuccess(type, resource);
+              params = crudSuccess(type, crudOptions.resource);
             }
           } else {
-            params = crudError(type, resource, response.errors, () =>
-              context?.showAlert(response.errors));
+            params = crudError(
+              type,
+              crudOptions.resource,
+              response.errors,
+              () => context?.showAlert(response.errors)
+            );
           }
           break;
+        }
+        case 'promote':
+          if (response.ok) {
+            if (response.warnings.length > 0) {
+              params = promoteSuccessWarn(response.warnings, () =>
+                context?.showAlert(response.warnings));
+            }
+            else {
+              params = promoteSuccess();
+            }
+          }
+          else {
+            params = promoteError(response.errors, () =>
+              context?.showAlert(response.errors));
+          }
       }
 
       if (params) {

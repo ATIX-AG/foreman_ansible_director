@@ -39,6 +39,8 @@ import { AnsibleLceComponentWrapper } from './AnsibleLceComponentWrapper';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 import { PermittedButton } from '../../../common/PermittedButton';
 import { Permitted } from '../../../common/Permitted';
+import { useToasts } from '../../../../helpers/toasts/useToasts';
+import { LifecycleEnvironmentPath } from '../../../../resources/clients/LifecycleEnvironmentPath';
 
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
@@ -73,6 +75,8 @@ export const AnsibleLcePathComponent = ({
   const [loadingButton, setLoadingButton] = useState<number>();
 
   const organization = useForemanOrganization();
+
+  const { withToast } = useToasts();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -102,103 +106,44 @@ export const AnsibleLcePathComponent = ({
     targetEnvId: number
   ): Promise<void> => {
     setLoadingButton(sourceEnvId);
-    try {
-      await axios.post(
-        foremanUrl(
-          `/api/v2/ansible_director/lifecycle_environments/paths/${lcePath.id}/promote`
-        ),
-        {
-          promote: {
-            source_environment_id: sourceEnvId,
-            target_environment_id: targetEnvId,
-          },
-        }
-      );
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `PROMOTE_${sourceEnvId}_ERR`,
-          message: `Promotion failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    } finally {
-      refreshRequest();
-      setLoadingButton(undefined);
-    }
+    await withToast({
+      type: 'promote',
+      func: LifecycleEnvironmentPath.promote(lcePath.id, {
+        promote: {
+          source_environment_id: sourceEnvId,
+          target_environment_id: targetEnvId,
+        },
+      }),
+    });
+    refreshRequest();
+    setLoadingButton(undefined);
   };
 
   const destroyLcePath = async (path: AnsibleLcePath): Promise<void> => {
-    // TODO: At some point I should refactor all these axios calls to a single function
-    try {
-      await axios.delete(
-        `${foremanUrl(
-          '/api/v2/ansible_director/lifecycle_environments/paths'
-        )}/${path.id}`
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `DESTROY_LCE_PATH_${path.name}_SUCC`,
-          message: `Successfully deleted Ansible lifecycle environment path "${path.name}"!`,
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `DESTROY_LCE_${path.name}_ERR`,
-          message: `Deletion of Ansible environment path "${
-            path.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'delete',
+      resource: 'lifecycle_environment_path',
+      func: LifecycleEnvironmentPath.destroy(path.id),
+    });
+    refreshRequest();
   };
 
   const updateLcePath = async (path: AnsibleLcePath): Promise<void> => {
-    // TODO: At some point I should refactor all these axios calls to a single function
-    try {
-      await axios.put(
-        `${foremanUrl(
-          '/api/v2/ansible_director/lifecycle_environments/paths'
-        )}/${path.id}`,
-        {
-          lifecycle_environment_path: lifecycleEnvironmentPath,
-          organization_id: organization?.id,
-        }
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `UPDATE_LCE_PATH_${path.name}_SUCC`,
-          message: `Successfully updated Ansible environment path "${path.name}"!`,
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `UPDATE_LCE_${path.name}_ERR`,
-          message: `Updating of Ansible environment path "${
-            path.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
+    if (lifecycleEnvironmentPath === undefined) {
+      return;
     }
+
+    await withToast({
+      type: 'update',
+      resource: 'lifecycle_environment_path',
+      func: LifecycleEnvironmentPath.update(path.id, {
+        lifecycle_environment_path: {
+          name: lifecycleEnvironmentPath.name,
+          description: lifecycleEnvironmentPath.description,
+        },
+      }),
+    });
+    refreshRequest();
   };
 
   const handleDestroyLcePath = (path: AnsibleLcePath): void => {
@@ -211,36 +156,6 @@ export const AnsibleLcePathComponent = ({
       await destroyLcePath(path);
     });
   };
-
-  // const destroyLce = async (lce: AnsibleLce): Promise<void> => {
-  //  try {
-  //    await axios.delete(
-  //      `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${lce.id}`
-  //    );
-  //    dispatch(
-  //      addToast({
-  //        type: 'success',
-  //        key: `DESTROY_LCE_${lce.name}_SUCC`,
-  //        message: `Successfully deleted Ansible environment "${lce.name}"!`,
-  //        sticky: false,
-  //      })
-  //    );
-  //    refreshRequest();
-  //  } catch (e) {
-  //    dispatch(
-  //      addToast({
-  //        type: 'danger',
-  //        key: `DESTROY_LCE_${lce.name}_ERR`,
-  //        message: `Deletion of Ansible environment "${
-  //          lce.name
-  //        }" failed with error code "${
-  //          (e as { response: AxiosResponse }).response.status
-  //        }".`,
-  //        sticky: false,
-  //      })
-  //    );
-  //  }
-  // };
 
   const insertEnv = async (
     pos: 'before' | 'after',
