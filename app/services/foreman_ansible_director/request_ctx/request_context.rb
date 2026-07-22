@@ -17,7 +17,7 @@ module ForemanAnsibleDirector
         end
       end
 
-      attr_reader :errors, :warnings, :created, :updated, :deleted
+      attr_reader :errors, :warnings, :created, :updated, :deleted, :coincidence_id
 
       def initialize(coincidence_id)
         @coincidence_id = coincidence_id
@@ -31,6 +31,15 @@ module ForemanAnsibleDirector
       def response_status
         return 'error' if @errors.any?
         'success'
+      end
+
+      def response_status_code
+        if @errors.any?
+          codes = @errors.map(&:status_code)
+          # In case an internal error happened during a request that would have returned 404, we want to return 500
+          return codes.max
+        end
+        200
       end
 
       def response_warnings
