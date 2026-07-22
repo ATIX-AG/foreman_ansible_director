@@ -21,6 +21,8 @@ import { AnsibleLcePathIndex } from './AnsibleLcePathIndex';
 import { Page } from '../../common/Page';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 import { PermittedButton } from '../../common/PermittedButton';
+import { useToasts } from '../../../helpers/toasts/useToasts';
+import { LifecycleEnvironmentPath } from '../../../resources/clients/LifecycleEnvironmentPath';
 
 export interface GetAnsibleLcePathsResponse extends IndexResponse {
   results: AnsibleLcePath[];
@@ -39,26 +41,25 @@ const AnsibleContentTableWrapper = ({
     boolean
   >(false);
 
+  const { withToast } = useToasts();
+
   const createLcePath = async (): Promise<void> => {
     setIsCreateButtonLoading(true);
-    try {
-      await axios.post(
-        foremanUrl('/api/v2/ansible_director/lifecycle_environments/paths'),
-        {
-          lifecycle_environment_path: {
-            name: 'Unnamed LCE Path',
-            description: '',
-          },
-          organization_id: organization?.id,
-        }
-      );
-    } catch (e) {
-      // TODO: Handle error
-    } finally {
-      setIsCreateButtonLoading(false);
-      refreshRequest();
-    }
+    await withToast({
+      type: 'create',
+      resource: 'lifecycle_environment_path',
+      func: LifecycleEnvironmentPath.create({
+        lifecycle_environment_path: {
+          name: 'Unnamed LCE Path',
+          description: '',
+        },
+        organization_id: organization?.id,
+      }),
+    });
+    setIsCreateButtonLoading(false);
+    refreshRequest();
   };
+
   const contentRequest: UseAPIReturn<GetAnsibleLcePathsResponse> = useTableIndexAPIResponse<
     GetAnsibleLcePathsResponse
   >({
