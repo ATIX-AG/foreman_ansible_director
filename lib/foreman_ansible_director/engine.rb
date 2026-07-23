@@ -41,6 +41,7 @@ module ForemanAnsibleDirector
       ::ConfigReportImporter.include ForemanAnsibleDirector::AnsibleReportImporter
 
       ::HostgroupsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostgroupExtensions
+      ::HostsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostExtensions
 
       ReportImporter.register_smart_proxy_feature('Ansible')
     end

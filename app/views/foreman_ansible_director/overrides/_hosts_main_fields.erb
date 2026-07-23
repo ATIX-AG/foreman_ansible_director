@@ -1,0 +1,34 @@
+<%
+
+  available_lces = ::ForemanAnsibleDirector::LifecycleEnvironment.where(organization_id: Organization.current&.id)
+
+  lce_objects = available_lces.map do |lce|
+    o = OpenStruct.new(id: lce.id)
+    o.define_singleton_method(:to_label) { lce.cs_name }
+    o
+  end
+
+  inherited_lce = ::ForemanAnsibleDirector::AssignmentService.content_source_for(form.object)[0]
+  inherited_label = _("no value")
+  if inherited_lce.present?
+    inherited_label = _("Inherit parent (%s)") % inherited_lce.cs_name
+  end
+
+  selected = form.object.ansible_lifecycle_environment&.id
+
+
+  select_opts = { include_blank: inherited_label, selected: selected }
+
+  html_opts = { label: _('Ansible Environment'),
+                required: false}
+
+  html_opts[:'meta-lce-id'] = inherited_lce.id if inherited_lce.present?
+%>
+
+<%= select_f form,
+             :ansible_lifecycle_environment_id,
+             lce_objects,
+             :id,
+             :to_label,
+             select_opts,
+             html_opts %>
