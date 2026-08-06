@@ -42,6 +42,11 @@ if defined? ForemanRemoteExecution
                     resolve: true
                   )
 
+                  if resolved_assignments.empty?
+                    raise ForemanTasks::Task::TaskCancelledException,
+                      "Configuration job cancelled, as no applicable roles were found for #{host.name}."
+                  end
+
                   playbook = ForemanAnsibleDirector::Generators::PlaybookGenerator.generate(
                     resolved_host_content: resolved_assignments
                   )
