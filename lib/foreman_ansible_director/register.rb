@@ -162,6 +162,7 @@ Foreman::Plugin.register :foreman_ansible_director do
       view_ansible_director_variables
       edit_ansible_director_variables
       view_ansible_director_variable_overrides
+      edit_ansible_director_variable_overrides
       create_ansible_director_variable_overrides
       destroy_ansible_director_variable_overrides
       view_ansible_lifecycle_environments
