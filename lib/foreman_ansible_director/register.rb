@@ -144,6 +144,7 @@ Foreman::Plugin.register :foreman_ansible_director do
       resource_type: 'ForemanAnsibleDirector::AnsibleContentAssignment'
 
     role 'AnsibleDirector Viewer', %i[
+      view_organizations
       view_ansible_content
       view_ansible_director_variables
       view_ansible_director_variable_overrides
@@ -154,6 +155,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ], 'All read-only permissions defined by AnsibleDirector.'
 
     role 'AnsibleDirector Manager', %i[
+      view_organizations
       view_ansible_content
       create_ansible_content
       destroy_ansible_content
