@@ -2,12 +2,13 @@
 include:
   - project: 'orcharhino/foreman_components/foreman_testing_ci_template'
     file: 'plugin.gitlab-ci.yml'
-    ref: '3.11.0'
+    ref: '3.13.0'
 
 variables:
   WITH_COVERAGE: true
+  WITH_NPM_AUDIT: true
 
-js-lint-test:
+.js:
   extends: .versions
   image: ${RUBY_IMAGE}
   cache:
@@ -22,10 +23,19 @@ js-lint-test:
     - cd foreman && npm install
     - cd ../${FOREMAN_PLUGIN}
     - npm ci --no-audit
-    - npm i jest-junit
+
+lint-js:
+  stage: lint
+  extends: .js
   script:
     # Run ESLint (linting)
     - npm run lint
+
+test-js:
+  stage: test
+  extends: .js
+  script:
+    - npm i jest-junit
     # Run tests
     - npm run test -- $JS_TEST_OPTIONS --coverage
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
