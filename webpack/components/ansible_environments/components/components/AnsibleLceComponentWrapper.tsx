@@ -15,6 +15,7 @@ import {
   AnsibleLce,
   SparseAnsibleLce,
 } from '../../../../types/AnsibleEnvironmentsTypes';
+import { DefaultResponse } from '../../../../types/common';
 
 interface AnsibleLceComponentWrapperProps {
   lce: SparseAnsibleLce;
@@ -29,7 +30,7 @@ interface AnsibleLceComponentWrapperProps {
   setIsExecutionEnvModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-interface GetAnsibleLceResponse extends AnsibleLce {}
+interface GetAnsibleLceResponse extends DefaultResponse<never, never, AnsibleLce> {}
 
 export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProps> = ({
   lce,
@@ -59,7 +60,7 @@ export const AnsibleLceComponentWrapper: React.FC<AnsibleLceComponentWrapperProp
   if (contentRequest.status === 'RESOLVED') {
     return (
       <AnsibleLceComponent
-        lce={contentRequest.response}
+        lce={contentRequest.response.results}
         pathEditMode={pathEditMode}
         refreshRequest={refreshRequest}
         setIsContentUnitModalOpen={setIsContentUnitModalOpen}

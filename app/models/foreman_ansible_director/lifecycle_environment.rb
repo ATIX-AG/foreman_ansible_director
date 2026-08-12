@@ -114,5 +114,45 @@ module ForemanAnsibleDirector
       return [] unless parent
       [parent] + parent.ancestors
     end
+
+    def render_for_api
+      {
+        id: id,
+        name: name,
+        description: description,
+        position: position,
+        content_hash: content_hash,
+        execution_environment: if execution_environment
+                                 {
+                                   id: execution_environment.id,
+                                   name: execution_environment.name,
+                                 }
+                               end,
+        content: content_unit_versions.to_a.then do |versions|
+          if versions.empty?
+            []
+          else
+            versions
+              .sort_by { |v| v.versionable.full_name }
+              .map do |v|
+                {
+                  id: v.versionable.id,
+                  type: v.content_unit_type,
+                  identifier: v.versionable.full_name,
+                  version: v.version,
+                  roles: if v.content_unit_type == 'collection'
+                           v.ansible_collection_roles
+                            .to_a
+                            .sort_by(&:name)
+                            .map { |role| { id: role.id, name: role.name } }
+                         else
+                           []
+                         end,
+                }
+              end
+          end
+        end,
+      }
+    end
   end
 end

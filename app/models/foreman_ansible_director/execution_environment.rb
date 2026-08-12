@@ -47,5 +47,17 @@ module ForemanAnsibleDirector
         content_unit_version: version
       )
     end
+
+    def render_for_api
+      {
+        id: id,
+        name: name,
+        base_image_url: base_image_url,
+        ansible_version: ansible_version,
+        build_status: build_status,
+        build_job: build_job,
+        content: [],
+      }
+    end
   end
 end

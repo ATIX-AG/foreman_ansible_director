@@ -6,8 +6,6 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { useDispatch } from 'react-redux';
-import axios, { AxiosResponse } from 'axios';
 
 import {
   Card,
@@ -21,12 +19,13 @@ import {
 import { useAPI } from 'foremanReact/common/hooks/API/APIHooks';
 import { foremanUrl } from 'foremanReact/common/helpers';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
-import { addToast } from 'foremanReact/components/ToastsList';
 
 import { DefaultResponse } from '../../../types/common';
 import { AnsibleExecutionEnv } from '../../../types/AnsibleExecutionEnvTypes';
 import { ExecutionEnvCard } from './ExecutionEnvCard';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
+import { ExecutionEnvironment } from '../../../resources/clients/ExecutionEnvironment';
+import { useToasts } from '../../../helpers/toasts/useToasts';
 import { useAdContext } from '../../../helpers/adContext';
 
 interface ExecutionEnvCardWrapperProps {
@@ -55,7 +54,7 @@ export const ExecutionEnvCardWrapper = ({
 
   const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const dispatch = useDispatch();
+  const { withToast } = useToasts();
 
   const ctx = useAdContext();
 
@@ -112,89 +111,28 @@ export const ExecutionEnvCardWrapper = ({
   ]);
 
   const updateEnvironment = async (env: AnsibleExecutionEnv): Promise<void> => {
-    try {
-      await axios.patch(
-        foremanUrl(`/api/v2/ansible_director/execution_environments/${env.id}`),
-        {
-          execution_environment: {
-            name: env.name,
-            base_image_url: env.base_image_url,
-            ansible_version: env.ansible_version,
-            content: env.content,
-          },
-        }
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `UPDATE_EE_${env.name}_SUCC`,
-          message: __(
-            _('Successfully updated Ansible Execution Environment "%(name)s"!'),
-            { name: env.name }
-          ),
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `UPDATE_EE_${env.name}_ERR`,
-          message: __(
-            _(
-              'Updating of Ansible Execution Environment "%(name)s" failed with error code "%(error)s".'
-            ),
-            {
-              name: env.name,
-              error: (e as { response: AxiosResponse }).response.status,
-            }
-          ),
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'update',
+      resource: 'execution_environment',
+      func: ExecutionEnvironment.update(env.id, {
+        execution_environment: {
+          name: env.name,
+          base_image_url: env.base_image_url,
+          ansible_version: env.ansible_version,
+        },
+      }),
+    });
+    refreshRequest();
   };
 
   const destroyEnvironment = async (
     env: AnsibleExecutionEnv
   ): Promise<void> => {
-    try {
-      await axios.delete(
-        `${foremanUrl('/api/v2/ansible_director/execution_environments')}/${
-          env.id
-        }`
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `DESTROY_EE_${env.name}_SUCC`,
-          message: __(
-            _('Successfully deleted Ansible Execution Environment "%(name)s"!'),
-            { name: env.name }
-          ),
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `DESTROY_EE_${env.name}_ERR`,
-          message: __(
-            _(
-              'Deletion of Ansible Execution Environment "%(name)s" failed with error code "%(error)s".'
-            ),
-            {
-              name: env.name,
-              error: (e as { response: AxiosResponse }).response.status,
-            }
-          ),
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'delete',
+      resource: 'execution_environment',
+      func: ExecutionEnvironment.destroy(env.id),
+    });
   };
 
   const currentEnv =
