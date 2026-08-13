@@ -35,10 +35,17 @@ module ForemanAnsibleDirector
         end
 
         def organization_scoped_resource_scope(scope = resource_class.all)
+          return scope.none if User.current.blank?
           organization = @organization || Organization.current
-          return scope unless organization
-
-          scope.where(organization_id: organization.id)
+          if organization.nil?
+            if User.current.admin?
+              scope
+            else
+              scope.where(organization_id: User.current.my_organizations)
+            end
+          else
+            scope.where(organization_id: organization.id)
+          end
         end
 
         def action_permission

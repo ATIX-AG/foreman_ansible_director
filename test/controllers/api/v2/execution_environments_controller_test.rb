@@ -12,6 +12,16 @@ module ForemanAnsibleDirectorTests
           User.current = User.find_by(login: 'admin')
           @organization = Organization.find_by(name: 'Organization 1')
           @other_organization = Organization.find_by(name: 'Organization 2')
+
+          as_admin do
+            @viewer = FactoryBot.create(
+              :user,
+              organizations: [@organization],
+              locations: [Location.find_by(name: 'Location 1')]
+            )
+            @viewer.roles << Role.find_by!(name: 'AnsibleDirector Viewer')
+          end
+
           @matching_execution_environment = FactoryBot.create(
             :execution_environment,
             organization: @organization,
@@ -24,6 +34,32 @@ module ForemanAnsibleDirectorTests
           )
         end
 
+        test 'limits index without organization context to the current user organizations' do
+          User.current = @viewer
+          Organization.current = nil
+
+          get :index,
+            params: {},
+            session: set_session_user(@viewer)
+
+          assert_response :success
+          assert_includes response.body, @matching_execution_environment.name
+          assert_not_includes response.body, 'other-ee'
+        end
+
+        test 'admin without organization context sees all resources' do
+          User.current = User.find_by(login: 'admin')
+          Organization.current = nil
+
+          get :index,
+            params: {},
+            session: set_session_user
+
+          assert_response :success
+          assert_includes response.body, @matching_execution_environment.name
+          assert_includes response.body, 'other-ee'
+        end
+
         test 'filters index by explicit organization' do
           Organization.current = nil
 
@@ -33,6 +69,19 @@ module ForemanAnsibleDirectorTests
 
           assert_response :success
           assert_includes response.body, @matching_execution_environment.name
+          assert_not_includes response.body, 'other-ee'
+        end
+
+        test 'non-admin cannot view other organization resources' do
+          User.current = @viewer
+          Organization.current = nil
+
+          get :index,
+            params: { organization_id: @other_organization.id },
+            session: set_session_user(@viewer)
+
+          assert_response :not_found
+          assert_not_includes response.body, 'matching-ee'
           assert_not_includes response.body, 'other-ee'
         end
 
