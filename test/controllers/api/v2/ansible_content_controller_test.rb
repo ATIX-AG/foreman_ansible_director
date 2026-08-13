@@ -11,20 +11,57 @@ module ForemanAnsibleDirectorTests
         setup do
           User.current = User.find_by(login: 'admin')
           @organization = Organization.find_by(name: 'Organization 1')
+
+          as_admin do
+            @viewer = FactoryBot.create(
+              :user,
+              organizations: [@organization],
+              locations: [Location.find_by(name: 'Location 1')]
+            )
+            @viewer.roles << Role.find_by!(name: 'AnsibleDirector Viewer')
+          end
         end
 
-        test 'allows requests without organization context' do
+        test 'limits requests without organization context to the current user organizations' do
+          User.current = @viewer
           Organization.current = nil
           first_unit = FactoryBot.create(
             :ansible_collection,
             organization: @organization,
             name: 'visible_without_org_context'
           )
+          FactoryBot.create(
+            :ansible_collection,
+            organization: Organization.find_by(name: 'Organization 2'),
+            name: 'hidden_without_org_context'
+          )
+
+          get :index, params: {}, session: set_session_user(@viewer)
+
+          assert_response :success
+          assert_includes response.body, first_unit.name
+          assert_not_includes response.body, 'hidden_without_org_context'
+        end
+
+        test 'admin without organization context sees all resources' do
+          User.current = User.find_by(login: 'admin')
+          Organization.current = nil
+          first_unit = FactoryBot.create(
+            :ansible_collection,
+            organization: @organization,
+            name: 'visible_to_admin_1'
+          )
+          second_unit = FactoryBot.create(
+            :ansible_collection,
+            organization: Organization.find_by(name: 'Organization 2'),
+            name: 'visible_to_admin_2'
+          )
 
           get :index, params: {}, session: set_session_user
 
           assert_response :success
           assert_includes response.body, first_unit.name
+          assert_includes response.body, second_unit.name
         end
 
         test 'filters index by explicit organization' do
@@ -84,6 +121,20 @@ module ForemanAnsibleDirectorTests
 
           assert_response :not_found
           assert_includes response.body, 'Organization with id 99999999 not found'
+        end
+
+        test 'non-admin cannot view other organization resources' do
+          User.current = @viewer
+          Organization.current = nil
+          other_organization = Organization.find_by(name: 'Organization 2')
+
+          get :index,
+            params: { organization_id: other_organization.id },
+            session: set_session_user(@viewer)
+
+          assert_response :not_found
+          # Non-admin viewing other org should see nothing from that org
+          assert_not_includes response.body, 'visible_to_admin_2'
         end
       end
     end
