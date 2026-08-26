@@ -24,6 +24,11 @@ module ForemanAnsibleDirector
           render_default_response
         end
 
+        rescue_from ActionController::ParameterMissing do |error|
+          @ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::ParameterMissingError.new(exception: error))
+          render_default_response
+        end
+
         def attach_request_ctx
           ::ForemanAnsibleDirector::RequestCtx::RequestContext.with_context(
             ::ForemanAnsibleDirector::RequestCtx::RequestContext.new(request.request_id)
