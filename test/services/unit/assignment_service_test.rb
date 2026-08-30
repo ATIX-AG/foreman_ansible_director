@@ -83,6 +83,50 @@ module ForemanAnsibleDirectorTests
             )
             assert_equal 2, target_assignments.count
           end
+
+          test 'does nothing for empty assignments' do
+            existing_assignment = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host
+            )
+
+            ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(target: @host, assignments: [])
+
+            assert_equal(
+              [existing_assignment.id],
+              ::ForemanAnsibleDirector::AnsibleContentAssignment.where(consumable: @host).pluck(:id)
+            )
+          end
+
+          test 'rolls back all target changes when a later assignment fails' do
+            existing_assignment = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host
+            )
+
+            assert_raises(ActiveRecord::StatementInvalid) do
+              ::ForemanAnsibleDirector::AssignmentService.create_bulk_assignments(
+                target: @host,
+                assignments: [
+                  {
+                    assignable_type: "ForemanAnsibleDirector::AnsibleRole",
+                    assignable_namespace: "geerlinguy",
+                    assignable_name: "redis",
+                  },
+                  {
+                    assignable_type: "ForemanAnsibleDirector::AnsibleRole",
+                    assignable_namespace: "geerlinguy",
+                    assignable_name: nil,
+                  }
+                ]
+              )
+            end
+
+            assert_equal(
+              [existing_assignment.id],
+              ::ForemanAnsibleDirector::AnsibleContentAssignment.where(consumable: @host).pluck(:id)
+            )
+          end
         end
 
         describe "#content_source_for" do
