@@ -2,12 +2,15 @@ import React, { ReactElement, useEffect, useRef } from 'react';
 import { Modal, ModalVariant, Button } from '@patternfly/react-core';
 import { translate as _ } from 'foremanReact/common/I18n';
 
-interface ConfirmationModalProps {
-  isConfirmationModalOpen: boolean;
+export interface ConfirmableAction {
   title: string;
   body: string;
   onConfirm: () => void | Promise<void>;
   onAbort: () => void;
+}
+
+interface ConfirmationModalProps extends ConfirmableAction {
+  isConfirmationModalOpen: boolean;
 }
 
 export const ConfirmationModal = ({

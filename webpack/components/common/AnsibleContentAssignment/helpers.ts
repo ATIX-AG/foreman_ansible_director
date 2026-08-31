@@ -1,3 +1,4 @@
+import { translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleCollectionRoleAssignment,
   AnsibleContentAssignment,
@@ -6,6 +7,7 @@ import {
   ContentResolutionNodeType,
   Fqrnable,
 } from '../../../types/AnsibleContentAssignmentTypes';
+
 import { pfLabelColorType } from '../../../types/common';
 
 export const assignmentFqrn = (assignment: Fqrnable): string => {
@@ -29,19 +31,22 @@ export const assignmentFqrn = (assignment: Fqrnable): string => {
   return '';
 };
 
+export const contentResolutionNodeTypeIdentifiers = ['Host', 'Hostgroup'] as const;
+
 export const crnTypeUrlMap: Record<ContentResolutionNodeType, string> = {
   Host: 'host',
-  Hostgroup: 'hostgroup',
-};
-
-export const crnTypeMatcherMap: Record<ContentResolutionNodeType, string> = {
-  Host: 'fqdn',
   Hostgroup: 'hostgroup',
 };
 
 export const crnTypeUiString: Record<ContentResolutionNodeType, string> = {
   Host: 'host',
   Hostgroup: 'host group',
+};
+
+// TODO: revert this and translate at point of usage
+export const crnTypeUiStringTitle: Record<ContentResolutionNodeType, string> = {
+  Host: _('Host'),
+  Hostgroup: _('Host group'),
 };
 
 export const crColorHierarchy: pfLabelColorType[] = ['gold', 'purple', 'cyan'];

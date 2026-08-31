@@ -37,7 +37,6 @@ module ForemanAnsibleDirector
       ::Host::Base.include ::ForemanAnsibleDirector::Concerns::HostExtensions
       ::Host::Managed.include ::ForemanAnsibleDirector::Concerns::HostExtensions
       ::Hostgroup.include ::ForemanAnsibleDirector::Concerns::HostgroupExtensions
-      ::LookupKey.include ::ForemanAnsibleDirector::Concerns::LookupKeysExtensions
       ::ConfigReportImporter.include ForemanAnsibleDirector::AnsibleReportImporter
 
       ::HostgroupsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostgroupExtensions

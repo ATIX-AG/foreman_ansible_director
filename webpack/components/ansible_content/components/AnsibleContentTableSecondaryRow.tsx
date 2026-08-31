@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch } from 'react';
 import {
   Table,
   Thead,
@@ -18,18 +18,14 @@ import { usePermissions } from 'foremanReact/common/hooks/Permissions/permission
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { useDispatch } from 'react-redux';
-import { AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
+import { AnsibleContentUnitWithCounts, AnsibleContentVersionWithCount } from './AnsibleContentTableWrapper';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
 import { DefaultResponse, Task } from '../../../types/common';
 
 interface AnsibleContentTableSecondaryRowProps {
-  identifier: string; // Needed for keys
-  nodeId: number;
-  nodeVersions: AnsibleContentVersionWithCount[];
+  node: AnsibleContentUnitWithCounts;
   isExpanded: boolean;
-  setSelectedVersionId: Dispatch<SetStateAction<number>>;
-  setSelectedIdentifier: Dispatch<SetStateAction<string>>;
-  setSelectedVersion: Dispatch<SetStateAction<string>>;
+  onVersionClick: (node: { node: AnsibleContentUnitWithCounts; version: AnsibleContentVersionWithCount }) => void;
   setIsConfirmationModalOpen: Dispatch<React.SetStateAction<boolean>>;
   setConfirmationModalTitle: Dispatch<React.SetStateAction<string>>;
   setConfirmationModalBody: Dispatch<React.SetStateAction<string>>;
@@ -37,13 +33,9 @@ interface AnsibleContentTableSecondaryRowProps {
 }
 
 const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowProps> = ({
-  identifier,
-  nodeId,
-  nodeVersions,
+  node,
   isExpanded,
-  setSelectedVersionId,
-  setSelectedIdentifier,
-  setSelectedVersion,
+  onVersionClick,
   setIsConfirmationModalOpen,
   setConfirmationModalTitle,
   setConfirmationModalBody,
@@ -53,16 +45,14 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
     versions: AnsibleContentVersionWithCount[]
   ): React.ReactNode =>
     versions.map(version => (
-      <Tr key={`${identifier}:${version.version}`}>
+      <Tr key={`${node.identifier}:${version.version}`}>
         <Td dataLabel="Version">{version.version}</Td>
         <Td dataLabel="Roles">
           <Button
             variant="link"
             isInline
             onClick={() => {
-              setSelectedVersionId(version.id);
-              setSelectedIdentifier(identifier);
-              setSelectedVersion(version.version);
+              onVersionClick({ node, version });
             }}
           >
             {version.roles_count === 1
@@ -87,11 +77,11 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
     onClick: () => {
       setIsConfirmationModalOpen(true);
       setConfirmationModalTitle(
-        __(_('Delete %(id)s?'), { id: `${identifier}:${version.version}` })
+        __(_('Delete %(id)s?'), { id: `${node.identifier}:${version.version}` })
       );
       setConfirmationModalBody(
         __(_('Are you sure you want to delete %(id)s?'), {
-          id: `${identifier}:${version.version}`,
+          id: `${node.identifier}:${version.version}`,
         })
       );
       setConfirmationModalOnConfirm(() => async () => {
@@ -106,7 +96,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
               data: {
                 units: [
                   {
-                    unit_id: nodeId,
+                    unit_id: node.id,
                     unit_version_ids: [version.id],
                   },
                 ],
@@ -116,7 +106,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
           dispatch(
             addToast({
               type: 'success',
-              key: `DESTROY_CUV_${identifier}_${version.version}_SUCC`,
+              key: `DESTROY_CUV_${node.identifier}_${version.version}_SUCC`,
               message: (
                 <span>
                   {__(
@@ -124,7 +114,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
                       'A task to delete Ansible content unit version "%(identifier)s" was started successfully!'
                     ),
                     {
-                      identifier: `${identifier}:${version.version}`,
+                      identifier: `${node.identifier}:${version.version}`,
                     }
                   )}
                   <br />
@@ -146,13 +136,13 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
           dispatch(
             addToast({
               type: 'danger',
-              key: `DESTROY_CUV_${identifier}_${version.version}_ERR`,
+              key: `DESTROY_CUV_${node.identifier}_${version.version}_ERR`,
               message: __(
                 _(
                   'Starting of task to delete Ansible content unit version "%(identifier)s" failed with error code "%(error)s".'
                 ),
                 {
-                  identifier: `${identifier}:${version.version}`,
+                  identifier: `${node.identifier}:${version.version}`,
                   error: (e as { response: AxiosResponse }).response.status,
                 }
               ),
@@ -181,7 +171,7 @@ const AnsibleContentTableSecondaryRow: React.FC<AnsibleContentTableSecondaryRowP
                 <Th dataLabel="Roles">{_('Roles')}</Th>
               </Tr>
             </Thead>
-            <Tbody>{versionRows(nodeVersions)}</Tbody>
+            <Tbody>{versionRows(node.versions)}</Tbody>
           </Table>
         </ExpandableRowContent>
       </Td>

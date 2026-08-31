@@ -42,6 +42,11 @@ if defined? ForemanRemoteExecution
                     resolve: true
                   )
 
+                  _, resolved_variables, = ::ForemanAnsibleDirector::VariableService.variables_for(
+                    target: host,
+                    resolve: true
+                  )
+
                   if resolved_assignments.empty?
                     raise ForemanTasks::Task::TaskCancelledException,
                       "Configuration job cancelled, as no applicable roles were found for #{host.name}."
@@ -60,16 +65,15 @@ if defined? ForemanRemoteExecution
                     host: host,
                     resolved_host_content: resolved_assignments
                   )
-                  variables = ForemanAnsibleDirector::Generators::VariableGenerator.generate(
-                    host: host,
-                    resolved_host_content: resolved_assignments
+                  variable_files = ForemanAnsibleDirector::Generators::VariableGenerator.generate(
+                    resolved_host_variables: resolved_variables
                   )
 
                   super(template_invocation, host).merge(
                     inventory: inventory,
                     playbook: playbook,
                     content: content,
-                    variables: variables,
+                    variable_files: variable_files,
                     execution_environment: {
                       id: execution_environment.id,
                       registry_url: execution_environment.registry_url,

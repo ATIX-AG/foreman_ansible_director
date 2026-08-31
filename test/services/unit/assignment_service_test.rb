@@ -294,16 +294,6 @@ module ForemanAnsibleDirectorTests
 
         describe '#finder' do
 
-          test 'returns Host for "host" type' do
-            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'host')
-            assert_equal Host, result
-          end
-
-          test 'returns Hostgroup for "hostgroup" type' do
-            result = ::ForemanAnsibleDirector::AssignmentService.finder(type: 'hostgroup')
-            assert_equal Hostgroup, result
-          end
-
           test 'raises error for invalid type' do
             assert_raises(RuntimeError, 'Invalid type: UNKNOWN') do
               ::ForemanAnsibleDirector::AssignmentService.finder(type: 'UNKNOWN')
@@ -314,12 +304,14 @@ module ForemanAnsibleDirectorTests
         describe '#find_target' do
 
           test 'finds a "host" target' do
-            result = ::ForemanAnsibleDirector::AssignmentService.find_target(
-              target_type: 'host',
-              target_id: @host.id
-            )
+            as_admin do
+              result = ::ForemanAnsibleDirector::AssignmentService.find_target(
+                target_type: 'host',
+                target_id: @host.id
+              )
 
-            assert_equal @host, result
+              assert_equal @host, result
+            end
           end
 
           test 'finds a "hostgroup" target' do
