@@ -41,12 +41,13 @@ import {
 } from '../../../types/AnsibleContentAssignmentTypes';
 import { HierarchyLevelSelector } from './components/HierarchyLevelSelector';
 import { AlertModal } from '../AlertModal';
-import { assignmentFqrn, crnTypeMatcherMap } from './helpers';
+import { assignmentFqrn } from './helpers';
 import { AssignmentSelectorWrapper } from './components/AssignmentSelectorWrapper';
 import { ResolutionWarning } from '../../../types/issues/warnings';
 import { Permitted } from '../Permitted';
 import { AssignmentContext } from './AssignmentContext';
-import { OverrideGridWrapper } from './components/Variables/OverrideGridWrapper';
+import { VariableTableWrapper } from './components/Variables/VariableTableWrapper';
+import { VariableContextWrapper } from './components/Variables/VariableContext';
 
 interface AnsibleContentAssignmentCompProps {
   crnId: number;
@@ -58,7 +59,7 @@ interface AnsibleContentAssignmentCompProps {
   resolutionWarnings: ResolutionWarning[];
 }
 
-const hierarchyIconMap: Record<ContentResolutionNodeType, ReactElement> = {
+export const hierarchyIconMap: Record<ContentResolutionNodeType, ReactElement> = {
   Host: <ClusterIcon />,
   Hostgroup: <ObjectGroupIcon />,
 };
@@ -305,18 +306,17 @@ export const AnsibleContentAssignmentComp = ({
           </div>
         </Permitted>
       </Tab>
-      {
-        assignmentCtx.dataInterface === 'api' && (
-          <Tab title={_('Ansible variables')} eventKey={1}>
-            <OverrideGridWrapper
-              crnType={crnType}
-              crnId={crnId}
-              matcherType={crnTypeMatcherMap[crnType]}
-              matcherName={crnName}
-            />
-          </Tab>
-        )
-      }
+      <Tab title={_('Ansible variables')} eventKey={1}>
+        <Permitted requiredPermissions={[AdPermissions.ansibleVariables.view]}>
+          <VariableContextWrapper
+            dataInterface={assignmentCtx.dataInterface}
+            crnId={assignmentCtx.crnId}
+            crnType={assignmentCtx.crnType}
+          >
+            <VariableTableWrapper />
+          </VariableContextWrapper>
+        </Permitted>
+      </Tab>
     </Tabs>
   );
 };

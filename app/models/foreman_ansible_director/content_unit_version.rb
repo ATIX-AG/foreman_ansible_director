@@ -27,5 +27,11 @@ module ForemanAnsibleDirector
       return nil unless (versionable.source_type = 'git') && dynamic
       super
     end
+
+    def render_for_api
+      {
+        collection_roles: ansible_collection_roles.map(&:render_for_api),
+      }
+    end
   end
 end

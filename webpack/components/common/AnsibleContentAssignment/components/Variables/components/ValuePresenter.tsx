@@ -1,0 +1,201 @@
+import React, { ReactElement } from 'react';
+import {
+  Bullseye,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateHeader,
+  EmptyStateIcon,
+} from '@patternfly/react-core';
+import { dump, load } from 'js-yaml';
+import { translate as _ } from 'foremanReact/common/I18n';
+import OutlinedDizzyIcon from '@patternfly/react-icons/dist/esm/icons/outlined-dizzy-icon';
+import global_warning_color_100 from '@patternfly/react-tokens/dist/esm/global_warning_color_100';
+import { AnsibleVariableDataType, AnsibleVariableParsedType } from '../../../../../../types/AnsibleVariableTypes';
+import {
+  YamlAdapter,
+} from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/YamlAdapter';
+import {
+  StringAdapter,
+} from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/StringAdapter';
+import {
+  BooleanAdapter,
+} from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/BooleanAdapter';
+import { YamlParsedTypeMismatchErrorState } from './components/YamlParsedTypeMismatchErrorState';
+import { dataTypeParsedTypeMap } from '../utils';
+import { YamlErrorState } from './components/YamlErrorState';
+import { ContentResolutionNode } from '../../../../../../types/AnsibleContentAssignmentTypes';
+import {
+  IntegerAdapter,
+} from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/IntegerAdapter';
+import {
+  RealAdapter,
+} from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/RealAdapter';
+import {
+  ArrayAdapter,
+} from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/ArrayAdapter';
+import { CrossNodeDisabledAlert } from './components/CrossNodeDisabledAlert';
+
+interface ValuePresenterBaseProps {
+  variant: 'variable' | 'binding';
+  valueType: AnsibleVariableDataType;
+  value: string;
+  onValueChange: (newValue: string) => void;
+  isDisabled: boolean;
+  crn?: ContentResolutionNode;
+}
+
+interface PropsForVariable {
+  variant: 'variable';
+  crn?: never;
+}
+
+interface PropsForBinding {
+  variant: 'binding';
+  crn: ContentResolutionNode;
+}
+
+type ValuePresenterProps = ValuePresenterBaseProps & (PropsForBinding | PropsForVariable);
+
+export const ValuePresenter = ({
+  variant,
+  valueType,
+  value,
+  onValueChange,
+  isDisabled,
+  crn,
+}: ValuePresenterProps): ReactElement | null => {
+
+  let loadedValue: AnsibleVariableParsedType;
+
+  try {
+    // This raises in case the YAML is invalid. Exception is handled by the error boundary.
+    // Casting here because I can't be asked to write type-guards for all of those types.
+    loadedValue = load(value) as AnsibleVariableParsedType;
+  } catch (e) {
+    return (
+      <YamlErrorState error={e as Error} />
+    );
+
+  }
+
+  const assertCorrectParsedType = (): boolean => {
+    switch (valueType) {
+      case 'boolean':
+      case 'string':
+      case 'float':
+      case 'integer':
+        return typeof loadedValue === dataTypeParsedTypeMap[valueType];
+      case 'dictionary':
+        return typeof loadedValue === 'object' && !Array.isArray(loadedValue) && loadedValue !== null;
+      case 'array':
+        return Array.isArray(loadedValue);
+      case 'unknown':
+        // "unknown" is a special case, where no dedicated adapter exists.
+        return true;
+    }
+  };
+
+  const onValue = (value: AnsibleVariableParsedType): void => {
+    onValueChange(`---\n${dump(value)}`);
+  };
+
+  const valueRenderer = (): ReactElement => {
+    if (assertCorrectParsedType()) {
+      switch (valueType) {
+        case 'string':
+          return (
+            <Bullseye>
+              <StringAdapter
+                isEditMode={!isDisabled}
+                value={loadedValue as string}
+                onChange={onValue}
+              />
+            </Bullseye>
+          );
+        case 'boolean':
+          return (
+            <Bullseye>
+              <BooleanAdapter
+                isEditMode={!isDisabled}
+                value={loadedValue as boolean}
+                onChange={onValue}
+              />
+            </Bullseye>
+          );
+        case 'integer':
+          return (
+            <Bullseye>
+              <IntegerAdapter
+                isEditMode={!isDisabled}
+                value={loadedValue as number}
+                onChange={onValue}
+              />
+            </Bullseye>
+          );
+        case 'float':
+          return (
+            <Bullseye>
+              <RealAdapter
+                isEditMode={!isDisabled}
+                value={loadedValue as number}
+                onChange={onValue}
+              />
+            </Bullseye>
+          );
+        case 'array':
+          return (
+            <ArrayAdapter
+              isEditMode={!isDisabled}
+              value={loadedValue as string[]}
+              onChange={onValue}
+            />
+          );
+        case 'unknown':
+          return (
+            <EmptyState>
+              <EmptyStateHeader
+                titleText={_('Unknown variable type')}
+                headingLevel="h4"
+                icon={<EmptyStateIcon icon={OutlinedDizzyIcon} color={global_warning_color_100.var} />}
+              />
+              <EmptyStateBody>
+                {_('Foreman cannot determine the type of this variable. Set the correct type or use the raw YAML input.')}
+              </EmptyStateBody>
+            </EmptyState>
+          );
+        default:
+          return (
+            <YamlAdapter
+              isEditMode={!isDisabled}
+              value={value}
+              onChange={onValue}
+            />
+          );
+      }
+    } else {
+      return (
+        <YamlParsedTypeMismatchErrorState
+          parsedType={typeof loadedValue}
+          expectedType={valueType}
+        />
+      );
+    }
+  };
+
+  return (
+    <>
+      {isDisabled && (variant === 'binding'
+        ? (
+          <CrossNodeDisabledAlert variant={variant} crn={crn} />
+        )
+        : (<CrossNodeDisabledAlert variant={variant} />)
+      )}
+
+      <Bullseye>
+        <div style={{ paddingTop: 20, width: '100%' }}>
+          {valueRenderer()}
+        </div>
+      </Bullseye>
+    </>
+  );
+};
