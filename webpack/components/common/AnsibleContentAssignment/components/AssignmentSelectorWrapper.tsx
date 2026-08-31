@@ -21,7 +21,7 @@ import {
   AnsibleContentAssignmentCreate,
   ContentResolutionNodeType,
 } from '../../../../types/AnsibleContentAssignmentTypes';
-import { crnTypeUiString, crnTypeUrlMap } from '../helpers';
+import { crnTypeUiString } from '../helpers';
 import { AssignmentContext } from '../AssignmentContext';
 import { DefaultResponse } from '../../../../types/common';
 

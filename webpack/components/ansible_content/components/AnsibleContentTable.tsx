@@ -6,18 +6,17 @@ import {
   PaginationProps,
 } from 'foremanReact/common/hooks/API/APIHooks';
 
-import { translate as _ } from 'foremanReact/common/I18n';
+import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 
+import { Modal } from '@patternfly/react-core';
 import {
-  AnsibleContentUnitWithCounts,
+  AnsibleContentUnitWithCounts, AnsibleContentVersionWithCount,
   GetAnsibleContentResponse,
 } from './AnsibleContentTableWrapper';
 import AnsibleContentTablePrimaryRow from './AnsibleContentTablePrimaryRow';
 import AnsibleContentTableSecondaryRow from './AnsibleContentTableSecondaryRow';
-import { AnsibleVariablesOverview } from './AnsibleVariablesOverview/AnsibleVariablesOverview';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
-import { AnsibleVariable } from '../../../types/AnsibleVariableTypes';
-import { VariableManagementModalWrapper } from './AnsibleVariablesOverview/VariableManagementModal/VariableManagementModalWrapper';
+import { CollectionOverviewWrapper } from './Variables/CollectionOverviewWrapper';
 
 interface AnsibleContentTableProps {
   apiResponse: GetAnsibleContentResponse;
@@ -32,6 +31,9 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
   onPagination,
   refreshRequest,
 }) => {
+
+  // TODO: Yikes... Refactor when nothing better to do
+
   const [expandedNodeNames, setExpandedNodeNames] = React.useState<string[]>(
     []
   );
@@ -40,11 +42,9 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     setExpandedDetailsNodeNames,
   ] = React.useState<string[]>([]);
 
-  const [selectedVersionId, setSelectedVersionId] = React.useState<number>(-1);
-  const [selectedIdentifier, setSelectedIdentifier] = React.useState<string>(
-    ''
-  );
-  const [selectedVersion, setSelectedVersion] = React.useState<string>('');
+  const [selectedNode, setSelectedNode] = React.useState<
+    { node: AnsibleContentUnitWithCounts; version: AnsibleContentVersionWithCount } | null
+  >(null);
 
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = React.useState<
     boolean
@@ -59,10 +59,6 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
     confirmationModalOnConfirm,
     setConfirmationModalOnConfirm,
   ] = React.useState<() => void>(() => () => {});
-
-  const [selectedVariable, setSelectedVariable] = React.useState<
-    AnsibleVariable | undefined
-  >(undefined);
 
   const renderRows = (
     results: AnsibleContentUnitWithCounts[]
@@ -90,14 +86,10 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
           setConfirmationModalOnConfirm={setConfirmationModalOnConfirm}
         />,
         <AnsibleContentTableSecondaryRow
-          identifier={identifier}
-          nodeId={result.id}
-          nodeVersions={result.versions}
+          node={result}
           isExpanded={isExpanded}
-          setSelectedVersionId={setSelectedVersionId}
-          setSelectedIdentifier={setSelectedIdentifier}
-          setSelectedVersion={setSelectedVersion}
           key={`${identifier}:secondary`}
+          onVersionClick={node => setSelectedNode(node)}
           setIsConfirmationModalOpen={setIsConfirmationModalOpen}
           setConfirmationModalTitle={setConfirmationModalTitle}
           setConfirmationModalBody={setConfirmationModalBody}
@@ -124,21 +116,18 @@ export const AnsibleContentTable: React.FC<AnsibleContentTableProps> = ({
         <Tbody>{renderRows(apiResponse.results)}</Tbody>
       </Table>
       <Pagination itemCount={apiResponse.total} onChange={onPagination} />
-      {selectedVersionId !== -1 && (
+      {selectedNode !== null && (
         <>
-          <AnsibleVariablesOverview
-            selectedVersionId={selectedVersionId}
-            selectedIdentifier={selectedIdentifier}
-            selectedVersion={selectedVersion}
-            onClose={() => setSelectedVersionId(-1)}
-            setSelectedVariable={setSelectedVariable}
-          />
-          {selectedVariable && (
-            <VariableManagementModalWrapper
-              variable={selectedVariable}
-              setSelectedVariable={setSelectedVariable}
-            />
-          )}
+          <Modal
+            width="80%"
+            title={__(_('Collection overview: %(id)s'), {
+              id: `${selectedNode.node.identifier}:${selectedNode.version.version}`,
+            })}
+            isOpen
+            onClose={() => setSelectedNode(null)}
+          >
+            <CollectionOverviewWrapper node={selectedNode} />
+          </Modal>
         </>
       )}
       <ConfirmationModal

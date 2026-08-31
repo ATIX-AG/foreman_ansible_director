@@ -35,9 +35,9 @@ module ForemanAnsibleDirector
       def finder(type:)
         case type
 
-        when 'host'
+        when 'host', 'Host::Base', 'Host::Managed'
           Host
-        when 'hostgroup'
+        when 'hostgroup', 'Hostgroup'
           Hostgroup
         else
           # TODO: Actual error message

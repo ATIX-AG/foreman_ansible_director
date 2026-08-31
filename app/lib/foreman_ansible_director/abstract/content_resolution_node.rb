@@ -22,6 +22,10 @@ module ForemanAnsibleDirector
       def cr_content_source_state
         raise NotImplementedError
       end
+
+      def cr_variable_bindings
+        raise NotImplementedError
+      end
     end
   end
 end

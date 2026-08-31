@@ -12,7 +12,7 @@ module ForemanAnsibleDirector
         end
 
         def title
-          if Rails.env.development?
+          if Rails.env.production?
             _('Internal server error')
           else
             "Internal Error: #{@exception.class}"
@@ -20,7 +20,7 @@ module ForemanAnsibleDirector
         end
 
         def message
-          if Rails.env.development?
+          if Rails.env.production?
             <<~MESSAGE
               Something went wrong trying to process the request.
               You can check the logs using the following command:
