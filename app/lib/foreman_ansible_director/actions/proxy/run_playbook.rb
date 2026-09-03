@@ -8,6 +8,7 @@ module ForemanAnsibleDirector
 
         input_format do
           param :proxy_task_id, Integer
+          param :smart_proxy_id, Integer
           param :inventory, Hash
           param :playbook, Hash
           param :content, Array
@@ -20,6 +21,7 @@ module ForemanAnsibleDirector
         def invoke_external_task
           ::ForemanAnsibleDirector::Proxy::Dynflow::SingleBatchAction.new(
             input[:proxy_task_id], 'ansible-navigator', 'Proxy::AnsibleDirector::Actions::Meta::RunPlaybook',
+            input[:smart_proxy_id],
             inventory: input[:inventory],
             playbook: input[:playbook],
             content: input[:content],
@@ -29,7 +31,9 @@ module ForemanAnsibleDirector
         end
 
         def poll_external_task
-          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(input[:proxy_task_id]).request
+          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(
+            input[:proxy_task_id], input[:smart_proxy_id]
+          ).request
           task_status = ::ForemanAnsibleDirector::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
 
           { progress: task_status.progress }
