@@ -24,6 +24,13 @@ module ForemanAnsibleDirector
         description: N_('Configure the host using Ansible content assigned to it'),
         host_action_button: true
       )
+
+      RemoteExecutionFeature.register(
+        :ansible_director_run_playbook,
+        N_('Run Playbook via Ansible Director'),
+        description: N_('Run an Ansible Playbook using Ansible Director'),
+        host_action_button: false
+      )
     end
   end
 end
