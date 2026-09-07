@@ -16,23 +16,26 @@ if defined? ForemanRemoteExecution
               end
 
               def proxy_command_options(template_invocation, host)
-                inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate host
+                inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate(
+                  host: host,
+                  ansible_user: template_invocation.job_invocation&.ssh_user ||
+                    host.host_param('remote_execution_ssh_user')
+                )
                 begin
-                  environment = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-                    id: Setting[:ansible_director_default_ee_rex]
-                  )
-                  raise ActiveRecord::RecordNotFound if environment.nil?
+                  environment = host&.ansible_lifecycle_environment&.execution_environment ||
+                                ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+                                  id: Setting[:ansible_director_default_ee_rex]
+                                )
+                  unless environment
+                    raise "Host #{host.name} is not in any lifecycle environment
+                    and the setting 'ansible_director_default_ee_rex' is not provided."
+                  end
                 end
 
-                raise "Host #{host.name} is not in any lifecycle environment" unless host.ansible_lifecycle_environment
-                unless host.ansible_lifecycle_environment.execution_environment
-                  raise "Lifecycle environment #{host.ansible_lifecycle_environment.name}
-                          does not provide an Execution Environment"
-                end
                 # As the templates currently do not have an execution environment input, this suffices
                 super(template_invocation, host).merge(
                   inventory: inventory,
-                  execution_environment: environment
+                  execution_environment: environment.registry_url
                 )
               end
 
@@ -42,6 +45,10 @@ if defined? ForemanRemoteExecution
 
               def proxy_action_class
                 'Proxy::AnsibleDirector::Actions::Meta::RunAnsibleScript'
+              end
+
+              def required_proxy_selector_for(_template)
+                ::ForemanAnsibleDirector::AnsibleDirectorProxySelector.new
               end
             end
           end
