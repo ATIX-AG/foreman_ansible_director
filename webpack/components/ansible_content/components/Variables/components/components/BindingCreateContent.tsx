@@ -45,8 +45,8 @@ export const BindingCreateContent = ({
     { id: number; name: string; type: 'host' | 'hostgroup' } | null
   >(null);
 
-  const [dataType, setDataType] = React.useState<AnsibleVariableDataType>('boolean');
-  const [rawValue, setRawValue] = React.useState<string>('--- \ntrue');
+  const [dataType, setDataType] = React.useState<AnsibleVariableDataType>(variable.data_type);
+  const [rawValue, setRawValue] = React.useState<string>(variable.raw_value);
 
   const yamlValidity = useMemo(() => {
     return getYamlValidity(rawValue, dataType);
