@@ -15,6 +15,7 @@ export interface AnsibleVariable extends Identifiable {
 
 export interface AnsibleVariableBinding extends Identifiable, Assignable, Consumable {
   data_type: AnsibleVariableDataType;
+  variable_name: string;
   raw_value: string;
   query: VariableValueQueryType;
   transformer: VariableValueTransformerType;

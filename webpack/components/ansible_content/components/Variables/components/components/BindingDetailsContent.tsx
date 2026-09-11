@@ -11,7 +11,7 @@ import {
 import { getYamlValidity } from '../../../../../common/AnsibleContentAssignment/components/Variables/utils';
 import { useToasts } from '../../../../../../helpers/toasts/useToasts';
 import { AnsibleVariableBinding } from '../../../../../../resources/clients/AnsibleVariableBinding';
-import { ContentResolutionNode } from '../../../../../../types/AnsibleContentAssignmentTypes';
+import { ContentResolutionNode, ContentResolutionNodeType } from '../../../../../../types/AnsibleContentAssignmentTypes';
 
 interface BindingDetailsContentProps {
   binding: AnsibleVariableBindingType;

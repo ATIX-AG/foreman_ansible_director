@@ -126,6 +126,7 @@ export const DrawerBindingContent = ({
         </StackItem>
         <BindingCreateContent
           assignable={assignable}
+          allBindings={bindings}
           variable={variable}
           onSuccess={onSuccess}
           onAbort={() => setNavigationState({ state: 'bindingIndex', binding: null })}

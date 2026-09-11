@@ -9,6 +9,10 @@ module ForemanAnsibleDirector
     enum query: { local: 0 }
     enum transformer: { static: 0 }
 
+    validates :variable_name, uniqueness: { scope: [:consumable],
+                                            message:
+                                             'A binding of this variable to the provided node already exists.' }
+
     def render_for_api
       {
         id: id,

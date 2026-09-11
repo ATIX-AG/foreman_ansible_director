@@ -1,11 +1,13 @@
 import React, { ReactElement, useMemo } from 'react';
 import {
+  Alert,
   Button,
   DrawerContentBody,
   Stack,
-  StackItem,
+  StackItem, Text, TextContent,
   Tile,
 } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 import { TargetNodeSelector } from '../../../AnsibleVariablesOverview/VariableManagementModal/TargetNodeSelector';
 import { ContentResolutionNodeType } from '../../../../../../types/AnsibleContentAssignmentTypes';
 import { hierarchyIconMap } from '../../../../../common/AnsibleContentAssignment/AnsibleContentAssignment';
@@ -17,7 +19,8 @@ import {
 import {
   AnsibleVariableDataType,
 } from '../../../../../../types/AnsibleVariableTypes';
-import { AnsibleVariable } from '../../../../../../types/AnsibleVariableTypes';
+import { AnsibleVariable,
+  AnsibleVariableBinding as AnsibleVariableBindingType } from '../../../../../../types/AnsibleVariableTypes';
 import {
   ValueCard,
 } from '../../../../../common/AnsibleContentAssignment/components/Variables/components/components/ValueCard';
@@ -28,6 +31,7 @@ import { CollectionRoleAssignable } from '../../../../../../types/DynamicAssignm
 
 interface BindingCreateContentProps {
   assignable: CollectionRoleAssignable;
+  allBindings: AnsibleVariableBindingType[];
   variable: AnsibleVariable;
   onSuccess: () => void;
   onAbort: () => void;
@@ -35,6 +39,7 @@ interface BindingCreateContentProps {
 
 export const BindingCreateContent = ({
   assignable,
+  allBindings,
   variable,
   onSuccess,
   onAbort,
@@ -51,6 +56,10 @@ export const BindingCreateContent = ({
   const yamlValidity = useMemo(() => {
     return getYamlValidity(rawValue, dataType);
   }, [dataType, rawValue]);
+
+  const isDuplicateBinding: boolean = useMemo(() => (
+    allBindings.findIndex(b => b.consumable_type === targetNodeType && b.consumable_id === targetNode?.id) !== -1
+  ), [allBindings, targetNode, targetNodeType]);
 
   const { withToast } = useToasts();
 
@@ -74,6 +83,23 @@ export const BindingCreateContent = ({
                 }
               </div>
             </StackItem>
+            {isDuplicateBinding && (
+              <Alert
+                title={_(
+                  'Duplicate binding'
+                )}
+                variant="danger"
+                isInline
+              >
+                <TextContent>
+                  <Text component="p">
+                    {_(
+                      `A binding of this variable to ${targetNode?.name} already exists. Edit this binding instead of creating a new one.`
+                    )}
+                  </Text>
+                </TextContent>
+              </Alert>
+            )}
             <StackItem>
               <TargetNodeSelector
                 selectedNode={targetNode}
@@ -104,7 +130,7 @@ export const BindingCreateContent = ({
           <Button
             key="confirm"
             variant={yamlValidity.state === 'type_mismatch' ? 'warning' : 'primary'}
-            isDisabled={yamlValidity.state === 'invalid' || targetNode === null}
+            isDisabled={yamlValidity.state === 'invalid' || targetNode === null || isDuplicateBinding}
             onClick={async () => {
               targetNode !== null && (
                 await (async () => {
