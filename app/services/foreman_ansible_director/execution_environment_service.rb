@@ -54,6 +54,7 @@ module ForemanAnsibleDirector
 
         env_definition = {
           id: execution_environment.id,
+          organization: execution_environment.organization.name,
           content: {
             base_image: execution_environment.base_image_url,
             ansible_core_version: execution_environment.ansible_version,
@@ -62,7 +63,7 @@ module ForemanAnsibleDirector
                 type: cuv.versionable.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role',
                 identifier: cuv.versionable.full_name,
                 version: cuv.version,
-                source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{Organization.current.id}/#{cuv.versionable.full_name}",
+                source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{execution_environment.organization_id}/#{cuv.versionable.full_name}",
               }
             end,
           },
