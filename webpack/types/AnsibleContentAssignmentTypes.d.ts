@@ -1,6 +1,5 @@
 import { Identifiable } from './AnsibleExecutionEnvTypes';
-
-export interface AnsibleContentAssignmentHierarchy {}
+import { contentResolutionNodeTypeIdentifiers } from '../components/common/AnsibleContentAssignment/helpers';
 
 export interface AssignableBase extends Identifiable {
   assignable_name: string;
@@ -34,7 +33,7 @@ export interface AnsibleCollectionRoleAssignment extends ApiAssignment {
   assignable_role_name: string;
 }
 
-type ContentResolutionNodeType = 'Host' | 'Hostgroup';
+type ContentResolutionNodeType = typeof contentResolutionNodeTypeIdentifiers[number];
 
 export interface ContentResolutionNode extends Identifiable {
   type: ContentResolutionNodeType;

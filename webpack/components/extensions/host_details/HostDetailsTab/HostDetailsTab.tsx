@@ -11,6 +11,7 @@ import { translate as _ } from 'foremanReact/common/I18n';
 
 import { AnsibleContentAssignmentMain } from '../../../common/AnsibleContentAssignment/AnsibleContentAssignmentMain';
 import { AnsibleContentSource } from '../../../../types/AnsibleContentTypes';
+import { AlertModalProvider } from '../../../common/Alerts/AlertContext';
 
 interface HostDetailsTabProps
   extends UseAPIReturn<{
@@ -25,13 +26,15 @@ export const HostDetailsTab = ({
 }: HostDetailsTabProps): ReactElement => {
   if (status === 'RESOLVED') {
     return (
-      <AnsibleContentAssignmentMain
-        dataInterface={'api'}
-        crnId={response.id}
-        crnType="Host"
-        crnName={response.name}
-        contentSource={response.ansible_content_source}
-      />
+      <AlertModalProvider>
+        <AnsibleContentAssignmentMain
+          dataInterface={'api'}
+          crnId={response.id}
+          crnType="Host"
+          crnName={response.name}
+          contentSource={response.ansible_content_source}
+        />
+      </AlertModalProvider>
     );
   }
   return (

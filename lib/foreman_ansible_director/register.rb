@@ -49,29 +49,29 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible Variables
     # View
     permission :view_ansible_director_variables,
-      { 'foreman_ansible_director/api/v2/ansible_variables': %i[show index] },
+      { 'foreman_ansible_director/api/v2/ansible_variables': %i[show variables_for_target index_acr resolve_single] },
       resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Edit
     permission :edit_ansible_director_variables,
-      { 'foreman_ansible_director/api/v2/ansible_variables': [:update] },
+      { 'foreman_ansible_director/api/v2/ansible_variables': %i[update_partial update_full] },
       resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Destroy
-    ## Ansible Variable Overrides
+    ## Ansible Variable Bindings
     # View
-    permission :view_ansible_director_variable_overrides,
-      { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:index_for_target] },
+    permission :view_ansible_director_variable_bindings,
+      { 'foreman_ansible_director/api/v2/ansible_variable_bindings': %i[show index_for_variable] },
       resource_type: 'LookupValue'
     # Create
-    permission :create_ansible_director_variable_overrides,
-      { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:create] },
+    permission :create_ansible_director_variable_bindings,
+      { 'foreman_ansible_director/api/v2/ansible_variable_bindings': [:create] },
       resource_type: 'LookupValue'
     # Edit
-    permission :edit_ansible_director_variable_overrides,
-      { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:update] },
+    permission :edit_ansible_director_variable_bindings,
+      { 'foreman_ansible_director/api/v2/ansible_variable_bindings': %i[update_full update_partial] },
       resource_type: 'LookupValue'
     # Destroy
-    permission :destroy_ansible_director_variable_overrides,
-      { 'foreman_ansible_director/api/v2/ansible_variable_overrides': [:destroy] },
+    permission :destroy_ansible_director_variable_bindings,
+      { 'foreman_ansible_director/api/v2/ansible_variable_bindings': [:destroy] },
       resource_type: 'LookupValue'
     # Ansible lifecycle environments
     # View
@@ -93,7 +93,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible lifecycle environment paths
     # View
     permission :view_ansible_lifecycle_environment_paths,
-      { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search] },
+      { 'foreman_ansible_director/api/v2/lifecycle_environment_paths': %i[index auto_complete_search show] },
       resource_type: 'ForemanAnsibleDirector::LifecycleEnvironmentPath'
     # Create
     permission :create_ansible_lifecycle_environment_paths,
@@ -147,7 +147,7 @@ Foreman::Plugin.register :foreman_ansible_director do
       view_organizations
       view_ansible_content
       view_ansible_director_variables
-      view_ansible_director_variable_overrides
+      view_ansible_director_variable_bindings
       view_ansible_lifecycle_environments
       view_ansible_lifecycle_environment_paths
       view_ansible_execution_environments
@@ -161,10 +161,10 @@ Foreman::Plugin.register :foreman_ansible_director do
       destroy_ansible_content
       view_ansible_director_variables
       edit_ansible_director_variables
-      view_ansible_director_variable_overrides
-      edit_ansible_director_variable_overrides
-      create_ansible_director_variable_overrides
-      destroy_ansible_director_variable_overrides
+      view_ansible_director_variable_bindings
+      edit_ansible_director_variable_bindings
+      create_ansible_director_variable_bindings
+      destroy_ansible_director_variable_bindings
       view_ansible_lifecycle_environments
       create_ansible_lifecycle_environments
       edit_ansible_lifecycle_environments
@@ -259,6 +259,11 @@ Foreman::Plugin.register :foreman_ansible_director do
                             This setting dictates the number of items prefetched into this cache.',
         default: 100,
         full_name: 'UI - Search cache size'
+      setting 'ansible_director_vars_cross_node_editing',
+        type: :boolean,
+        description: 'TODO',
+        default: false,
+        full_name: 'UI - Variables - Allow editing of Ansible variable bindings across inheritance nodes'
     end
   end
 
@@ -273,6 +278,8 @@ Foreman::Plugin.register :foreman_ansible_director do
                     Setting[:ansible_director_ui_refresh_interval],
                   ansible_director_ui_search_cache_size:
                     Setting[:ansible_director_ui_search_cache_size],
+                  ansible_director_vars_cross_node_editing:
+                    Setting[:ansible_director_vars_cross_node_editing],
                 }
               },
   })

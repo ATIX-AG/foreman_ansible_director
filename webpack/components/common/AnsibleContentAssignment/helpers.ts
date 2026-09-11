@@ -29,19 +29,21 @@ export const assignmentFqrn = (assignment: Fqrnable): string => {
   return '';
 };
 
+export const contentResolutionNodeTypeIdentifiers = ['Host', 'Hostgroup'] as const;
+
 export const crnTypeUrlMap: Record<ContentResolutionNodeType, string> = {
   Host: 'host',
-  Hostgroup: 'hostgroup',
-};
-
-export const crnTypeMatcherMap: Record<ContentResolutionNodeType, string> = {
-  Host: 'fqdn',
   Hostgroup: 'hostgroup',
 };
 
 export const crnTypeUiString: Record<ContentResolutionNodeType, string> = {
   Host: 'host',
   Hostgroup: 'host group',
+};
+
+export const crnTypeUiStringTitle: Record<ContentResolutionNodeType, string> = {
+  Host: 'Host',
+  Hostgroup: 'Host Group',
 };
 
 export const crColorHierarchy: pfLabelColorType[] = ['gold', 'purple', 'cyan'];

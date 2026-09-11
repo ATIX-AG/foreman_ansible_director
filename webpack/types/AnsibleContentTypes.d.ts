@@ -1,6 +1,6 @@
 import { Identifiable } from './AnsibleExecutionEnvTypes';
-import { AnsibleVariable } from './AnsibleVariableTypes';
 import { ContentResolutionNode } from './AnsibleContentAssignmentTypes';
+import { AnsibleVariable } from './AnsibleVariableTypes';
 
 export interface AnsibleContentUnitCreateBase {
   type: 'collection' | 'role';
@@ -39,6 +39,10 @@ export interface AnsibleGalaxyContentVersionCreate {
 
 export interface AnsibleCollectionRole extends Identifiable {
   name: string;
+}
+
+export interface AnsibleCollectionRoleWithVarCount extends AnsibleCollectionRole {
+  variables_count: number;
 }
 
 export interface AnsibleRole {

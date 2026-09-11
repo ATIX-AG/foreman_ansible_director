@@ -84,31 +84,61 @@ module ForemanAnsibleDirector
           roles.transform_values! do |v|
             all_defaults = {}
             v[:defaults]&.each do |defaults_yaml_str|
-              next unless (loaded = YAML.safe_load(defaults_yaml_str))
-              all_defaults.merge!(loaded.transform_values do |variable|
-                                    {
-                                      value: variable,
-                                      type: key_type(variable),
-                                    }
-                                  end)
+              ast = YAML.parse(defaults_yaml_str)
+              if ast.root.children.length.odd?
+                # Variables are always k: v
+                # If the number of nodes is not even, something is wrong i.e. the YAML is not valid
+                return {}
+              end
+
+              (0..ast.root.children.length - 1).step(2).each do |node_idx|
+                key = ast.root.children[node_idx]
+                value = ast.root.children[node_idx + 1]
+
+                all_defaults[key.value] = {
+                  value: node_value(value),
+                  type: node_type(value),
+                }
+              end
             end
             all_defaults
           end
         end
 
-        def key_type(variable)
-          case variable
-          when TrueClass, FalseClass
-            'boolean'
-          when String
-            'string'
-          when Integer
-            'integer'
-          when Float
-            'float'
-          else
-            'yaml'
+        def node_type(node)
+          case node
+          when Psych::Nodes::Scalar
+
+            scanner = Psych::ScalarScanner.new(Psych::ClassLoader.new)
+            inferred_value = scanner.tokenize(node.value)
+
+            case inferred_value
+            when TrueClass, FalseClass
+              'boolean'
+            when String
+              'string'
+            when Integer
+              'integer'
+            when Float
+              'float'
+            else # Scalars like ~ map to NilClass. Determining the type here is not possible.
+              'unknown'
+            end
+          when Psych::Nodes::Sequence
+            'array'
+          when Psych::Nodes::Mapping
+            'dictionary'
           end
+        end
+
+        def node_value(node)
+          stream = Psych::Nodes::Stream.new
+          doc    = Psych::Nodes::Document.new
+
+          stream.children << doc
+          doc.children << node
+
+          stream.to_yaml
         end
       end
     end

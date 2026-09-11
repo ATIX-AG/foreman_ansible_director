@@ -1,4 +1,7 @@
-export interface AnsibleDirectorWarning {
+import { AnsibleDirectorIssue } from './types';
+
+export interface AnsibleDirectorWarning extends AnsibleDirectorIssue {
+  type: 'warning';
   title: string;
   message: string;
 }

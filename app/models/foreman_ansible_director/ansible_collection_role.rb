@@ -15,6 +15,14 @@ module ForemanAnsibleDirector
 
     validate :ansible_collection_version_must_be_for_collection
 
+    def render_for_api
+      {
+        id: id,
+        name: name,
+        variables_count: ansible_variables.count,
+      }
+    end
+
     private
 
     def ansible_collection_version_must_be_for_collection

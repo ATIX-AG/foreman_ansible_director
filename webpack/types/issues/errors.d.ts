@@ -1,4 +1,5 @@
-export interface AnsibleDirectorError {
-  title: string;
-  message: string;
+import { AnsibleDirectorIssue } from './types';
+
+export interface AnsibleDirectorError extends AnsibleDirectorIssue {
+  type: 'error';
 }

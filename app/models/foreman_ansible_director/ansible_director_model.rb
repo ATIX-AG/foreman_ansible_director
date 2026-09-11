@@ -15,5 +15,11 @@ module ForemanAnsibleDirector
     def flatten_errors
       errors.messages.map { |attribute, messages| messages.map { |msg| "#{attribute}: #{msg}" } }.flatten.join("\n")
     end
+
+    def render_for_api
+      {
+        id: id,
+      }
+    end
   end
 end

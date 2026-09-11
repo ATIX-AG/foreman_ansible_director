@@ -56,9 +56,13 @@ node(:results) do
               end,
       }
     end,
-    content_source: {
-      id: @effective_content_source.id,
-      type: @effective_content_source.class.name,
-    },
+    content_source: if @effective_content_source.nil?
+                      nil
+                    else
+                      {
+                        id: @effective_content_source.id,
+                        type: @effective_content_source.class.name,
+                      }
+                    end,
   }
 end
