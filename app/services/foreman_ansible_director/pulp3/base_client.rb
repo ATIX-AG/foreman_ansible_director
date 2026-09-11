@@ -7,7 +7,10 @@ module ForemanAnsibleDirector
       class << self
         def pulp3_configuration(config_class)
           config_class.new do |config|
-            uri = URI.parse(::SmartProxy.unscoped.first.url)
+            proxy = ::SmartProxy.with_features(::ForemanAnsibleDirector::PROXY_FEATURE).first
+            raise "No smart proxy with '#{::ForemanAnsibleDirector::PROXY_FEATURE}' feature found" unless proxy
+
+            uri = URI.parse(proxy.url)
             config.host = uri.host
             config.scheme = uri.scheme
             pulp3_ssl_configuration(config)

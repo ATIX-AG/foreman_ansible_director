@@ -6,6 +6,11 @@ module ForemanAnsibleDirectorTests
       class ExecutionEnvironmentServiceTest < ForemanAnsibleDirectorTestCase
 
         describe '#create_execution_environment' do
+          setup do
+            @proxy = FactoryBot.build_stubbed(:smart_proxy)
+            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
+          end
+
           test 'creates an execution environment with valid params' do
 
             ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
@@ -61,10 +66,24 @@ module ForemanAnsibleDirectorTests
 
             assert_equal initial_count, ::ForemanAnsibleDirector::ExecutionEnvironment.count
           end
+
+          test 'raises when no proxy with Ansible_Director feature exists' do
+            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([])
+            assert_raises(RuntimeError) do
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
+                name: 'test_ee',
+                base_image_url: 'quay.io/ansible/base-ee:latest',
+                ansible_version: '2.20.0',
+                organization_id: @organization.id
+              )
+            end
+          end
         end
 
         describe '#edit_execution_environment' do
           setup do
+            @proxy = FactoryBot.build_stubbed(:smart_proxy)
+            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
             @execution_environment = FactoryBot.create(:execution_environment, organization: @organization)
           end
 
@@ -193,6 +212,8 @@ module ForemanAnsibleDirectorTests
 
         describe '#build_execution_environment' do
           setup do
+            @proxy = FactoryBot.build_stubbed(:smart_proxy)
+            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
             @execution_environment = FactoryBot.create(:execution_environment, organization: @organization)
             @collection = FactoryBot.create(:ansible_collection, organization: @organization)
             @collection_version = FactoryBot.create(:content_unit_version, :for_collection, versionable: @collection)
