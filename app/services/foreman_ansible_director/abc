@@ -1,0 +1,318 @@
+commit fba947ae77d65e57039030346690657ace257f9d
+Author: Bernhard Suttner <suttner@atix.de>
+Date:   Thu May 7 20:36:45 2026 +0200
+
+    feat(actions/execution_environments): use first valid proxy with Ansible_Director feature
+    
+    Before this commit, proxy selection had two issues: it always selected
+    the first available Smart Proxy, regardless of whether the Ansible_Director
+    feature was available, and it could select a proxy that did not belong to
+    the user's organization.
+    
+    With this change, the first Smart Proxy with the Ansible_Director feature
+    is selected based on the current user and organization. The selected proxy
+    is then passed through to the action.
+    
+    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+diff --git app/lib/foreman_ansible_director/actions/proxy/build_execution_environment.rb app/lib/foreman_ansible_director/actions/proxy/build_execution_environment.rb
+index d31ce83..c1f44b3 100644
+--- app/lib/foreman_ansible_director/actions/proxy/build_execution_environment.rb
++++ app/lib/foreman_ansible_director/actions/proxy/build_execution_environment.rb
+@@ -10,6 +10,7 @@ module ForemanAnsibleDirector
+ 
+         input_format do
+           param :proxy_task_id, Integer
++          param :smart_proxy_id, Integer
+           param :execution_environment_definition, Hash
+           param :execution_environment_id, String
+         end
+@@ -20,13 +21,16 @@ module ForemanAnsibleDirector
+         def invoke_external_task
+           ::ForemanAnsibleDirector::Proxy::Dynflow::SingleBatchAction.new(
+             input[:proxy_task_id], 'meta', 'Proxy::AnsibleDirector::Actions::Meta::BuildPushEe',
++            input[:smart_proxy_id],
+             execution_environment: input[:execution_environment_definition]
+           ).request
+           nil
+         end
+ 
+         def poll_external_task
+-          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(input[:proxy_task_id]).request
++          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(
++            input[:proxy_task_id], input[:smart_proxy_id]
++          ).request
+           task_status = ::ForemanAnsibleDirector::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
+ 
+           { progress: task_status.progress,
+diff --git app/lib/foreman_ansible_director/actions/proxy/run_playbook.rb app/lib/foreman_ansible_director/actions/proxy/run_playbook.rb
+index db20c11..35e342f 100644
+--- app/lib/foreman_ansible_director/actions/proxy/run_playbook.rb
++++ app/lib/foreman_ansible_director/actions/proxy/run_playbook.rb
+@@ -8,6 +8,7 @@ module ForemanAnsibleDirector
+ 
+         input_format do
+           param :proxy_task_id, Integer
++          param :smart_proxy_id, Integer
+           param :inventory, Hash
+           param :playbook, Hash
+           param :content, Array
+@@ -20,6 +21,7 @@ module ForemanAnsibleDirector
+         def invoke_external_task
+           ::ForemanAnsibleDirector::Proxy::Dynflow::SingleBatchAction.new(
+             input[:proxy_task_id], 'ansible-navigator', 'Proxy::AnsibleDirector::Actions::Meta::RunPlaybook',
++            input[:smart_proxy_id],
+             inventory: input[:inventory],
+             playbook: input[:playbook],
+             content: input[:content],
+@@ -29,7 +31,9 @@ module ForemanAnsibleDirector
+         end
+ 
+         def poll_external_task
+-          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(input[:proxy_task_id]).request
++          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(
++            input[:proxy_task_id], input[:smart_proxy_id]
++          ).request
+           task_status = ::ForemanAnsibleDirector::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
+ 
+           { progress: task_status.progress }
+diff --git app/services/foreman_ansible_director/execution_environment_service.rb app/services/foreman_ansible_director/execution_environment_service.rb
+index 19b10d6..53f26fe 100644
+--- app/services/foreman_ansible_director/execution_environment_service.rb
++++ app/services/foreman_ansible_director/execution_environment_service.rb
+@@ -49,6 +49,9 @@ module ForemanAnsibleDirector
+       end
+ 
+       def build_execution_environment(execution_environment)
++        proxy = ::SmartProxy.with_features(::ForemanAnsibleDirector::PROXY_FEATURE).first
++        raise "No smart proxy with '#{::ForemanAnsibleDirector::PROXY_FEATURE}' feature found" unless proxy
++
+         env_definition = {
+           id: execution_environment.id,
+           content: {
+@@ -71,6 +74,7 @@ module ForemanAnsibleDirector
+           ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
+           task_args: {
+             proxy_task_id: SecureRandom.uuid,
++            smart_proxy_id: proxy.id,
+             execution_environment_definition: env_definition,
+             execution_environment_id: execution_environment.id,
+           },
+diff --git app/services/foreman_ansible_director/proxy/base_client.rb app/services/foreman_ansible_director/proxy/base_client.rb
+index 222c439..2694be5 100644
+--- app/services/foreman_ansible_director/proxy/base_client.rb
++++ app/services/foreman_ansible_director/proxy/base_client.rb
+@@ -1,28 +1,28 @@
+ # frozen_string_literal: true
+ 
+-require 'pulpcore_client'
+ module ForemanAnsibleDirector
+   module Proxy
+-    class BaseClient
+-      class << self
+-        def proxy_resource
+-          ssl_config = {
+-            ssl_client_cert: ::ForemanAnsibleDirector::Cert::Certs.ssl_client_cert,
+-            ssl_client_key: ::ForemanAnsibleDirector::Cert::Certs.ssl_client_key,
+-            ssl_ca_file: ::ForemanAnsibleDirector::Cert::Certs.ca_cert_file,
+-            verify_ssl: OpenSSL::SSL::VERIFY_PEER,
+-          }
++    class BaseClient < ::ProxyAPI::Resource
++      def initialize(proxy)
++        @url = proxy.url
++        super(url: @url)
++      end
++
++      def launch_dynflow_task(proxy_task_id, operation, action_class, action_input)
++        payload = {
++          operation: operation,
++          input: {
++            proxy_task_id => {
++              action_class: action_class,
++              action_input: action_input,
++            },
++          },
++        }.to_json
++        post(payload, 'dynflow/tasks/launch')
++      end
+ 
+-          # TODO: This should be configurable by the user and use a selector
+-          if Rails.env.development?
+-            return RestClient::Resource.new(
+-              'http://192.168.121.1:8080'
+-            )
+-          end
+-          RestClient::Resource.new(
+-            ::SmartProxy.first.url, ssl_config
+-          )
+-        end
++      def dynflow_task_status(proxy_task_id)
++        get("dynflow/tasks/#{proxy_task_id}/status")
+       end
+     end
+   end
+diff --git app/services/foreman_ansible_director/proxy/dynflow/single_batch_action.rb app/services/foreman_ansible_director/proxy/dynflow/single_batch_action.rb
+index 7e439ab..7c6317e 100644
+--- app/services/foreman_ansible_director/proxy/dynflow/single_batch_action.rb
++++ app/services/foreman_ansible_director/proxy/dynflow/single_batch_action.rb
+@@ -4,9 +4,8 @@ module ForemanAnsibleDirector
+   module Proxy
+     module Dynflow
+       class SingleBatchAction
+-        def initialize(proxy_task_id, operation, action_class, action_input)
+-          proxy_resource = BaseClient.proxy_resource
+-          @resource = proxy_resource['/dynflow/tasks/launch']
++        def initialize(proxy_task_id, operation, action_class, smart_proxy_id, action_input)
++          @client = BaseClient.new(::SmartProxy.find(smart_proxy_id))
+           @proxy_task_id = proxy_task_id
+           @operation = operation
+           @action_class = action_class
+@@ -14,15 +13,7 @@ module ForemanAnsibleDirector
+         end
+ 
+         def request
+-          @resource.post({
+-            operation: @operation,
+-            input: {
+-              @proxy_task_id => {
+-                action_class: @action_class,
+-                action_input: @action_input,
+-              },
+-            },
+-          }.to_json)
++          @client.launch_dynflow_task(@proxy_task_id, @operation, @action_class, @action_input)
+         end
+       end
+     end
+diff --git app/services/foreman_ansible_director/proxy/dynflow/task_status.rb app/services/foreman_ansible_director/proxy/dynflow/task_status.rb
+index 7b8a21f..8cb15fc 100644
+--- app/services/foreman_ansible_director/proxy/dynflow/task_status.rb
++++ app/services/foreman_ansible_director/proxy/dynflow/task_status.rb
+@@ -4,13 +4,13 @@ module ForemanAnsibleDirector
+   module Proxy
+     module Dynflow
+       class TaskStatus
+-        def initialize(proxy_task_id)
+-          proxy_resource = BaseClient.proxy_resource
+-          @resource = proxy_resource["/dynflow/tasks/#{proxy_task_id}/status"]
++        def initialize(proxy_task_id, smart_proxy_id)
++          @client = BaseClient.new(::SmartProxy.find(smart_proxy_id))
++          @proxy_task_id = proxy_task_id
+         end
+ 
+         def request
+-          @resource.get
++          @client.dynflow_task_status(@proxy_task_id)
+         end
+       end
+     end
+diff --git lib/foreman_ansible_director/engine.rb lib/foreman_ansible_director/engine.rb
+index 649c347..93a4e67 100644
+--- lib/foreman_ansible_director/engine.rb
++++ lib/foreman_ansible_director/engine.rb
+@@ -5,6 +5,7 @@ require 'foreman_ansible_director/remote_execution'
+ 
+ module ForemanAnsibleDirector
+   DYNFLOW_QUEUE = :foreman_ansible_director
++  PROXY_FEATURE = 'Ansible_Director'
+   class Engine < ::Rails::Engine
+     isolate_namespace ForemanAnsibleDirector
+     engine_name 'foreman_ansible_director'
+diff --git test/controllers/api/v2/execution_environments_controller_test.rb test/controllers/api/v2/execution_environments_controller_test.rb
+index 1f836df..742507f 100644
+--- test/controllers/api/v2/execution_environments_controller_test.rb
++++ test/controllers/api/v2/execution_environments_controller_test.rb
+@@ -13,6 +13,9 @@ module ForemanAnsibleDirectorTests
+           @organization = Organization.find_by(name: 'Organization 1')
+           @other_organization = Organization.find_by(name: 'Organization 2')
+ 
++          @proxy = FactoryBot.build_stubbed(:smart_proxy)
++          ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
++
+           as_admin do
+             @viewer = FactoryBot.create(
+               :user,
+diff --git test/services/unit/execution_environment_service_test.rb test/services/unit/execution_environment_service_test.rb
+index 4b05cb4..d497400 100644
+--- test/services/unit/execution_environment_service_test.rb
++++ test/services/unit/execution_environment_service_test.rb
+@@ -6,6 +6,11 @@ module ForemanAnsibleDirectorTests
+       class ExecutionEnvironmentServiceTest < ForemanAnsibleDirectorTestCase
+ 
+         describe '#create_execution_environment' do
++          setup do
++            @proxy = FactoryBot.build_stubbed(:smart_proxy)
++            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
++          end
++
+           test 'creates an execution environment with valid params' do
+ 
+             ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
+@@ -61,10 +66,24 @@ module ForemanAnsibleDirectorTests
+ 
+             assert_equal initial_count, ::ForemanAnsibleDirector::ExecutionEnvironment.count
+           end
++
++          test 'raises when no proxy with Ansible_Director feature exists' do
++            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([])
++            assert_raises(RuntimeError) do
++              ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
++                name: 'test_ee',
++                base_image_url: 'quay.io/ansible/base-ee:latest',
++                ansible_version: '2.20.0',
++                organization_id: @organization.id
++              )
++            end
++          end
+         end
+ 
+         describe '#edit_execution_environment' do
+           setup do
++            @proxy = FactoryBot.build_stubbed(:smart_proxy)
++            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
+             @execution_environment = FactoryBot.create(:execution_environment, organization: @organization)
+           end
+ 
+@@ -193,6 +212,8 @@ module ForemanAnsibleDirectorTests
+ 
+         describe '#build_execution_environment' do
+           setup do
++            @proxy = FactoryBot.build_stubbed(:smart_proxy)
++            ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
+             @execution_environment = FactoryBot.create(:execution_environment, organization: @organization)
+             @collection = FactoryBot.create(:ansible_collection, organization: @organization)
+             @collection_version = FactoryBot.create(:content_unit_version, :for_collection, versionable: @collection)
+diff --git test/services/unit/proxy/base_client_test.rb test/services/unit/proxy/base_client_test.rb
+new file mode 100644
+index 0000000..1d8716b
+--- /dev/null
++++ test/services/unit/proxy/base_client_test.rb
+@@ -0,0 +1,28 @@
++# frozen_string_literal: true
++
++require 'foreman_ansible_director_test_helper'
++
++module ForemanAnsibleDirectorTests
++  module Services
++    module Unit
++      module Proxy
++        class BaseClientTest < ForemanAnsibleDirectorTestCase
++
++          describe 'BaseClient.new' do
++            test 'uses the given proxy url' do
++              proxy = FactoryBot.create(:smart_proxy)
++              client = ::ForemanAnsibleDirector::Proxy::BaseClient.new(proxy)
++              assert_equal proxy.url, client.url
++            end
++
++            test 'raises when no proxy is given' do
++              assert_raises(ArgumentError) do
++                ::ForemanAnsibleDirector::Proxy::BaseClient.new
++              end
++            end
++          end
++        end
++      end
++    end
++  end
++end
