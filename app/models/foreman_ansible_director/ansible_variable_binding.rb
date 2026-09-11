@@ -24,7 +24,8 @@ module ForemanAnsibleDirector
                            consumable_type
                          end,
         consumable_id: consumable_id,
-        consumable_name: consumable.try(:name),
+        # Use title attribute for host groups
+        consumable_name: consumable.try(:title) || consumable.try(:name),
         assignable_type: assignable_type,
         assignable_namespace: assignable_namespace,
         assignable_name: assignable_name,

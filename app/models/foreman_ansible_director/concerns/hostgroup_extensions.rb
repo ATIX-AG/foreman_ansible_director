@@ -21,7 +21,7 @@ module ForemanAnsibleDirector
       end
 
       def cr_name
-        name
+        title
       end
 
       def cr_content_assignments
