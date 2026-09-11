@@ -78,6 +78,7 @@ module ForemanAnsibleDirector
         # endregion
         def update_full
           variable_params = variable_full_params
+          validate_yaml! variable_params[:raw_value]
           ::ForemanAnsibleDirector::VariableService.edit_variable(
             variable: @ansible_variable,
             **variable_params
@@ -86,6 +87,7 @@ module ForemanAnsibleDirector
 
         def update_partial
           arguments = variable_partial_params
+          validate_yaml! variable_partial_params[:raw_value]
           ::ForemanAnsibleDirector::VariableService.edit_variable(
             variable: @ansible_variable,
             **arguments
@@ -152,6 +154,10 @@ module ForemanAnsibleDirector
           data_type = node.require(:data_type)
           raw_value = node.require(:raw_value)
           { name: name, data_type: data_type, raw_value: raw_value }
+        end
+
+        def validate_yaml!(string)
+          YAML.safe_load(string)
         end
 
         def resource_class

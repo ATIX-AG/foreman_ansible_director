@@ -66,6 +66,7 @@ module ForemanAnsibleDirector
 
         def create
           binding_params = variable_binding_create_params
+          validate_yaml! variable_binding_create_params[:raw_value]
 
           target = ::ForemanAnsibleDirector::AssignmentService.find_target(
             target_type: binding_params[:target],
@@ -85,6 +86,8 @@ module ForemanAnsibleDirector
 
         def update_full
           variable_binding_params = variable_binding_full_params
+          validate_yaml! variable_binding_full_params[:raw_value]
+
           ::ForemanAnsibleDirector::VariableBindingService.edit_variable_binding(
             variable_binding: @ansible_variable_binding,
             **variable_binding_params
@@ -93,6 +96,8 @@ module ForemanAnsibleDirector
 
         def update_partial
           variable_binding_params = variable_binding_partial_params
+          validate_yaml! variable_binding_partial_params[:raw_value]
+
           ::ForemanAnsibleDirector::VariableBindingService.edit_variable_binding(
             variable_binding: @ansible_variable_binding,
             **variable_binding_params
@@ -177,6 +182,10 @@ module ForemanAnsibleDirector
             raw_value: root_node[:raw_value],
             variable_name: root_node[:variable_name],
           }.compact
+        end
+
+        def validate_yaml!(string)
+          YAML.safe_load(string)
         end
 
         def controller_permission
