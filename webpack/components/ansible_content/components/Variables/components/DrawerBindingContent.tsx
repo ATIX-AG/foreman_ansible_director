@@ -103,6 +103,11 @@ export const DrawerBindingContent = ({
             binding={navigationState.binding}
             onSuccess={onSuccess}
             onAbort={() => setNavigationState({ state: 'bindingIndex', binding: null })}
+            boundNode={{
+              id: navigationState.binding.consumable_id,
+              name: navigationState.binding.consumable_name,
+              type: navigationState.binding.consumable_type,
+            }}
           />
         </>)
         : null

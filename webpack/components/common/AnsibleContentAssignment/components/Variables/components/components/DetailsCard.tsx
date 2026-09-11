@@ -6,17 +6,20 @@ import {
   DescriptionListGroup,
   DescriptionListTerm, Dropdown, DropdownItem, DropdownList, FormGroup,
   Grid,
-  GridItem, MenuToggle, MenuToggleElement, Popover,
+  GridItem, Label, MenuToggle, MenuToggleElement, Popover,
 } from '@patternfly/react-core';
-import { translate as _ } from 'foremanReact/common/I18n';
+import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import styles from '@patternfly/react-styles/css/components/Form/form';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import { dataTypeDisplayNameMap, queryIdUiStringMap, transformerIdUiStringMap } from '../../utils';
 import {
   AnsibleVariableDataType, VariableValueQueryType, VariableValueTransformerType,
 } from '../../../../../../../types/AnsibleVariableTypes';
+import { ContentResolutionNode } from '../../../../../../../types/AnsibleContentAssignmentTypes';
+import { hierarchyIconMap } from '../../../../AnsibleContentAssignment';
+import { crColorHierarchy, crnTypeUiString } from '../../../../helpers';
 
-interface DetailsCardProps {
+interface DetailsCardBaseProps {
   variant: 'variable' | 'binding' | 'bindingCreate';
   valueQuery: VariableValueQueryType;
   valueTransformer: VariableValueTransformerType;
@@ -25,14 +28,33 @@ interface DetailsCardProps {
   isDisabled: boolean;
 }
 
-export const DetailsCard = ({
-  variant,
-  valueQuery,
-  valueTransformer,
-  itemType,
-  onItemTypeChange,
-  isDisabled,
-}: DetailsCardProps): ReactElement => {
+interface DetailsCardVariableProps {
+  variant: 'variable';
+}
+
+interface DetailsCardBindingCreateProps {
+  variant: 'bindingCreate';
+}
+
+interface DetailsCardBindingProps {
+  variant: 'binding';
+  boundNode: ContentResolutionNode;
+}
+
+type DetailsCardProps = DetailsCardBaseProps & (DetailsCardVariableProps | DetailsCardBindingProps | DetailsCardBindingCreateProps);
+
+export const DetailsCard = (
+  props: DetailsCardProps
+): ReactElement => {
+
+  const {
+    variant,
+    valueQuery,
+    valueTransformer,
+    itemType,
+    onItemTypeChange,
+    isDisabled,
+  } = props;
 
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = React.useState<boolean>(false);
 
@@ -58,6 +80,22 @@ export const DetailsCard = ({
                   {transformerIdUiStringMap[valueTransformer]}
                 </DescriptionListDescription>
               </DescriptionListGroup>
+              {variant === 'binding' && (
+                <DescriptionListGroup>
+                  <DescriptionListTerm>
+                    {_('Bound node')}
+                  </DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {
+                      <Label
+                        icon={hierarchyIconMap[props.boundNode.type]}
+                      >
+                        {props.boundNode.name}
+                      </Label>
+                    }
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+              )}
             </DescriptionList>
           </GridItem>
           <GridItem span={4}>

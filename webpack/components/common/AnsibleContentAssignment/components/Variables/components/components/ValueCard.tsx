@@ -80,14 +80,26 @@ export const ValueCard = ({
   return (
     <>
       <StackItem>
-        <DetailsCard
-          variant={variant}
-          valueQuery={valueQuery}
-          valueTransformer={valueTransformer}
-          itemType={itemType}
-          onItemTypeChange={type => onItemTypeChange(type)}
-          isDisabled={isDisabled}
-        />
+        {variant === 'binding' ? (
+          <DetailsCard
+            variant={variant}
+            valueQuery={valueQuery}
+            valueTransformer={valueTransformer}
+            itemType={itemType}
+            onItemTypeChange={type => onItemTypeChange(type)}
+            isDisabled={isDisabled}
+            boundNode={crn}
+          />
+        ) : (
+          <DetailsCard
+            variant={variant}
+            valueQuery={valueQuery}
+            valueTransformer={valueTransformer}
+            itemType={itemType}
+            onItemTypeChange={type => onItemTypeChange(type)}
+            isDisabled={isDisabled}
+          />
+        )}
       </StackItem>
       <StackItem>
         <Card>

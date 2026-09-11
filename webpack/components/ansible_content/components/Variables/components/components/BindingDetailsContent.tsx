@@ -11,15 +11,18 @@ import {
 import { getYamlValidity } from '../../../../../common/AnsibleContentAssignment/components/Variables/utils';
 import { useToasts } from '../../../../../../helpers/toasts/useToasts';
 import { AnsibleVariableBinding } from '../../../../../../resources/clients/AnsibleVariableBinding';
+import { ContentResolutionNode } from '../../../../../../types/AnsibleContentAssignmentTypes';
 
 interface BindingDetailsContentProps {
   binding: AnsibleVariableBindingType;
+  boundNode: ContentResolutionNode;
   onSuccess: () => void;
   onAbort: () => void;
 }
 
 export const BindingDetailsContent = ({
   binding,
+  boundNode,
   onAbort,
   onSuccess,
 }: BindingDetailsContentProps): ReactElement => {
@@ -39,7 +42,7 @@ export const BindingDetailsContent = ({
         <DrawerContentBody>
           <Stack hasGutter style={{ paddingTop: '15px', paddingBottom: '15px' }}>
             <ValueCard
-              variant="bindingCreate"
+              variant="binding"
               itemType={dataType}
               itemValue={rawValue}
               valueQuery={'local'}
@@ -47,6 +50,7 @@ export const BindingDetailsContent = ({
               onItemTypeChange={type => setDataType(type)}
               onItemValueChange={value => setRawValue(value)}
               isDisabled={false}
+              crn={boundNode}
             />
           </Stack>
         </DrawerContentBody>
