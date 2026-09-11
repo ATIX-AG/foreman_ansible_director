@@ -54,7 +54,7 @@ module ForemanAnsibleDirector
         content_source, = content_source_override || content_source_for(target)
         resolved_assignments, hierarchy = recurse_content_assignments(target)
 
-        return [resolved_assignments, nil, hierarchy, nil] unless resolve && content_source
+        return [resolved_assignments, [], hierarchy, nil] unless resolve && content_source
 
         resolved = resolve_content_units(content_source, resolved_assignments)
 
