@@ -109,7 +109,8 @@ module ForemanAnsibleDirector
                       name: variable_name,
                       data_type: variable[:type],
                       raw_value: variable[:value],
-                      owner: collection_role_record
+                      owner: collection_role_record,
+                      organization_id: input[:organization_id]
                     )
                   end
                 end

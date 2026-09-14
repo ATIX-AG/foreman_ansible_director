@@ -7,6 +7,8 @@ module ForemanAnsibleDirector
         before_action :find_resource, only: %i[show update_full update_partial]
         before_action :find_collection_role, only: [:index_acr]
 
+        before_action :find_optional_organization, only: %i[show index_acr variables_for_target auto_complete_search]
+
         resource_description { resource_id 'AD Ansible Variables' }
 
         # region ApiDoc: GET /api/v2/ansible_director/ansible_variables/:id
@@ -120,6 +122,11 @@ module ForemanAnsibleDirector
           )
         end
 
+        def resource_scope
+          organization_scoped_resource_scope
+        end
+
+
         private
 
         def find_collection_role
@@ -158,10 +165,6 @@ module ForemanAnsibleDirector
 
         def validate_yaml!(string)
           YAML.safe_load(string)
-        end
-
-        def resource_class
-          ::ForemanAnsibleDirector::AnsibleVariable
         end
 
         def controller_permission

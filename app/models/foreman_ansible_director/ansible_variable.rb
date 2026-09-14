@@ -15,14 +15,16 @@ module ForemanAnsibleDirector
           assignable_namespace: ownable.ansible_collection_version.versionable.namespace,
           assignable_name: ownable.ansible_collection_version.versionable.name,
           assignable_role_name: ownable.name,
-          variable_name: name
+          variable_name: name,
+          organization_id: organization_id
         )
       else
         ::ForemanAnsibleDirector::AnsibleVariableBinding.where(
           assignable_type: 'ForemanAnsibleDirector::AnsibleRole',
           assignable_namespace: ownable.versionable.namespace,
           assignable_name: ownable.versionable.name,
-          variable_name: name
+          variable_name: name,
+          organization_id: organization_id
         )
       end
     end

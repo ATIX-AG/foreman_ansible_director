@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class VariableRedesign < ActiveRecord::Migration[6.1]
+class AdVariableRedesign < ActiveRecord::Migration[6.1]
   def change
     create_table :ad_ansible_variables do |t|
       t.string :name, null: false
@@ -12,6 +12,8 @@ class VariableRedesign < ActiveRecord::Migration[6.1]
       t.jsonb :transformer_data, default: {}, null: false
       t.text :raw_value, null: true
       t.references :ownable, polymorphic: true, null: false, index: true
+      t.integer :organization_id, null: false
+      t.timestamps
     end
 
     create_table :ad_ansible_variable_bindings do |t|
@@ -28,6 +30,8 @@ class VariableRedesign < ActiveRecord::Migration[6.1]
       t.string :assignable_name, null: false
       t.string :assignable_role_name, null: true
       t.references :consumable, polymorphic: true, null: false, index: true
+      t.integer :organization_id, null: false
+      t.timestamps
     end
   end
 end

@@ -10,7 +10,8 @@ module ForemanAnsibleDirector
                           query: 0,
                           query_data: {},
                           transformer: 0,
-                          transformer_data: {})
+                          transformer_data: {},
+                          organization_id:)
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::AnsibleVariable.create!(
             name: name,
@@ -20,7 +21,8 @@ module ForemanAnsibleDirector
             query_data: query_data,
             transformer: transformer,
             transformer_data: transformer_data,
-            ownable: owner
+            ownable: owner,
+            organization_id: organization_id,
           )
         end
       end

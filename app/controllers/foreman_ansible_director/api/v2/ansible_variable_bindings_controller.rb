@@ -6,6 +6,10 @@ module ForemanAnsibleDirector
       class AnsibleVariableBindingsController < AnsibleDirectorApiController
         before_action :find_resource, only: %w[show destroy update_full update_partial]
         before_action :find_variable, only: [:index_for_variable]
+
+        before_action :find_organization, only: %i[create]
+        before_action :find_optional_organization, only: %i[index_for_variable auto_complete_search]
+
         resource_description { resource_id 'AD Ansible Variable Bindings' }
 
         # region ApiDoc: POST /api/v2/ansible_director/ansible_variables/:ansible_variable_id/overrides
@@ -72,6 +76,8 @@ module ForemanAnsibleDirector
             target_type: binding_params[:target],
             target_id: binding_params[:target_id]
           )
+
+          puts @organization
           @created_binding = ::ForemanAnsibleDirector::VariableBindingService.create_variable_binding(
             variable_name: binding_params[:variable_name],
             data_type: binding_params[:data_type],
@@ -80,7 +86,8 @@ module ForemanAnsibleDirector
             assignable_type: binding_params[:assignable_type],
             assignable_namespace: binding_params[:assignable_namespace],
             assignable_name: binding_params[:assignable_name],
-            assignable_role_name: binding_params[:assignable_role_name]
+            assignable_role_name: binding_params[:assignable_role_name],
+            organization_id: @organization.id
           )
         end
 
@@ -126,6 +133,10 @@ module ForemanAnsibleDirector
 
         def resource_class
           ::ForemanAnsibleDirector::AnsibleVariableBinding
+        end
+
+        def resource_scope
+          organization_scoped_resource_scope
         end
 
         private

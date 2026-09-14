@@ -14,7 +14,8 @@ module ForemanAnsibleDirector
                                   query: 0,
                                   query_data: {},
                                   transformer: 0,
-                                  transformer_data: {})
+                                  transformer_data: {},
+                                  organization_id:)
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::AnsibleVariableBinding.create!(
             variable_name: variable_name,
@@ -28,7 +29,8 @@ module ForemanAnsibleDirector
             assignable_namespace: assignable_namespace,
             assignable_name: assignable_name,
             assignable_role_name: assignable_role_name,
-            consumable: target
+            consumable: target,
+            organization_id: organization_id
           )
         end
       end
