@@ -18,7 +18,7 @@ export const YamlErrorState = ({ error }: YamlErrorStateProps): ReactElement => 
       />
       <Modal
         variant={ModalVariant.medium}
-        title={'YAML parsing error'}
+        title={_('YAML parsing error')}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         actions={[

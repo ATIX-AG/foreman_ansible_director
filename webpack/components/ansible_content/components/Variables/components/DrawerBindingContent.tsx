@@ -50,10 +50,10 @@ export const DrawerBindingContent = ({
           component={'button'}
           onClick={() => setNavigationState({ state: 'bindingIndex', binding: null })}
         >
-          Binding index
+          {_('Binding index')}
         </BreadcrumbItem>
-        {navigationState.state === 'bindingDetails' && (<BreadcrumbItem>Binding</BreadcrumbItem>)}
-        {navigationState.state === 'bindingCreate' && (<BreadcrumbItem>Create Binding</BreadcrumbItem>)}
+        {navigationState.state === 'bindingDetails' && (<BreadcrumbItem>{_('Binding')}</BreadcrumbItem>)}
+        {navigationState.state === 'bindingCreate' && (<BreadcrumbItem>{_('Create binding')}</BreadcrumbItem>)}
       </Breadcrumb>
     );
   };
@@ -72,7 +72,7 @@ export const DrawerBindingContent = ({
                 onClick={
                   () => setNavigationState({ state: 'bindingCreate', binding: null })
                 }
-              >Create Binding</Button>
+              >{_('Create binding')}</Button>
             </FlexItem>
           </Flex>
         </StackItem>

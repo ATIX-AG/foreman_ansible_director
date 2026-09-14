@@ -20,6 +20,7 @@ import { AnsibleVariableBinding } from '../../../../../../resources/clients/Ansi
 import {
   InlineValueRenderer,
 } from '../../../../../common/AnsibleContentAssignment/components/Variables/components/InlineValueRenderer';
+import {crnTypeUiString} from '../../../../../common/AnsibleContentAssignment/helpers';
 
 interface BindingIndexContentProps {
   variable: AnsibleVariable;
@@ -44,7 +45,7 @@ export const BindingIndexContent = ({
     <>
       <StackItem>
         <SearchInput
-          placeholder="Find by bound node"
+          placeholder={_('Filter by host or host group')}
           value={boundNodeFilter}
           onChange={(_event, value) => setBoundNodeFilter(value)}
           onClear={() => setBoundNodeFilter('')}
@@ -102,15 +103,19 @@ export const BindingIndexContent = ({
                                       onClick={
                                         () => onBindingManageClick(binding)
                                       }
-                                    >Manage</Button>
+                                    >{_('Manage')}</Button>
                                   </OverflowMenuItem>
                                   <OverflowMenuItem>
                                     <Button
                                       variant="danger"
                                       onClick={() => {
                                         setConfirmableAction({
-                                          title: 'Delete binding?',
-                                          body: `Delete binding of variable ${variable.name} to node ${binding.consumable_name}?`,
+                                          title: _('Delete binding?'),
+                                          body: __(_('Delete binding of variable %(variableName)s to %(nodeType)s %(nodeName)s?'), {
+                                            variableName: variable.name,
+                                            nodeType: crnTypeUiString[binding.consumable_type],
+                                            nodeName: binding.consumable_name,
+                                          }),
                                           onAbort: () => setConfirmableAction(null),
                                           onConfirm: async () => {
                                             await withToast(
@@ -124,7 +129,7 @@ export const BindingIndexContent = ({
                                           },
                                         });
                                       }}
-                                    >Delete</Button>
+                                    >{_('Delete')}</Button>
                                   </OverflowMenuItem>
                                 </OverflowMenuGroup>
                               </OverflowMenuContent>
@@ -141,7 +146,7 @@ export const BindingIndexContent = ({
           <EmptyState>
             <EmptyStateHeader
               titleText={__(
-                _('%(variableName)s is not bound to any nodes.'),
+                _('%(variableName)s is not bound to any host or host group'),
                 { variableName: variable.name }
               )}
               headingLevel="h4"

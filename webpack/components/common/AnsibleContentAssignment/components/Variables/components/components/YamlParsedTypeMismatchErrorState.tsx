@@ -19,15 +19,15 @@ export const YamlParsedTypeMismatchErrorState = ({
   return (
     <EmptyState>
       <EmptyStateHeader
-        titleText={_('Parsed type mismatch')}
+        titleText={_('Type mismatch')}
         headingLevel="h4"
         icon={<EmptyStateIcon icon={OutlinedDizzyIcon} color={global_warning_color_100.var} />}
       />
       <EmptyStateBody>
-        The YAML you entered is valid but does not match this items type.
+        {_('The YAML you entered is valid but does not match the type of this item.')}
         <List isPlain>
-          <ListItem>{`Expected: ${dataTypeDisplayNameMap[expectedType]}`}</ListItem>
-          <ListItem>{`Got: ${parsedType}`}</ListItem>
+          <ListItem>{_(`Expected: ${dataTypeDisplayNameMap[expectedType]}`)}</ListItem>
+          <ListItem>{_(`Got: ${parsedType}`)}</ListItem>
         </List>
       </EmptyStateBody>
     </EmptyState>

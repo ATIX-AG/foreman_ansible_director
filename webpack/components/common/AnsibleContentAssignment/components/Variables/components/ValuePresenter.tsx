@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useContext } from 'react';
 import {
   Alert,
   AlertActionLink,
@@ -36,6 +36,7 @@ import {
 import {
   ArrayAdapter,
 } from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/ArrayAdapter';
+import { VariableContext } from '../VariableContext';
 
 interface ValuePresenterBaseProps {
   variant: 'variable' | 'binding';
@@ -65,7 +66,13 @@ export const ValuePresenter = ({
   onValueChange,
   isDisabled,
   crn,
-}: ValuePresenterProps): ReactElement => {
+}: ValuePresenterProps): ReactElement | null => {
+
+  const variableCtx = useContext(VariableContext);
+
+  if (variableCtx === null) {
+    return null;
+  }
 
   let loadedValue: AnsibleVariableParsedType;
 
@@ -153,7 +160,7 @@ export const ValuePresenter = ({
                 icon={<EmptyStateIcon icon={OutlinedDizzyIcon} color={global_warning_color_100.var} />}
               />
               <EmptyStateBody>
-                {_('The type of this variable could not be extracted during importing. Set the correct type or use the YAML input.')}
+                {_('Foreman cannot determine the type of this variable. Set the correct type or use the raw YAML input.')}
               </EmptyStateBody>
             </EmptyState>
           );
@@ -180,7 +187,7 @@ export const ValuePresenter = ({
     <>
       {isDisabled && (
         <Alert
-          title={_('Cross-node value editing disabled.')}
+          title={_('Cross-node value editing disabled')}
           variant="warning"
           isInline
           actionLinks={
@@ -188,15 +195,15 @@ export const ValuePresenter = ({
               <AlertActionLink component="a" href="#">
                 {variant === 'variable' ? (
                   _('Ansible > Ansible Content > Variables')
-                ) : (_(`Configure > ${crnTypeUiString[crn.type]} > ${crn.name}`))}
+                ) : (_(`Configure > ${crnTypeUiString[crn.type]} > ${crn.name}`))}r
               </AlertActionLink>
             </>
           }
         >
           {
             variant === 'variable'
-              ? (_('Editing of variable default values from consumer nodes is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the default value on the Ansible Variables page.'))
-              : (_(`Editing of values not bound to this node is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the value on the Ansible Director page of ${crnTypeUiString[crn.type]} ${crn.name}.`))
+              ? (_(`Editing of variable defaults from this ${crnTypeUiString[variableCtx.crnType]} is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the default value on the Ansible Variables page.`))
+              : (_(`Editing of bindings not belonging to this ${crnTypeUiString[variableCtx.crnType]} is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the value on the Ansible Director tab of ${crnTypeUiString[crn.type]} ${crn.name}.`))
           }
 
         </Alert>

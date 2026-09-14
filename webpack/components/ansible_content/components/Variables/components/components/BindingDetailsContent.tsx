@@ -12,6 +12,7 @@ import { getYamlValidity } from '../../../../../common/AnsibleContentAssignment/
 import { useToasts } from '../../../../../../helpers/toasts/useToasts';
 import { AnsibleVariableBinding } from '../../../../../../resources/clients/AnsibleVariableBinding';
 import { ContentResolutionNode, ContentResolutionNodeType } from '../../../../../../types/AnsibleContentAssignmentTypes';
+import {translate as _} from 'foremanReact/common/I18n';
 
 interface BindingDetailsContentProps {
   binding: AnsibleVariableBindingType;
@@ -76,14 +77,14 @@ export const BindingDetailsContent = ({
               onSuccess();
             }}
           >
-            {yamlValidity.state === 'type_mismatch' ? 'Confirm (I know what I am doing)' : 'Confirm'}
+            {yamlValidity.state === 'type_mismatch' ? _('Confirm (I know what I am doing)') : _('Confirm')}
           </Button>
           <Button
             key="cancel"
             variant="link"
             onClick={onAbort}
           >
-            Cancel
+            {_('Cancel')}
           </Button>
         </div>
       </StackItem>

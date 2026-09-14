@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Button, CodeBlock, CodeBlockCode, Popover, TextInput, Truncate } from '@patternfly/react-core';
+import { translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleVariable,
   AnsibleVariableBinding,
@@ -19,7 +20,7 @@ export const InlineValueRenderer = ({
       hasAutoWidth
       triggerAction="hover"
       aria-label="Hoverable popover"
-      headerContent={<div>Effective value</div>}
+      headerContent={<div>{_('Effective value')}</div>}
       bodyContent={
         <div style={{ width: '20vw' }}>
           <CodeBlock>
@@ -30,7 +31,7 @@ export const InlineValueRenderer = ({
         </div>
       }
     >
-      <Button variant={'secondary'}>Hover to preview value</Button>
+      <Button variant={'secondary'}>{_('Hover to preview value')}</Button>
     </Popover>
   );
 

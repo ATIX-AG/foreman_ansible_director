@@ -15,7 +15,7 @@ import {
 } from '@patternfly/react-core';
 import { InnerScrollContainer, OuterScrollContainer, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import React, { ReactElement } from 'react';
-import { translate as _ } from 'foremanReact/common/I18n';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
@@ -64,7 +64,7 @@ export const VariableList = ({
                           <Th modifier="nowrap" width={30}>
                             {_('Name')}
                           </Th>
-                          <Th modifier={'nowrap'}>{_('Variable value')}</Th>
+                          <Th modifier={'nowrap'}>{_('Value')}</Th>
                           <Th modifier="nowrap">{_('Data type')}</Th>
                           <Th modifier="nowrap">{_('Bound by')}</Th>
                           <Th modifier="nowrap" />
@@ -79,13 +79,13 @@ export const VariableList = ({
                           .map(variable => (
                             <Tr key={variable.id}>
                               <Td
-                                dataLabel={_('Variable name')}
+                                dataLabel={_('Name')}
                                 modifier="breakWord"
                               >
                                 {variable.name}
                               </Td>
                               <Td
-                                dataLabel={_('Variable value')}
+                                dataLabel={_('Value')}
                                 modifier="nowrap"
                               >
                                 <InlineValueRenderer item={variable} />
@@ -97,7 +97,9 @@ export const VariableList = ({
                               </Td>
                               <Td dataLabel={_('Bound by')}>
                                 <Label color="blue" isCompact>
-                                  {`${variable.bindings_count} bindings`}
+                                  {__(_(`${variable.bindings_count} %(plural)s`), {
+                                    plural: variable.bindings_count === 1 ? 'binding' : 'bindings',
+                                  })}
                                 </Label>
                               </Td>
                               <Td isActionCell>
@@ -110,7 +112,7 @@ export const VariableList = ({
                                           onClick={
                                             () => onManageVariablesClick(variable)
                                           }
-                                        >Manage Variable</Button>
+                                        >{_('Manage variable')}</Button>
                                       </OverflowMenuItem>
                                       <OverflowMenuItem>
                                         <Button
@@ -118,7 +120,7 @@ export const VariableList = ({
                                           onClick={
                                             () => onManageBindingsClick(variable)
                                           }
-                                        >Manage Bindings</Button>
+                                        >{_('Manage bindings')}</Button>
                                       </OverflowMenuItem>
                                     </OverflowMenuGroup>
                                   </OverflowMenuContent>

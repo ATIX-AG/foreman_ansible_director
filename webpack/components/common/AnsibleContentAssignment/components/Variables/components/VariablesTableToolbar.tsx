@@ -20,7 +20,7 @@ export const VariablesTableToolbar = ({
             <ToolbarItem>
               <SearchInput
                 style={{ width: '20vw' }}
-                placeholder={_('Filter by variable name')}
+                placeholder={_('Filter by name')}
                 value={variableFilter}
                 onChange={(_event, value) => onVariableFilter(value)}
               />

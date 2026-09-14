@@ -239,7 +239,7 @@ export const BindingDetailModal = ({
             })()) : (
               <EmptyState>
                 <EmptyStateHeader
-                  titleText={_('Variable not bound to this node.')}
+                  titleText={_(`Variable not bound to this ${crnTypeUiString[crn.type]}.`)}
                   headingLevel="h4"
                   icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
                 />
@@ -373,7 +373,7 @@ export const BindingDetailModal = ({
 
     <Modal
       variant={ModalVariant.large}
-      title={`Manage variable "${variable.name}"`}
+      title={_(`Manage variable "${variable.name}"`)}
       isOpen
       onClose={onClose}
       actions={[
@@ -388,14 +388,14 @@ export const BindingDetailModal = ({
             onConfirmSuccess();
           }}
         >
-          {anyWarning ? 'Confirm (I know what I am doing)' : 'Confirm'}
+          {anyWarning ? _('Confirm (I know what I am doing)') : _('Confirm')}
         </Button>,
         <Button
           key="cancel"
           variant="link"
           onClick={onClose}
         >
-          Cancel
+          {_('Cancel')}
         </Button>,
       ]}
     >

@@ -4,6 +4,7 @@ module ForemanAnsibleDirector
   class AnsibleVariable < AnsibleDirectorModel
     include ::ForemanAnsibleDirector::AnsibleVariableValue::ValueResolution
     belongs_to :ownable, polymorphic: true, optional: false
+    belongs_to :organization, inverse_of: :ansible_variables
 
     enum query: { local: 0 }
     enum transformer: { static: 0 }
@@ -21,8 +22,8 @@ module ForemanAnsibleDirector
       else
         ::ForemanAnsibleDirector::AnsibleVariableBinding.where(
           assignable_type: 'ForemanAnsibleDirector::AnsibleRole',
-          assignable_namespace: ownable.versionable.namespace,
-          assignable_name: ownable.versionable.name,
+          assignable_namespace: ownable.namespace,
+          assignable_name: ownable.name,
           variable_name: name,
           organization_id: organization_id
         )

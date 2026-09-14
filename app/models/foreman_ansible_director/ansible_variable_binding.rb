@@ -5,6 +5,7 @@ module ForemanAnsibleDirector
     include ::ForemanAnsibleDirector::AnsibleVariableValue::ValueResolution
 
     belongs_to :consumable, polymorphic: true
+    belongs_to :organization, inverse_of: :ansible_variable_bindings
 
     enum query: { local: 0 }
     enum transformer: { static: 0 }

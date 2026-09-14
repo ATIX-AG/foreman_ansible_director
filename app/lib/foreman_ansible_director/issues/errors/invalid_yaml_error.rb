@@ -15,7 +15,7 @@ module ForemanAnsibleDirector
 
         def message
           <<~MESSAGE
-            The YAML string you passed does not appear to be valid YAML.
+            The YAML string you passed is not valid YAML.
             An issue was found at:
             ---
             #{@exception.message}

@@ -42,10 +42,10 @@ export const VariablesTable = ({ variables, resolutionHierarchy, onItemClick }: 
   const [activeSortDirection, setActiveSortDirection] = React.useState<sortDirection | undefined>('asc');
 
   const columnNames = {
-    variableName: 'Variable name',
-    dataType: 'Variable data type',
-    resolverStatus: 'Effective value source',
-    value: 'Variable value',
+    variableName: _('Name'),
+    dataType: _('Data type'),
+    resolverStatus: _('Effective value source'),
+    value: _('Value'),
   };
 
   const sortPredicate = (
@@ -148,12 +148,12 @@ export const VariablesTable = ({ variables, resolutionHierarchy, onItemClick }: 
                           : variable.binding.consumable_name}
                       </Label>
                     </>
-                  ) : <Label>{'Default value'}</Label>
+                  ) : <Label>{_('Default value')}</Label>
                 }
               </Td>
               <Td>
                 <TableText>
-                  <Button variant="secondary" onClick={() => onItemClick(variable)}>Manage</Button>
+                  <Button variant="secondary" onClick={() => onItemClick(variable)}>{_('Manage')}</Button>
                 </TableText>
               </Td>
             </Tr>

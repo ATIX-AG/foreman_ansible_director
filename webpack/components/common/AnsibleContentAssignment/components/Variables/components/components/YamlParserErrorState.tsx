@@ -23,14 +23,14 @@ export const YamlParserErrorState = ({ onInspectClick }: YamlParserErrorStatePro
         icon={<EmptyStateIcon icon={OutlinedDizzyIcon} color={global_danger_color_100.var} />}
       />
       <EmptyStateBody>
-        An error occurred trying to render the value. Ensure the value is valid YAML.
+        {_('Foreman cannot render this value. Ensure the value is valid YAML.')}
       </EmptyStateBody>
       <EmptyStateFooter>
         <EmptyStateActions>
           <Button
             variant="primary"
             onClick={onInspectClick}
-          >Inspect</Button>
+          >{_('Inspect')}</Button>
         </EmptyStateActions>
       </EmptyStateFooter>
     </EmptyState>

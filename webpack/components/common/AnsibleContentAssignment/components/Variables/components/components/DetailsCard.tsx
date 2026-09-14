@@ -83,7 +83,9 @@ export const DetailsCard = (
               {variant === 'binding' && (
                 <DescriptionListGroup>
                   <DescriptionListTerm>
-                    {_('Bound node')}
+                    {__(_('Bound %(nodeType)s'), {
+                      nodeType: crnTypeUiString[props.boundNode.type],
+                    })}
                   </DescriptionListTerm>
                   <DescriptionListDescription>
                     {
@@ -100,14 +102,14 @@ export const DetailsCard = (
           </GridItem>
           <GridItem span={4}>
             <FormGroup
-              label={<b>{_('Value type')}</b>}
+              label={<b>{_('Data type')}</b>}
               labelIcon={
                 <Popover
-                  headerContent={<div>{_('Variable type')}</div>}
+                  headerContent={<div>{_('Data type')}</div>}
                   bodyContent={
                     <div>
                       {_(
-                        'Select the value type used to validate this value.'
+                        'Select the data type used to validate this value.'
                       )}
                     </div>
                   }
