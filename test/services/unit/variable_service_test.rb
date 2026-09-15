@@ -21,155 +21,105 @@ module ForemanAnsibleDirectorTests
             @host = FactoryBot.create(:host, ansible_lifecycle_environment: @lifecycle_environment)
             @host2 = FactoryBot.create(:host, ansible_lifecycle_environment: @lifecycle_environment)
           end
-
         end
 
         describe '#create_variable' do
           test 'creates a variable with valid params for collection role' do
-
             variable = ::ForemanAnsibleDirector::VariableService.create_variable(
-              key: "test_variable",
-              type: "string",
-              default_value: "test_value",
-              owner: @collection_role
+              name: 'test_variable',
+              data_type: 'string',
+              raw_value: 'test_value',
+              owner: @collection_role,
+              organization_id: @organization.id
             )
 
             assert_not_nil variable
-            assert_equal 'test_variable', variable.key
-            assert_equal 'test_value', variable.default_value
-            assert_equal 'string', variable.variable_type
+            assert_equal 'test_variable', variable.name
+            assert_equal 'test_value', variable.raw_value
+            assert_equal 'string', variable.data_type
             assert_equal @collection_role, variable.ownable
           end
 
-        end
+          test 'creates a variable with optional query/transform params' do
+            variable = ::ForemanAnsibleDirector::VariableService.create_variable(
+              name: 'explicit_q_t_var',
+              data_type: 'string',
+              raw_value: '--- "value"',
+              owner: @collection_role,
+              query: 0,
+              query_data: { some: "query" },
+              transformer: 0,
+              transformer_data: { some: 'transformer' },
+              organization_id: @organization.id
+            )
 
+            assert_not_nil variable
+            assert_equal 'explicit_q_t_var', variable.name
+            assert_equal "local", variable[:query]
+            assert_equal "static", variable[:transformer]
+            assert_equal "query", variable[:query_data]["some"]
+            assert_equal "transformer", variable[:transformer_data]["some"]
+          end
+
+          test 'creates a variable within a transaction' do
+            assert_difference('::ForemanAnsibleDirector::AnsibleVariable.count', 1) do
+              ::ForemanAnsibleDirector::VariableService.create_variable(
+                name: 'txn_var',
+
+                data_type: 'integer',
+                raw_value: 42,
+                owner: @collection_role,
+                organization_id: @organization.id
+              )
+            end
+          end
+        end
         describe '#edit_variable' do
           setup do
             as_admin do
-              # TODO: This does not need admin permissions. Will be fixed in the permission update
               @variable = FactoryBot.create(:ansible_variable, :for_collection_role, ownable: @collection_role)
             end
           end
 
-          test 'updates variable with valid params' do
-
+          test 'updates variable attributes directly' do
             ::ForemanAnsibleDirector::VariableService.edit_variable(
               variable: @variable,
-              key: "updated_key",
-              type: "boolean",
-              default_value: true,
-              overridable: true
+              name: 'updated_name',
+              data_type: 'boolean',
+              raw_value: '--- true'
             )
             @variable.reload
 
-            assert_equal 'updated_key', @variable.key
-            assert_equal 'boolean', @variable.key_type
-            assert_equal true, @variable.default_value
-            assert @variable.override
+            assert_equal 'updated_name', @variable.name
+            assert_equal 'boolean', @variable.data_type
+            assert_equal '--- true', @variable.raw_value
           end
 
-          test 'variable is marked "overridden" correctly' do
-
-            variable1 = nil
-            variable2 = nil
-
-            as_admin do
-              variable1 = FactoryBot.create(:ansible_variable, :for_collection_role, ownable: @collection_role)
-              variable2 = FactoryBot.create(:ansible_variable, :for_collection_role, ownable: @collection_role)
-            end
-
-            assert variable1
-            assert variable2
-            assert_not variable1.overridable?
-            assert_not variable2.overridable?
-
+          test 'updates partial attributes when not all provided' do
+            original_name = @variable.name
             ::ForemanAnsibleDirector::VariableService.edit_variable(
-              variable: variable1,
-              key: variable1.key,
-              type: variable1.key_type,
-              default_value: variable1.default_value,
-              overridable: true
-            )
-            variable1.reload
-
-            assert variable1.overridable?
-
-            ::ForemanAnsibleDirector::VariableService.create_override(
-              variable: variable2,
-              value: "new_value",
-              matcher: "fqdn",
-              matcher_value: @host.fqdn
-            )
-            variable2.reload
-
-            assert variable2.overridable?
-          end
-        end
-
-        describe '#create_override' do
-          setup do
-            as_admin do
-              @variable = FactoryBot.create(:ansible_variable, :for_collection_role, ownable: @collection_role)
-            end
-          end
-
-          test 'creates an override with valid params' do
-
-            override = ::ForemanAnsibleDirector::VariableService.create_override(
               variable: @variable,
-              value: "new_value",
-              matcher: "fqdn",
-              matcher_value: @host.fqdn
+              data_type: 'dictionary'
             )
+            @variable.reload
 
-            assert_not_nil override
-            assert_equal "fqdn=#{@host.fqdn}", override.match
-            assert_equal 'new_value', override.value
-            assert_equal @variable.id, override.lookup_key_id
+            assert_equal original_name, @variable.name
+            assert_equal 'dictionary', @variable.data_type
           end
 
-        end
-
-        describe '#edit_override' do
-          setup do
-            as_admin do
-              @variable = FactoryBot.create(:ansible_variable, :for_collection_role, ownable: @collection_role)
+          test 'updates within a transaction' do
+            assert_nothing_raised do
+              ::ForemanAnsibleDirector::VariableService.edit_variable(
+                variable: @variable,
+                raw_value: 'new_value'
+              )
             end
-            @override = FactoryBot.create(:lookup_value, lookup_key: @variable, match: "fqdn=#{@host.fqdn}", value: 'original_value')
-          end
-
-          test 'updates override with valid params' do
-            ::ForemanAnsibleDirector::VariableService.edit_override(
-              override: @override,
-              value: "new_value",
-              matcher: "fqdn",
-              matcher_value: @host.fqdn
-            )
-            @override.reload
-
-            assert_equal 'new_value', @override.value
+            @variable.reload
+            assert_equal 'new_value', @variable.raw_value
           end
         end
 
-        describe '#destroy_override' do
-          setup do
-            as_admin do
-              @variable = FactoryBot.create(:ansible_variable, :for_collection_role, ownable: @collection_role)
-            end
-            @override = FactoryBot.create(:lookup_value, lookup_key: @variable, match: "fqdn=#{@host.fqdn}", value: 'original_value')
-          end
-
-          test 'destroys override successfully' do
-            override_id = @override.id
-
-            ::ForemanAnsibleDirector::VariableService.destroy_override(@override)
-
-            assert_nil LookupValue.find_by(id: override_id)
-          end
-        end
-
-        describe '#get_overrides_for_target' do
-
+        describe '#collect_hierarchical_bindings' do
           setup do
             @hostgroup = FactoryBot.create(
               :hostgroup,
@@ -185,325 +135,512 @@ module ForemanAnsibleDirectorTests
               assignable_name: @collection.name,
               assignable_role_name: @collection_role.name
             )
-            FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: @host2,
+          end
+
+          test 'result includes all higher items in the hieararchy' do
+            result = ::ForemanAnsibleDirector::VariableService.collect_hierarchical_bindings(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection_role.name,
               assignable_namespace: @collection.namespace,
-              assignable_name: @collection.name,
-              assignable_role_name: @collection_role.name
+              variable_name: 'nonexistent_var',
+              target: @host
             )
+
+            assert_equal 2, result.length
+            assert_nil result[0][:binding]
+            assert_nil result[1][:binding]
           end
 
-          test 'returns overrides for host target' do
-
-            as_admin do
-              @variables = FactoryBot.create_list(
-                :ansible_variable, 4, :for_collection_role,
-                ownable: @collection_role,
-                override: true,
-                path: 'fqdn'
-              )
-            end
-
-            override1 = FactoryBot.create(:lookup_value, lookup_key: @variables[0], match: "fqdn=#{@host.fqdn}")
-            override2 = FactoryBot.create(:lookup_value, lookup_key: @variables[1], match: "fqdn=#{@host.fqdn}")
-
-            override3 = FactoryBot.create(:lookup_value, lookup_key: @variables[2], match: "fqdn=#{@host2.fqdn}")
-            override4 = FactoryBot.create(:lookup_value, lookup_key: @variables[3], match: "fqdn=#{@host2.fqdn}")
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
-
-            assert_equal 2, results.length
-            assert_equal [override1.value, override2.value].sort, results.pluck(:override_value).sort
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host2)
-
-            assert_equal 2, results.length
-            assert_equal [override3.value, override4.value].sort, results.pluck(:override_value).sort
-          end
-
-          test 'selects the correct override for one variable across host and hostgroup matchers' do
-            other_hostgroup = FactoryBot.create(
-              :hostgroup,
-              organizations: [@organization],
-              ansible_lifecycle_environment: @lifecycle_environment
-            )
-            @host2.update!(hostgroup: other_hostgroup)
-
-            as_admin do
-              @host3 = FactoryBot.create(:host, ansible_lifecycle_environment: @lifecycle_environment, hostgroup: @hostgroup)
-            end
-
+          test 'returns binding from host when host has one' do
             FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: @host3,
-              assignable_namespace: @collection.namespace,
-              assignable_name: @collection.name,
-              assignable_role_name: @collection_role.name
-            )
-
-            as_admin do
-              @variable = FactoryBot.create(
-                :ansible_variable, :for_collection_role,
-                ownable: @collection_role,
-                override: true,
-                path: "fqdn\nhostgroup"
-              )
-            end
-
-            host_override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "fqdn=#{@host.fqdn}",
-              value: 'host override value'
-            )
-            other_host_override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "fqdn=#{@host2.fqdn}",
-              value: 'other host override value'
-            )
-            hostgroup_override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "hostgroup=#{@hostgroup.to_label}",
-              value: 'hostgroup override value',
-              host_or_hostgroup: @hostgroup
-            )
-            other_hostgroup_override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "hostgroup=#{other_hostgroup.to_label}",
-              value: 'other hostgroup override value',
-              host_or_hostgroup: other_hostgroup
-            )
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
-            result = results.find { |entry| entry[:variable_id] == @variable.id }
-
-            refute_nil result
-            assert_equal host_override.match, result[:override_matcher]
-            assert_equal host_override.value, result[:override_value]
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host2)
-            result = results.find { |entry| entry[:variable_id] == @variable.id }
-
-            refute_nil result
-            assert_equal other_host_override.match, result[:override_matcher]
-            assert_equal other_host_override.value, result[:override_value]
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host3)
-            result = results.find { |entry| entry[:variable_id] == @variable.id }
-
-            refute_nil result
-            assert_equal hostgroup_override.match, result[:override_matcher]
-            assert_equal hostgroup_override.value, result[:override_value]
-
-            refute_equal other_hostgroup_override.match, result[:override_matcher]
-          end
-
-          test 'returns host resolved inherited overrides for host target' do
-            nested_hostgroup = FactoryBot.create(
-              :hostgroup,
-              organizations: [@organization],
-              ansible_lifecycle_environment: @lifecycle_environment,
-              parent: @hostgroup
-            )
-            @host.hostgroup = nested_hostgroup
-
-            as_admin do
-              @variable = FactoryBot.create(
-                :ansible_variable, :for_collection_role,
-                ownable: @collection_role,
-                override: true,
-                path: 'hostgroup'
-              )
-            end
-
-            override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "hostgroup=#{nested_hostgroup.to_label}",
-              value: 'hostgroup value',
-              host_or_hostgroup: nested_hostgroup
-            )
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
-
-            assert_equal 1, results.length
-            assert_equal override.match, results[0][:override_matcher]
-            assert_equal override.value, results[0][:override_value]
-          end
-
-          test 'returns overrides for hostgroup target' do
-            FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: @hostgroup,
-              assignable_namespace: @collection.namespace,
-              assignable_name: @collection.name,
-              assignable_role_name: @collection_role.name
-            )
-
-            as_admin do
-              @variable = FactoryBot.create(
-                :ansible_variable, :for_collection_role,
-                ownable: @collection_role,
-                override: true,
-                path: 'hostgroup'
-              )
-            end
-
-            override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "hostgroup=#{@hostgroup.to_label}",
-              value: 'hostgroup value'
-            )
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@hostgroup)
-
-            assert_equal 1, results.length
-            assert_equal override.match, results[0][:override_matcher]
-            assert_equal override.value, results[0][:override_value]
-          end
-
-          test 'returns overrides for nested hostgroup target' do
-            parent_hostgroup = FactoryBot.create(
-              :hostgroup,
-              organizations: [@organization],
-              ansible_lifecycle_environment: @lifecycle_environment
-            )
-            nested_hostgroup = FactoryBot.create(
-              :hostgroup,
-              organizations: [@organization],
-              ansible_lifecycle_environment: @lifecycle_environment,
-              parent: parent_hostgroup
-            )
-
-            FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: nested_hostgroup,
-              assignable_namespace: @collection.namespace,
-              assignable_name: @collection.name,
-              assignable_role_name: @collection_role.name
-            )
-
-            as_admin do
-              @variable = FactoryBot.create(
-                :ansible_variable, :for_collection_role,
-                ownable: @collection_role,
-                override: true,
-                path: 'hostgroup'
-              )
-            end
-
-            override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "hostgroup=#{nested_hostgroup.to_label}",
-              value: 'nested hostgroup value'
-            )
-
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(nested_hostgroup)
-
-            assert_equal 1, results.length
-            assert_equal override.match, results[0][:override_matcher]
-            assert_equal override.value, results[0][:override_value]
-          end
-
-          test 'returns overrides for standalone ansible role target' do
-            role = FactoryBot.create(:ansible_role, organization: @organization)
-            role_version = FactoryBot.create(:content_unit_version, :for_role, versionable: role)
-            FactoryBot.create(
-              :lifecycle_environment_content_unit_version,
-              lifecycle_environment: @lifecycle_environment,
-              content_unit_version: role_version
-            )
-            FactoryBot.create(
-              :ansible_content_assignment,
-              :for_role,
+              :ansible_variable_binding,
               consumable: @host,
-              assignable_namespace: role.namespace,
-              assignable_name: role.name
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'host_var',
+              raw_value: 'host_binding_value',
+              organization: @organization
             )
 
-            as_admin do
-              @variable = FactoryBot.create(
-                :ansible_variable, :for_ansible_role,
-                ownable: role,
-                override: true,
-                path: 'fqdn'
-              )
-            end
-
-            override = FactoryBot.create(
-              :lookup_value,
-              lookup_key: @variable,
-              match: "fqdn=#{@host.fqdn}",
-              value: 'standalone role value'
+            result = ::ForemanAnsibleDirector::VariableService.collect_hierarchical_bindings(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection.name,
+              assignable_namespace: @collection.namespace,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'host_var',
+              target: @host
             )
 
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host)
-            result = results.find { |entry| entry[:variable_id] == @variable.id }
-
-            refute_nil result
-            assert_equal override.match, result[:override_matcher]
-            assert_equal override.value, result[:override_value]
+            assert_equal 2, result.length
+            assert_equal @host, result[-1][:node]
+            assert_not_nil result[-1][:binding]
+            assert_equal 'host_var', result[-1][:binding].variable_name
+            assert_equal 'host_binding_value', result[-1][:binding].raw_value
           end
 
-          test 'includes overridable variables when flag is true' do
+          test 'returns binding from hostgroup when hostgroup has one' do
+            FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @hostgroup,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'hostgroup_var',
+              raw_value: 'hostgroup_binding_value',
+              organization: @organization
+            )
 
-            as_admin do
-              variables_without_override_flag = FactoryBot.create_list(
-                :ansible_variable, 2, :for_collection_role, ownable: @collection_role
-              )
-              variables_with_override_flag = FactoryBot.create_list(
-                :ansible_variable, 2, :for_collection_role,
-                ownable: @collection_role,
-                override: true,
-                path: 'fqdn'
-              )
-              @variables = [*variables_without_override_flag, *variables_with_override_flag]
-            end
+            result = ::ForemanAnsibleDirector::VariableService.collect_hierarchical_bindings(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection.name,
+              assignable_namespace: @collection.namespace,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'hostgroup_var',
+              target: @host
+            )
 
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, include_overridable: true)
-
-            assert_equal 2, results.length
-            assert results[0][:overridable]
-            assert results[1][:overridable]
-
-            _override1 = FactoryBot.create(:lookup_value, lookup_key: @variables[0], match: "fqdn=#{@host.fqdn}")
-            _override2 = FactoryBot.create(:lookup_value, lookup_key: @variables[1], match: "fqdn=#{@host.fqdn}")
-            results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, include_overridable: true)
-
-            assert_equal 4, results.length
-
+            assert_equal 2, result.length
+            assert_not_nil result[0][:binding]
+            assert_equal @hostgroup, result[0][:node]
+            assert_equal 'hostgroup_var', result[0][:binding].variable_name
+            assert_equal 'hostgroup_binding_value', result[0][:binding].raw_value
+            assert_nil result[-1][:binding]
           end
 
-          test 'raises error for unsupported target type' do
-            unsupported_target = @organization
+          test 'returns bindings from multiple levels in hierarchy' do
+            FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @host,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'my_var',
+              raw_value: 'host_value',
+              organization: @organization
+            )
+            FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @hostgroup,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'my_var',
+              raw_value: 'hostgroup_value',
+              organization: @organization
+            )
 
-            assert_raises(NotImplementedError) do
-              ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(unsupported_target)
-            end
+            result = ::ForemanAnsibleDirector::VariableService.collect_hierarchical_bindings(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection.name,
+              assignable_namespace: @collection.namespace,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'my_var',
+              target: @host
+            )
+
+            assert_equal 2, result.length
+            assert_equal @host, result[-1][:node]
+            assert_equal 'host_value', result[-1][:binding].raw_value
+            assert_equal @hostgroup, result[0][:node]
+            assert_equal 'hostgroup_value', result[0][:binding].raw_value
           end
-
-          # test 'handles yaml type variables' do TODO: I am actually not sure what the intended result is for YAML variables
-          #  as_admin do
-          #    @variable = FactoryBot.create(:ansible_variable, :with_override, ownable: @collection_role)
-          #  end
-          #
-          #  update = Structs::AnsibleVariable::AnsibleVariableEdit.new(@variable.key, "yaml", "key: value", true)
-          #
-          #  ::ForemanAnsibleDirector::VariableService.edit_variable(update, @variable)
-          #  @variable.reload
-          #
-          #  results = ::ForemanAnsibleDirector::VariableService.get_overrides_for_target(@host, true)
-          #
-          #  assert_equal "key: value", results[0][:default_value]
-          # end
         end
 
+        describe '#resolve_single' do
+          setup do
+            as_admin do
+              @hostgroup = FactoryBot.create(
+                :hostgroup,
+                organizations: [@organization],
+                ansible_lifecycle_environment: @lifecycle_environment
+              )
+              @host.update!(hostgroup: @hostgroup)
+            end
+
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+
+            @variable = FactoryBot.create(
+              :ansible_variable,
+              name: 'role_var',
+              data_type: 'string',
+              raw_value: 'default_value',
+              ownable: @collection_role,
+              organization: @organization
+            )
+          end
+
+          test 'returns hierarchical bindings and referenced variable for valid CRN' do
+            result = ::ForemanAnsibleDirector::VariableService.resolve_single(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection.name,
+              assignable_namespace: @collection.namespace,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'role_var',
+              target: @host
+            )
+
+            hierarchical_bindings, referenced_variable = result
+
+            assert_not_nil referenced_variable
+            assert_equal @variable, referenced_variable
+            assert_equal 2, hierarchical_bindings.length
+            assert_nil hierarchical_bindings[0][:binding]
+            assert_nil hierarchical_bindings[1][:binding]
+          end
+
+          test 'returns empty arrays when no matching assignment found' do
+            result = ::ForemanAnsibleDirector::VariableService.resolve_single(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: 'nonexistent_role',
+              assignable_namespace: 'nonexistent_ns',
+              variable_name: 'role_var',
+              target: @host
+            )
+
+            assert_equal [], result[0]
+            assert_nil result[1]
+          end
+
+          test 'returns nil variable when variable name not found' do
+            result = ::ForemanAnsibleDirector::VariableService.resolve_single(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection.name,
+              assignable_namespace: @collection.namespace,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'nonexistent_var',
+              target: @host
+            )
+
+            assert_equal [], result[0]
+            assert_nil result[1]
+          end
+
+          test 'includes bindings collected from hierarchy' do
+            FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @host,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'role_var',
+              raw_value: 'host_value',
+              data_type: 'string',
+              organization: @organization
+            )
+
+            FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @hostgroup,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'role_var',
+              raw_value: 'hostgroup_value',
+              data_type: 'string',
+              organization: @organization
+            )
+
+
+            hierarchical_bindings, referenced_variable = ::ForemanAnsibleDirector::VariableService.resolve_single(
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_name: @collection.name,
+              assignable_namespace: @collection.namespace,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'role_var',
+              target: @host
+            )
+
+            assert_equal 2, hierarchical_bindings.length
+            assert_equal 'hostgroup_value', hierarchical_bindings[0][:binding].raw_value
+            assert_equal 'host_value', hierarchical_bindings[1][:binding].raw_value
+          end
+        end
+
+        describe '#variables_for' do
+          setup do
+            as_admin do
+              @hostgroup = FactoryBot.create(
+                :hostgroup,
+                organizations: [@organization],
+                ansible_lifecycle_environment: @lifecycle_environment
+              )
+              @host.update!(hostgroup: @hostgroup)
+            end
+
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+
+            @variable = FactoryBot.create(
+              :ansible_variable,
+              name: 'test_var',
+              data_type: 'string',
+              raw_value: 'value123',
+              ownable: @collection_role,
+              organization: @organization
+            )
+          end
+
+          test 'returns hierarchical bindings without resolved values when resolve is false' do
+            bindings, resolved_variables, hiera = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            assert_equal 0, bindings.length
+            assert_equal 0, resolved_variables.length
+            assert_equal 2, hiera.length
+          end
+
+          test 'returns resolved variables when resolve is true' do
+            bindings, resolved_variables, hiera = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: true
+            )
+
+            assert resolved_variables.any? do |assignment|
+              assignment[:variables].any? { |v| v[:name] == 'test_var' }
+            end
+          end
+
+          test 'returns hierarchy from content_source_for traversal' do
+            _bindings, _resolved, hiera = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            assert_equal 2, hiera.length
+            assert hiera.any? { |node| node == @host }
+            assert hiera.any? { |node| node == @hostgroup }
+          end
+
+          test 'resolves bindings, variables and hieararchy' do
+            assignment = FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+            variable1 = FactoryBot.create(
+              :ansible_variable,
+              name: 'test_var_1',
+              data_type: 'string',
+              raw_value: 'var1',
+              ownable: @collection_role,
+              organization: @organization
+            )
+            variable2 = FactoryBot.create(
+              :ansible_variable,
+              name: 'test_var_2',
+              data_type: 'string',
+              raw_value: 'var2',
+              ownable: @collection_role,
+              organization: @organization
+            )
+            host_binding = FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @host,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'test_var_1',
+              raw_value: 'var_1_host',
+              organization: @organization
+            )
+            hostgroup_binding = FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @hostgroup,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'test_var_2',
+              raw_value: 'var_2_hg',
+              organization: @organization
+            )
+
+            bindings, resolved, hiera = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: true
+            )
+
+            # Hiearchy assertions
+            assert_equal 2, hiera.length
+            assert_equal @host, hiera[0]
+            assert_equal @hostgroup, hiera[1]
+            # Variable assertions
+            assert_equal 1, resolved.length # 1 assignable (@collection_role)
+            assert_equal assignment, resolved[0][:assignment]
+            assert_equal 3, resolved[0][:variables].length # 3 variables belonging to @collection_role
+            refute_nil resolved[0][:variables].filter { |v| v[:name] == 'test_var_1' }.first[:binding] # Bound to host
+            assert_equal "var_1_host", resolved[0][:variables].filter { |v| v[:name] == 'test_var_1' }.first[:binding][:raw_value]
+            refute_nil resolved[0][:variables].filter { |v| v[:name] == 'test_var_2' }.first[:binding] # Bound to hg
+            assert_equal "var_2_hg", resolved[0][:variables].filter { |v| v[:name] == 'test_var_2' }.first[:binding][:raw_value]
+            assert_nil resolved[0][:variables].filter { |v| v[:name] == 'test_var' }.first[:binding] # Default value
+            # Binding assertions
+            assert_equal 2, bindings.length
+            assert_includes bindings, host_binding
+            assert_includes bindings, hostgroup_binding
+          end
+        end
+
+        describe '#resolve_values' do
+          setup do
+            FactoryBot.create(
+              :ansible_content_assignment,
+              consumable: @host,
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name
+            )
+
+            @variable = FactoryBot.create(
+              :ansible_variable,
+              name: 'resolve_me',
+              data_type: 'string',
+              raw_value: 'resolved_value',
+              ownable: @collection_role,
+              organization: @organization
+            )
+          end
+
+          test 'maps variables with their bindings for target' do
+            bindings, _, _ = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            resolved = ::ForemanAnsibleDirector::VariableService.resolve_values(
+              target: @host,
+              resolved_bindings: bindings
+            )
+
+            assert_instance_of Array, resolved
+            assert resolved.any? { |m| m[:variables].any? { |v| v[:name] == 'resolve_me' } }
+          end
+
+          test 'includes binding data when binding exists' do
+            FactoryBot.create(
+              :ansible_variable_binding,
+              consumable: @host,
+              assignable_type: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+              assignable_namespace: @collection.namespace,
+              assignable_name: @collection.name,
+              assignable_role_name: @collection_role.name,
+              variable_name: 'resolve_me',
+              raw_value: 'binding_resolves_to_this',
+              organization: @organization
+            )
+
+            bindings, _, _ = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            resolved = ::ForemanAnsibleDirector::VariableService.resolve_values(
+              target: @host,
+              resolved_bindings: bindings
+            )
+
+            assignment_with_var = resolved.find { |m| m[:variables].any? { |v| v[:name] == 'resolve_me' } }
+            var_entry = assignment_with_var[:variables].find { |v| v[:name] == 'resolve_me' }
+
+            assert_not_nil var_entry[:binding]
+            assert_equal 'binding_resolves_to_this', var_entry[:binding][:raw_value]
+          end
+
+          test 'has nil binding when no binding exists for variable' do
+            bindings, _, _ = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            resolved = ::ForemanAnsibleDirector::VariableService.resolve_values(
+              target: @host,
+              resolved_bindings: bindings
+            )
+
+            assignment_with_var = resolved.find { |m| m[:variables].any? { |v| v[:name] == 'resolve_me' } }
+            var_entry = assignment_with_var[:variables].find { |v| v[:name] == 'resolve_me' }
+
+            assert_nil var_entry[:binding]
+          end
+
+          test 'includes all variables from resolved assignments' do
+            second_variable = FactoryBot.create(
+              :ansible_variable,
+              name: 'resolve_me_too',
+              data_type: 'integer',
+              raw_value: 99,
+              ownable: @collection_role,
+              organization: @organization
+            )
+
+            bindings, _, _ = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            resolved = ::ForemanAnsibleDirector::VariableService.resolve_values(
+              target: @host,
+              resolved_bindings: bindings
+            )
+
+            assignment_with_vars = resolved.find { |m| m[:variables].any? { |v| v[:name] == 'resolve_me' } }
+            variable_names = assignment_with_vars[:variables].map { |v| v[:name] }
+
+            assert variable_names.include?('resolve_me')
+            assert variable_names.include?('resolve_me_too')
+          end
+
+          test 'includes assignment data in result' do
+            bindings, _, _ = ::ForemanAnsibleDirector::VariableService.variables_for(
+              target: @host,
+              resolve: false
+            )
+
+            resolved = ::ForemanAnsibleDirector::VariableService.resolve_values(
+              target: @host,
+              resolved_bindings: bindings
+            )
+
+            assert resolved.any? do |m|
+              m[:assignment].key?(:assignable_type) &&
+                m[:assignment].key?(:assignable_namespace) &&
+                m[:assignment].key?(:assignable_name) &&
+                m[:assignment].key?(:assignable_role_name)
+            end
+          end
+
+          test 'handles empty bindings gracefully' do
+            resolved = ::ForemanAnsibleDirector::VariableService.resolve_values(
+              target: @host,
+              resolved_bindings: []
+            )
+
+            assert_instance_of Array, resolved
+            assert_equal 1, resolved.length # Default value
+          end
+        end
       end
     end
   end

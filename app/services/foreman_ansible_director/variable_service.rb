@@ -36,37 +36,6 @@ module ForemanAnsibleDirector
         end
       end
 
-      def create_override(variable:,
-                          value:,
-                          matcher:,
-                          matcher_value:)
-        ActiveRecord::Base.transaction do
-          LookupValue.create!(
-            match: "#{matcher}=#{matcher_value}",
-            value: value,
-            lookup_key_id: variable.id
-          )
-        end
-      end
-
-      def edit_override(override:,
-                        value:,
-                        matcher:,
-                        matcher_value:)
-        ActiveRecord::Base.transaction do
-          override.update!(
-            match: "#{matcher}=#{matcher_value}",
-            value: value
-          )
-        end
-      end
-
-      def destroy_override(override)
-        ActiveRecord::Base.transaction do
-          override.destroy!
-        end
-      end
-
       def resolve_single(assignable_type:,
                          assignable_name:,
                          assignable_namespace:,
@@ -214,25 +183,27 @@ module ForemanAnsibleDirector
       def merge_bindings(preceding_bindings, bindings)
         merged_hash = {}
 
-        preceding_bindings.each do |assignment|
-          assignment_key = [
-            assignment[:assignable_namespace],
-            assignment[:assignable_name],
-            assignment[:assignable_role_name],
-            assignment[:assignable_type],
+        preceding_bindings.each do |binding|
+          binding_key = [
+            binding[:assignable_namespace],
+            binding[:assignable_name],
+            binding[:assignable_role_name],
+            binding[:assignable_type],
+            binding[:variable_name],
           ]
-          merged_hash[assignment_key] = assignment
+          merged_hash[binding_key] = binding
         end
 
-        bindings.each do |assignment|
-          assignment_key = [
-            assignment[:assignable_namespace],
-            assignment[:assignable_name],
-            assignment[:assignable_role_name],
-            assignment[:assignable_type],
+        bindings.each do |binding|
+          binding_key = [
+            binding[:assignable_namespace],
+            binding[:assignable_name],
+            binding[:assignable_role_name],
+            binding[:assignable_type],
+            binding[:variable_name],
           ]
 
-          merged_hash[assignment_key] = assignment
+          merged_hash[binding_key] = binding
         end
 
         merged_hash.values
@@ -241,7 +212,7 @@ module ForemanAnsibleDirector
       def variables_for(target:, resolve: false)
         resolved_bindings, hiera = recurse_variable_bindings(target)
 
-        return [resolved_bindings, nil, hiera] unless resolve
+        return [resolved_bindings, [], hiera] unless resolve
 
         resolved_variables = resolve_values(target: target, resolved_bindings: resolved_bindings)
 
@@ -293,7 +264,7 @@ module ForemanAnsibleDirector
             used_binding = nil
             unless (binding = variable_binding_lookup[key][variable_name]).nil?
               used_binding = binding
-              variable_binding_lookup.delete(key)
+              variable_binding_lookup[key].delete(variable_name)
             end
             effective_variables << {
               id: variable[:id],
