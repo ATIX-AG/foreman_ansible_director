@@ -262,7 +262,8 @@ Foreman::Plugin.register :foreman_ansible_director do
       setting 'ansible_director_vars_cross_node_editing',
         type: :boolean,
         description: 'When enabled, editing of Ansible variables and bindings is allowed across inheritance nodes.
-For example: If a host inherits a binding from a host group, you can edit the host group\'s binding on the host details page. ',
+                            For example: If a host inherits a binding from a host group, you can edit the host group\'s
+                            binding on the host details page. ',
         default: false,
         full_name: 'UI - Variables - Allow editing of Ansible variable bindings across inheritance nodes'
     end

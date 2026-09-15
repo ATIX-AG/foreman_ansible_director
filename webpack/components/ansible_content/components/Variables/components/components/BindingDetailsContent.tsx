@@ -1,6 +1,7 @@
 import React, { ReactElement, useMemo } from 'react';
 import { Button, DrawerContentBody, Stack, StackItem } from '@patternfly/react-core';
 
+import { translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleVariableBinding as AnsibleVariableBindingType,
   AnsibleVariableDataType,
@@ -11,8 +12,7 @@ import {
 import { getYamlValidity } from '../../../../../common/AnsibleContentAssignment/components/Variables/utils';
 import { useToasts } from '../../../../../../helpers/toasts/useToasts';
 import { AnsibleVariableBinding } from '../../../../../../resources/clients/AnsibleVariableBinding';
-import { ContentResolutionNode, ContentResolutionNodeType } from '../../../../../../types/AnsibleContentAssignmentTypes';
-import {translate as _} from 'foremanReact/common/I18n';
+import { ContentResolutionNode } from '../../../../../../types/AnsibleContentAssignmentTypes';
 
 interface BindingDetailsContentProps {
   binding: AnsibleVariableBindingType;

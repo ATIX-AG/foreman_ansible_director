@@ -7,7 +7,9 @@ module ForemanAnsibleDirector
         before_action :find_resource, only: %i[show update_full update_partial]
         before_action :find_collection_role, only: [:index_acr]
 
+        # rubocop:disable Rails/LexicallyScopedActionFilter
         before_action :find_optional_organization, only: %i[show index_acr variables_for_target auto_complete_search]
+        # rubocop:enable Rails/LexicallyScopedActionFilter
 
         resource_description { resource_id 'AD Ansible Variables' }
 
@@ -19,7 +21,8 @@ module ForemanAnsibleDirector
         end
 
         # region ApiDoc: GET /api/v2/ansible_director/collection_roles/:id/variables
-        api :GET, '/v2/ansible_director/collection_roles/:id/variables', N_('List variables for an Ansible collection role')
+        api :GET, '/v2/ansible_director/collection_roles/:id/variables',
+          N_('List variables for an Ansible collection role')
         param :id, :number, desc: N_('Ansible collection role identifier.'), required: true
         # endregion
         def index_acr
@@ -84,7 +87,7 @@ module ForemanAnsibleDirector
           param :raw_value,
             String,
             desc: N_('Value of the variable (must be valid YAML for any type).'),
-            example: "---\\ntime.example.com",
+            example: '---\\ntime.example.com',
             required: true
         end
         # TRANSLATORS: ApiDoc, do not translate!
@@ -128,7 +131,7 @@ module ForemanAnsibleDirector
           param :raw_value,
             String,
             desc: N_('Value of the variable (must be valid YAML for any type).'),
-            example: "---\\nnew-time.example.com",
+            example: '---\\nnew-time.example.com',
             required: false
         end
         # TRANSLATORS: ApiDoc, do not translate!
@@ -150,7 +153,8 @@ module ForemanAnsibleDirector
         end
 
         # region ApiDoc: GET /api/v2/ansible_director/ansible_variables/:target/:target_id/single
-        api :GET, '/v2/ansible_director/ansible_variables/:target/:target_id/single', N_('Resolve a single variable for a target')
+        api :GET, '/v2/ansible_director/ansible_variables/:target/:target_id/single',
+          N_('Resolve a single variable for a target')
         # TRANSLATORS: ApiDoc, do not translate!
         description <<~DESC
           View the effective value used when this variable is consumed by Ansible.
@@ -203,7 +207,6 @@ module ForemanAnsibleDirector
         def resource_scope
           organization_scoped_resource_scope
         end
-
 
         private
 

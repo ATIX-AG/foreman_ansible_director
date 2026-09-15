@@ -11,11 +11,10 @@ module ForemanAnsibleDirector
                                   assignable_namespace:,
                                   assignable_name:,
                                   assignable_role_name:,
-                                  query: 0,
+                                  organization_id:, query: 0,
                                   query_data: {},
                                   transformer: 0,
-                                  transformer_data: {},
-                                  organization_id:)
+                                  transformer_data: {})
         ActiveRecord::Base.transaction do
           ::ForemanAnsibleDirector::AnsibleVariableBinding.create!(
             variable_name: variable_name,

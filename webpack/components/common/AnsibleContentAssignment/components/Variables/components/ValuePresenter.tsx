@@ -195,7 +195,7 @@ export const ValuePresenter = ({
               <AlertActionLink component="a" href="#">
                 {variant === 'variable' ? (
                   _('Ansible > Ansible Content > Variables')
-                ) : (_(`Configure > ${crnTypeUiString[crn.type]} > ${crn.name}`))}r
+                ) : (_(`Configure > ${crnTypeUiString[crn.type]} > ${crn.name}`))}
               </AlertActionLink>
             </>
           }

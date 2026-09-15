@@ -20,7 +20,7 @@ import { AnsibleVariableBinding } from '../../../../../../resources/clients/Ansi
 import {
   InlineValueRenderer,
 } from '../../../../../common/AnsibleContentAssignment/components/Variables/components/InlineValueRenderer';
-import {crnTypeUiString} from '../../../../../common/AnsibleContentAssignment/helpers';
+import { crnTypeUiString } from '../../../../../common/AnsibleContentAssignment/helpers';
 
 interface BindingIndexContentProps {
   variable: AnsibleVariable;

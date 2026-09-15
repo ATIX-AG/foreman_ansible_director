@@ -8,8 +8,9 @@ module ForemanAnsibleDirector
         before_action :find_variable, only: [:index_for_variable]
 
         before_action :find_organization, only: %i[create]
+        # rubocop:disable Rails/LexicallyScopedActionFilter
         before_action :find_optional_organization, only: %i[index_for_variable auto_complete_search]
-
+        # rubocop:enable Rails/LexicallyScopedActionFilter
         resource_description { resource_id 'AD Ansible Variable Bindings' }
 
         def index_for_variable
@@ -43,7 +44,7 @@ module ForemanAnsibleDirector
             required: true
           param :assignable_type,
             %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
-            desc: N_('Type of the assignable (ForemanAnsibleDirector::AnsibleCollectionRole | ForemanAnsibleDirector::AnsibleRole).'),
+            desc: N_('Type of the assignable ForemanAnsibleDirector::(AnsibleCollectionRole | AnsibleRole).'),
             required: true
           param :assignable_namespace,
             String,
@@ -119,49 +120,49 @@ module ForemanAnsibleDirector
         DESC
         param :ansible_variable_binding, Hash, desc: N_('Variable binding updates'), required: true do
           param :variable_name,
-                String,
-                desc: N_('Name of the Ansible variable to bind.'),
-                example: 'ntp_server',
-                required: true
+            String,
+            desc: N_('Name of the Ansible variable to bind.'),
+            example: 'ntp_server',
+            required: true
           param :data_type,
-                %w[string integer boolean float array dictionary],
-                desc: N_('Data type of the variable.'),
-                example: 'string',
-                required: true
+            %w[string integer boolean float array dictionary],
+            desc: N_('Data type of the variable.'),
+            example: 'string',
+            required: true
           param :raw_value,
-                String,
-                desc: N_('Value of the variable (must be valid YAML for any type).'),
-                example: "---\\ntime.example.com",
-                required: true
+            String,
+            desc: N_('Value of the variable (must be valid YAML for any type).'),
+            example: '---\\ntime.example.com',
+            required: true
           param :assignable_type,
-                %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
-                desc: N_('Type of the assignable (ForemanAnsibleDirector::AnsibleCollectionRole | ForemanAnsibleDirector::AnsibleRole).'),
-                required: true
+            %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
+            desc: N_('Type of the assignable ForemanAnsibleDirector::(AnsibleCollectionRole | AnsibleRole).'),
+            required: true
           param :assignable_namespace,
-                String,
-                desc: N_('Namespace of the assignable.'),
-                example: 'my_namespace',
-                required: true
+            String,
+            desc: N_('Namespace of the assignable.'),
+            example: 'my_namespace',
+            required: true
           param :assignable_name,
-                String,
-                desc: N_('Name of the assignable.'),
-                example: 'my_collection',
-                required: true
+            String,
+            desc: N_('Name of the assignable.'),
+            example: 'my_collection',
+            required: true
           param :assignable_role_name,
-                String,
-                desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
-                example: 'my_role',
-                required: false
+            String,
+            desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
+            example: 'my_role',
+            required: false
           param :target,
-                String,
-                desc: N_('Target type for the binding (host | hostgroup).'),
-                example: 'host',
-                required: true
+            String,
+            desc: N_('Target type for the binding (host | hostgroup).'),
+            example: 'host',
+            required: true
           param :target_id,
-                :number,
-                desc: N_('ID of the target entity.'),
-                example: 1,
-                required: true
+            :number,
+            desc: N_('ID of the target entity.'),
+            example: 1,
+            required: true
         end
         # TRANSLATORS: ApiDoc, do not translate!
         example <<~EXAMPLE
@@ -197,49 +198,49 @@ module ForemanAnsibleDirector
         DESC
         param :ansible_variable_binding, Hash, desc: N_('Variable binding updates'), required: true do
           param :variable_name,
-                String,
-                desc: N_('Name of the Ansible variable to bind.'),
-                example: 'ntp_server',
-                required: false
+            String,
+            desc: N_('Name of the Ansible variable to bind.'),
+            example: 'ntp_server',
+            required: false
           param :data_type,
-                %w[string integer boolean float array dictionary],
-                desc: N_('Data type of the variable.'),
-                required: false
+            %w[string integer boolean float array dictionary],
+            desc: N_('Data type of the variable.'),
+            required: false
           param :raw_value,
-                String,
-                desc: N_('Value of the variable (must be valid YAML for any type).'),
-                example: "---\ntime.example.com",
-                required: false
+            String,
+            desc: N_('Value of the variable (must be valid YAML for any type).'),
+            example: "---\ntime.example.com",
+            required: false
           param :assignable_type,
-                %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
-                desc: N_('Type of the assignable (ForemanAnsibleDirector::AnsibleCollectionRole | ForemanAnsibleDirector::AnsibleRole).'),
-                example: 'ForemanAnsibleDirector::AnsibleCollectionRole',
-                required: false
+            %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
+            desc: N_('Type of the assignable ForemanAnsibleDirector::(AnsibleCollectionRole | AnsibleRole).'),
+            example: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+            required: false
           param :assignable_namespace,
-                String,
-                desc: N_('Namespace of the assignable.'),
-                example: 'my_namespace',
-                required: false
+            String,
+            desc: N_('Namespace of the assignable.'),
+            example: 'my_namespace',
+            required: false
           param :assignable_name,
-                String,
-                desc: N_('Name of the assignable.'),
-                example: 'my_collection',
-                required: false
+            String,
+            desc: N_('Name of the assignable.'),
+            example: 'my_collection',
+            required: false
           param :assignable_role_name,
-                String,
-                desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
-                example: 'my_role',
-                required: false
+            String,
+            desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
+            example: 'my_role',
+            required: false
           param :target,
-                String,
-                desc: N_('Target type for the binding (host | hostgroup).'),
-                example: 'host',
-                required: false
+            String,
+            desc: N_('Target type for the binding (host | hostgroup).'),
+            example: 'host',
+            required: false
           param :target_id,
-                :number,
-                desc: N_('ID of the target entity.'),
-                example: 1,
-                required: false
+            :number,
+            desc: N_('ID of the target entity.'),
+            example: 1,
+            required: false
         end
         # TRANSLATORS: ApiDoc, do not translate!
         example <<~EXAMPLE
