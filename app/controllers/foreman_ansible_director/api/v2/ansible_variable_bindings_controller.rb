@@ -12,62 +12,83 @@ module ForemanAnsibleDirector
 
         resource_description { resource_id 'AD Ansible Variable Bindings' }
 
-        # region ApiDoc: POST /api/v2/ansible_director/ansible_variables/:ansible_variable_id/overrides
-        api :POST, '/v2/ansible_director/ansible_variables/:ansible_variable_id/overrides',
-          N_('Create an override for an Ansible variable')
-        # TRANSLATORS: ApiDoc, do not translate!
-        description <<~DESC
-          Create a new override rule for the specified Ansible variable.
-          Overrides allow customizing the variable value for specific hosts, hostgroups, or other matchers.
-        DESC
-        param :ansible_variable_id,
-          :number,
-          desc: N_('ID of the Ansible variable to override.'),
-          required: true
-        param :override, Hash, desc: N_('Override definition'), required: true do
-          param :value,
+        def index_for_variable
+        end
+
+        # region ApiDoc: GET /api/v2/ansible_director/ansible_variables/bindings/:id
+        api :GET, '/api/v2/ansible_director/variables/bindings/:id', N_('Show details of a variable binding')
+        param :id, :number, desc: N_('Variable Binding identifier.'), required: true
+        # endregion
+        def show
+        end
+
+        # region ApiDoc: POST /api/v2/ansible_director/ansible_variables/bindings
+        api :POST, '/api/v2/ansible_director/variables/bindings', N_('Create a variable binding')
+        param :organization_id, :number, desc: N_('Organization identifier.'), required: true
+        param :ansible_variable_binding, Hash, desc: N_('Variable binding definition'), required: true do
+          param :variable_name,
             String,
-            desc: N_('Override value (must be valid JSON when the variable type is `json`, `array`, or `hash`).'),
-            example: '192.168.1.1',
+            desc: N_('Name of the Ansible variable to bind.'),
+            example: 'ntp_server',
             required: true
-          param :matcher,
-            %w[fqdn hostgroup],
-            desc: N_('Matcher type.'),
-            example: 'fqdn',
+          param :data_type,
+            %w[string integer boolean float array dictionary],
+            desc: N_('Data type of the variable.'),
+            example: 'string',
             required: true
-          param :matcher_value,
+          param :raw_value,
             String,
-            desc: N_('Value for the matcher (e.g., "myhost.example.com").'),
-            example: 'myhost.example.com',
+            desc: N_('Value of the variable (must be valid YAML for any type).'),
+            example: "---\ntime.example.com",
+            required: true
+          param :assignable_type,
+            %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
+            desc: N_('Type of the assignable (ForemanAnsibleDirector::AnsibleCollectionRole | ForemanAnsibleDirector::AnsibleRole).'),
+            required: true
+          param :assignable_namespace,
+            String,
+            desc: N_('Namespace of the assignable.'),
+            example: 'my_namespace',
+            required: true
+          param :assignable_name,
+            String,
+            desc: N_('Name of the assignable.'),
+            example: 'my_collection',
+            required: true
+          param :assignable_role_name,
+            String,
+            desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
+            example: 'my_role',
+            required: false
+          param :target,
+            String,
+            desc: N_('Target type for the binding (host | hostgroup).'),
+            example: 'host',
+            required: true
+          param :target_id,
+            :number,
+            desc: N_('ID of the target entity.'),
+            example: 1,
             required: true
         end
         # TRANSLATORS: ApiDoc, do not translate!
         example <<~EXAMPLE
           {
-            "override": {
-              "value": "prod-ntp.internal",
-              "matcher": "fqdn",
-              "matcher_value": "prod-web-01.example.com"
+            "organization_id": 1,
+            "ansible_variable_binding": {
+              "variable_name": "ntp_server",
+              "data_type": "string",
+              "raw_value": "---\ntime.example.com",
+              "assignable_type": "ForemanAnsibleDirector::AnsibleCollectionRole",
+              "assignable_namespace": "my_namespace",
+              "assignable_name": "my_collection",
+              "assignable_role_name": "my_role",
+              "target": "host",
+              "target_id": 1
             }
           }
         EXAMPLE
         # endregion
-        def create_url_params
-          override = override_params
-          ::ForemanAnsibleDirector::VariableService.create_override(
-            variable: @ansible_variable,
-            value: override[:value],
-            matcher: override[:matcher],
-            matcher_value: override[:matcher_value]
-          )
-        end
-
-        def index_for_variable
-        end
-
-        def show
-        end
-
         def create
           binding_params = variable_binding_create_params
           validate_yaml! variable_binding_create_params[:raw_value]
@@ -77,7 +98,6 @@ module ForemanAnsibleDirector
             target_id: binding_params[:target_id]
           )
 
-          puts @organization
           @created_binding = ::ForemanAnsibleDirector::VariableBindingService.create_variable_binding(
             variable_name: binding_params[:variable_name],
             data_type: binding_params[:data_type],
@@ -91,6 +111,70 @@ module ForemanAnsibleDirector
           )
         end
 
+        # region ApiDoc: PUT /api/v2/ansible_director/ansible_variables/bindings/:id
+        api :PUT, '/v2/ansible_director/ansible_variables/bindings/:id', N_('Update a variable binding')
+        param :ansible_variable_binding, Hash, desc: N_('Variable binding updates'), required: true do
+          param :variable_name,
+                String,
+                desc: N_('Name of the Ansible variable to bind.'),
+                example: 'ntp_server',
+                required: true
+          param :data_type,
+                %w[string integer boolean float array dictionary],
+                desc: N_('Data type of the variable.'),
+                example: 'string',
+                required: true
+          param :raw_value,
+                String,
+                desc: N_('Value of the variable (must be valid YAML for any type).'),
+                example: "---\ntime.example.com",
+                required: true
+          param :assignable_type,
+                %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
+                desc: N_('Type of the assignable (ForemanAnsibleDirector::AnsibleCollectionRole | ForemanAnsibleDirector::AnsibleRole).'),
+                required: true
+          param :assignable_namespace,
+                String,
+                desc: N_('Namespace of the assignable.'),
+                example: 'my_namespace',
+                required: true
+          param :assignable_name,
+                String,
+                desc: N_('Name of the assignable.'),
+                example: 'my_collection',
+                required: true
+          param :assignable_role_name,
+                String,
+                desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
+                example: 'my_role',
+                required: false
+          param :target,
+                String,
+                desc: N_('Target type for the binding (host | hostgroup).'),
+                example: 'host',
+                required: true
+          param :target_id,
+                :number,
+                desc: N_('ID of the target entity.'),
+                example: 1,
+                required: true
+        end
+        # TRANSLATORS: ApiDoc, do not translate!
+        example <<~EXAMPLE
+          {
+            "ansible_variable_binding": {
+              "data_type": "string",
+              "raw_value": "---\ntime.example.com",
+              "variable_name": "ntp_server",
+              "assignable_type": "ForemanAnsibleDirector::AnsibleCollectionRole",
+              "assignable_namespace": "my_namespace",
+              "assignable_name": "my_collection",
+              "assignable_role_name": "my_role",
+              "target": "host",
+              "target_id": 1
+            }
+          }
+        EXAMPLE
         def update_full
           variable_binding_params = variable_binding_full_params
           validate_yaml! variable_binding_full_params[:raw_value]
@@ -101,6 +185,63 @@ module ForemanAnsibleDirector
           )
         end
 
+        # region ApiDoc: PATCH /api/v2/ansible_director/ansible_variables/bindings/:id
+        api :PATCH, '/api/v2/ansible_director/ansible_variables/bindings/:id', N_('Partially update a variable binding')
+        param :ansible_variable_binding, Hash, desc: N_('Variable binding updates'), required: true do
+          param :variable_name,
+                String,
+                desc: N_('Name of the Ansible variable to bind.'),
+                example: 'ntp_server',
+                required: false
+          param :data_type,
+                %w[string integer boolean float array dictionary],
+                desc: N_('Data type of the variable.'),
+                required: false
+          param :raw_value,
+                String,
+                desc: N_('Value of the variable (must be valid YAML for any type).'),
+                example: "---\ntime.example.com",
+                required: false
+          param :assignable_type,
+                %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
+                desc: N_('Type of the assignable (ForemanAnsibleDirector::AnsibleCollectionRole | ForemanAnsibleDirector::AnsibleRole).'),
+                example: 'ForemanAnsibleDirector::AnsibleCollectionRole',
+                required: false
+          param :assignable_namespace,
+                String,
+                desc: N_('Namespace of the assignable.'),
+                example: 'my_namespace',
+                required: false
+          param :assignable_name,
+                String,
+                desc: N_('Name of the assignable.'),
+                example: 'my_collection',
+                required: false
+          param :assignable_role_name,
+                String,
+                desc: N_('Name of the role within the collection (required for AnsibleCollectionRole).'),
+                example: 'my_role',
+                required: false
+          param :target,
+                String,
+                desc: N_('Target type for the binding (host | hostgroup).'),
+                example: 'host',
+                required: false
+          param :target_id,
+                :number,
+                desc: N_('ID of the target entity.'),
+                example: 1,
+                required: false
+        end
+        # TRANSLATORS: ApiDoc, do not translate!
+        example <<~EXAMPLE
+          {
+            "ansible_variable_binding": {
+              "raw_value": "---\nnew-time.example.com"
+            }
+          }
+        EXAMPLE
+        # endregion
         def update_partial
           variable_binding_params = variable_binding_partial_params
           validate_yaml! variable_binding_partial_params[:raw_value]
@@ -111,21 +252,9 @@ module ForemanAnsibleDirector
           )
         end
 
-        # region ApiDoc: DELETE /api/v2/ansible_director/ansible_variables/:ansible_variable_id/overrides/:id
-        api :DELETE, '/v2/ansible_director/ansible_variables/:ansible_variable_id/overrides/:id',
-          N_('Delete an override')
-        # TRANSLATORS: ApiDoc, do not translate!
-        description <<~DESC
-          Delete an override rule.
-        DESC
-        param :ansible_variable_id,
-          :number,
-          desc: N_('ID of the Ansible variable.'),
-          required: true
-        param :id,
-          :number,
-          desc: N_('ID of the override to delete.'),
-          required: true
+        # region ApiDoc: DELETE /api/v2/ansible_director/ansible_variables/bindings/:id
+        api :DELETE, '/api/v2/ansible_director/ansible_variables/bindings/:id', N_('Delete a variable binding')
+        param :id, :number, desc: N_('Variable Binding identifier.'), required: true
         # endregion
         def destroy
           ::ForemanAnsibleDirector::VariableBindingService.destroy_variable_binding(@ansible_variable_binding)
