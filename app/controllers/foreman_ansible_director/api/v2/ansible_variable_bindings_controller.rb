@@ -16,15 +16,15 @@ module ForemanAnsibleDirector
         end
 
         # region ApiDoc: GET /api/v2/ansible_director/ansible_variables/bindings/:id
-        api :GET, '/api/v2/ansible_director/variables/bindings/:id', N_('Show details of a variable binding')
-        param :id, :number, desc: N_('Variable Binding identifier.'), required: true
+        api :GET, '/v2/ansible_director/variables/bindings/:id', N_('Show details of a variable binding')
+        param :id, :number, desc: N_('Variable binding identifier'), required: true
         # endregion
         def show
         end
 
         # region ApiDoc: POST /api/v2/ansible_director/ansible_variables/bindings
         api :POST, '/api/v2/ansible_director/variables/bindings', N_('Create a variable binding')
-        param :organization_id, :number, desc: N_('Organization identifier.'), required: true
+        param :organization_id, :number, desc: N_('Organization identifier'), required: true
         param :ansible_variable_binding, Hash, desc: N_('Variable binding definition'), required: true do
           param :variable_name,
             String,
@@ -78,7 +78,7 @@ module ForemanAnsibleDirector
             "ansible_variable_binding": {
               "variable_name": "ntp_server",
               "data_type": "string",
-              "raw_value": "---\ntime.example.com",
+              "raw_value": "---\\ntime.example.com",
               "assignable_type": "ForemanAnsibleDirector::AnsibleCollectionRole",
               "assignable_namespace": "my_namespace",
               "assignable_name": "my_collection",
@@ -113,6 +113,10 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: PUT /api/v2/ansible_director/ansible_variables/bindings/:id
         api :PUT, '/v2/ansible_director/ansible_variables/bindings/:id', N_('Update a variable binding')
+        description <<~DESC
+          Replace an entire variable binding. All binding attributes have to be provided. To update only a subset of+
+          arguments, consider using PATCH.
+        DESC
         param :ansible_variable_binding, Hash, desc: N_('Variable binding updates'), required: true do
           param :variable_name,
                 String,
@@ -127,7 +131,7 @@ module ForemanAnsibleDirector
           param :raw_value,
                 String,
                 desc: N_('Value of the variable (must be valid YAML for any type).'),
-                example: "---\ntime.example.com",
+                example: "---\\ntime.example.com",
                 required: true
           param :assignable_type,
                 %w[ForemanAnsibleDirector::AnsibleCollectionRole ForemanAnsibleDirector::AnsibleRole],
@@ -164,7 +168,7 @@ module ForemanAnsibleDirector
           {
             "ansible_variable_binding": {
               "data_type": "string",
-              "raw_value": "---\ntime.example.com",
+              "raw_value": "---\\ntime.example.com",
               "variable_name": "ntp_server",
               "assignable_type": "ForemanAnsibleDirector::AnsibleCollectionRole",
               "assignable_namespace": "my_namespace",
@@ -187,6 +191,10 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: PATCH /api/v2/ansible_director/ansible_variables/bindings/:id
         api :PATCH, '/api/v2/ansible_director/ansible_variables/bindings/:id', N_('Partially update a variable binding')
+        description <<~DESC
+          Partially update an Ansible variable binding. To update every binding attribute, consider using PUT, which
+          informs you of missing attributes.
+        DESC
         param :ansible_variable_binding, Hash, desc: N_('Variable binding updates'), required: true do
           param :variable_name,
                 String,
@@ -237,7 +245,7 @@ module ForemanAnsibleDirector
         example <<~EXAMPLE
           {
             "ansible_variable_binding": {
-              "raw_value": "---\nnew-time.example.com"
+              "raw_value": "---\\nnew-time.example.com"
             }
           }
         EXAMPLE
@@ -254,7 +262,7 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: DELETE /api/v2/ansible_director/ansible_variables/bindings/:id
         api :DELETE, '/api/v2/ansible_director/ansible_variables/bindings/:id', N_('Delete a variable binding')
-        param :id, :number, desc: N_('Variable Binding identifier.'), required: true
+        param :id, :number, desc: N_('Variable Binding identifier'), required: true
         # endregion
         def destroy
           ::ForemanAnsibleDirector::VariableBindingService.destroy_variable_binding(@ansible_variable_binding)

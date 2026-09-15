@@ -29,8 +29,8 @@ module ForemanAnsibleDirector
         api :GET, '/v2/ansible_director/ansible_variables/:target/:target_id', N_('List variables for a target')
         # TRANSLATORS: ApiDoc, do not translate!
         description <<~DESC
-          Retrieve all Ansible variables for a given target (host or hostgroup).
-          If resolve is true, the server will resolve the variable values from their bindings.
+          Retrieve all Ansible variables for a given target (host or host group).
+          If resolve is true, Foreman will resolve the variable values from their bindings.
         DESC
         param :target,
           %w[host hostgroup],
@@ -65,6 +65,10 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: PUT /api/v2/ansible_director/ansible_variables/:id
         api :PUT, '/v2/ansible_director/ansible_variables/:id', N_('Update an Ansible variable')
+        description <<~DESC
+          Replace an entire variable. All variable attributes have to be provided. To update only a subset of arguments,
+          consider using PATCH.
+        DESC
         param :id, :number, desc: N_('Variable identifier.'), required: true
         param :ansible_variable, Hash, desc: N_('Variable definition'), required: true do
           param :name,
@@ -80,7 +84,7 @@ module ForemanAnsibleDirector
           param :raw_value,
             String,
             desc: N_('Value of the variable (must be valid YAML for any type).'),
-            example: "---\ntime.example.com",
+            example: "---\\ntime.example.com",
             required: true
         end
         # TRANSLATORS: ApiDoc, do not translate!
@@ -89,7 +93,7 @@ module ForemanAnsibleDirector
             "ansible_variable": {
               "name": "ntp_server",
               "data_type": "string",
-              "raw_value": "---\ntime.example.com"
+              "raw_value": "---\\ntime.example.com"
             }
           }
         EXAMPLE
@@ -105,6 +109,10 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: PATCH /api/v2/ansible_director/ansible_variables/:id
         api :PATCH, '/v2/ansible_director/ansible_variables/:id', N_('Partially update an Ansible variable')
+        description <<~DESC
+          Partially update an Ansible variable. To update every variable attribute, consider using PUT, which informs
+          you of missing attributes.
+        DESC
         param :id, :number, desc: N_('Variable identifier.'), required: true
         param :ansible_variable, Hash, desc: N_('Variable updates'), required: true do
           param :name,
@@ -120,7 +128,7 @@ module ForemanAnsibleDirector
           param :raw_value,
             String,
             desc: N_('Value of the variable (must be valid YAML for any type).'),
-            example: "---\nnew-time.example.com",
+            example: "---\\nnew-time.example.com",
             required: false
         end
         # TRANSLATORS: ApiDoc, do not translate!
@@ -145,8 +153,7 @@ module ForemanAnsibleDirector
         api :GET, '/v2/ansible_director/ansible_variables/:target/:target_id/single', N_('Resolve a single variable for a target')
         # TRANSLATORS: ApiDoc, do not translate!
         description <<~DESC
-          Resolve a single variable for a given target, returning the hierarchical bindings
-          and the mapped variable definition.
+          View the effective value used when this variable is consumed by Ansible.
         DESC
         param :target,
           %w[host hostgroup],
