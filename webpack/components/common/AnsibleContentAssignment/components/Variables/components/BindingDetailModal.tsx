@@ -10,9 +10,7 @@ import {
   ModalVariant,
   Stack,
   Tab,
-  TabProps,
   Tabs,
-  TabsProps,
 } from '@patternfly/react-core';
 import GlobeEuropeIcon from '@patternfly/react-icons/dist/esm/icons/globe-europe-icon';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
@@ -184,7 +182,7 @@ export const BindingDetailModal = ({
     }));
   };
 
-  const itemTab = (props: ItemDetailTabProps): ReactElement<TabProps> => {
+  const itemTab = (props: ItemDetailTabProps): ReactElement => {
     let tabIcon: ReactElement;
     let tabLabelColor: pfLabelColorType;
     let tabTitle: string;
@@ -400,8 +398,7 @@ export const BindingDetailModal = ({
         </Button>,
       ]}
     >
-      {/* The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
-      @ts-ignore */}
+      {/* itemTab returns a valid <Tab> element but patternfly's TabsChild type is too strict for our use case */}
       <Tabs
         isBox
         isFilled
@@ -410,30 +407,25 @@ export const BindingDetailModal = ({
           setSelectedTab(Number(eventKey))}
         role="region"
       >
-        {
-          // The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
-          // @ts-ignore
-          itemTab({
-            eventKey: 0,
-            variant: 'variable',
-            item: variable,
-            draftType: drafts.variable.type,
-            draftValue: drafts.variable.value,
-            onDraftTypeChange: (type: AnsibleVariableDataType) => updateDraft('variable', {
-              type: type,
-              value: drafts.variable.value,
-              operation: drafts.variable.operation,
-            }),
-            onDraftValueChange: (value: string) => updateDraft('variable', {
-              type: drafts.variable.type,
-              value: value,
-              operation: drafts.variable.operation,
-            }),
-          })
-        }
+        {itemTab({
+          eventKey: 0,
+          variant: 'variable',
+          item: variable,
+          draftType: drafts.variable.type,
+          draftValue: drafts.variable.value,
+          onDraftTypeChange: (type: AnsibleVariableDataType) => updateDraft('variable', {
+            type: type,
+            value: drafts.variable.value,
+            operation: drafts.variable.operation,
+          }),
+          onDraftValueChange: (value: string) => updateDraft('variable', {
+            type: drafts.variable.type,
+            value: value,
+            operation: drafts.variable.operation,
+          }),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any}
         {hierarchicalBindings.map((hBinding, index) =>
-        // The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
-        // @ts-ignore
           itemTab({
             eventKey: index + 1,
             variant: 'binding',
@@ -459,7 +451,8 @@ export const BindingDetailModal = ({
                 operation: drafts[key]?.operation || null,
               });
             },
-          }))}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          }) as any)}
       </Tabs>
     </Modal>
   );
