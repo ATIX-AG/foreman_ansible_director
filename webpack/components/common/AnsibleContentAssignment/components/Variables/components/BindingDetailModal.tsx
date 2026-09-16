@@ -183,7 +183,7 @@ export const BindingDetailModal = ({
     }));
   };
 
-  const itemTab = (props: ItemDetailTabProps): TabsProps['children'] => {
+  const itemTab = (props: ItemDetailTabProps): ReactElement => {
     let tabIcon: ReactElement;
     let tabLabelColor: pfLabelColorType;
     let tabTitle: string;
@@ -409,6 +409,8 @@ export const BindingDetailModal = ({
           setSelectedTab(Number(eventKey))}
         role="region"
       >
+        {/* The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
+        @ts-ignore */}
         {itemTab({
           eventKey: 0,
           variant: 'variable',
@@ -427,6 +429,8 @@ export const BindingDetailModal = ({
           }),
         })}
         {hierarchicalBindings.map((hBinding, index) =>
+        // The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
+        // @ts-ignore
           itemTab({
             eventKey: index + 1,
             variant: 'binding',
