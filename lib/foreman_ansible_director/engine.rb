@@ -5,6 +5,7 @@ require 'foreman_ansible_director/remote_execution'
 
 module ForemanAnsibleDirector
   DYNFLOW_QUEUE = :foreman_ansible_director
+  PROXY_FEATURE = 'Ansible_Director'
   class Engine < ::Rails::Engine
     isolate_namespace ForemanAnsibleDirector
     engine_name 'foreman_ansible_director'
@@ -44,6 +45,8 @@ module ForemanAnsibleDirector
       ::HostsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostExtensions
 
       ::Host::Managed.prepend ::ForemanAnsibleDirector::Concerns::AnsibleExecutionExtensions
+
+      ::Katello::OrganizationCreator.prepend(::ForemanAnsibleDirector::Concerns::OrganizationCreatorExtensions)
 
       ReportImporter.register_smart_proxy_feature('Ansible')
     end

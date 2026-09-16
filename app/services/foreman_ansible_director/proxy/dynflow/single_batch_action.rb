@@ -4,9 +4,8 @@ module ForemanAnsibleDirector
   module Proxy
     module Dynflow
       class SingleBatchAction
-        def initialize(proxy_task_id, operation, action_class, action_input)
-          proxy_resource = BaseClient.proxy_resource
-          @resource = proxy_resource['/dynflow/tasks/launch']
+        def initialize(proxy_task_id, operation, action_class, smart_proxy_id, action_input)
+          @client = BaseClient.new(::SmartProxy.find(smart_proxy_id))
           @proxy_task_id = proxy_task_id
           @operation = operation
           @action_class = action_class
@@ -14,15 +13,7 @@ module ForemanAnsibleDirector
         end
 
         def request
-          @resource.post({
-            operation: @operation,
-            input: {
-              @proxy_task_id => {
-                action_class: @action_class,
-                action_input: @action_input,
-              },
-            },
-          }.to_json)
+          @client.launch_dynflow_task(@proxy_task_id, @operation, @action_class, @action_input)
         end
       end
     end
