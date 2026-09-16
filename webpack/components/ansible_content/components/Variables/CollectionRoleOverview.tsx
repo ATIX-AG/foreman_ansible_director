@@ -32,6 +32,21 @@ export const CollectionRoleOverview = ({
 
   const [roleNameFilter, setRoleNameFilter] = React.useState<string>('');
 
+  const [activeSortDirection, setActiveSortDirection] = React.useState<'asc' | 'desc'>('asc');
+
+  const filteredRoles: AnsibleCollectionRoleWithVarCount[] = React.useMemo(() => {
+    let result = [...collectionRoles].filter(role =>
+      role.name.startsWith(roleNameFilter.toLowerCase()));
+
+    result = result.sort(
+      (a, b) => activeSortDirection === 'asc'
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
+
+    return result;
+  }, [collectionRoles, roleNameFilter, activeSortDirection]);
+
   return (
     <Grid hasGutter>
       <GridItem span={3}>
@@ -53,16 +68,27 @@ export const CollectionRoleOverview = ({
                   <Table variant="compact" isStickyHeader>
                     <Thead>
                       <Tr>
-                        <Th modifier="nowrap" width={30}>
+                        <Th
+                          modifier="nowrap"
+                          width={30}
+                          sort={{
+                            sortBy: {
+                              index: 0,
+                              direction: activeSortDirection,
+                            },
+                            onSort: (_event, _index, direction) => {
+                              setActiveSortDirection(direction as 'desc' | 'asc');
+                            },
+                            columnIndex: 0,
+                          }}
+                        >
                           {_('Role')}
                         </Th>
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {collectionRoles
-                        .filter(role =>
-                          role.name.startsWith(roleNameFilter.toLowerCase()))
-                        .map(role => (
+                      {
+                        filteredRoles.map(role => (
                           <Tr
                             key={role.name}
                             onRowClick={() => {
@@ -76,7 +102,8 @@ export const CollectionRoleOverview = ({
                               {role.name}
                             </Td>
                           </Tr>
-                        ))}
+                        ))
+                      }
                     </Tbody>
                   </Table>
                 </InnerScrollContainer>
