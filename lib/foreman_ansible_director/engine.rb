@@ -46,6 +46,8 @@ module ForemanAnsibleDirector
 
       ::Host::Managed.prepend ::ForemanAnsibleDirector::Concerns::AnsibleExecutionExtensions
 
+      ::Katello::OrganizationCreator.prepend(::ForemanAnsibleDirector::Concerns::OrganizationCreatorExtensions)
+
       ReportImporter.register_smart_proxy_feature('Ansible')
     end
 
