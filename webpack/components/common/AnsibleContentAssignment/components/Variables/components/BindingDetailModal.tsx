@@ -10,6 +10,7 @@ import {
   ModalVariant,
   Stack,
   Tab,
+  TabProps,
   Tabs,
   TabsProps,
 } from '@patternfly/react-core';
@@ -183,7 +184,7 @@ export const BindingDetailModal = ({
     }));
   };
 
-  const itemTab = (props: ItemDetailTabProps): ReactElement => {
+  const itemTab = (props: ItemDetailTabProps): ReactElement<TabProps> => {
     let tabIcon: ReactElement;
     let tabLabelColor: pfLabelColorType;
     let tabTitle: string;
