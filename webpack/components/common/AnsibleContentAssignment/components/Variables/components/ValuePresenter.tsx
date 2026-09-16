@@ -1,4 +1,4 @@
-import React, { ReactElement, useContext } from 'react';
+import React, { ReactElement } from 'react';
 import {
   Alert,
   AlertActionLink,
@@ -36,7 +36,6 @@ import {
 import {
   ArrayAdapter,
 } from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/ArrayAdapter';
-import { VariableContext } from '../VariableContext';
 
 interface ValuePresenterBaseProps {
   variant: 'variable' | 'binding';
@@ -67,12 +66,6 @@ export const ValuePresenter = ({
   isDisabled,
   crn,
 }: ValuePresenterProps): ReactElement | null => {
-
-  const variableCtx = useContext(VariableContext);
-
-  if (variableCtx === null) {
-    return null;
-  }
 
   let loadedValue: AnsibleVariableParsedType;
 
@@ -202,8 +195,8 @@ export const ValuePresenter = ({
         >
           {
             variant === 'variable'
-              ? (_(`Editing of variable defaults from this ${crnTypeUiString[variableCtx.crnType]} is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the default value on the Ansible Variables page.`))
-              : (_(`Editing of bindings not belonging to this ${crnTypeUiString[variableCtx.crnType]} is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the value on the Ansible Director tab of ${crnTypeUiString[crn.type]} ${crn.name}.`))
+              ? (_('Editing of variable defaults from consumers is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the default value on the Ansible Variables page.'))
+              : (_('Editing of bindings not belonging to this consumer is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the value on the Ansible Director tab of the binding\'s owner.'))
           }
 
         </Alert>

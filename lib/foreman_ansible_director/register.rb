@@ -60,19 +60,19 @@ Foreman::Plugin.register :foreman_ansible_director do
     # View
     permission :view_ansible_director_variable_bindings,
       { 'foreman_ansible_director/api/v2/ansible_variable_bindings': %i[show index_for_variable] },
-      resource_type: 'LookupValue'
+      resource_type: 'ForemanAnsibleDirector::AnsibleVariableBinding'
     # Create
     permission :create_ansible_director_variable_bindings,
       { 'foreman_ansible_director/api/v2/ansible_variable_bindings': [:create] },
-      resource_type: 'LookupValue'
+      resource_type: 'ForemanAnsibleDirector::AnsibleVariableBinding'
     # Edit
     permission :edit_ansible_director_variable_bindings,
       { 'foreman_ansible_director/api/v2/ansible_variable_bindings': %i[update_full update_partial] },
-      resource_type: 'LookupValue'
+      resource_type: 'ForemanAnsibleDirector::AnsibleVariableBinding'
     # Destroy
     permission :destroy_ansible_director_variable_bindings,
       { 'foreman_ansible_director/api/v2/ansible_variable_bindings': [:destroy] },
-      resource_type: 'LookupValue'
+      resource_type: 'ForemanAnsibleDirector::AnsibleVariableBinding'
     # Ansible lifecycle environments
     # View
     permission :view_ansible_lifecycle_environments,

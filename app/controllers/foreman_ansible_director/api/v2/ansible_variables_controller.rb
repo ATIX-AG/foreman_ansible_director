@@ -208,6 +208,10 @@ module ForemanAnsibleDirector
           organization_scoped_resource_scope
         end
 
+        def resource_class
+          ::ForemanAnsibleDirector::AnsibleVariable
+        end
+
         private
 
         def find_collection_role

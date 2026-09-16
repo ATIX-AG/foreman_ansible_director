@@ -16,6 +16,7 @@ export const YamlEditor = ({
 }: YamlEditorProps): ReactElement => (
   // TODO: This needs a customized highlighter
   <AceEditor
+    style={{ maxHeight: '18rem' }}
     value={yamlFile}
     mode="yaml"
     onChange={setYamlFile}

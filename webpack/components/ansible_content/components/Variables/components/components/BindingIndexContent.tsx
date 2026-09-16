@@ -21,6 +21,7 @@ import {
   InlineValueRenderer,
 } from '../../../../../common/AnsibleContentAssignment/components/Variables/components/InlineValueRenderer';
 import { crnTypeUiString } from '../../../../../common/AnsibleContentAssignment/helpers';
+import { dataTypeDisplayNameMap } from '../../../../../common/AnsibleContentAssignment/components/Variables/utils';
 
 interface BindingIndexContentProps {
   variable: AnsibleVariable;
@@ -90,7 +91,7 @@ export const BindingIndexContent = ({
                           </Td>
                           <Td dataLabel={_('Data type')}>
                             <Label color="blue" isCompact>
-                              {binding.data_type}
+                              {dataTypeDisplayNameMap[binding.data_type]}
                             </Label>
                           </Td>
                           <Td isActionCell>

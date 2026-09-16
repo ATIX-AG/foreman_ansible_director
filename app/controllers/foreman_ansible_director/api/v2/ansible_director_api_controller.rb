@@ -17,6 +17,7 @@ module ForemanAnsibleDirector
             coincidence_id: @ctx.coincidence_id
           ))
           render_default_response
+          raise error
         end
 
         rescue_from ActiveRecord::RecordNotFound do |error|
