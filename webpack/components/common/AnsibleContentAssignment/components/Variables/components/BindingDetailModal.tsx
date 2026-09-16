@@ -11,6 +11,7 @@ import {
   Stack,
   Tab,
   Tabs,
+  TabsProps,
 } from '@patternfly/react-core';
 import GlobeEuropeIcon from '@patternfly/react-icons/dist/esm/icons/globe-europe-icon';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
@@ -182,7 +183,7 @@ export const BindingDetailModal = ({
     }));
   };
 
-  const itemTab = (props: ItemDetailTabProps): ReactElement => {
+  const itemTab = (props: ItemDetailTabProps): TabsProps['children'] => {
     let tabIcon: ReactElement;
     let tabLabelColor: pfLabelColorType;
     let tabTitle: string;
@@ -370,7 +371,6 @@ export const BindingDetailModal = ({
   };
 
   return (
-
     <Modal
       variant={ModalVariant.large}
       title={_(`Manage variable "${variable.name}"`)}

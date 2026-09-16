@@ -24,6 +24,8 @@ export const ManagementDrawer = ({
     | null
   >(null);
 
+  // I don't know why TS wants an argument here. useRef does not take any in React 16.9.
+  // @ts-ignore TS2554
   const drawerRef = React.useRef<HTMLDivElement>();
 
   const onExpand = (): void => {

@@ -180,6 +180,7 @@ module ForemanAnsibleDirector
             }
           }
         EXAMPLE
+        # endregion
         def update_full
           variable_binding_params = variable_binding_full_params
           validate_yaml! variable_binding_full_params[:raw_value]
