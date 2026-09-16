@@ -409,25 +409,27 @@ export const BindingDetailModal = ({
           setSelectedTab(Number(eventKey))}
         role="region"
       >
-        {/* The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
-        @ts-ignore */}
-        {itemTab({
-          eventKey: 0,
-          variant: 'variable',
-          item: variable,
-          draftType: drafts.variable.type,
-          draftValue: drafts.variable.value,
-          onDraftTypeChange: (type: AnsibleVariableDataType) => updateDraft('variable', {
-            type: type,
-            value: drafts.variable.value,
-            operation: drafts.variable.operation,
-          }),
-          onDraftValueChange: (value: string) => updateDraft('variable', {
-            type: drafts.variable.type,
-            value: value,
-            operation: drafts.variable.operation,
-          }),
-        })}
+        {
+          // The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
+          // @ts-ignore
+          itemTab({
+            eventKey: 0,
+            variant: 'variable',
+            item: variable,
+            draftType: drafts.variable.type,
+            draftValue: drafts.variable.value,
+            onDraftTypeChange: (type: AnsibleVariableDataType) => updateDraft('variable', {
+              type: type,
+              value: drafts.variable.value,
+              operation: drafts.variable.operation,
+            }),
+            onDraftValueChange: (value: string) => updateDraft('variable', {
+              type: drafts.variable.type,
+              value: value,
+              operation: drafts.variable.operation,
+            }),
+          })
+        }
         {hierarchicalBindings.map((hBinding, index) =>
         // The itemTab function does return the correct type, but patternfly does not export the TabsChild type.
         // @ts-ignore
