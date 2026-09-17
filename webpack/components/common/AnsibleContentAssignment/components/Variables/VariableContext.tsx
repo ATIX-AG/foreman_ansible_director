@@ -32,6 +32,7 @@ interface BaseVariableContextValue {
   assignmentsWithVariables: WithResolvedVariables<AnsibleContentAssignment>[];
   resolutionHierarchy: ContentResolutionNode[];
   handleManagementConfirm: (actionableDrafts: TabDraft[]) => Promise<unknown>;
+  refreshVariables: () => void;
 }
 
 interface VariableContextDomValue extends BaseVariableContextValue {
@@ -104,6 +105,25 @@ export const VariableContextWrapper = ({
             }),
           }));
           break;
+        case 'createBinding':
+          requests.push(withToast({
+            type: 'create',
+            resource: 'ansible_variable_binding',
+            func: AnsibleVariableBinding.create({
+              ansible_variable_binding: {
+                data_type: draft.type,
+                raw_value: draft.value,
+                // TODO: CANONIZE ASAP!
+                target: draft.targetCrn.type.toLowerCase() as 'host' | 'hostgroup',
+                target_id: draft.targetCrn.id,
+                assignable_role_name: draft.assignable.assignable_role_name,
+                assignable_name: draft.assignable.assignable_name,
+                assignable_namespace: draft.assignable.assignable_namespace,
+                assignable_type: draft.assignable.assignable_type,
+                variable_name: draft.variableName,
+              },
+            }),
+          }));
       }
     });
 
@@ -128,6 +148,7 @@ export const VariableContextWrapper = ({
         crnId: crnId as number,
         resolutionHierarchy: safeResolutionHierarchy,
         handleManagementConfirm: handleManagementConfirmApi,
+        refreshVariables: () => getCrnVariablesRequest.refetch(),
       } satisfies VariableContextApiValue
       : {
         ...baseContextValue,
@@ -135,6 +156,7 @@ export const VariableContextWrapper = ({
         crnId: -1,
         resolutionHierarchy: safeResolutionHierarchy,
         handleManagementConfirm: handleManagementConfirmApi,
+        refreshVariables: () => {},
       } satisfies VariableContextDomValue;
 
   return (

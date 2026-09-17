@@ -36,6 +36,7 @@ import {
 import {
   ArrayAdapter,
 } from '../../../../../ansible_content/components/AnsibleVariablesOverview/VariableManagementModal/ValueAdapters/ArrayAdapter';
+import { CrossNodeDisabledAlert } from './components/CrossNodeDisabledAlert';
 
 interface ValuePresenterBaseProps {
   variant: 'variable' | 'binding';
@@ -178,28 +179,11 @@ export const ValuePresenter = ({
 
   return (
     <>
-      {isDisabled && (
-        <Alert
-          title={_('Cross-node value editing disabled')}
-          variant="warning"
-          isInline
-          actionLinks={
-            <>
-              <AlertActionLink component="a" href="#">
-                {variant === 'variable' ? (
-                  _('Ansible > Ansible Content > Variables')
-                ) : (_(`Configure > ${crnTypeUiString[crn.type]} > ${crn.name}`))}
-              </AlertActionLink>
-            </>
-          }
-        >
-          {
-            variant === 'variable'
-              ? (_('Editing of variable defaults from consumers is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the default value on the Ansible Variables page.'))
-              : (_('Editing of bindings not belonging to this consumer is disabled. Enable the "ansible_director_vars_cross_node_editing" setting or edit the value on the Ansible Director tab of the binding\'s owner.'))
-          }
-
-        </Alert>
+      {isDisabled && (variant === 'binding'
+        ? (
+          <CrossNodeDisabledAlert variant={variant} crn={crn} />
+        )
+        : (<CrossNodeDisabledAlert variant={variant} />)
       )}
 
       <Bullseye>

@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useContext } from 'react';
 import { Table, Thead, Tr, Th, Tbody, Td, ExpandableRowContent } from '@patternfly/react-table';
 import {
   BoundAnsibleVariable,
@@ -8,6 +8,7 @@ import { AnsibleContentAssignment, ContentResolutionNode } from '../../../../../
 import { assignmentFqrn } from '../../../helpers';
 import { VariablesTable } from './VariablesTable';
 import { BindingDetailModalWrapper } from './BindingDetailModalWrapper';
+import { VariableContext } from '../VariableContext';
 
 interface VariablesTableProps {
   assignmentsWithVariables: WithResolvedVariables<AnsibleContentAssignment>[];
@@ -18,7 +19,13 @@ interface VariablesTableProps {
 export const VariablesAssignmentTable = ({
   assignmentsWithVariables,
   resolutionHierarchy,
-  fqrnFilter }: VariablesTableProps): ReactElement => {
+  fqrnFilter }: VariablesTableProps): ReactElement | null => {
+
+  const variableCtx = useContext(VariableContext);
+
+  if (variableCtx === null) {
+    return null;
+  }
 
   const columnNames = {
     fqrn: 'FQRN',
@@ -96,6 +103,7 @@ export const VariablesAssignmentTable = ({
           onClose={() => {
             setSelectedAssignment(null);
             setSelectedVariable(null);
+            variableCtx.refreshVariables();
           }}
         />
       )}

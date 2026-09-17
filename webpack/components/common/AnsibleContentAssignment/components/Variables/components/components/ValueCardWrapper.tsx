@@ -10,13 +10,11 @@ import { useAdContext } from '../../../../../../../helpers/adContext';
 
 interface ValueCardWrapperPropsForVariable {
   variant: 'variable';
-  item: AnsibleVariable;
   crn?: never;
 }
 
 interface ValueCardWrapperPropsForBinding {
   variant: 'binding';
-  item: AnsibleVariableBinding;
   crn: ContentResolutionNode;
 }
 

@@ -1,7 +1,7 @@
 import React, { CSSProperties, ReactElement, useContext, useMemo } from 'react';
 import {
   Button,
-  EmptyState,
+  EmptyState, EmptyStateActions, EmptyStateBody, EmptyStateFooter,
   EmptyStateHeader,
   EmptyStateIcon,
   Label,
@@ -35,10 +35,14 @@ import { pfLabelColorType } from '../../../../../../types/common';
 import { ContentResolutionNode } from '../../../../../../types/AnsibleContentAssignmentTypes';
 import { ValueCardWrapper } from './components/ValueCardWrapper';
 import { getYamlValidity, YamlValidity } from '../utils';
+import { useAdContext } from '../../../../../../helpers/adContext';
+import { CrossNodeDisabledAlert } from './components/CrossNodeDisabledAlert';
+import { CollectionRoleAssignable } from '../../../../../../types/DynamicAssignmentTypes';
 
-interface BindingDetailModal {
+interface BindingDetailModalProps {
   variable: AnsibleVariable;
   hierarchicalBindings: HierarchicalBinding[];
+  assignable: CollectionRoleAssignable;
   onClose: () => void;
   onConfirmSuccess: () => void;
 }
@@ -92,11 +96,20 @@ interface BaseDraftUpdate {
 
 type DraftUpdate = BaseDraftUpdate & (VariableDraftUpdate | BindingDraftUpdate);
 
-export interface TabDraftBinding {
+export interface TabDraftBindingEdit {
   type: AnsibleVariableDataType;
   value: string;
-  operation: 'editBinding' | 'createBinding' | null;
+  operation: 'editBinding' | null;
   sourceObject: AnsibleVariableBinding;
+}
+
+export interface TabDraftBindingCreate {
+  type: AnsibleVariableDataType;
+  value: string;
+  operation: 'createBinding' | null;
+  targetCrn: ContentResolutionNode;
+  assignable: CollectionRoleAssignable;
+  variableName: string;
 }
 
 export interface TabDraftVariable {
@@ -106,21 +119,23 @@ export interface TabDraftVariable {
   sourceObject: AnsibleVariable;
 }
 
-export type TabDraft = TabDraftBinding | TabDraftVariable;
+export type TabDraft = TabDraftBindingEdit | TabDraftBindingCreate | TabDraftVariable;
 
 const getDraftKey = (variant: 'variable' | 'binding', key: number | string): TabKey =>
   variant === 'variable' ? 'variable' : `binding_${key}`;
 
 export const BindingDetailModal = ({
   variable,
+  assignable,
   hierarchicalBindings,
   onClose,
   onConfirmSuccess,
-}: BindingDetailModal): ReactElement | null => {
+}: BindingDetailModalProps): ReactElement | null => {
 
   const variableCtx = useContext(VariableContext);
+  const ctx = useAdContext();
 
-  if (variableCtx === null) {
+  if (variableCtx === null || ctx === null) {
     return null;
   }
 
@@ -128,7 +143,7 @@ export const BindingDetailModal = ({
 
   type DraftState = {
     variable: TabDraftVariable;
-    [key: string]: TabDraftBinding | TabDraftVariable | null;
+    [key: string]: TabDraftBindingEdit | TabDraftBindingCreate | TabDraftVariable | null;
   };
 
   const initialDraftState = (): DraftState => {
@@ -150,7 +165,14 @@ export const BindingDetailModal = ({
           operation: null,
           sourceObject: hb.binding,
         }
-        : null;
+        : {
+          type: variable.data_type,
+          value: variable.raw_value,
+          operation: null,
+          targetCrn: hb.content_resolution_node,
+          assignable: assignable,
+          variableName: variable.name,
+        };
     });
 
     return initialState;
@@ -175,10 +197,11 @@ export const BindingDetailModal = ({
     setDrafts(prev => ({
       ...prev,
       [key]: {
+        ...draft,
         type: update.type,
         value: update.value,
         operation: update.operation,
-        sourceObject: draft.sourceObject },
+      },
     }));
   };
 
@@ -187,6 +210,7 @@ export const BindingDetailModal = ({
     let tabLabelColor: pfLabelColorType;
     let tabTitle: string;
     let changesMade: boolean = false;
+    let onRevertClick: () => void = () => {};
 
     let originalType: AnsibleVariableDataType;
     let originalValue: string;
@@ -209,17 +233,33 @@ export const BindingDetailModal = ({
             : item.content_resolution_node.name
         );
       })();
+      console.log(item, draft);
       tabContent = (
         <Stack hasGutter style={{ paddingTop: '15px', paddingBottom: '15px' }}>
           {
-            item.binding !== null && draft ? ((() => {
-              changesMade = item.binding.raw_value !== draft.value || item.binding.data_type !== draft.type;
-              originalType = item.binding.data_type;
-              originalValue = item.binding.raw_value;
+            (item.binding !== null && draft || draft && draft.operation === 'createBinding' ? ((() => {
+              if (item.binding) {
+                changesMade = item.binding.raw_value !== draft.value || item.binding.data_type !== draft.type;
+                originalType = item.binding.data_type;
+                originalValue = item.binding.raw_value;
+                onRevertClick = () => updateDraft(tabKey, {
+                  type: originalType,
+                  value: originalValue,
+                  operation: null,
+                });
+              }
+              else {
+                changesMade = true;
+                onRevertClick = () => updateDraft(tabKey, {
+                  type: variable.data_type,
+                  value: variable.raw_value,
+                  operation: null,
+                });
+              }
+
               return (
                 <ValueCardWrapper
                   variant="binding"
-                  item={item.binding}
                   crn={crn}
                   isTargetNode={isTargetNode}
                   draftType={draft.type}
@@ -243,8 +283,28 @@ export const BindingDetailModal = ({
                   headingLevel="h4"
                   icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
                 />
+                {variant === 'binding' && !isTargetNode && !ctx.settings.ansible_director_vars_cross_node_editing && (
+                  <EmptyStateBody>
+                    <CrossNodeDisabledAlert variant={'binding'} crn={crn} />
+                  </EmptyStateBody>
+                )}
+                <EmptyStateFooter>
+                  <EmptyStateActions>
+                    <Button
+                      variant="primary"
+                      onClick={() => updateDraft(tabKey, {
+                        type: variable.data_type,
+                        value: variable.raw_value,
+                        operation: 'createBinding',
+                      })}
+                      isDisabled={!isTargetNode && !ctx.settings.ansible_director_vars_cross_node_editing}
+                    >
+                      {_('Create new binding')}
+                    </Button>
+                  </EmptyStateActions>
+                </EmptyStateFooter>
               </EmptyState>
-            )
+            ))
           }
         </Stack>
       );
@@ -278,14 +338,13 @@ export const BindingDetailModal = ({
       tabContent = (
         <Stack hasGutter style={{ paddingTop: '15px', paddingBottom: '15px' }}>
           {
-            item !== null && draft ? (() => {
+            item !== null && draft && (() => {
               changesMade = item.data_type !== draft.type || item.raw_value !== draft.value;
               originalValue = item.raw_value;
               originalType = item.data_type;
               return (
                 <ValueCardWrapper
                   variant="variable"
-                  item={item}
                   isTargetNode={false}
                   draftType={draft.type}
                   draftValue={draft.value}
@@ -301,15 +360,7 @@ export const BindingDetailModal = ({
                   })}
                 />
               );
-            })() : (
-              <EmptyState>
-                <EmptyStateHeader
-                  titleText={_('Variable not bound to this node.')}
-                  headingLevel="h4"
-                  icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
-                />
-              </EmptyState>
-            )
+            })()
           }
         </Stack>
       );
@@ -348,11 +399,7 @@ export const BindingDetailModal = ({
               </Label>
               {changesMade && (
                 <Label
-                  onClick={() => updateDraft(tabKey, {
-                    type: originalType,
-                    value: originalValue,
-                    operation: null,
-                  })}
+                  onClick={onRevertClick}
                   icon={<UndoIcon />}
                   color={'orange'}
                 >

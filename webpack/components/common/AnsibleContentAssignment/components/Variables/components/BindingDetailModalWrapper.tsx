@@ -10,6 +10,7 @@ import { isCollectionRoleAssignment } from '../../../../../../helpers/typeGuards
 import { BindingDetailModal } from './BindingDetailModal';
 import { AssignmentContext } from '../../../AssignmentContext';
 import { crnTypeUrlMap } from '../../../helpers';
+import { CollectionRoleAssignable } from '../../../../../../types/DynamicAssignmentTypes';
 
 export type HierarchicalBinding = {
   binding: AnsibleVariableBinding | null;
@@ -66,6 +67,13 @@ export const BindingDetailModalWrapper = ({
         hierarchicalBindings={getResolvedBindingsResponse.response.results.bindings}
         onClose={onClose}
         onConfirmSuccess={() => getResolvedBindingsResponse.setAPIOptions(options => ({ ...options }))}
+        // TODO: Refs Role support: This cast makes life easy at the moment but needs to go when roles are supported
+        assignable={{
+          assignable_type: (assignment as CollectionRoleAssignable).assignable_type,
+          assignable_namespace: assignment.assignable_namespace,
+          assignable_name: assignment.assignable_name,
+          assignable_role_name: (assignment as CollectionRoleAssignable).assignable_role_name,
+        }}
       />
     );
   }
