@@ -13,6 +13,10 @@ dependent: :destroy
 dependent: :destroy
         has_many :lifecycle_environment_paths, class_name: '::ForemanAnsibleDirector::LifecycleEnvironmentPath',
 dependent: :destroy
+        has_many :ansible_variables, class_name: '::ForemanAnsibleDirector::AnsibleVariable',
+                 dependent: :destroy
+        has_many :ansible_variable_bindings, class_name: '::ForemanAnsibleDirector::AnsibleVariableBinding',
+                 dependent: :destroy
       end
     end
   end

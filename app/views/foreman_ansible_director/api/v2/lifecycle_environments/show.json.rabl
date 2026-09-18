@@ -1,39 +1,7 @@
 # frozen_string_literal: true
 
-object @lifecycle_environment
+extends 'api/v2/common/response', object: @ctx
 
-attributes :id, :name, :description, :position, :content_hash
-
-node :execution_environment do |object|
-  if object.execution_environment
-    {
-      id: object.execution_environment.id,
-      name: object.execution_environment.name,
-    }
-  end
-end
-
-node :content do |object|
-  if object.content_unit_versions.empty?
-    []
-  else
-    object.content_unit_versions
-          .sort_by { |cuv| cuv.versionable.full_name }
-          .map do |lcecu|
-      {
-        id: lcecu.versionable.id,
-        type: lcecu.content_unit_type,
-        identifier: lcecu.versionable.full_name,
-        version: lcecu.version,
-        roles: if lcecu.content_unit_type == 'collection'
-                 lcecu.ansible_collection_roles
-                      .to_a
-                      .sort_by(&:name)
-                      .map { |role| { id: role.id, name: role.name } }
-               else
-                 []
-               end,
-      }
-    end
-  end
+node(:results) do
+  @lifecycle_environment.render_for_api
 end

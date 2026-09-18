@@ -53,6 +53,10 @@ module ForemanAnsibleDirector
       def cr_content_source_state
         ansible_lifecycle_environment_state
       end
+
+      def cr_variable_bindings
+        ansible_variable_bindings
+      end
     end
   end
 end

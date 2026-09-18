@@ -9,6 +9,7 @@ const defaultContext: AnsibleDirectorContext = {
     ansible_director_default_ansible_core_version: '2.19.3',
     ansible_director_ui_refresh_interval: 5,
     ansible_director_ui_search_cache_size: 100,
+    ansible_director_vars_cross_node_editing: false,
   },
 };
 export const useAdContext = (): AnsibleDirectorContext => {

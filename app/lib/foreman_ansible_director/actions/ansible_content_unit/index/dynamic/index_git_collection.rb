@@ -106,10 +106,11 @@ module ForemanAnsibleDirector
                 ActiveRecord::Base.transaction do
                   cr_variables.each do |variable_name, variable|
                     ::ForemanAnsibleDirector::VariableService.create_variable(
-                      key: variable_name,
-                      type: variable[:type],
-                      default_value: variable[:value],
-                      owner: collection_role_record
+                      name: variable_name,
+                      data_type: variable[:type],
+                      raw_value: variable[:value],
+                      owner: collection_role_record,
+                      organization_id: input[:organization_id]
                     )
                   end
                 end

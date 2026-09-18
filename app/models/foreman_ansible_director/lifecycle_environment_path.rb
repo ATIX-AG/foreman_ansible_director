@@ -20,5 +20,22 @@ module ForemanAnsibleDirector
     def environments_ordered
       lifecycle_environments.order('position')
     end
+
+    def render_for_api
+      {
+        id: id,
+        name: name,
+        description: description,
+        lifecycle_environments: lifecycle_environments.map do |lce|
+          {
+            id: lce.id,
+            name: lce.name,
+            description: lce.description,
+            position: lce.position,
+            content_hash: lce.content_hash,
+          }
+        end,
+      }
+    end
   end
 end
