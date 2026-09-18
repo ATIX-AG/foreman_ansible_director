@@ -41,6 +41,7 @@ Rails.application.routes.draw do
                   get 'auto_complete_search'
                 end
                 member do
+                  get '/', action: :show
                   put '/', action: :update
                   post '/promote', to: 'lifecycle_environment_paths#promote'
                   delete '/', action: :destroy

@@ -3,12 +3,15 @@ import AnsibleExecutionEnvPage from './AnsibleExecutionEnvPage';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
 import { ForceTaxonomy } from '../common/ForceTaxonomy';
 import { Permitted } from '../common/Permitted';
+import { AlertModalProvider } from '../common/Alerts/AlertContext';
 
 const AnsibleExecutionEnvPageWrapper: React.FC = () => (
   <Permitted requiredPermissions={[AdPermissions.executionEnvironments.view]}>
-    <ForceTaxonomy organization>
-      <AnsibleExecutionEnvPage />
-    </ForceTaxonomy>
+    <AlertModalProvider>
+      <ForceTaxonomy organization>
+        <AnsibleExecutionEnvPage />
+      </ForceTaxonomy>
+    </AlertModalProvider>
   </Permitted>
 );
 

@@ -37,7 +37,7 @@ module ForemanAnsibleDirector
     end
 
     def generate_content_hash
-      content_string = content_unit_versions.pluck(:versionable_id, :version)
+      content_string = content_unit_versions.order(:versionable_id, :version).pluck(:versionable_id, :version)
       Digest::SHA2.new(256).hexdigest("#{content_string}:#{ansible_version}:#{base_image_url}")[0, 8]
     end
 
@@ -50,6 +50,18 @@ module ForemanAnsibleDirector
         content_unit: content_unit,
         content_unit_version: version
       )
+    end
+
+    def render_for_api
+      {
+        id: id,
+        name: name,
+        base_image_url: base_image_url,
+        ansible_version: ansible_version,
+        build_status: build_status,
+        build_job: build_job,
+        content: [],
+      }
     end
   end
 end
