@@ -7,11 +7,14 @@ import {
   Label, OverflowMenu,
   OverflowMenuContent,
   OverflowMenuGroup, OverflowMenuItem,
+  Popover,
   SearchInput, StackItem,
 } from '@patternfly/react-core';
 import { InnerScrollContainer, OuterScrollContainer, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
+import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
+import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import { hierarchyIconMap } from '../../../../../common/AnsibleContentAssignment/AnsibleContentAssignment';
 import { AnsibleVariable, AnsibleVariableBinding as AnsibleVariableBindingType } from '../../../../../../types/AnsibleVariableTypes';
 import { ConfirmableAction, ConfirmationModal } from '../../../../../../helpers/components/ConfirmationModal';
@@ -99,38 +102,46 @@ export const BindingIndexContent = ({
                               <OverflowMenuContent>
                                 <OverflowMenuGroup groupType="button">
                                   <OverflowMenuItem>
-                                    <Button
-                                      variant="secondary"
-                                      onClick={
-                                        () => onBindingManageClick(binding)
-                                      }
-                                    >{_('Manage')}</Button>
+                                    <Popover bodyContent={_('Edit binding')} triggerAction="hover">
+                                      <Button
+                                        variant="plain"
+                                        icon={<EditIcon />}
+                                        aria-label={_('Manage')}
+                                        onClick={
+                                          () => onBindingManageClick(binding)
+                                        }
+                                      />
+                                    </Popover>
                                   </OverflowMenuItem>
                                   <OverflowMenuItem>
-                                    <Button
-                                      variant="danger"
-                                      onClick={() => {
-                                        setConfirmableAction({
-                                          title: _('Delete binding?'),
-                                          body: __(_('Delete binding of variable %(variableName)s to %(nodeType)s %(nodeName)s?'), {
-                                            variableName: variable.name,
-                                            nodeType: crnTypeUiString[binding.consumable_type],
-                                            nodeName: binding.consumable_name,
-                                          }),
-                                          onAbort: () => setConfirmableAction(null),
-                                          onConfirm: async () => {
-                                            await withToast(
-                                              {
-                                                type: 'delete',
-                                                resource: 'ansible_variable_binding',
-                                                func: AnsibleVariableBinding.destroy(binding.id),
-                                              }
-                                            );
-                                            onSuccess();
-                                          },
-                                        });
-                                      }}
-                                    >{_('Delete')}</Button>
+                                    <Popover bodyContent={_('Delete binding')} triggerAction="hover">
+                                      <Button
+                                        variant="plain"
+                                        aria-label={_('Delete binding')}
+                                        icon={<TrashIcon />}
+                                        onClick={() => {
+                                          setConfirmableAction({
+                                            title: _('Delete binding?'),
+                                            body: __(_('Delete binding of variable %(variableName)s to %(nodeType)s %(nodeName)s?'), {
+                                              variableName: variable.name,
+                                              nodeType: crnTypeUiString[binding.consumable_type],
+                                              nodeName: binding.consumable_name,
+                                            }),
+                                            onAbort: () => setConfirmableAction(null),
+                                            onConfirm: async () => {
+                                              await withToast(
+                                                {
+                                                  type: 'delete',
+                                                  resource: 'ansible_variable_binding',
+                                                  func: AnsibleVariableBinding.destroy(binding.id),
+                                                }
+                                              );
+                                              onSuccess();
+                                            },
+                                          });
+                                        }}
+                                      />
+                                    </Popover>
                                   </OverflowMenuItem>
                                 </OverflowMenuGroup>
                               </OverflowMenuContent>

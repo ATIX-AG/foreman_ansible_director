@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Button, CodeBlock, CodeBlockCode, Popover, TextInput, Truncate } from '@patternfly/react-core';
+import SearchIcon from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import { translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleVariable,
@@ -31,7 +32,7 @@ export const InlineValueRenderer = ({
         </div>
       }
     >
-      <Button variant={'secondary'}>{_('Hover to preview value')}</Button>
+      <Button variant="plain" className="pf-m-no-padding"><SearchIcon /> {_('Preview')}</Button>
     </Popover>
   );
 

@@ -3,8 +3,10 @@ import { Table, TableText, Tbody, Td, Th, Thead, ThProps, Tr } from '@patternfly
 import {
   Button,
   Label,
+  Popover,
 
 } from '@patternfly/react-core';
+import { PencilAltIcon } from '@patternfly/react-icons';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleVariable,
@@ -157,7 +159,9 @@ export const VariablesTable = ({ variables, resolutionHierarchy, onItemClick }: 
               </Td>
               <Td>
                 <TableText>
-                  <Button variant="secondary" onClick={() => onItemClick(variable)}>{_('Manage')}</Button>
+                  <Popover bodyContent={_('Manage bindings')} triggerAction="hover">
+                    <Button variant="plain" aria-label={_('Manage bindings')} icon={<PencilAltIcon />} onClick={() => onItemClick(variable)} />
+                  </Popover>
                 </TableText>
               </Td>
             </Tr>
