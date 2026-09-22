@@ -141,7 +141,10 @@ module ForemanAnsibleDirector
           stream.children << doc
           doc.children << node
 
-          stream.to_yaml
+          # Psych serialize simple root values on the same line as the YAML document
+          # marker, which is still valid YAML. (e.g. '--- []')
+          # Keep the output formatting consistent by moving such values to the next line. (e.g. '---\n[]')
+          stream.to_yaml.sub(/\A---[ \t]*(?=\S)/, "---\n")
         end
       end
     end
