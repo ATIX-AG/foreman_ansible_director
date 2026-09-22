@@ -20,8 +20,8 @@ module ForemanAnsibleDirector
         def show
         end
 
-        # region ApiDoc: GET /api/v2/ansible_director/collection_roles/:id/variables
-        api :GET, '/v2/ansible_director/collection_roles/:id/variables',
+        # region ApiDoc: GET /api/v2/ansible_director/ansible_content/collection_roles/:id/variables
+        api :GET, '/v2/ansible_director/ansible_content/collection_roles/:id/variables',
           N_('List variables for an Ansible collection role')
         param :id, :number, desc: N_('Ansible collection role identifier.'), required: true
         # endregion
