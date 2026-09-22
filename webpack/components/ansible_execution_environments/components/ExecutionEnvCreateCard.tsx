@@ -46,7 +46,7 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
   >({
     name: '',
     ansible_version: ctx.settings.ansible_director_default_ansible_core_version,
-    base_image_url: '',
+    base_image_url: ctx.settings.ansible_director_default_base_image_url,
     content: [],
   });
 
@@ -56,7 +56,7 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
       name: '',
       ansible_version:
         ctx.settings.ansible_director_default_ansible_core_version,
-      base_image_url: '',
+      base_image_url: ctx.settings.ansible_director_default_base_image_url,
       content: [],
     });
   };

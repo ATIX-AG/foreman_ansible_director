@@ -200,6 +200,13 @@ Foreman::Plugin.register :foreman_ansible_director do
                        (check history: https://pypi.org/project/ansible-core/#history).',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_ANSIBLE_VERSION,
         full_name: 'Execution Environments - Default ansible-core version'
+      setting 'ansible_director_default_base_image_url',
+        type: :string,
+        description: 'Default base image used for Execution Environments.
+                       A fully-qualified image reference is strongly recommended.
+                       (Further reading: https://www.redhat.com/en/blog/be-careful-when-pulling-images-short-name).',
+        default: ::ForemanAnsibleDirector::Constants::DEFAULT_BASE_IMAGE_URL,
+        full_name: 'Execution Environments - Default base image URL'
       setting 'ansible_director_default_ee_rex',
         type: :integer,
         description: 'Default Execution Environment used for execution of Remote Execution jobs.',
@@ -276,6 +283,8 @@ Foreman::Plugin.register :foreman_ansible_director do
                     Setting[:ansible_director_default_galaxy_url],
                   ansible_director_default_ansible_core_version:
                     Setting[:ansible_director_default_ansible_core_version],
+                  ansible_director_default_base_image_url:
+                    Setting[:ansible_director_default_base_image_url],
                   ansible_director_ui_refresh_interval:
                     Setting[:ansible_director_ui_refresh_interval],
                   ansible_director_ui_search_cache_size:
