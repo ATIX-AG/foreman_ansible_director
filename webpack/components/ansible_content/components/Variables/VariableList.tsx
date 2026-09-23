@@ -9,6 +9,7 @@ import {
   OverflowMenuContent,
   OverflowMenuGroup,
   OverflowMenuItem,
+  Popover,
   SearchInput,
   Stack,
   StackItem,
@@ -17,6 +18,8 @@ import { InnerScrollContainer, OuterScrollContainer, Table, Tbody, Td, Th, Thead
 import React, { ReactElement } from 'react';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
+import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
+import { ProjectDiagramIcon } from '@patternfly/react-icons';
 import { AdPermissions } from '../../../../constants/foremanAnsibleDirectorPermissions';
 import { AnsibleVariable } from '../../../../types/AnsibleVariableTypes';
 import { Permitted } from '../../../common/Permitted';
@@ -107,20 +110,28 @@ export const VariableList = ({
                                   <OverflowMenuContent>
                                     <OverflowMenuGroup groupType="button">
                                       <OverflowMenuItem>
-                                        <Button
-                                          variant="secondary"
-                                          onClick={
-                                            () => onManageVariablesClick(variable)
-                                          }
-                                        >{_('Manage variable')}</Button>
+                                        <Popover bodyContent={_('Manage variable')} triggerAction="hover">
+                                          <Button
+                                            variant="plain"
+                                            aria-label={_('Manage variable')}
+                                            icon={<EditIcon />}
+                                            onClick={
+                                              () => onManageVariablesClick(variable)
+                                            }
+                                          />
+                                        </Popover>
                                       </OverflowMenuItem>
                                       <OverflowMenuItem>
-                                        <Button
-                                          variant="secondary"
-                                          onClick={
-                                            () => onManageBindingsClick(variable)
-                                          }
-                                        >{_('Manage bindings')}</Button>
+                                        <Popover bodyContent={_('Manage bindings')} triggerAction="hover">
+                                          <Button
+                                            variant="plain"
+                                            aria-label={_('Manage bindings')}
+                                            icon={<ProjectDiagramIcon />}
+                                            onClick={
+                                              () => onManageBindingsClick(variable)
+                                            }
+                                          />
+                                        </Popover>
                                       </OverflowMenuItem>
                                     </OverflowMenuGroup>
                                   </OverflowMenuContent>
