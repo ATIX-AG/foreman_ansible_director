@@ -192,7 +192,6 @@ export const BindingDetailModal = ({
   const anyWarning = Object.values(validities).filter(v => v !== null).some(v => v.state === 'type_mismatch');
 
   const updateDraft = (key: TabKey, update: DraftUpdate): void => {
-    console.log('update', key, update);
     const draft = drafts[key] as TabDraft;
     // @ts-ignore I can't be asked to deal with this.
     setDrafts(prev => ({
@@ -205,7 +204,6 @@ export const BindingDetailModal = ({
       },
     }));
   };
-  console.log(drafts);
 
   const itemTab = (props: ItemDetailTabProps): ReactElement => {
     let tabIcon: ReactElement;
@@ -235,7 +233,6 @@ export const BindingDetailModal = ({
             : item.content_resolution_node.name
         );
       })();
-      console.log(item, draft);
       tabContent = (
         <Stack hasGutter style={{ paddingTop: '15px', paddingBottom: '15px' }}>
           {
