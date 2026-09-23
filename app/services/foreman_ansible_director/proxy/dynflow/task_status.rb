@@ -4,13 +4,13 @@ module ForemanAnsibleDirector
   module Proxy
     module Dynflow
       class TaskStatus
-        def initialize(proxy_task_id)
-          proxy_resource = BaseClient.proxy_resource
-          @resource = proxy_resource["/dynflow/tasks/#{proxy_task_id}/status"]
+        def initialize(proxy_task_id, smart_proxy_id)
+          @client = BaseClient.new(::SmartProxy.find(smart_proxy_id))
+          @proxy_task_id = proxy_task_id
         end
 
         def request
-          @resource.get
+          @client.dynflow_task_status(@proxy_task_id)
         end
       end
     end

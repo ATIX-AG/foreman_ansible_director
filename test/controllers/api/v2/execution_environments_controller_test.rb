@@ -13,6 +13,9 @@ module ForemanAnsibleDirectorTests
           @organization = Organization.find_by(name: 'Organization 1')
           @other_organization = Organization.find_by(name: 'Organization 2')
 
+          @proxy = FactoryBot.build_stubbed(:smart_proxy)
+          ::SmartProxy.stubs(:with_features).with(::ForemanAnsibleDirector::PROXY_FEATURE).returns([@proxy])
+
           as_admin do
             @viewer = FactoryBot.create(
               :user,

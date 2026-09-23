@@ -49,8 +49,12 @@ module ForemanAnsibleDirector
       end
 
       def build_execution_environment(execution_environment)
+        proxy = ::SmartProxy.with_features(::ForemanAnsibleDirector::PROXY_FEATURE).first
+        raise "No smart proxy with '#{::ForemanAnsibleDirector::PROXY_FEATURE}' feature found" unless proxy
+
         env_definition = {
           id: execution_environment.id,
+          organization: execution_environment.organization.name,
           content: {
             base_image: execution_environment.base_image_url,
             ansible_core_version: execution_environment.ansible_version,
@@ -59,7 +63,7 @@ module ForemanAnsibleDirector
                 type: cuv.versionable.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role',
                 identifier: cuv.versionable.full_name,
                 version: cuv.version,
-                source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{Organization.current.id}/#{cuv.versionable.full_name}",
+                source: "https://#{SETTINGS[:fqdn]}/pulp_ansible/galaxy/#{execution_environment.organization_id}/#{cuv.versionable.full_name}",
               }
             end,
           },
@@ -71,6 +75,7 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
           task_args: {
             proxy_task_id: SecureRandom.uuid,
+            smart_proxy_id: proxy.id,
             execution_environment_definition: env_definition,
             execution_environment_id: execution_environment.id,
           },
