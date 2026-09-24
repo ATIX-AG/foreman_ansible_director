@@ -418,7 +418,7 @@ export const BindingDetailModal = ({
             </LabelGroup>
           </>
         }
-        aria-label="variable and binding data tabs"
+        aria-label={_('Variable and binding data tabs')}
       >
         {tabContent}
       </Tab>

@@ -48,7 +48,7 @@ export const AnsibleExecutionEnvSelectionModalWrapper = ({
   }
 
   return (
-    <Modal isOpen variant={ModalVariant.large}>
+    <Modal aria-label={_('Select Execution Environment')} isOpen variant={ModalVariant.large}>
       <EmptyPage
         message={{
           type: 'loading',

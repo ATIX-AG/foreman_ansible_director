@@ -5,6 +5,7 @@ import { addToast } from 'foremanReact/components/ToastsList';
 import { useDispatch } from 'react-redux';
 
 import { foremanUrl } from 'foremanReact/common/helpers';
+import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
   Button,
@@ -84,7 +85,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
   return (
     <>
       <Modal
-        title="Execution environments"
+        title={_('Execution environments')}
         isOpen
         onClose={() => {
           setIsExecutionEnvModalOpen(false);

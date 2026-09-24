@@ -80,6 +80,7 @@ export const BindingDetailModalWrapper = ({
 
   return (
     <Modal
+      aria-label={_('Manage variables and bindings')}
       variant={ModalVariant.large}
       isOpen
     >
