@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'katello'
 require 'action_cable/engine'
 require 'foreman_ansible_director/remote_execution'
 
@@ -43,6 +44,8 @@ module ForemanAnsibleDirector
       ::HostsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostExtensions
 
       ::Host::Managed.prepend ::ForemanAnsibleDirector::Concerns::AnsibleExecutionExtensions
+
+      ::Katello::OrganizationCreator.prepend(::ForemanAnsibleDirector::Concerns::OrganizationCreatorExtensions)
 
       ReportImporter.register_smart_proxy_feature('Ansible')
     end

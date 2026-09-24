@@ -15,6 +15,9 @@ module ForemanAnsibleDirector
       creator_version: ::ForemanAnsibleDirector::Constants::PLUGIN_VERSION,
     }.freeze
 
+    EE_STAGING_PRODUCT_NAME = 'internal_ad_execution_environment'
+    EE_IMAGE_BASENAME = 'ad_execution_environment'
+
     ANSIBLE_VERSIONS = %w[
       v10.0.0
       v10.0.1
