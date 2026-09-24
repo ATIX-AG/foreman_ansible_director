@@ -345,6 +345,12 @@ export const BindingDetailModal = ({
               changesMade = item.data_type !== draft.type || item.raw_value !== draft.value;
               originalValue = item.raw_value;
               originalType = item.data_type;
+              onRevertClick = () => updateDraft(tabKey, {
+                type: originalType,
+                value: originalValue,
+                operation: null,
+              });
+
               return (
                 <ValueCardWrapper
                   variant="variable"
