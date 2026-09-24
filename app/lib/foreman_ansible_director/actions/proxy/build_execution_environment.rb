@@ -9,9 +9,11 @@ module ForemanAnsibleDirector
         include Dynflow::Action::Polling
 
         input_format do
+          param :proxy_id, Integer
           param :proxy_task_id, Integer
           param :execution_environment_definition, Hash
           param :execution_environment_id, String
+          param :push_url, String
         end
 
         output_format do
@@ -19,14 +21,21 @@ module ForemanAnsibleDirector
 
         def invoke_external_task
           ::ForemanAnsibleDirector::Proxy::Dynflow::SingleBatchAction.new(
-            input[:proxy_task_id], 'meta', 'Proxy::AnsibleDirector::Actions::Meta::BuildPushEe',
-            execution_environment: input[:execution_environment_definition]
+            input[:proxy_id],
+            input[:proxy_task_id],
+            'meta',
+            'Proxy::AnsibleDirector::Actions::Meta::BuildPushEe',
+            execution_environment: input[:execution_environment_definition],
+            push_url: input[:push_url]
           ).request
           nil
         end
 
         def poll_external_task
-          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(input[:proxy_task_id]).request
+          task = ::ForemanAnsibleDirector::Proxy::Dynflow::TaskStatus.new(
+            input[:proxy_id],
+            input[:proxy_task_id]
+          ).request
           task_status = ::ForemanAnsibleDirector::Parsers::Proxy::Dynflow::TaskStatusParser.new(task)
 
           { progress: task_status.progress,

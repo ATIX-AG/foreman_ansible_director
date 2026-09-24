@@ -122,9 +122,59 @@ module ForemanAnsibleDirectorTests
         end
 
         describe '#registry_url' do
-          test 'returns local registry path for execution environment' do
-            expected = "localhost/ansible_director/#{@execution_environment.id}:latest"
-            assert_equal expected, @execution_environment.registry_url
+          test 'raises TaskCancelledException if staging product not found' do
+            error = assert_raises(::ForemanTasks::Task::TaskCancelledException) do
+              @execution_environment.registry_url!
+            end
+            assert error.message.include? 'Product'
+          end
+
+          test 'raises TaskCancelledException if EE repository not found' do
+            as_admin do
+              provider = FactoryBot.create(:katello_provider, organization: @organization)
+              FactoryBot.create(
+                :katello_product,
+                :organization => @organization,
+                :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+                :provider => provider,
+                :cp_id => '12345',
+              )
+            end
+
+            error = assert_raises(::ForemanTasks::Task::TaskCancelledException) do
+              @execution_environment.registry_url!
+            end
+
+            assert error.message.include? 'Repository'
+          end
+
+          test 'returns pullable path of image' do
+            as_admin do
+              repository_type_manager = ::Katello::RepositoryTypeManager
+              partial_repository_types = {
+                'docker' => repository_type_manager.find_defined('docker'),
+              }
+              repository_type_manager.instance_variable_set(:@enabled_repository_types, partial_repository_types)
+
+              provider = FactoryBot.create(:katello_provider, organization: @organization)
+              product = FactoryBot.create(
+                :katello_product,
+                :organization => @organization,
+                :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+                :provider => provider,
+                :cp_id => '12345',
+                )
+              FactoryBot.create(
+                :katello_root_repository,
+                :docker_root,
+                name: "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}",
+                product: product
+              )
+
+              expected_path = "#{SETTINGS[:fqdn]}/id/#{@organization.id}/#{product.id}/#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}:latest"
+              assert_equal expected_path, @execution_environment.registry_url!
+            end
+
           end
         end
 
