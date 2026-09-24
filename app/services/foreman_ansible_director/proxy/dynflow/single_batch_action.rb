@@ -4,8 +4,8 @@ module ForemanAnsibleDirector
   module Proxy
     module Dynflow
       class SingleBatchAction
-        def initialize(proxy_task_id, operation, action_class, action_input)
-          proxy_resource = BaseClient.proxy_resource
+        def initialize(proxy_id, proxy_task_id, operation, action_class, action_input)
+          proxy_resource = BaseClient.proxy_resource(proxy_id)
           @resource = proxy_resource['/dynflow/tasks/launch']
           @proxy_task_id = proxy_task_id
           @operation = operation

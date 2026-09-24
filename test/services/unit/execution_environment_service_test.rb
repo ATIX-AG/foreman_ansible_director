@@ -5,6 +5,27 @@ module ForemanAnsibleDirectorTests
     module Unit
       class ExecutionEnvironmentServiceTest < ForemanAnsibleDirectorTestCase
 
+        setup do
+          as_admin do
+            provider = FactoryBot.create(:katello_provider, organization: @organization)
+            @staging_product = FactoryBot.create(
+              :katello_product,
+              :organization => @organization,
+              :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+              :provider => provider,
+              :cp_id => '12345',
+              )
+
+            @build_proxy = FactoryBot.create(
+              :smart_proxy,
+              :ansible_director,
+              organizations: [@organization],
+              container_registry_auth_enabled: true
+            )
+          end
+          ::ForemanAnsibleDirector::AnsibleDirectorBuildProxySelector.any_instance.stubs(:determine_proxy).returns(@build_proxy)
+        end
+
         describe '#create_execution_environment' do
           test 'creates an execution environment with valid params' do
 
@@ -252,6 +273,29 @@ module ForemanAnsibleDirectorTests
             types = env_def[:content][:content_units].map { |cu| cu[:type] }
             assert_includes types, 'collection'
             assert_includes types, 'role'
+          end
+
+          test 'issues critical error if staging product missing' do
+            as_admin do
+              @staging_product.destroy!
+            end
+            assert_raises(ForemanAnsibleDirector::Issues::CriticalErrorException) do
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment(@execution_environment)
+            end
+
+            assert_equal 1, ctx.errors.length
+            assert_instance_of ForemanAnsibleDirector::Issues::Errors::StagingProductMissing, ctx.errors.first
+          end
+
+          test 'issues critical error if no build proxy available' do
+            ::ForemanAnsibleDirector::AnsibleDirectorBuildProxySelector.any_instance.stubs(:determine_proxy).returns(nil)
+
+            assert_raises(ForemanAnsibleDirector::Issues::CriticalErrorException) do
+              ::ForemanAnsibleDirector::ExecutionEnvironmentService.build_execution_environment(@execution_environment)
+            end
+
+            assert_equal 1, ctx.errors.length
+            assert_instance_of ForemanAnsibleDirector::Issues::Errors::NoProxyForBuild, ctx.errors.first
           end
 
         end

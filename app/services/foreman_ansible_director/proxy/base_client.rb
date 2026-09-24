@@ -5,7 +5,7 @@ module ForemanAnsibleDirector
   module Proxy
     class BaseClient
       class << self
-        def proxy_resource
+        def proxy_resource(proxy_id)
           ssl_config = {
             ssl_client_cert: ::ForemanAnsibleDirector::Cert::Certs.ssl_client_cert,
             ssl_client_key: ::ForemanAnsibleDirector::Cert::Certs.ssl_client_key,
@@ -20,7 +20,7 @@ module ForemanAnsibleDirector
             )
           end
           RestClient::Resource.new(
-            ::SmartProxy.first.url, ssl_config
+            ::SmartProxy.find_by!(id: proxy_id).url, ssl_config
           )
         end
       end
