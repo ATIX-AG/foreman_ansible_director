@@ -107,6 +107,11 @@ module ForemanAnsibleDirector
 
             case input[:index_mode]
             when 'import'
+              # Nothing was successfully imported (e.g. every requested collection/version was
+              # invalid). There is no content to persist. Cleanup of the now-orphaned Pulp objects
+              # created for this import attempt is scheduled separately by the import action (see
+              # ImportProviders::Galaxy::ImportCollection and ImportProviders::Galaxy::Rescue).
+              return if unit_versions.empty?
 
               unit_record = ::ForemanAnsibleDirector::AnsibleCollection.find_by(name: input[:unit_name],
                 namespace: input[:unit_namespace],

@@ -30,6 +30,24 @@ module ForemanAnsibleDirector
           def total_count
             input[:resolved_content_units].size
           end
+
+          # WithSubPlans#recalculate_counts lumps sub-plans that stopped with a :warning result
+          # (e.g. a collection import that could only partially import its requested content, see
+          # ImportProviders::Galaxy::VerifyCollectionImport) together with genuine :error sub-plans into
+          # :failed_count, which in turn makes #check_for_errors! raise and pause this bulk task
+          # even though nothing actually failed. Reclassify warning-only sub-plans as successes
+          # so :failed_count reflects only genuine errors (which should still pause, as usual).
+          def recalculate_counts
+            super
+            stopped_with_warning = sub_plans_count('state' => %w[stopped], 'result' => 'warning')
+            # Reclassify warning-only sub-plans as successes (not failures) so #done? still sees
+            # success_count + failed_count + cancelled_count add up to total_count; merely
+            # subtracting them from failed_count would leave them uncounted and the bulk task
+            # would never finish.
+            output[:failed_count] -= stopped_with_warning
+            output[:success_count] += stopped_with_warning
+            output[:warning_count] = stopped_with_warning
+          end
         end
       end
     end
