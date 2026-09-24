@@ -48,7 +48,7 @@ module ForemanAnsibleDirector
                   remote_href: remote_href
                 )
 
-                _index_action = plan_action(
+                index_action = plan_action(
                   ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Index::IndexStatic,
                   index_mode: 'update',
                   repository_href: repository_href,
@@ -60,6 +60,17 @@ module ForemanAnsibleDirector
                   unit_name: new_unit.unit_name,
                   unit_namespace: new_unit.unit_namespace,
                   organization_id: organization_id
+                )
+
+                # Verified against new_unit's own requirements (not existing_unit's full
+                # requirements_file), since indexed_unit_versions only reflects the versions
+                # synced in this update round, not the collection's full version history.
+                plan_action(
+                  VerifyCollectionImport,
+                  requested_versions: new_unit.versions,
+                  unit_namespace: new_unit.unit_namespace,
+                  unit_name: new_unit.unit_name,
+                  indexed_unit_versions: index_action.output[:indexed_unit_versions]
                 )
               end
             end
