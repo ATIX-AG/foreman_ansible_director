@@ -9,6 +9,9 @@ module ForemanAnsibleDirector
             class Update < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
               include Dynflow::Action::Polling
 
+              # Value of a task's :progress once it has fully completed.
+              FULL_PROGRESS = 1
+
               input_format do
                 param :collection_remote_href, String, required: true
                 param :requirements, String, required: true
@@ -33,15 +36,20 @@ module ForemanAnsibleDirector
               end
 
               def done?
-                output[:task]&.[](:progress) == 1
+                output[:task]&.[](:progress) == FULL_PROGRESS
               end
 
               def poll_external_task
-                remote_update_task = output&.[](:collection_remote_update_response)&.[](:task) # TODO: Error handling
-                task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(remote_update_task).request
-                task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
+                if (remote_update_task = output.dig(:collection_remote_update_response, :task))
+                  task = ::ForemanAnsibleDirector::Pulp3::Core::Task::Status.new(remote_update_task).request
+                  task_status = ::ForemanAnsibleDirector::Parsers::Pulp3::Core::Task::Status.new(task)
 
-                { progress: task_status.progress }
+                  { progress: task_status.progress }
+                else
+                  # Pulp does not spawn a task when the PATCH is a no-op (e.g. the requirements
+                  # file is unchanged), so there is nothing to poll for.
+                  { progress: FULL_PROGRESS }
+                end
               end
 
               def task_output
