@@ -2,7 +2,7 @@
 include:
   - project: 'orcharhino/foreman_components/foreman_testing_ci_template'
     file: 'plugin.gitlab-ci.yml'
-    ref: '3.13.0'
+    ref: '3.13.1'
 
 variables:
   WITH_COVERAGE: true
