@@ -3,7 +3,7 @@
 module ForemanAnsibleDirector
   module Concerns
     module OrganizationCreatorExtensions
-      def seed!
+      def create!
         super
         create_ansible_director_product
       end
@@ -11,11 +11,13 @@ module ForemanAnsibleDirector
       private
 
       def create_ansible_director_product
-        ::Katello::Product.where(
+        return if ::Katello::Product.where(
           name: ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
-          organization: @organization,
-          provider: @anonymous_provider
-        ).first_or_create!
+          organization: @organization
+        ).exists?
+
+        product = ::Katello::Product.new(name: ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME)
+        ::ForemanTasks.sync_task(::Actions::Katello::Product::Create, product, @organization)
       end
     end
   end
