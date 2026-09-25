@@ -23,13 +23,29 @@ module ForemanAnsibleDirector
     scoped_search on: :base_image_url, complete_value: true
     scoped_search on: :ansible_version, complete_value: true
 
-    # COMPAT 3.16 - 3
-    # Registry authorization has not been finalized.
-    # Therefore, execution images are not pulled, but rather sourced from Podman storage.
-    def registry_url
-      # registry_port = 4321
-      # "#{SETTINGS[:fqdn]}:#{registry_port}/ansible_director/#{id}:latest"
-      "localhost/ansible_director/#{id}:latest"
+    def registry_url!
+      staging_product = ::Katello::Product.find_by(
+        organization_id: self[:organization_id],
+        name: ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME
+      )
+      unless staging_product
+        raise ForemanTasks::Task::TaskCancelledException,
+          "Execution Environment unavailable: Product #{::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME}
+            not found. Try rebuilding Execution Environment #{self[:name]}."
+      end
+      image_base_path = "id/#{self[:organization_id]}/#{staging_product.id}"
+      image_name = "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{self[:id]}"
+      image_path = "#{image_base_path}/#{image_name}"
+
+      environment_repo = staging_product.root_repositories.find_by(name: image_name)
+
+      unless environment_repo
+        raise ForemanTasks::Task::TaskCancelledException,
+          "Execution Environment unavailable: Repository #{image_path}
+            not found. Try rebuilding Execution Environment #{self[:name]}."
+      end
+
+      "#{SETTINGS[:fqdn]}/#{image_path}:latest"
     end
 
     def rebuild_necessary?

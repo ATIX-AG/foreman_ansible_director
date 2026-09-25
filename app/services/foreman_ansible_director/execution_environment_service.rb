@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class ExecutionEnvironmentService
+  class ExecutionEnvironmentService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
       def create_execution_environment(name:,
                                        base_image_url:,
@@ -43,12 +43,50 @@ module ForemanAnsibleDirector
       end
 
       def destroy_execution_environment(execution_environment)
+        staging_product = ::Katello::Product.find_by(
+          organization_id: execution_environment.organization_id,
+          name: ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME
+        )
+        if staging_product
+          image_base_path = "id/#{execution_environment.organization_id}/#{staging_product.id}"
+          image_name = "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{execution_environment.id}"
+          image_path = "#{image_base_path}/#{image_name}"
+
+          environment_repo = staging_product.repositories.find_by(container_repository_name: image_path)
+          if environment_repo
+            ::ForemanTasks.async_task(
+              ::Actions::Katello::Repository::Destroy, environment_repo
+            )
+          end
+        end
+
         ActiveRecord::Base.transaction do
           execution_environment.destroy!
         end
       end
 
       def build_execution_environment(execution_environment)
+        staging_product = ::Katello::Product.find_by(
+          organization_id: execution_environment.organization_id,
+          name: ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME
+        )
+
+        unless staging_product
+          ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::StagingProductMissing.new(
+            execution_environment: execution_environment
+          ), critical: true)
+        end
+
+        selector = ::ForemanAnsibleDirector::AnsibleDirectorBuildProxySelector.new
+        build_proxy = selector.determine_proxy(
+          execution_environment_org_id: execution_environment.organization_id
+        )
+
+        unless build_proxy
+          execution_environment.update!(build_status: 'failed')
+          ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::NoProxyForBuild.new, critical: true)
+        end
+
         env_definition = {
           id: execution_environment.id,
           content: {
@@ -65,14 +103,21 @@ module ForemanAnsibleDirector
           },
         }
 
+        registry_base_url = "#{SETTINGS[:fqdn]}/id/#{execution_environment.organization_id}/#{staging_product.id}"
+        image_name = "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{execution_environment.id}:latest"
+
+        push_url = "#{registry_base_url}/#{image_name}"
+
         execution_environment.update!(build_status: 'running')
 
         ::ForemanAnsibleDirector::ActionService.trigger(
           ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
           task_args: {
+            proxy_id: build_proxy.id,
             proxy_task_id: SecureRandom.uuid,
             execution_environment_definition: env_definition,
             execution_environment_id: execution_environment.id,
+            push_url: push_url,
           },
           mode: :async
         )

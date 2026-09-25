@@ -30,11 +30,9 @@ module ForemanAnsibleDirector
           end
 
           def external_output
-            # Order defined in BuildPushEe smart-proxy action:
-            # 0: BuildPushEe
-            # 1: BuildExecutionEnvironment
-            # 2: PushExecutionEnvironment
-            build_action = @parsed_response['actions'][1]
+            # The triggered action is BuildPushEe, which uses MetaRunner to keep track of different stages
+            # There is guaranteed to be exactly a single item in the 'actions' array.
+            build_action = @parsed_response['actions'][0]
             build_action['output']
           end
         end

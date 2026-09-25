@@ -37,6 +37,8 @@ if defined? ForemanRemoteExecution
                       { host_name: host.name })
                   end
 
+                  pull_url = execution_environment.registry_url!
+
                   _, resolved_assignments, = ::ForemanAnsibleDirector::AssignmentService.assignments_for(
                     target: host,
                     resolve: true
@@ -75,12 +77,17 @@ if defined? ForemanRemoteExecution
                     content: content,
                     variable_files: variable_files,
                     execution_environment: {
-                      id: execution_environment.id,
-                      registry_url: execution_environment.registry_url,
+                      pull_url: pull_url,
                       ansible_core_version: execution_environment.ansible_version,
                     }
                   )
                 end
+              end
+
+              # Atm, the smart proxy does not do granular features, so the required feature is "Ansible_Director".
+              # In the future, this can be deleted to use the actual "AnsibleNavigator" and "AnsibleBuilder" features.
+              def proxy_feature
+                'Ansible_Director'
               end
 
               def proxy_operation_name
@@ -92,7 +99,7 @@ if defined? ForemanRemoteExecution
               end
 
               def required_proxy_selector_for(_template)
-                ::ForemanAnsibleDirector::AnsibleDirectorProxySelector.new
+                ::ForemanAnsibleDirector::AnsibleDirectorRunProxySelector.new
               end
             end
           end

@@ -39,6 +39,10 @@ if defined? ForemanRemoteExecution
                 )
               end
 
+              def proxy_feature
+                'Ansible_Director'
+              end
+
               def proxy_operation_name
                 'meta'
               end
@@ -48,7 +52,7 @@ if defined? ForemanRemoteExecution
               end
 
               def required_proxy_selector_for(_template)
-                ::ForemanAnsibleDirector::AnsibleDirectorProxySelector.new
+                ::ForemanAnsibleDirector::AnsibleDirectorRunProxySelector.new
               end
             end
           end

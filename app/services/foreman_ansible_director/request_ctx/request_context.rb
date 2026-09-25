@@ -68,8 +68,9 @@ module ForemanAnsibleDirector
         end
       end
 
-      def add_error(error)
+      def add_error(error, critical: false)
         @errors << error
+        raise ::ForemanAnsibleDirector::Issues::CriticalErrorException if critical
       end
 
       def add_warning(warning)

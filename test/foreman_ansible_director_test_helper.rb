@@ -3,6 +3,12 @@
 # This calls the main test_helper in Foreman-core
 require 'test_helper'
 
+# "Borrowed" from foreman_rh_cloud
+katello_files = Dir.glob("#{Katello::Engine.root}/test/factories/**/*.rb")
+FactoryBot.definition_file_paths +=
+  katello_files
+    .map { |f| f.gsub('.rb', '') } # .rb extension is will be appended by factorybot
+
 # Add plugin to FactoryBot's paths
 FactoryBot.definition_file_paths << File.join(File.dirname(__FILE__), 'factories')
 FactoryBot.reload

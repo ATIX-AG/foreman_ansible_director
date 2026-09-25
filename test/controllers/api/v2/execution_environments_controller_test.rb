@@ -86,6 +86,25 @@ module ForemanAnsibleDirectorTests
         end
 
         test 'creates execution environment with explicit organization when no current organization is set' do
+          as_admin do
+            provider = FactoryBot.create(:katello_provider, organization: @organization)
+            @staging_product = FactoryBot.create(
+              :katello_product,
+              :organization => @organization,
+              :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+              :provider => provider,
+              :cp_id => '12345',
+              )
+
+            @build_proxy = FactoryBot.create(
+              :smart_proxy,
+              :ansible_director,
+              organizations: [@organization],
+              container_registry_auth_enabled: true
+            )
+          end
+          ::ForemanAnsibleDirector::AnsibleDirectorBuildProxySelector.any_instance.stubs(:determine_proxy).returns(@build_proxy)
+
           Organization.current = nil
 
           assert_difference(

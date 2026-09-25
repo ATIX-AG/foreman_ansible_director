@@ -35,3 +35,6 @@ jobs:
       plugin: foreman_ansible_director
       foreman_repository: "theforeman/foreman"
       foreman_version: 'develop'
+      environment_variables: |
+        KATELLO_SOURCE=ATIX-AG/katello
+        KATELLO_REF=proxy_cert_auth
