@@ -39,7 +39,7 @@ export const AnsibleContentAssignmentWrapper = (): ReactElement | null => {
     return (
       <EmptyState variant={EmptyStateVariant.lg}>
         <EmptyStateHeader
-          titleText={_('No lifecycle environment selected')}
+          titleText={_('No Ansible Environment selected')}
           headingLevel="h4"
           icon={<EmptyStateIcon icon={ResourcesEmptyIcon} />}
         />
