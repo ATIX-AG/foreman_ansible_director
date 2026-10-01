@@ -3,8 +3,8 @@
 module ForemanAnsibleDirector
   module Concerns
     module OrganizationCreatorExtensions
-      def create!
-        super
+      def create!(...)
+        super(...)
         create_ansible_director_product
       end
 
