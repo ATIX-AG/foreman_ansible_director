@@ -3,13 +3,13 @@ import { Table, TableText, Tbody, Td, Th, Thead, ThProps, Tr } from '@patternfly
 import {
   Button,
   Label,
-  Popover,
-
+  Tooltip,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import {
   AnsibleVariable,
+  AnsibleVariableBinding as AnsibleVariableBindingType,
   BoundAnsibleVariable,
 } from '../../../../../../types/AnsibleVariableTypes';
 import { dataTypeDisplayNameMap } from '../utils';
@@ -21,11 +21,13 @@ import { crColorHierarchy, crnTypeUiString } from '../../../helpers';
 import { VariablesTableToolbar } from './VariablesTableToolbar';
 import { InlineValueRenderer } from './InlineValueRenderer';
 import { hierarchyIconMap } from '../../../AnsibleContentAssignment';
+import { BindingDeleteButton } from '../../../../../../helpers/components/BindingDeleteButton';
 
 interface VariablesTableProps {
   variables: BoundAnsibleVariable[];
   resolutionHierarchy: ContentResolutionNode[];
   onItemClick: (variable: BoundAnsibleVariable) => void;
+  onDeleteSuccess: () => void;
 }
 
 type sortableKeys = 'variableName' | 'dataType';
@@ -36,7 +38,12 @@ const indexMap: Record<sortableKeys, number> = {
   dataType: 1,
 };
 
-export const VariablesTable = ({ variables, resolutionHierarchy, onItemClick }: VariablesTableProps): ReactElement => {
+export const VariablesTable = ({
+  variables,
+  resolutionHierarchy,
+  onItemClick,
+  onDeleteSuccess,
+}: VariablesTableProps): ReactElement => {
 
   const [variableFilter, setVariableFilter] = React.useState<string>('');
 
@@ -100,6 +107,12 @@ export const VariablesTable = ({ variables, resolutionHierarchy, onItemClick }: 
     sortedVariables = sortedVariables.sort((a, b) => sortPredicate(activeSortKey, activeSortDirection)(a, b));
   }
 
+  const currentNode = resolutionHierarchy[resolutionHierarchy.length - 1];
+  const deleteBindingTooltipText = __(_('Delete binding for this %(crnType)s'), { crnType: crnTypeUiString[currentNode.type] });
+  const isBindingForCurrentNode = (binding: AnsibleVariableBindingType | null): boolean =>
+    binding?.consumable_type === currentNode.type &&
+    binding?.consumable_id === currentNode.id;
+
   return (
     <>
       <VariablesTableToolbar
@@ -159,9 +172,16 @@ export const VariablesTable = ({ variables, resolutionHierarchy, onItemClick }: 
               </Td>
               <Td>
                 <TableText>
-                  <Popover bodyContent={_('Manage bindings')} triggerAction="hover">
+                  <Tooltip content={_('Manage bindings')}>
                     <Button variant="plain" aria-label={_('Manage bindings')} icon={<PencilAltIcon />} onClick={() => onItemClick(variable)} />
-                  </Popover>
+                  </Tooltip>
+                  <BindingDeleteButton
+                    binding={variable.binding}
+                    variableName={variable.name}
+                    tooltipText={deleteBindingTooltipText}
+                    isDisabled={!isBindingForCurrentNode(variable.binding)}
+                    onDeleted={onDeleteSuccess}
+                  />
                 </TableText>
               </Td>
             </Tr>
