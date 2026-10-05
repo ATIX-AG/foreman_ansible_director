@@ -23,6 +23,29 @@ module ForemanAnsibleDirector
       versionable.type == 'ForemanAnsibleDirector::AnsibleCollection' ? 'collection' : 'role'
     end
 
+    def referenced_by
+      references = []
+      ::ForemanAnsibleDirector::LifecycleEnvironmentContentUnitVersion
+        .where(content_unit_version_id: self[:id])
+        .find_each do |lcecuv|
+        references.push({
+          lce: lcecuv.lifecycle_environment,
+          via: lcecuv,
+        })
+      end
+      ::ForemanAnsibleDirector::ContentSnapshotContentUnitVersion
+        .where(content_unit_version_id: self[:id])
+        .find_each do |cscuv|
+        cscuv.content_snapshot.lifecycle_environments.each do |lce|
+          references.push({
+            lce: lce,
+            via: cscuv,
+          })
+        end
+      end
+      references
+    end
+
     def content_unit_revisions
       return nil unless (versionable.source_type = 'git') && dynamic
       super
