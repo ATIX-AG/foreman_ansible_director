@@ -31,6 +31,8 @@ module ForemanAnsibleDirector
 
           unit_versions = Hash.new { |h, k| h[k] = { versions: { galaxy: Set.new, git: Set.new }, complete: false } }
 
+          errors = []
+
           payload.each do |unit|
             unit_id = unit[:unit_id]
             unit_record = units[unit_id]
@@ -39,14 +41,29 @@ module ForemanAnsibleDirector
             all_version_ids = unit_record.content_unit_versions.pluck(:id).to_set
 
             if (requested_versions = unit[:unit_version_ids]).nil?
+              unit_record.content_unit_versions.each do |cuv|
+                references = cuv.referenced_by
+                next unless references.length.positive?
+                errors << ::ForemanAnsibleDirector::Issues::Errors::CuvStillReferencedError.new(
+                  cuv: cuv,
+                  references: references
+                )
+              end
               unit_versions[unit_id][:complete] = true # Key not given -> Full deletion
             else
               requested_versions.each do |version_id|
                 cuv = ContentUnitVersion.find_by(id: version_id)
                 raise(ActiveRecord::RecordNotFound, "Version with id #{version_id} not found") unless cuv
-
-                source_type = cuv.source_type.to_sym
-                unit_versions[unit_id][:versions][source_type].add(version_id)
+                references = cuv.referenced_by
+                if references.length.positive?
+                  errors << ::ForemanAnsibleDirector::Issues::Errors::CuvStillReferencedError.new(
+                    cuv: cuv,
+                    references: references
+                  )
+                else
+                  source_type = cuv.source_type.to_sym
+                  unit_versions[unit_id][:versions][source_type].add(version_id)
+                end
               end
             end
 
@@ -56,6 +73,13 @@ module ForemanAnsibleDirector
             if (supplied_galaxy_versions + supplied_git_versions).to_set.superset?(all_version_ids)
               unit_versions[unit_id][:complete] = true
             end
+          end
+
+          if errors.length.positive?
+            errors.each do |error|
+              ctx.add_error(error)
+            end
+            raise Issues::CriticalErrorException
           end
 
           unit_versions.transform_values do |types|
