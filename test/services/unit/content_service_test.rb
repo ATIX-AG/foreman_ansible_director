@@ -147,6 +147,257 @@ module ForemanAnsibleDirectorTests
             assert_equal revision, active_revision.content_unit_revision
           end
         end
+
+        describe '#resolve_import_payload' do
+          test 'resolves a single collection unit' do
+            result = ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+              [
+                {
+                  unit_type: 'collection',
+                  unit_name: 'my_namespace.my_collection',
+                  unit_source_type: 'galaxy',
+                  unit_source: 'https://galaxy.ansible.com/',
+                  unit_versions: %w[1.0.0 2.0.0]
+                }
+              ]
+            )
+
+            assert_equal 1, result.length
+            unit = result.first
+            assert_equal :collection, unit.unit_type
+            assert_equal 'https://galaxy.ansible.com/', unit.source
+            assert_equal 'my_namespace.my_collection', unit.name
+            assert_equal %w[1.0.0 2.0.0], unit.versions
+          end
+
+          test 'parses a role unit' do
+            result = ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+              [
+                {
+                  unit_type: 'role',
+                  unit_name: 'my_namespace.my_role',
+                  unit_source_type: 'galaxy',
+                  unit_source: 'https://galaxy.ansible.com',
+                  unit_versions: ['1.0.0']
+                }
+              ]
+            )
+
+            assert_equal 1, result.length
+            assert_equal :role, result.first.unit_type
+          end
+
+          test 'deduplicates units by name and source' do
+            result = ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+              [
+                {
+                  unit_type: 'collection',
+                  unit_name: 'ns.coll',
+                  unit_source_type: 'galaxy',
+                  unit_source: 'https://galaxy.ansible.com',
+                  unit_versions: ['1.0.0']
+                },
+                {
+                  unit_type: 'collection',
+                  unit_name: 'ns.coll',
+                  unit_source_type: 'galaxy',
+                  unit_source: 'https://galaxy.ansible.com',
+                  unit_versions: ['2.0.0']
+                },
+              ]
+            )
+
+            assert_equal 1, result.length
+            assert_equal %w[1.0.0 2.0.0], result.first.versions
+          end
+
+          test 'defaults to galaxy source when not provided' do
+            result = ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+              [
+                {
+                  unit_type: 'collection',
+                  unit_name: 'ns.coll',
+                  unit_source_type: 'galaxy',
+                  unit_versions: ['1.0.0']
+                }
+              ]
+            )
+
+            assert_equal 'https://galaxy.ansible.com/', result.first.source
+          end
+
+          test 'skips version validation for git source type' do
+            result = ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+              [
+                {
+                  unit_type: 'role',
+                  unit_name: 'ns.role',
+                  unit_source_type: 'git',
+                  unit_source: 'https://github.com/example/repo.git',
+                  unit_versions: %w[main develop]
+                }
+              ]
+            )
+
+            assert_equal :git, result.first.source_type
+            assert_equal %w[main develop], result.first.versions
+          end
+
+          test 'raises ArgumentError for invalid unit name' do
+            assert_raises(ArgumentError) do
+              ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+                [
+                  {
+                    unit_type: 'collection',
+                    unit_name: 'invalid_name',
+                    unit_source_type: 'galaxy',
+                    unit_versions: ['1.0.0']
+                  }
+                ]
+              )
+            end
+          end
+
+          test 'raises ArgumentError for invalid unit type' do
+            assert_raises(ArgumentError) do
+              ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+                [
+                  {
+                    unit_type: 'module',
+                    unit_name: 'ns.coll',
+                    unit_source_type: 'galaxy',
+                    unit_versions: ['1.0.0']
+                  }
+                ]
+              )
+            end
+          end
+
+          test 'raises ArgumentError for invalid unit source type' do
+            assert_raises(ArgumentError) do
+              ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+                [
+                  {
+                    unit_type: 'collection',
+                    unit_name: 'ns.coll',
+                    unit_source_type: 'pulp',
+                    unit_versions: ['1.0.0']
+                  }
+                ]
+              )
+            end
+          end
+
+          test 'raises ArgumentError for invalid version format' do
+            assert_raises(ArgumentError) do
+              ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
+                [
+                  {
+                    unit_type: 'collection',
+                    unit_name: 'ns.coll',
+                    unit_source_type: 'galaxy',
+                    unit_versions: ['1.0']
+                  }
+                ]
+              )
+            end
+          end
+        end
+
+        describe '#resolve_destroy_payload' do
+          setup do
+            @collection = FactoryBot.create(:ansible_collection, organization: @organization)
+            @content_version = FactoryBot.create(:content_unit_version, versionable: @collection, source_type: 'galaxy')
+            @content_version2 = FactoryBot.create(:content_unit_version, versionable: @collection, source_type: 'git')
+          end
+
+          test 'returns version IDs for deletion when no references exist' do
+            payload = [
+              {
+                unit_id: @collection.id,
+                unit_version_ids: [@content_version.id]
+              }
+            ]
+
+            result = ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(payload)
+
+            assert_equal 1, result.length
+            assert_equal [@content_version.id], result[@collection.id][:versions][:galaxy]
+            assert_equal false, result[@collection.id][:complete]
+          end
+
+          test 'returns complete: true when all versions are requested for deletion' do
+            payload = [
+              {
+                unit_id: @collection.id,
+                unit_version_ids: [@content_version.id, @content_version2.id]
+              }
+            ]
+
+            result = ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(payload)
+
+            assert_equal true, result[@collection.id][:complete]
+          end
+
+          test 'returns complete: true when no unit_version_ids given' do
+            payload = [{ unit_id: @collection.id }]
+
+            result = ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(payload)
+
+            assert_equal true, result[@collection.id][:complete]
+          end
+
+          test 'raises RecordNotFound for missing content unit' do
+            payload = [{ unit_id: 999_999 }]
+
+            assert_raises(ActiveRecord::RecordNotFound) do
+              ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(payload)
+            end
+          end
+
+          test 'raises RecordNotFound for missing version' do
+            payload = [
+              {
+                unit_id: @collection.id,
+                unit_version_ids: [999_999]
+              }
+            ]
+
+            assert_raises(ActiveRecord::RecordNotFound) do
+              ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(payload)
+            end
+          end
+
+          test 'adds error and raises CriticalErrorException when CUv is still referenced' do
+            path = FactoryBot.create(
+              :lifecycle_environment_path,
+              organization: @organization
+            )
+            lce = FactoryBot.create(
+              :lifecycle_environment,
+              organization: @collection.organization,
+              lifecycle_environment_path: path
+            )
+            FactoryBot.create(
+              :lifecycle_environment_content_unit_version,
+              lifecycle_environment: lce,
+              content_unit_version: @content_version
+            )
+
+            payload = [
+              { unit_id: @collection.id,
+                unit_version_ids: [@content_version.id]
+              }
+            ]
+
+            assert_raises(::ForemanAnsibleDirector::Issues::CriticalErrorException) do
+              ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(payload)
+            end
+
+            assert_equal 1, ctx.errors.length
+            assert_instance_of(::ForemanAnsibleDirector::Issues::Errors::CuvStillReferencedError, ctx.errors.first)
+          end
+        end
       end
     end
   end
