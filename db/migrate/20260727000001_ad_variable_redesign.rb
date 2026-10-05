@@ -1,7 +1,17 @@
 # frozen_string_literal: true
 
 class AdVariableRedesign < ActiveRecord::Migration[6.1]
-  def change
+  def up
+    ansible_variable_ids = LookupKey.where(type: 'ForemanAnsibleDirector::AnsibleVariable').pluck(:id)
+
+    if ansible_variable_ids.any?
+      LookupValue.where(lookup_key_id: ansible_variable_ids).delete_all
+      ForemanAnsibleDirector::AnsibleVariable.where(id: ansible_variable_ids).delete_all
+    end
+
+    remove_column :lookup_keys, :ownable_type
+    remove_column :lookup_keys, :ownable_id
+
     create_table :ad_ansible_variables do |t|
       t.string :name, null: false
       t.text :description, null: true
@@ -33,5 +43,9 @@ class AdVariableRedesign < ActiveRecord::Migration[6.1]
       t.integer :organization_id, null: false
       t.timestamps
     end
+  end
+
+  def down
+    raise ActiveRecord::IrreversibleMigration
   end
 end
