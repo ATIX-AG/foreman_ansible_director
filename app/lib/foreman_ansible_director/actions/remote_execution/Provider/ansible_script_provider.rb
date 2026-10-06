@@ -35,7 +35,7 @@ if defined? ForemanRemoteExecution
                 # As the templates currently do not have an execution environment input, this suffices
                 super(template_invocation, host).merge(
                   inventory: inventory,
-                  execution_environment: environment.registry_url
+                  execution_environment: environment.registry_url!
                 )
               end
 
