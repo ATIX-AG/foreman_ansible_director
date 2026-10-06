@@ -1,5 +1,19 @@
 # frozen_string_literal: true
 
+require 'simplecov'
+SimpleCov.start do
+  enable_coverage :branch
+  root File.expand_path('..', __dir__)
+  add_filter '/test/'
+
+  add_group 'Controllers', %r{app/controllers}
+  add_group 'Services', %r{app/services}
+  add_group 'Concerns', %r{concerns}
+  add_group 'Models', %r{app/models}
+  add_group 'Actions', %r{app/lib/.*actions}
+  add_group 'Lib', %r{app/lib}
+end
+
 # This calls the main test_helper in Foreman-core
 require 'test_helper'
 
