@@ -168,7 +168,8 @@ export const ValuePresenter = ({
             <YamlAdapter
               isEditMode={!isDisabled}
               value={value}
-              onChange={onValue}
+              // This is already YAML. As such, it must not be dumped again.
+              onChange={onValueChange}
             />
           );
       }
