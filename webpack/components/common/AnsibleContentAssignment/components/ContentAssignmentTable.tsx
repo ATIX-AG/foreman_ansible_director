@@ -9,15 +9,14 @@ import {
   OuterScrollContainer,
   InnerScrollContainer,
   ThProps,
-  IAction,
-  ActionsColumn,
 } from '@patternfly/react-table';
 
-import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
+import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 
-import { Icon, Label, Popover } from '@patternfly/react-core';
+import { Button, Icon, Label, Popover } from '@patternfly/react-core';
 import CubesIcon from '@patternfly/react-icons/dist/esm/icons/cubes-icon';
 import CubeIcon from '@patternfly/react-icons/dist/esm/icons/cube-icon';
+import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
 import {
   AnsibleContentAssignment,
   ContentResolutionNode,
@@ -179,12 +178,6 @@ export const ContentAssignmentTable = ({
     resolved: _('Resolved version'),
   };
 
-  const rowActions = (
-    assignment: ResolvedAssignment<AnsibleContentAssignment>
-  ): IAction[] => [
-    { title: _('Unassign'), onClick: () => onAssignmentRemove(assignment) },
-  ];
-
   return (
     <div style={{ height: '50vh' }}>
       <OuterScrollContainer>
@@ -263,15 +256,23 @@ export const ContentAssignmentTable = ({
                     )}
                   </Td>
                   <Td isActionCell>
-                    <ActionsColumn
-                      items={rowActions(assignment)}
-                      isDisabled={
-                        !(
-                          assignment.consumable_type === crnType &&
-                          assignment.consumable_id === crnId
-                        )
-                      }
-                    />
+                    <Popover bodyContent={_('Unassign')} triggerAction="hover">
+                      <Button
+                        variant="plain"
+                        aria-label="Action"
+                        isDisabled={
+                          !(
+                            assignment.consumable_type === crnType &&
+                                                        assignment.consumable_id === crnId
+                          )
+                        }
+                        onClick={() => onAssignmentRemove(assignment)}
+                      >
+                        <Icon size="md">
+                          <TrashIcon />
+                        </Icon>
+                      </Button>
+                    </Popover>
                   </Td>
                 </Tr>
               ))}
