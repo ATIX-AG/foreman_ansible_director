@@ -41,13 +41,14 @@ import {
 } from '../../../types/AnsibleContentAssignmentTypes';
 import { HierarchyLevelSelector } from './components/HierarchyLevelSelector';
 import { AlertModal } from '../AlertModal';
-import { assignmentFqrn } from './helpers';
+import { assignmentFqrn, crnTypeUiString } from './helpers';
 import { AssignmentSelectorWrapper } from './components/AssignmentSelectorWrapper';
 import { ResolutionWarning } from '../../../types/issues/warnings';
 import { Permitted } from '../Permitted';
 import { AssignmentContext } from './AssignmentContext';
 import { VariableTableWrapper } from './components/Variables/VariableTableWrapper';
 import { VariableContextWrapper } from './components/Variables/VariableContext';
+import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
 
 interface AnsibleContentAssignmentCompProps {
   crnId: number;
@@ -63,6 +64,13 @@ export const hierarchyIconMap: Record<ContentResolutionNodeType, ReactElement> =
   Host: <ClusterIcon />,
   Hostgroup: <ObjectGroupIcon />,
 };
+
+interface ConfirmableAction {
+  title: string;
+  body: string;
+  onConfirm: () => void;
+  onAbort: () => void;
+}
 
 export const AnsibleContentAssignmentComp = ({
   crnId,
@@ -84,6 +92,8 @@ export const AnsibleContentAssignmentComp = ({
   const [activeTabKey, setActiveTabKey] = React.useState<number>(0);
 
   const [fqrnFilter, setFqrnFilter] = React.useState<string>('');
+
+  const [deletionPendingConfirmation, setDeletionPendingConfirmation] = React.useState<ConfirmableAction | null>(null);
 
   const assignmentCtx = useContext(AssignmentContext);
 
@@ -144,12 +154,19 @@ export const AnsibleContentAssignmentComp = ({
             );
             setSelectedAlert(warning === undefined ? null : warning);
           }}
-          onAssignmentRemove={async assignment => {
-            await assignmentCtx.handleAssignmentDestroy(assignment);
-            assignmentCtx.dataInterface === 'api'
-              ? assignmentCtx.refreshAssignments()
-              : setIsAssignmentModalOpen(false);
-          }}
+          onAssignmentRemove={assignment => setDeletionPendingConfirmation(
+            {
+              title: _(`Unassign ${assignmentFqrn(assignment)}?`),
+              body: _(`This action unassigns ${assignmentFqrn(assignment)} from ${crnTypeUiString[crnType]} '${crnName}'. Ansible will not execute this role. Variable bindings remain created but are ineffective.`),
+              onAbort: () => setDeletionPendingConfirmation(null),
+              onConfirm: async () => {
+                await assignmentCtx.handleAssignmentDestroy(assignment);
+                assignmentCtx.dataInterface === 'api'
+                  ? assignmentCtx.refreshAssignments()
+                  : setIsAssignmentModalOpen(false);
+              },
+            }
+          )}
         />
       );
     }
@@ -192,131 +209,144 @@ export const AnsibleContentAssignmentComp = ({
   };
 
   return (
-    <Tabs
-      activeKey={activeTabKey}
-      onSelect={(_event, eventKey) => setActiveTabKey(eventKey as number)}
-      isBox
-      isFilled
-    >
-      <Tab title={_('Ansible content')} eventKey={0}>
-        <Permitted
-          requiredPermissions={[
-            AdPermissions.assignments.view,
-            AdPermissions.assignments.create,
-            AdPermissions.assignments.destroy,
-          ]}
-        >
-          <div style={{ padding: '16px' }}>
-            <Flex direction={{ default: 'column' }}>
-              <FlexItem>
-                <Level>
-                  <LevelItem>
-                    <>
-                      <TextContent
-                        style={{
-                          display: 'inline-block',
-                        }}
-                      >
-                        <Text component={TextVariants.h3} style={{}}>
-                          {_('Content source:')}
-                        </Text>
-                      </TextContent>
-                      <Button
-                        variant="link"
-                        icon={<ExternalLinkSquareAltIcon />}
-                        iconPosition="end"
-                        onClick={() => {
-                          window.open(foremanUrl('/ansible/environments'));
-                        }}
-                      >
-                        {_('Lifecycle Environment')}
-                      </Button>
-                    </>
-                  </LevelItem>
-                  <LevelItem>
-                    <>
-                      <TextContent
-                        style={{
-                          display: 'inline-block',
-                          paddingRight: '16px',
-                        }}
-                      >
-                        <Text component={TextVariants.h3}>
-                          {_('Inheritance hierarchy:')}
-                        </Text>
-                      </TextContent>
-                      <HierarchyLevelSelector
-                        hierarchy={hierarchy}
-                        hierarchyIconMap={hierarchyIconMap}
-                        onSelect={crn => setSelectedHierarchyNode(crn)}
-                        selected={selectedHierarchyNode}
-                      />
-                    </>
-                  </LevelItem>
-                  <LevelItem>
-                    <Toolbar>
-                      <ToolbarContent>
-                        <ToolbarItem>
-                          <SearchInput
-                            style={{ width: '20vw' }}
-                            placeholder={_('Filter by name')}
-                            value={fqrnFilter}
-                            onChange={(_event, value) => setFqrnFilter(value)}
-                          />
-                        </ToolbarItem>
-                        <ToolbarItem variant="separator" />
-                        <ToolbarItem>
-                          <Button
-                            variant="primary"
-                            onClick={() => setIsAssignmentModalOpen(true)}
-                          >
-                            {_('Assign content')}
-                          </Button>
-                        </ToolbarItem>
-                      </ToolbarContent>
-                    </Toolbar>
-                  </LevelItem>
-                </Level>
-              </FlexItem>
-              <FlexItem>{mainContent()}</FlexItem>
-            </Flex>
-            {selectedAlert !== null && (
-              <AlertModal
-                variant="warning"
-                isOpen
-                onClose={() => setSelectedAlert(null)}
-                title={selectedAlert.title}
-                message={selectedAlert.message}
-              />
-            )}
-            {isAssignmentModalOpen && (
-              <AssignmentSelectorWrapper
-                crnType={crnType}
-                csId={csId}
-                onClose={() => setIsAssignmentModalOpen(false)}
-                onAbort={() => setIsAssignmentModalOpen(false)}
-                onSuccess={assignmentCtx.dataInterface === 'api' ? () => {
-                  assignmentCtx.refreshAssignments();
-                  setIsAssignmentModalOpen(false);
-                } : () => {
-                  setIsAssignmentModalOpen(false);
-                }}
-              />
-            )}
-          </div>
-        </Permitted>
-      </Tab>
-      <Tab title={_('Ansible variables')} eventKey={1}>
-        <Permitted requiredPermissions={[AdPermissions.ansibleVariables.view]}>
-          <VariableContextWrapper
-            dataInterface={assignmentCtx.dataInterface}
-            crnId={assignmentCtx.crnId}
-            crnType={assignmentCtx.crnType}
+    <>
+      <Tabs
+        activeKey={activeTabKey}
+        onSelect={(_event, eventKey) => setActiveTabKey(eventKey as number)}
+        isBox
+        isFilled
+      >
+        <Tab title={_('Ansible content')} eventKey={0}>
+          <Permitted
+            requiredPermissions={[
+              AdPermissions.assignments.view,
+              AdPermissions.assignments.create,
+              AdPermissions.assignments.destroy,
+            ]}
           >
-            <VariableTableWrapper />
-          </VariableContextWrapper>
-        </Permitted>
-      </Tab>
-    </Tabs>
+            <div style={{ padding: '16px' }}>
+              <Flex direction={{ default: 'column' }}>
+                <FlexItem>
+                  <Level>
+                    <LevelItem>
+                      <>
+                        <TextContent
+                          style={{
+                            display: 'inline-block',
+                          }}
+                        >
+                          <Text component={TextVariants.h3} style={{}}>
+                            {_('Content source:')}
+                          </Text>
+                        </TextContent>
+                        <Button
+                          variant="link"
+                          icon={<ExternalLinkSquareAltIcon />}
+                          iconPosition="end"
+                          onClick={() => {
+                            window.open(foremanUrl('/ansible/environments'));
+                          }}
+                        >
+                          {_('Lifecycle Environment')}
+                        </Button>
+                      </>
+                    </LevelItem>
+                    <LevelItem>
+                      <>
+                        <TextContent
+                          style={{
+                            display: 'inline-block',
+                            paddingRight: '16px',
+                          }}
+                        >
+                          <Text component={TextVariants.h3}>
+                            {_('Inheritance hierarchy:')}
+                          </Text>
+                        </TextContent>
+                        <HierarchyLevelSelector
+                          hierarchy={hierarchy}
+                          hierarchyIconMap={hierarchyIconMap}
+                          onSelect={crn => setSelectedHierarchyNode(crn)}
+                          selected={selectedHierarchyNode}
+                        />
+                      </>
+                    </LevelItem>
+                    <LevelItem>
+                      <Toolbar>
+                        <ToolbarContent>
+                          <ToolbarItem>
+                            <SearchInput
+                              style={{ width: '20vw' }}
+                              placeholder={_('Filter by name')}
+                              value={fqrnFilter}
+                              onChange={(_event, value) => setFqrnFilter(value)}
+                            />
+                          </ToolbarItem>
+                          <ToolbarItem variant="separator" />
+                          <ToolbarItem>
+                            <Button
+                              variant="primary"
+                              onClick={() => setIsAssignmentModalOpen(true)}
+                            >
+                              {_('Assign content')}
+                            </Button>
+                          </ToolbarItem>
+                        </ToolbarContent>
+                      </Toolbar>
+                    </LevelItem>
+                  </Level>
+                </FlexItem>
+                <FlexItem>{mainContent()}</FlexItem>
+              </Flex>
+              {selectedAlert !== null && (
+                <AlertModal
+                  variant="warning"
+                  isOpen
+                  onClose={() => setSelectedAlert(null)}
+                  title={selectedAlert.title}
+                  message={selectedAlert.message}
+                />
+              )}
+              {isAssignmentModalOpen && (
+                <AssignmentSelectorWrapper
+                  crnType={crnType}
+                  csId={csId}
+                  onClose={() => setIsAssignmentModalOpen(false)}
+                  onAbort={() => setIsAssignmentModalOpen(false)}
+                  onSuccess={assignmentCtx.dataInterface === 'api' ? () => {
+                    assignmentCtx.refreshAssignments();
+                    setIsAssignmentModalOpen(false);
+                  } : () => {
+                    setIsAssignmentModalOpen(false);
+                  }}
+                />
+              )}
+            </div>
+          </Permitted>
+        </Tab>
+        <Tab title={_('Ansible variables')} eventKey={1}>
+          <Permitted requiredPermissions={[AdPermissions.ansibleVariables.view]}>
+            <VariableContextWrapper
+              dataInterface={assignmentCtx.dataInterface}
+              crnId={assignmentCtx.crnId}
+              crnType={assignmentCtx.crnType}
+            >
+              <VariableTableWrapper />
+            </VariableContextWrapper>
+          </Permitted>
+        </Tab>
+      </Tabs>
+      {
+        deletionPendingConfirmation !== null && (
+          <ConfirmationModal
+            isConfirmationModalOpen
+            title={deletionPendingConfirmation.title}
+            body={deletionPendingConfirmation.body}
+            onConfirm={deletionPendingConfirmation.onConfirm}
+            onAbort={deletionPendingConfirmation.onAbort}
+          />
+        )
+      }
+    </>
   );
 };
