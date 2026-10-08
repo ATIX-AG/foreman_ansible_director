@@ -11,6 +11,10 @@ module ForemanAnsibleDirector
             param :unit_name, String, required: true
             param :unit_namespace, String, required: true
             param :organization_id, Integer, required: true
+            # requirements.yml-style requirements file used to sync the remote, only applicable
+            # when content_unit_type is :collection. Used to verify that every requested
+            # collection was actually imported.
+            param :requirements, String, required: false
             param :skip, Boolean, required: false
           end
 
@@ -40,6 +44,15 @@ module ForemanAnsibleDirector
                                 skip: args[:skip]
                               )
                             end
+
+              if args[:content_unit_type] == :collection && args[:requirements]
+                plan_action(
+                  ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Index::VerifyCollectionImport,
+                  requirements: args[:requirements],
+                  list_action_output: list_action.output,
+                  skip: args[:skip]
+                )
+              end
 
               extract_variables_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ExtractVariables,
