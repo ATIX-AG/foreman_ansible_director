@@ -27,8 +27,9 @@ if defined? ForemanRemoteExecution
                                   id: Setting[:ansible_director_default_ee_rex]
                                 )
                   unless environment
-                    raise "Host #{host.name} is not in any lifecycle environment
-                    and the setting 'ansible_director_default_ee_rex' is not provided."
+                    raise "No Execution Environment found.
+                    You must either assign your host #{host.name} to an Ansible environment
+                    or configure a default Execution Environment through the 'ansible_director_default_ee_rex' setting."
                   end
                 end
 
