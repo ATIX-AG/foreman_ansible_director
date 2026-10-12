@@ -6,7 +6,7 @@ class AdVariableRedesign < ActiveRecord::Migration[6.1]
 
     if ansible_variable_ids.any?
       LookupValue.where(lookup_key_id: ansible_variable_ids).delete_all
-      ForemanAnsibleDirector::AnsibleVariable.where(id: ansible_variable_ids).delete_all
+      LookupKey.where(id: ansible_variable_ids).delete_all
     end
 
     remove_column :lookup_keys, :ownable_type
