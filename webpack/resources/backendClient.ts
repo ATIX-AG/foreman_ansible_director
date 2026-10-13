@@ -7,7 +7,8 @@ interface ApiResponseSuccess<
   TCreated,
   TUpdated,
   TDeleted,
-  TWarning extends AnsibleDirectorWarning
+  TWarning extends AnsibleDirectorWarning,
+  TResponse
 > {
   status: 'success';
   ok: true;
@@ -15,9 +16,13 @@ interface ApiResponseSuccess<
   updated: ExtractRecordFromUnion<TUpdated>;
   created: ExtractRecordFromUnion<TCreated>;
   deleted: TDeleted[];
+  results: TResponse;
 }
 
-interface ApiResponseWarning<TWarning extends AnsibleDirectorWarning> {
+interface ApiResponseWarning<
+  TWarning extends AnsibleDirectorWarning,
+  TResponse
+> {
   status: 'warning';
   ok: true;
   warnings: TWarning[];
@@ -25,9 +30,13 @@ interface ApiResponseWarning<TWarning extends AnsibleDirectorWarning> {
   created: never;
   deleted: never;
   errors: never;
+  results: TResponse;
 }
 
-interface ApiResponseError<TError extends AnsibleDirectorError> {
+interface ApiResponseError<
+  TError extends AnsibleDirectorError,
+  TResponse
+> {
   status: 'error';
   ok: false;
   errors: TError[];
@@ -35,6 +44,7 @@ interface ApiResponseError<TError extends AnsibleDirectorError> {
   updated: never;
   created: never;
   deleted: never;
+  results: TResponse;
 }
 
 export type ApiResponse<
@@ -42,11 +52,12 @@ export type ApiResponse<
   TUpdated,
   TDeleted,
   TWarning extends AnsibleDirectorWarning,
-  TError extends AnsibleDirectorError
+  TError extends AnsibleDirectorError,
+  TResponse = never
 > =
-  | ApiResponseSuccess<TCreated, TUpdated, TDeleted, TWarning>
-  | ApiResponseWarning<TWarning>
-  | ApiResponseError<TError>;
+  | ApiResponseSuccess<TCreated, TUpdated, TDeleted, TWarning, TResponse>
+  | ApiResponseWarning<TWarning, TResponse>
+  | ApiResponseError<TError, TResponse>;
 
 type BackendRequest<TPayload, TQueryParams> = {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -70,10 +81,11 @@ export async function backendRequest<
   TWarning extends AnsibleDirectorWarning,
   TError extends AnsibleDirectorError,
   TPayload,
-  TParams
+  TParams,
+  TResponse = never
 > (
   request: BackendRequest<TPayload, TParams>
-): Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>> {
+): Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>> {
   const payload = 'payload' in request ? request.payload : undefined;
   const queryParams =
     'queryParams' in request ? request.queryParams : undefined;
@@ -128,23 +140,47 @@ export async function backendRequest<
     }
   }
 
-  return (responseJson !== null && responseJson.status === 'success'
-    ? {
-      status: 'success' as const,
-      ok: true,
-      errors: [] as never,
-      warnings: responseJson.warnings satisfies TWarning[],
-      created: responseJson.created satisfies TCreated[],
-      updated: responseJson.updated satisfies TUpdated[],
-      deleted: responseJson.deleted satisfies TDeleted[],
+  if (responseJson !== null) {
+    if (responseJson.status === 'success') {
+      return (
+        {
+          status: 'success' as const,
+          ok: true,
+          warnings: responseJson.warnings satisfies TWarning[],
+          created: responseJson.created satisfies TCreated[],
+          updated: responseJson.updated satisfies TUpdated[],
+          deleted: responseJson.deleted satisfies TDeleted[],
+          results: responseJson.results satisfies TResponse,
+        }
+      );
     }
-    : {
-      status: 'error' as const,
-      ok: false,
-      errors: responseErrors as TError[],
-      warnings: [] as never,
-      created: [] as never,
-      updated: [] as never,
-      deleted: [] as never,
-    }) as ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>;
+    else {
+      return (
+        {
+          status: 'error' as const,
+          ok: false,
+          errors: responseErrors as TError[],
+          warnings: [] as never,
+          created: [] as never,
+          updated: [] as never,
+          deleted: [] as never,
+          results: responseJson.results satisfies TResponse,
+        } satisfies ApiResponseError<TError, TResponse>
+      );
+    }
+  }
+  else {
+    return (
+      {
+        status: 'error' as const,
+        ok: false,
+        errors: [] as never,
+        warnings: [] as never,
+        created: [] as never,
+        updated: [] as never,
+        deleted: [] as never,
+        results: null as never,
+      }
+    );
+  }
 }
