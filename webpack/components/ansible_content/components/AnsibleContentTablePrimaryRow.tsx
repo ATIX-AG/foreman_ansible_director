@@ -1,15 +1,12 @@
 import React, { Dispatch } from 'react';
 import { ActionsColumn, IAction, Td, Tr } from '@patternfly/react-table';
-import axios, { AxiosResponse } from 'axios';
-import { foremanUrl } from 'foremanReact/common/helpers';
-import { addToast } from 'foremanReact/components/ToastsList';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 
-import { useDispatch } from 'react-redux';
 import { AnsibleContentUnit } from '../../../types/AnsibleContentTypes';
 import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
-import { DefaultResponse, Task } from '../../../types/common';
+import { AnsibleContent } from '../../../resources/clients/AnsibleContent';
+import { useToasts } from '../../../helpers/toasts/useToasts';
 
 interface AnsibleContentTablePrimaryRowProps {
   node: AnsibleContentUnit;
@@ -66,7 +63,7 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
     },
   };
 
-  const dispatch = useDispatch();
+  const { withToast } = useToasts();
 
   const userCanDestroyContent: boolean = usePermissions([
     AdPermissions.ansibleContent.destroy,
@@ -83,70 +80,16 @@ const AnsibleContentTablePrimaryRow: React.FC<AnsibleContentTablePrimaryRowProps
         })
       );
       setConfirmationModalOnConfirm(() => async () => {
-        try {
-          const triggeredTask: AxiosResponse<DefaultResponse<
-            never,
-            never,
-            { task: Task }
-          >> = await axios.delete(
-            foremanUrl('/api/v2/ansible_director/ansible_content'),
-            {
-              data: {
-                units: [
-                  {
-                    unit_id: node.id,
-                  },
-                ],
+        await withToast({
+          type: 'task',
+          func: AnsibleContent.destroy({
+            units: [
+              {
+                unit_id: node.id,
               },
-            }
-          );
-          dispatch(
-            addToast({
-              type: 'success',
-              key: `DESTROY_CU_${node.id}_SUCC`,
-              message: (
-                <span>
-                  {__(
-                    _(
-                      'A task to delete Ansible content unit "%(identifier)s" was started successfully!'
-                    ),
-                    {
-                      identifier,
-                    }
-                  )}
-                  <br />
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={foremanUrl(
-                      `/foreman_tasks/tasks/${triggeredTask.data.results.task.id}`
-                    )}
-                  >
-                    {_('View the task page for more details.')}
-                  </a>
-                </span>
-              ),
-              sticky: false,
-            })
-          );
-        } catch (e) {
-          dispatch(
-            addToast({
-              type: 'danger',
-              key: `DESTROY_CU_${node.id}_ERR`,
-              message: __(
-                _(
-                  'Starting of task to delete Ansible content unit "%(identifier)s" failed with error code "%(error)s".'
-                ),
-                {
-                  identifier,
-                  error: (e as { response: AxiosResponse }).response.status,
-                }
-              ),
-              sticky: false,
-            })
-          );
-        }
+            ],
+          }),
+        });
       });
     },
   });

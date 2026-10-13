@@ -13,17 +13,20 @@ import {
 import { promoteError, promoteSuccess, promoteSuccessWarn } from './promoteToasts';
 import { resourceIdentifier } from '../../resources/utils';
 import { AlertContext } from '../../components/common/Alerts/AlertContext';
+import { taskStartError, taskStartSuccess, taskStartWarning } from './taskToasts';
+import { Task } from '../../types/common';
 
 interface CrudToastOptions<
   TCreated,
   TUpdated,
   TDeleted,
   TWarning extends AnsibleDirectorWarning,
-  TError extends AnsibleDirectorError
+  TError extends AnsibleDirectorError,
+  TResponse
 > {
   type: crudOperation;
   resource: resourceIdentifier;
-  func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>>;
+  func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>>;
 }
 
 interface PromoteToastOptions<
@@ -31,10 +34,22 @@ interface PromoteToastOptions<
   TUpdated,
   TDeleted,
   TWarning extends AnsibleDirectorWarning,
-  TError extends AnsibleDirectorError
+  TError extends AnsibleDirectorError,
+  TResponse
 > {
   type: 'promote';
-  func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>>;
+  func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>>;
+}
+
+interface TaskToastOptions<
+  TCreated,
+  TUpdated,
+  TDeleted,
+  TWarning extends AnsibleDirectorWarning,
+  TError extends AnsibleDirectorError
+> {
+  type: 'task';
+  func: Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, { task: Task }>>;
 }
 
 type WithToastOptions<
@@ -42,9 +57,11 @@ type WithToastOptions<
   TUpdated,
   TDeleted,
   TWarning extends AnsibleDirectorWarning,
-  TError extends AnsibleDirectorError
-> = CrudToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>
-  | PromoteToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>;
+  TError extends AnsibleDirectorError,
+  TResponse
+> = CrudToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>
+  | PromoteToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>
+  | TaskToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>;
 
 interface UseToastsReturn {
   withToast: <
@@ -52,10 +69,11 @@ interface UseToastsReturn {
     TUpdated,
     TDeleted,
     TWarning extends AnsibleDirectorWarning,
-    TError extends AnsibleDirectorError
+    TError extends AnsibleDirectorError,
+    TResponse
   >(
-    options: WithToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>
-  ) => Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>>;
+    options: WithToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>
+  ) => Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>>;
   dispatchToast: (params: toastParams) => void;
 }
 
@@ -69,10 +87,11 @@ export const useToasts = (): UseToastsReturn => {
       TUpdated,
       TDeleted,
       TWarning extends AnsibleDirectorWarning,
-      TError extends AnsibleDirectorError
+      TError extends AnsibleDirectorError,
+      TResponse
     >(
-      options: WithToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError>
-    ): Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError>> => {
+      options: WithToastOptions<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>
+    ): Promise<ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>> => {
       const { type, func } = options;
       const response = await func;
 
@@ -87,7 +106,8 @@ export const useToasts = (): UseToastsReturn => {
             TUpdated,
             TDeleted,
             TWarning,
-            TError
+            TError,
+            TResponse
           >;
           if (response.ok) {
             if (response.warnings.length > 0) {
@@ -124,13 +144,29 @@ export const useToasts = (): UseToastsReturn => {
             params = promoteError(response.errors, () =>
               context?.showAlert(response.errors));
           }
+          break;
+        case 'task':
+          if (response.ok) {
+            if (response.warnings.length > 0) {
+              params = taskStartWarning((response.results as { task: Task }).task, response.warnings, () =>
+                context?.showAlert(response.warnings));
+            }
+            else {
+              params = taskStartSuccess((response.results as { task: Task }).task);
+            }
+          }
+          else {
+            params = taskStartError(response.errors, () =>
+              context?.showAlert(response.errors));
+          }
+          break;
       }
 
       if (params) {
         dispatch(addToast(params));
       }
 
-      return response;
+      return response as unknown as ApiResponse<TCreated, TUpdated, TDeleted, TWarning, TError, TResponse>;
     },
     [context, dispatch]
   );
