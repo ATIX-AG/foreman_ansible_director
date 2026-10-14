@@ -59,8 +59,8 @@ if defined? ForemanRemoteExecution
                   )
                   inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate(
                     host: host,
-                    ansible_user: template_invocation.job_invocation&.ssh_user ||
-                      host.host_param('remote_execution_ssh_user')
+                    host_address: find_ip_or_hostname(host),
+                    template_invocation: template_invocation
                   )
 
                   content = ForemanAnsibleDirector::Generators::ContentGenerator.generate(
@@ -82,6 +82,10 @@ if defined? ForemanRemoteExecution
                     }
                   )
                 end
+              end
+
+              def supports_effective_user?
+                true
               end
 
               # Atm, the smart proxy does not do granular features, so the required feature is "Ansible_Director".
