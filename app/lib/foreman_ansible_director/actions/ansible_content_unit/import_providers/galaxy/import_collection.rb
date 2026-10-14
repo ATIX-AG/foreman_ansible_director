@@ -68,7 +68,8 @@ module ForemanAnsibleDirector
                 content_unit_source: unit.source,
                 unit_name: unit.unit_name,
                 unit_namespace: unit.unit_namespace,
-                organization_id: organization_id
+                organization_id: organization_id,
+                requirements: unit.collection_file
               )
             end
           end

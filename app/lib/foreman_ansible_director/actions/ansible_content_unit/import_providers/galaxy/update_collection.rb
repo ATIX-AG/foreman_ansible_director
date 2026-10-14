@@ -36,10 +36,12 @@ module ForemanAnsibleDirector
                                                .pulp_distribution_href
 
               sequence do
+                requirements = existing_unit.requirements_file(new_unit)
+
                 _remote_update_action = plan_action(
                   ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Update,
                   collection_remote_href: remote_href,
-                  requirements: existing_unit.requirements_file(new_unit)
+                  requirements: requirements
                 )
 
                 _snyc_action = plan_action(
@@ -59,7 +61,8 @@ module ForemanAnsibleDirector
                   content_unit_id: args[:content_unit_id],
                   unit_name: new_unit.unit_name,
                   unit_namespace: new_unit.unit_namespace,
-                  organization_id: organization_id
+                  organization_id: organization_id,
+                  requirements: requirements
                 )
               end
             end
