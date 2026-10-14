@@ -35,6 +35,14 @@ class ForemanAnsibleDirectorTestCase < ActiveSupport::TestCase
     Setting[setting] = original
   end
 
+  class << self
+    def test_as_admin(name, &block)
+      test(name) do
+        as_admin { instance_eval(&block) }
+      end
+    end
+  end
+
   setup do
     User.current = User.find_by(login: 'admin')
     @organization ||= Organization.find_by(name: 'Organization 1')
