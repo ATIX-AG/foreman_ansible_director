@@ -11,11 +11,11 @@ import {
   OuterScrollContainer,
   InnerScrollContainer,
 } from '@patternfly/react-table';
-import { SearchInput, Stack, StackItem } from '@patternfly/react-core';
+import { Alert, SearchInput, Stack, StackItem } from '@patternfly/react-core';
 
 import CubesIcon from '@patternfly/react-icons/dist/esm/icons/cubes-icon';
 import CubeIcon from '@patternfly/react-icons/dist/esm/icons/cube-icon';
-import { translate as _ } from 'foremanReact/common/I18n';
+import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 import {
   AnsibleCollectionRole,
   FullAnsibleContentUnitAssignment,
@@ -24,12 +24,13 @@ import {
   AnsibleCollectionRoleAssignment,
   AnsibleContentAssignment,
   AnsibleContentAssignmentCreate,
-  AnsibleRoleAssignment,
+  AnsibleRoleAssignment, Fqrnable,
 } from '../../../../types/AnsibleContentAssignmentTypes';
 import { assignmentFqrn } from '../helpers';
 
 interface AssignmentSelectorProps {
   availableContent: FullAnsibleContentUnitAssignment[];
+  excludeAssignments: Fqrnable[];
   selected: AnsibleContentAssignmentCreate<AnsibleContentAssignment>[];
   onChange: (
     newAssignables: AnsibleContentAssignmentCreate<AnsibleContentAssignment>[]
@@ -38,6 +39,7 @@ interface AssignmentSelectorProps {
 
 export const AssignmentSelector = ({
   availableContent,
+  excludeAssignments,
   selected,
   onChange,
 }: AssignmentSelectorProps): ReactElement => {
@@ -47,6 +49,11 @@ export const AssignmentSelector = ({
   const assignableFqrns = useMemo(
     () => selected.map(assignable => assignmentFqrn(assignable)),
     [selected]
+  );
+
+  const excludeFqrns = useMemo(
+    () => excludeAssignments.map(assignment => assignmentFqrn(assignment)),
+    [excludeAssignments]
   );
 
   const renderAcuRows = (
@@ -169,7 +176,7 @@ export const AssignmentSelector = ({
         key={node.id}
         aria-level={level}
         aria-posinset={posinset}
-        isHidden={isHidden}
+        isHidden={isHidden || excludeFqrns.includes(fqrn)}
         isClickable
         onRowClick={() => onAcrSelect(isChecked, parent, node)}
       >
@@ -269,6 +276,18 @@ export const AssignmentSelector = ({
   return (
     <div style={{ height: '70vh' }}>
       <Stack hasGutter>
+        {excludeFqrns.length > 0 && (
+          <StackItem>
+            <Alert
+              variant={'info'}
+              title={__(_(`${excludeFqrns.length} %(plural)s already assigned and excluded from this list.`), {
+                plural: excludeFqrns.length === 1 ? _('Ansible role is') : _('Ansible roles are'),
+              })}
+              ouiaId="AlertModalAlert"
+              isInline
+            />
+          </StackItem>
+        )}
         <StackItem>
           <SearchInput
             style={{ width: '100%' }}

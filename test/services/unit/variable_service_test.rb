@@ -380,7 +380,7 @@ module ForemanAnsibleDirectorTests
               @host.update!(hostgroup: @hostgroup)
             end
 
-            FactoryBot.create(
+            @assignment = FactoryBot.create(
               :ansible_content_assignment,
               consumable: @host,
               assignable_namespace: @collection.namespace,
@@ -431,14 +431,7 @@ module ForemanAnsibleDirectorTests
             assert hiera.any? { |node| node == @hostgroup }
           end
 
-          test 'resolves bindings, variables and hieararchy' do
-            assignment = FactoryBot.create(
-              :ansible_content_assignment,
-              consumable: @host,
-              assignable_namespace: @collection.namespace,
-              assignable_name: @collection.name,
-              assignable_role_name: @collection_role.name
-            )
+          test 'resolves bindings, variables and hierarchy' do
             variable1 = FactoryBot.create(
               :ansible_variable,
               name: 'test_var_1',
@@ -489,7 +482,7 @@ module ForemanAnsibleDirectorTests
             assert_equal @hostgroup, hiera[1]
             # Variable assertions
             assert_equal 1, resolved.length # 1 assignable (@collection_role)
-            assert_equal assignment, resolved[0][:assignment]
+            assert_equal @assignment, resolved[0][:assignment]
             assert_equal 3, resolved[0][:variables].length # 3 variables belonging to @collection_role
             refute_nil resolved[0][:variables].filter { |v| v[:name] == 'test_var_1' }.first[:binding] # Bound to host
             assert_equal "var_1_host", resolved[0][:variables].filter { |v| v[:name] == 'test_var_1' }.first[:binding][:raw_value]
