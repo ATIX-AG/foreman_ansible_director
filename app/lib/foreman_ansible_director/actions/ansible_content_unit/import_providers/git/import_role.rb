@@ -41,7 +41,7 @@ module ForemanAnsibleDirector
               #
               # remote_href = collection_remote_create_action.output['collection_remote_create_response']['pulp_href']
               #
-              # _snyc_action = plan_action(
+              # _sync_action = plan_action(
               #  ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
               #  repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
               #  remote_href: remote_href
