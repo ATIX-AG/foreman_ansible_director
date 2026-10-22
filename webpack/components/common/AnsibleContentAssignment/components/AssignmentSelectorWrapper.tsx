@@ -84,6 +84,11 @@ export const AssignmentSelectorWrapper = ({
       >
         <AssignmentSelector
           availableContent={getAvailableContentRequest.response.results.content}
+          excludeAssignments={
+            assignmentCtx.assignments.filter(assignment =>
+              assignment.consumable_type === assignmentCtx.crnType &&
+              assignment.consumable_id === assignmentCtx.crnId)
+          }
           selected={selectedAssignables}
           onChange={newAssignables => setSelectedAssignables(newAssignables)}
         />
