@@ -32,7 +32,7 @@ module ForemanAnsibleDirector
                 collection_remote_href: remote_href,
                 requirements: new_requirements
               )
-              _snyc_action = plan_action(
+              _sync_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
                 repository_href: repository_href,
                 remote_href: remote_href

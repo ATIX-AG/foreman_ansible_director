@@ -42,7 +42,7 @@ module ForemanAnsibleDirector
                   requirements: existing_unit.requirements_file(new_unit)
                 )
 
-                _snyc_action = plan_action(
+                _sync_action = plan_action(
                   ::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Sync,
                   repository_href: repository_href,
                   remote_href: remote_href
