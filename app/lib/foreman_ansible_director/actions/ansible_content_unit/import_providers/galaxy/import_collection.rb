@@ -58,7 +58,7 @@ module ForemanAnsibleDirector
                 remote_href: remote_href
               )
 
-              _index_action = plan_action(
+              index_action = plan_action(
                 ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::Index::IndexStatic,
                 index_mode: 'import',
                 repository_href: repository_create_action.output['repository_create_response']['pulp_href'],
@@ -69,6 +69,14 @@ module ForemanAnsibleDirector
                 unit_name: unit.unit_name,
                 unit_namespace: unit.unit_namespace,
                 organization_id: organization_id
+              )
+
+              plan_action(
+                ::ForemanAnsibleDirector::Actions::AnsibleContentUnit::ImportProviders::Galaxy::VerifyCollectionImport,
+                requirements: unit.collection_file,
+                unit_namespace: unit.unit_namespace,
+                unit_name: unit.unit_name,
+                indexed_unit_versions: index_action.output[:indexed_unit_versions]
               )
             end
           end

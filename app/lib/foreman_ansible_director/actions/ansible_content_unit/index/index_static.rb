@@ -107,6 +107,14 @@ module ForemanAnsibleDirector
 
             case input[:index_mode]
             when 'import'
+              # Nothing was successfully imported (e.g. every requested collection/version was
+              # invalid). There is no content to persist, and the Pulp objects created for this
+              # import attempt are now orphaned under a deterministic name - clean them up so a
+              # later import of the same unit does not collide with that name.
+              if unit_versions.empty?
+                cleanup_orphaned_pulp_objects
+                return
+              end
 
               unit_record = ::ForemanAnsibleDirector::AnsibleCollection.find_by(name: input[:unit_name],
                 namespace: input[:unit_namespace],
@@ -234,6 +242,40 @@ module ForemanAnsibleDirector
             else
               raise NotImplementedError
             end
+          end
+
+          private
+
+          # Best-effort cleanup of the repository/distribution/remote created for an import that
+          # ended up with no content. Each destroy is attempted independently and failures are
+          # only logged, never raised: a stale Pulp object left behind here will simply surface
+          # again (and be retried) the next time this unit is imported. Letting a cleanup failure
+          # raise here would put this action's finalize step into an :error state, and since
+          # finalize errors default to the Pause rescue strategy, that would require a human to
+          # resume the task instead of the import finishing with a (correct) warning result.
+          def cleanup_orphaned_pulp_objects
+            remote_destroy_class =
+              if input[:content_unit_type] == 'collection'
+                ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Collection::Destroy
+              else
+                ::ForemanAnsibleDirector::Pulp3::Ansible::Remote::Role::Destroy
+              end
+
+            destroy_best_effort(remote_destroy_class, input[:remote_href])
+            destroy_best_effort(
+              ::ForemanAnsibleDirector::Pulp3::Ansible::Distribution::Destroy, input[:distribution_href]
+            )
+            destroy_best_effort(::ForemanAnsibleDirector::Pulp3::Ansible::Repository::Destroy, input[:repository_href])
+          end
+
+          def destroy_best_effort(destroy_class, href)
+            return unless href
+
+            destroy_class.new(href).request
+          rescue StandardError => e
+            action_logger.warn(
+              "Failed to clean up orphaned Pulp object #{href} (#{destroy_class}) after an empty import: #{e.message}"
+            )
           end
         end
       end
