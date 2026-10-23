@@ -41,3 +41,7 @@ Naming/FileName:
 
 Metrics/ParameterLists:
   CountKeywordArgs: false
+
+Rails/BulkChangeTable:
+  Exclude:
+    - db/migrate/*
