@@ -84,6 +84,7 @@ export const VariablesAssignmentTable = ({
                     {<VariablesTable
                       variables={assignment.variables}
                       resolutionHierarchy={resolutionHierarchy}
+                      onDeleteSuccess={variableCtx.refreshVariables}
                       onItemClick={variable => {
                         setSelectedVariable(variable);
                         setSelectedAssignment(assignment);
