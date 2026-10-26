@@ -20,11 +20,11 @@ module ForemanAnsibleDirector
                 source_type: 'galaxy'
               ).includes(:versionable).first
 
-              concurrence do
-                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
-                  repository_href: cuv.pulp_repository_href)
+              sequence do
                 plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
                   distribution_href: cuv.pulp_distribution_href)
+                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
+                  repository_href: cuv.pulp_repository_href)
 
                 if cuv.versionable.collection?
                   plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Destroy,
