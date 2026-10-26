@@ -63,7 +63,7 @@ export const ExecutionEnvEditCard = ({
 
   const [validateBaseImageUrl, setValidateBaseImageUrl] = useState<
     ValidationState
-  >(getDefaultState(executionEnvironment.base_image_url));
+  >(getDefaultState(executionEnvironment.container_image_url));
 
   const [validateAnsibleVersion, setValidateAnsibleVersion] = useState<
     ValidationState
@@ -72,7 +72,7 @@ export const ExecutionEnvEditCard = ({
   useEffect(() => {
     setValidateName(getDefaultState(executionEnvironment.name));
     setValidateBaseImageUrl(
-      getDefaultState(executionEnvironment.base_image_url)
+      getDefaultState(executionEnvironment.container_image_url)
     );
     setValidateAnsibleVersion(
       getDefaultState(executionEnvironment.ansible_version)
@@ -146,7 +146,7 @@ export const ExecutionEnvEditCard = ({
             <TextInputEditable
               validated={validateBaseImageUrl}
               isEditable={editMode}
-              value={executionEnvironment.base_image_url}
+              value={executionEnvironment.container_image_url}
               setValue={handleBaseImageChange}
             />
           </FormGroup>

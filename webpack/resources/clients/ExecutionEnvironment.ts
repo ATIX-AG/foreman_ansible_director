@@ -1,11 +1,12 @@
 import { AnsibleExecutionEnv } from '../../types/AnsibleExecutionEnvTypes';
 import { ApiResponse, backendRequest } from '../backendClient';
 import { Organizable } from '../types';
+import { Task } from '../../types/common';
 
 export interface ExecutionEnvironmentCreatePayload extends Organizable {
   execution_environment: Pick<
     AnsibleExecutionEnv,
-    'name' | 'base_image_url' | 'ansible_version'
+    'name' | 'container_image_url' | 'ansible_version'
   >;
 }
 
@@ -33,6 +34,7 @@ export class ExecutionEnvironment {
       payload: createParams,
     });
   }
+
   static update (
     id: number,
     updateParams: ExecutionEnvironmentUpdatePayload
