@@ -4,13 +4,13 @@ module ForemanAnsibleDirector
   class ExecutionEnvironmentService < ::ForemanAnsibleDirector::AnsibleDirectorService
     class << self
       def create_execution_environment(name:,
-                                       base_image_url:,
+                                       container_image_url:,
                                        ansible_version:,
                                        organization_id:)
         # ActiveRecord::Base.transaction do
         env = ::ForemanAnsibleDirector::ExecutionEnvironment.create!(
           name: name,
-          base_image_url: base_image_url,
+          container_image_url: container_image_url,
           ansible_version: ansible_version,
           organization_id: organization_id,
           build_status: 'pending'
@@ -24,13 +24,13 @@ module ForemanAnsibleDirector
 
       def edit_execution_environment(execution_environment:,
                                      name:,
-                                     base_image_url:,
+                                     container_image_url:,
                                      ansible_version:)
         # TODO: Disabling this transaction as it locks up the task for an unknown reason
         # ActiveRecord::Base.transaction do
         execution_environment.update!(
           name: name,
-          base_image_url: base_image_url,
+          container_image_url: container_image_url,
           ansible_version: ansible_version
         )
         new_hash = execution_environment.generate_content_hash
@@ -90,7 +90,7 @@ module ForemanAnsibleDirector
         env_definition = {
           id: execution_environment.id,
           content: {
-            base_image: execution_environment.base_image_url,
+            base_image: execution_environment.container_image_url,
             ansible_core_version: execution_environment.ansible_version,
             content_units: execution_environment.content_unit_versions.map do |cuv|
               {
