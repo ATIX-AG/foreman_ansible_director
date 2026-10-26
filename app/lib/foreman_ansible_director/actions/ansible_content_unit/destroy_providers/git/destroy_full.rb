@@ -16,11 +16,11 @@ module ForemanAnsibleDirector
 
               cuv = ::ForemanAnsibleDirector::ContentUnitVersion.find_by(id: unit_version_id)
 
-              concurrence do
-                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
-                  repository_href: cuv.pulp_repository_href)
+              sequence do
                 plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
                   distribution_href: cuv.pulp_distribution_href)
+                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
+                  repository_href: cuv.pulp_repository_href)
 
                 plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Destroy,
                   git_remote_href: cuv.pulp_remote_href)
