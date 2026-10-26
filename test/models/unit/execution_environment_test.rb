@@ -33,7 +33,7 @@ module ForemanAnsibleDirectorTests
           test 'must be unique within an organization' do
             duplicate = described_class.new(
               name: @execution_environment.name,
-              base_image_url: 'quay.io/ansible/another-ee:latest',
+              container_image_url: 'quay.io/ansible/another-ee:latest',
               ansible_version: '2.20.0',
               organization: @organization
             )
@@ -46,7 +46,7 @@ module ForemanAnsibleDirectorTests
             other_organization = Organization.find_by(name: 'Organization 2')
             duplicate = described_class.new(
               name: @execution_environment.name,
-              base_image_url: 'quay.io/ansible/another-ee:latest',
+              container_image_url: 'quay.io/ansible/another-ee:latest',
               ansible_version: '2.20.0',
               organization: other_organization
             )
@@ -55,22 +55,22 @@ module ForemanAnsibleDirectorTests
           end
         end
 
-        describe '#base_image_url' do
+        describe '#container_image_url' do
           test 'must not be empty' do
             ee = described_class.create(
                 name: "MyEE",
               )
             assert_not ee.valid?
-            assert_includes ee.errors[:base_image_url], 'Execution Environment base image URL cannot be blank.'
+            assert_includes ee.errors[:container_image_url], 'Execution Environment container image URL cannot be blank.'
           end
 
           test 'must not exceed 255 characters' do
             ee = described_class.create(
                 name: "MyEE",
-                base_image_url: "A" * 256,
+                container_image_url: "A" * 256,
               )
             assert_not ee.valid?
-            assert_includes ee.errors[:base_image_url], 'is too long (maximum is 255 characters)'
+            assert_includes ee.errors[:container_image_url], 'is too long (maximum is 255 characters)'
           end
         end
 
@@ -78,7 +78,7 @@ module ForemanAnsibleDirectorTests
           test 'must not be empty' do
             ee = described_class.create(
               name: "MyEE",
-              base_image_url: "https://quay.io/fedora/fedora:42"
+              container_image_url: "https://quay.io/fedora/fedora:42"
             )
             assert_not ee.valid?
             assert_includes ee.errors[:ansible_version], 'Ansible Version cannot be blank.'
@@ -89,7 +89,7 @@ module ForemanAnsibleDirectorTests
           test 'must not be empty' do
             ee = described_class.create(
               name: 'MyEE',
-              base_image_url: 'https://quay.io/fedora/fedora:42',
+              container_image_url: 'https://quay.io/fedora/fedora:42',
               ansible_version: '2.20.0'
             )
 
@@ -199,7 +199,7 @@ module ForemanAnsibleDirectorTests
           test 'changes when base image changes' do
             original_hash = @execution_environment.generate_content_hash
 
-            @execution_environment.base_image_url = 'quay.io/ansible/other-ee:latest'
+            @execution_environment.container_image_url = 'quay.io/ansible/other-ee:latest'
             @execution_environment.save!
 
             assert_not_equal original_hash, @execution_environment.generate_content_hash
@@ -209,14 +209,14 @@ module ForemanAnsibleDirectorTests
             @collection2 = FactoryBot.create(:ansible_collection, organization: @organization)
             @version2 = FactoryBot.create(:content_unit_version, versionable: @collection2, version: '1.0.0')
 
-            original_base_image_url = @execution_environment.base_image_url
+            original_container_image_url = @execution_environment.container_image_url
             original_ansible_version = @execution_environment.ansible_version
             assignment_1 = @execution_environment.add_content_unit(@collection, @version)
             @execution_environment.add_content_unit(@collection2, @version2)
 
             original_hash = @execution_environment.generate_content_hash
 
-            @execution_environment.base_image_url = 'quay.io/ansible/other-ee:latest'
+            @execution_environment.container_image_url = 'quay.io/ansible/other-ee:latest'
             @execution_environment.ansible_version = 'MyEE'
             @execution_environment.save!
             assignment_1.destroy!
@@ -224,7 +224,7 @@ module ForemanAnsibleDirectorTests
 
             assert_not_equal original_hash, @execution_environment.generate_content_hash
 
-            @execution_environment.base_image_url = original_base_image_url
+            @execution_environment.container_image_url = original_container_image_url
             @execution_environment.ansible_version = original_ansible_version
             @execution_environment.save!
             @execution_environment.add_content_unit(@collection, @version)

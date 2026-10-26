@@ -31,14 +31,14 @@ module ForemanAnsibleDirectorTests
 
             ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
               name: "test_ee",
-              base_image_url: "quay.io/ansible/base-ee:latest",
+              container_image_url: "quay.io/ansible/base-ee:latest",
               ansible_version: "2.20.0",
               organization_id: @organization.id
             )
 
             assert_not_nil ee
             assert_equal 'test_ee', ee.name
-            assert_equal 'quay.io/ansible/base-ee:latest', ee.base_image_url
+            assert_equal 'quay.io/ansible/base-ee:latest', ee.container_image_url
             assert_equal '2.20.0', ee.ansible_version
           end
 
@@ -56,7 +56,7 @@ module ForemanAnsibleDirectorTests
             }) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
                 name: "test_ee",
-                base_image_url: "quay.io/ansible/base-ee:latest",
+                container_image_url: "quay.io/ansible/base-ee:latest",
                 ansible_version: "2.20.0",
                 organization_id: @organization.id
               )
@@ -74,7 +74,7 @@ module ForemanAnsibleDirectorTests
             assert_raises(ActiveRecord::RecordInvalid) do
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
                 name: nil,
-                base_image_url: "quay.io/ansible/base-ee:latest",
+                container_image_url: "quay.io/ansible/base-ee:latest",
                 ansible_version: "2.20.0",
                 organization_id: @organization.id
               )
@@ -94,13 +94,13 @@ module ForemanAnsibleDirectorTests
             ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
               execution_environment: @execution_environment,
               name: "updated_ee",
-              base_image_url: "quay.io/ansible/updated-ee:latest",
+              container_image_url: "quay.io/ansible/updated-ee:latest",
               ansible_version: "2.19.0"
             )
             @execution_environment.reload
 
             assert_equal 'updated_ee', @execution_environment.name
-            assert_equal 'quay.io/ansible/updated-ee:latest', @execution_environment.base_image_url
+            assert_equal 'quay.io/ansible/updated-ee:latest', @execution_environment.container_image_url
             assert_equal '2.19.0', @execution_environment.ansible_version
           end
 
@@ -119,7 +119,7 @@ module ForemanAnsibleDirectorTests
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
                 name: "edited_name",
-                base_image_url: @execution_environment.base_image_url,
+                container_image_url: @execution_environment.container_image_url,
                 ansible_version: @execution_environment.ansible_version
               )
             end
@@ -138,7 +138,7 @@ module ForemanAnsibleDirectorTests
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
                 name: @execution_environment.name,
-                base_image_url: "quay.io/fedora/fedora:42",
+                container_image_url: "quay.io/fedora/fedora:42",
                 ansible_version: @execution_environment.ansible_version
               )
             end
@@ -159,7 +159,7 @@ module ForemanAnsibleDirectorTests
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
                 name: @execution_environment.name,
-                base_image_url: @execution_environment.base_image_url,
+                container_image_url: @execution_environment.container_image_url,
                 ansible_version: "2.19.3"
               )
             end
@@ -177,7 +177,7 @@ module ForemanAnsibleDirectorTests
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
                 execution_environment: @execution_environment,
                 name: nil,
-                base_image_url: 'quay.io/ansible/base-ee:latest',
+                container_image_url: 'quay.io/ansible/base-ee:latest',
                 ansible_version: '2.19.0'
               )
             end
@@ -235,7 +235,7 @@ module ForemanAnsibleDirectorTests
             assert task_called
             assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
             assert_not_nil env_def
-            assert_equal @execution_environment.base_image_url, env_def[:content][:base_image]
+            assert_equal @execution_environment.container_image_url, env_def[:content][:base_image]
             assert_equal @execution_environment.ansible_version, env_def[:content][:ansible_core_version]
             assert_equal 0, env_def[:content][:content_units].length
           end

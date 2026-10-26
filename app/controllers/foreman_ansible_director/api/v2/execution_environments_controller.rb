@@ -40,7 +40,7 @@ module ForemanAnsibleDirector
             desc: N_('Execution Environment name.'),
             example: 'MyExecutionEnvironment',
             required: true
-          param :base_image_url,
+          param :container_image_url,
             String,
             desc: N_('Execution Environment base image URL. The image must be pullable by an unauthenticated user.'),
             example: 'registry.fedoraproject.org/fedora:43',
@@ -62,7 +62,7 @@ module ForemanAnsibleDirector
             "organization_id": 1,
             "execution_environment": {
               "name": "EE-2.20.0",
-              "base_image_url": "quay.io/fedora/fedora:42",
+              "container_image_url": "quay.io/fedora/fedora:42",
               "ansible_version": "2.20.0"
             }
           }
@@ -74,7 +74,7 @@ module ForemanAnsibleDirector
 
           ::ForemanAnsibleDirector::ExecutionEnvironmentService.create_execution_environment(
             name: permitted_params[:name],
-            base_image_url: permitted_params[:base_image_url],
+            container_image_url: permitted_params[:container_image_url],
             ansible_version: permitted_params[:ansible_version],
             organization_id: @organization.id
           )
@@ -88,7 +88,7 @@ module ForemanAnsibleDirector
             desc: N_('Execution Environment name.'),
             example: 'MyExecutionEnvironment',
             required: false
-          param :base_image_url,
+          param :container_image_url,
             String,
             desc: N_('Execution Environment base image URL. The image must be pullable by an unauthenticated user.'),
             example: 'registry.fedoraproject.org/fedora:43',
@@ -109,7 +109,7 @@ module ForemanAnsibleDirector
           {
             "execution_environment": {
               "name": "EE-2.20.0",
-              "base_image_url": "quay.io/fedora/fedora:42",
+              "container_image_url": "quay.io/fedora/fedora:42",
               "ansible_version": "2.20.0"
             }
           }
@@ -122,7 +122,7 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::ExecutionEnvironmentService.edit_execution_environment(
             execution_environment: @execution_environment,
             name: permitted_params[:name],
-            base_image_url: permitted_params[:base_image_url],
+            container_image_url: permitted_params[:container_image_url],
             ansible_version: permitted_params[:ansible_version]
           )
         end
@@ -148,7 +148,7 @@ module ForemanAnsibleDirector
         def execution_environment_params
           params.require(:execution_environment).permit(
             :name,
-            :base_image_url,
+            :container_image_url,
             :ansible_version
             # content: %i[
             #  id

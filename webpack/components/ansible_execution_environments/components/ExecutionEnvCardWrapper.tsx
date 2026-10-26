@@ -117,7 +117,7 @@ export const ExecutionEnvCardWrapper = ({
       func: ExecutionEnvironment.update(env.id, {
         execution_environment: {
           name: env.name,
-          base_image_url: env.base_image_url,
+          container_image_url: env.container_image_url,
           ansible_version: env.ansible_version,
         },
       }),

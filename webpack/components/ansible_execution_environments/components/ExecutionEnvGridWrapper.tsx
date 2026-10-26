@@ -80,7 +80,7 @@ const ExecutionEnvGridWrapper = ({
         organization_id: organization.id,
         execution_environment: {
           name: env.name,
-          base_image_url: env.base_image_url,
+          container_image_url: env.container_image_url,
           ansible_version: env.ansible_version,
         },
       }),

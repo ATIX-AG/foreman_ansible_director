@@ -6,7 +6,7 @@ export interface Identifiable {
 
 export interface AnsibleExecutionEnvBase {
   name: string;
-  base_image_url: string;
+  container_image_url: string;
   ansible_version: string;
   image_hash?: string;
   image_url?: string;

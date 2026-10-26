@@ -59,7 +59,7 @@ export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
       onBaseImageUrlChange={(baseImageUrl: string) => {
         setExecutionEnvironment({
           ...executionEnvironment,
-          base_image_url: baseImageUrl,
+          container_image_url: baseImageUrl,
         });
       }}
       onAnsibleVersionChange={(ansibleVersion: string) => {
