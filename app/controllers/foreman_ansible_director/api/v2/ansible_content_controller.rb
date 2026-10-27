@@ -58,7 +58,7 @@ module ForemanAnsibleDirector
         EXAMPLE
         # endregion
         def create_units
-          resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_import_payload(
+          resolved = ::ForemanAnsibleDirector::ContentService.resolve_import_payload(
             params[:units]
           )
           @bulk_create_task = ::ForemanAnsibleDirector::ActionService.trigger(
@@ -119,7 +119,7 @@ module ForemanAnsibleDirector
         EXAMPLE
         # endregion
         def destroy_units
-          resolved = ::ForemanAnsibleDirector::AnsibleContent::AnsibleContentHelpers.resolve_destroy_payload(
+          resolved = ::ForemanAnsibleDirector::ContentService.resolve_destroy_payload(
             destroy_params
           )
           @bulk_destroy_task = ::ForemanAnsibleDirector::ActionService.trigger(
