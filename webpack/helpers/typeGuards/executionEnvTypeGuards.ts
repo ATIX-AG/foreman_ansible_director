@@ -5,4 +5,4 @@ import {
 
 export const isAnsibleExecutionEnv = (
   env: AnsibleExecutionEnv | AnsibleExecutionEnvCreate
-): env is AnsibleExecutionEnv => 'build_status' in env;
+): env is AnsibleExecutionEnv => 'status' in env;

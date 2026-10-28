@@ -20,8 +20,8 @@ export interface ExecutionEnvContentUnit extends Identifiable {
 }
 
 export interface AnsibleExecutionEnv extends Identifiable, AnsibleExecutionEnvBase {
-  build_status: 'pending' | 'running' | 'success' | 'failed';
-  build_job: string;
+  status: 'pending' | 'running' | 'success' | 'failed';
+  latest_task_id: string;
 }
 
 export interface AnsibleExecutionEnvCreate extends AnsibleExecutionEnvBase {}

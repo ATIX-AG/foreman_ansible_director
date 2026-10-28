@@ -42,7 +42,10 @@ module ForemanAnsibleDirector
             required: true
           param :container_image_url,
             String,
-            desc: N_('Execution Environment base image URL. The image must be pullable by an unauthenticated user.'),
+            desc: <<~DESC,
+              Execution Environment container image URL.
+              The container image must be pullable by an unauthenticated user.
+            DESC
             example: 'registry.fedoraproject.org/fedora:43',
             required: true
           # TRANSLATORS: ApiDoc, do not translate!
@@ -90,7 +93,10 @@ module ForemanAnsibleDirector
             required: false
           param :container_image_url,
             String,
-            desc: N_('Execution Environment base image URL. The image must be pullable by an unauthenticated user.'),
+            desc: <<~DESC,
+              Execution Environment container image URL.
+              The container image must be pullable by an unauthenticated user.
+            DESC
             example: 'registry.fedoraproject.org/fedora:43',
             required: false
           # TRANSLATORS: ApiDoc, do not translate!

@@ -74,8 +74,8 @@ module ForemanAnsibleDirector
         name: name,
         container_image_url: container_image_url,
         ansible_version: ansible_version,
-        build_status: build_status,
-        build_job: build_job,
+        status: status,
+        latest_task_id: latest_task_id,
         content: [],
       }
     end

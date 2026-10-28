@@ -59,7 +59,7 @@ module ForemanAnsibleDirector
           env = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(id: input[:execution_environment_id])
 
           env.update!(
-            build_status: (output[:task]&.[](:success) ? 'success' : 'failed')
+            status: (output[:task]&.[](:success) ? 'success' : 'failed')
           )
         end
       end

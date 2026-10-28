@@ -13,10 +13,10 @@ module ForemanAnsibleDirector
           container_image_url: container_image_url,
           ansible_version: ansible_version,
           organization_id: organization_id,
-          build_status: 'pending'
+          status: 'pending'
         )
         task = build_execution_environment env
-        env.update!(content_hash: env.generate_content_hash, build_job: task.id)
+        env.update!(content_hash: env.generate_content_hash, latest_task_id: task.id)
 
         env
         # end
@@ -36,7 +36,7 @@ module ForemanAnsibleDirector
         new_hash = execution_environment.generate_content_hash
         if new_hash != execution_environment.content_hash
           task = build_execution_environment execution_environment
-          execution_environment.update!(content_hash: new_hash, build_job: task.id)
+          execution_environment.update!(content_hash: new_hash, latest_task_id: task.id)
         end
         execution_environment
         # end
@@ -83,7 +83,7 @@ module ForemanAnsibleDirector
         )
 
         unless build_proxy
-          execution_environment.update!(build_status: 'failed')
+          execution_environment.update!(status: 'failed')
           ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::NoProxyForBuild.new, critical: true)
         end
 
@@ -108,7 +108,7 @@ module ForemanAnsibleDirector
 
         push_url = "#{registry_base_url}/#{image_name}"
 
-        execution_environment.update!(build_status: 'running')
+        execution_environment.update!(status: 'running')
 
         ::ForemanAnsibleDirector::ActionService.trigger(
           ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
