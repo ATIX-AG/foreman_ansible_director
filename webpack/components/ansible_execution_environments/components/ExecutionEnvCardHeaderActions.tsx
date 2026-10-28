@@ -40,7 +40,7 @@ export const ExecutionEnvCardHeaderActions = ({
   handleAbort,
 }: ExecutionEnvCardHeaderActionsProps): ReactElement => {
   const statusIcon = (env: AnsibleExecutionEnv): ReactElement => {
-    switch (env.build_status) {
+    switch (env.status) {
       case 'success':
         return (
           <Icon status="success" size="lg">
@@ -69,7 +69,7 @@ export const ExecutionEnvCardHeaderActions = ({
   };
 
   const statusMessage = (env: AnsibleExecutionEnv): string => {
-    switch (env.build_status) {
+    switch (env.status) {
       case 'success':
         return _('Foreman successfully built this Execution Environment.');
       case 'failed':
@@ -95,7 +95,7 @@ export const ExecutionEnvCardHeaderActions = ({
             'aria-label': _('build status popover'),
             headerComponent: 'h1',
             headerContent: __(_('Build %(status)s'), {
-              status: executionEnvironment.build_status,
+              status: executionEnvironment.status,
             }),
             bodyContent: <div>{statusMessage(executionEnvironment)}</div>,
           }}
@@ -104,7 +104,7 @@ export const ExecutionEnvCardHeaderActions = ({
           onClick={() => {
             const baseUrl = window.location.origin;
             window.open(
-              `${baseUrl}/foreman_tasks/tasks/${executionEnvironment.build_job}`,
+              `${baseUrl}/foreman_tasks/tasks/${executionEnvironment.latest_task_id}`,
               '_blank'
             );
           }}

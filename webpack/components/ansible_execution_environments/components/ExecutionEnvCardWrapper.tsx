@@ -97,7 +97,7 @@ export const ExecutionEnvCardWrapper = ({
   useEffect(() => {
     if (
       getExecutionEnvResponse.status === 'RESOLVED' &&
-      getExecutionEnvResponse.response?.results?.build_status === 'running'
+      getExecutionEnvResponse.response?.results?.status === 'running'
     ) {
       startPolling();
     } else {
