@@ -2,7 +2,7 @@
 
 collection @execution_environments
 
-attributes :id, :name, :container_image_url, :ansible_version, :image_hash, :image_url, :build_status, :build_job
+attributes :id, :name, :container_image_url, :ansible_version, :image_hash, :image_url, :status, :latest_task_id
 
 child execution_environment_content_units: :content do
   node :id do |eecu|
