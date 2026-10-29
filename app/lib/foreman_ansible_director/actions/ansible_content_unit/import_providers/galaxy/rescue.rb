@@ -5,11 +5,21 @@ module ForemanAnsibleDirector
     module AnsibleContentUnit
       module ImportProviders
         module Galaxy
+          # Cleans up the repository/distribution/remote Pulp objects created for an import.
+          #
+          # This action is planned twice by ImportCollection:
+          # - Right after the create actions, to clean up and fail the import if any of the Pulp
+          #   objects failed to be created (+pulp_failure+).
+          # - After indexing/verification, to clean up objects that are orphaned because the
+          #   import ended up with no content at all, e.g. because every requested
+          #   collection/version was invalid. This case does not fail the import (+pulp_failure+
+          #   is false) - the surrounding task still finishes with a warning, raised by
+          #   VerifyCollectionImport.
           class Rescue < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
             input_format do
-              param :repository_create_action, Hash
-              param :distribution_create_action, Hash
-              param :collection_remote_create_action, Hash
+              param :repository_href, String, required: true
+              param :distribution_href, String, required: true
+              param :remote_href, String, required: true
               param :skip_repository_cleanup, Boolean
               param :skip_distribution_cleanup, Boolean
               param :skip_remote_cleanup, Boolean
@@ -17,22 +27,14 @@ module ForemanAnsibleDirector
             end
 
             def plan(args)
-              repository_create_action = args[:repository_create_action]
-              distribution_create_action = args[:distribution_create_action]
-              collection_remote_create_action = args[:collection_remote_create_action]
-
-              repository_href = repository_create_action['repository_create_response']['pulp_href']
-              distribution_href = distribution_create_action['distribution_create_response']['pulp_href']
-              remote_href = collection_remote_create_action['collection_remote_create_response']['pulp_href']
-
               plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
-                repository_href: repository_href,
+                repository_href: args[:repository_href],
                 skip: args[:skip_repository_cleanup])
               plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
-                distribution_href: distribution_href,
+                distribution_href: args[:distribution_href],
                 skip: args[:skip_distribution_cleanup])
               plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Collection::Destroy,
-                collection_remote_href: remote_href,
+                collection_remote_href: args[:remote_href],
                 skip: args[:skip_remote_cleanup])
 
               plan_self(
