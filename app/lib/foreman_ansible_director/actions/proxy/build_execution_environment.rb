@@ -20,14 +20,22 @@ module ForemanAnsibleDirector
         end
 
         def invoke_external_task
-          ::ForemanAnsibleDirector::Proxy::Dynflow::SingleBatchAction.new(
-            input[:proxy_id],
-            input[:proxy_task_id],
-            'meta',
-            'Proxy::AnsibleDirector::Actions::Meta::BuildPushEe',
-            execution_environment: input[:execution_environment_definition],
-            push_url: input[:push_url]
-          ).request
+          begin
+            ::ForemanAnsibleDirector::Proxy::Dynflow::SingleBatchAction.new(
+              input[:proxy_id],
+              input[:proxy_task_id],
+              'meta',
+              'Proxy::AnsibleDirector::Actions::Meta::BuildPushEe',
+              execution_environment: input[:execution_environment_definition],
+              push_url: input[:push_url]
+            ).request
+          rescue StandardError => _e
+            {
+              progress: 1,
+              external_output: nil,
+              success: false,
+            }
+          end
           nil
         end
 
@@ -55,12 +63,8 @@ module ForemanAnsibleDirector
           4
         end
 
-        def finalize
-          env = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(id: input[:execution_environment_id])
-
-          env.update!(
-            status: (output[:task]&.[](:success) ? 'success' : 'failed')
-          )
+        def rescue_strategy_for_self
+          Dynflow::Action::Rescue::Skip
         end
       end
     end
