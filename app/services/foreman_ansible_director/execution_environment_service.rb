@@ -111,7 +111,7 @@ module ForemanAnsibleDirector
         execution_environment.update!(status: 'running')
 
         ::ForemanAnsibleDirector::ActionService.trigger(
-          ::ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment,
+          ::ForemanAnsibleDirector::Actions::ExecutionEnvironment::Build,
           task_args: {
             proxy_id: build_proxy.id,
             proxy_task_id: SecureRandom.uuid,

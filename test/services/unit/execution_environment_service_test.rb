@@ -63,7 +63,7 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::ExecutionEnvironment::Build", action_name
             assert_not_nil env_def
           end
 
@@ -144,7 +144,7 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::ExecutionEnvironment::Build", action_name
             assert_not_nil env_def
 
             task_called = false
@@ -165,7 +165,7 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::ExecutionEnvironment::Build", action_name
             assert_not_nil env_def
 
           end
@@ -233,7 +233,7 @@ module ForemanAnsibleDirectorTests
             end
 
             assert task_called
-            assert_equal "ForemanAnsibleDirector::Actions::Proxy::BuildExecutionEnvironment", action_name
+            assert_equal "ForemanAnsibleDirector::Actions::ExecutionEnvironment::Build", action_name
             assert_not_nil env_def
             assert_equal @execution_environment.container_image_url, env_def[:content][:base_image]
             assert_equal @execution_environment.ansible_version, env_def[:content][:ansible_core_version]
