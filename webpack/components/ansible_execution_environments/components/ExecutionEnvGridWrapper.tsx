@@ -21,6 +21,9 @@ import {
 import { ExecutionEnvironment as ExecutionEnvironmentClient } from '../../../resources/clients/ExecutionEnvironment';
 import { useToasts } from '../../../helpers/toasts/useToasts';
 import { Page } from '../../common/Page';
+import { PermittedButton } from '../../common/PermittedButton';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
+import { ExecutionEnvImportModal } from './ExecutionEnvImportModal';
 
 export interface GetAnsibleExecutionEnvResponse extends IndexResponse {
   results: ExecutionEnvironment[];
@@ -33,6 +36,8 @@ interface ExecutionEnvGridWrapperProps {
 const ExecutionEnvGridWrapper = ({
   initialSearch,
 }: ExecutionEnvGridWrapperProps): ReactElement | null => {
+
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState<boolean>(false);
 
   const organization = useForemanOrganization();
   const { withToast } = useToasts();
@@ -84,7 +89,15 @@ const ExecutionEnvGridWrapper = ({
 
         <Page
           header={_('Ansible Execution Environments')}
-          customToolbarItems={[]}
+          customToolbarItems={[
+            <PermittedButton
+              onClick={() => setIsImportModalOpen(true)}
+              requiredPermissions={[AdPermissions.executionEnvironments.create]}
+              variant={'secondary'}
+            >
+              {_('Import Execution Environment')}
+            </PermittedButton>,
+          ]}
           hasDocumentation={false}
           searchBar={
             <SearchBar
@@ -100,14 +113,26 @@ const ExecutionEnvGridWrapper = ({
             />
           }
         >
-          <ExecutionEnvGrid
-            apiResponse={executionEnvResponse.response}
-            onPagination={onPagination}
-            search={params.search as string}
-            onSearch={onSearch}
-            createEnvAction={createEnvAction}
-            refreshRequest={refreshRequest}
-          />
+          <>
+            <ExecutionEnvGrid
+              apiResponse={executionEnvResponse.response}
+              onPagination={onPagination}
+              search={params.search as string}
+              onSearch={onSearch}
+              createEnvAction={createEnvAction}
+              refreshRequest={refreshRequest}
+              onImportButtonClick={() => setIsImportModalOpen(true)}
+            />
+            {isImportModalOpen && (
+              <ExecutionEnvImportModal
+                onAbort={() => setIsImportModalOpen(false)}
+                onImportSuccess={() => {
+                  setIsImportModalOpen(false);
+                  refreshRequest();
+                }}
+              />
+            )}
+          </>
         </Page>
       );
     }

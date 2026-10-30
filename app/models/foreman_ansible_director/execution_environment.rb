@@ -13,15 +13,19 @@ module ForemanAnsibleDirector
       presence: { message: 'Execution Environment name cannot be blank.' },
       length: { maximum: 255 },
       uniqueness: { scope: :organization_id }
-    validates :container_image_url, presence: { message: 'Execution Environment container image URL cannot be blank.' },
+    validates :container_image_url, presence: { if: -> { self[:source] == 'image_build' },
+                                                message: 'Execution Environment container image URL cannot be blank.' },
               length: { maximum: 255 }
 
-    validates :ansible_version, presence: { message: 'Ansible Version cannot be blank.' }
+    validates :ansible_version, presence: { if: -> { self[:source] == 'image_build' },
+                                            message: 'Ansible Version cannot be blank.' }
     validates :organization_id, presence: true
 
     scoped_search on: :name, complete_value: true
     scoped_search on: :container_image_url, complete_value: true
     scoped_search on: :ansible_version, complete_value: true
+
+    enum source: { image_build: 0, image_import: 1 }
 
     def registry_url!
       staging_product = ::Katello::Product.find_by(
@@ -44,8 +48,19 @@ module ForemanAnsibleDirector
           "Execution Environment unavailable: Repository #{image_path}
             not found. Try rebuilding Execution Environment #{self[:name]}."
       end
+      if source == 'image_build'
+        "#{SETTINGS[:fqdn]}/#{image_path}:latest"
+      else
+        full_paths = environment_repo.repositories.map(&:full_path)
 
-      "#{SETTINGS[:fqdn]}/#{image_path}:latest"
+        unless full_paths.length == 1
+          raise ForemanTasks::Task::TaskCancelledException,
+            "Execution Environment unavailable: The Repository #{image_path}
+            supplies multiple container images. Try rebuilding Execution Environment #{self[:name]}."
+        end
+
+        "#{full_paths.first}:#{self[:container_image_url].split(':').last}"
+      end
     end
 
     def rebuild_necessary?
@@ -72,6 +87,7 @@ module ForemanAnsibleDirector
       {
         id: id,
         name: name,
+        source: source,
         container_image_url: container_image_url,
         ansible_version: ansible_version,
         status: status,

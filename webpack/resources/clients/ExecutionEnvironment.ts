@@ -1,27 +1,38 @@
-import { AnsibleExecutionEnv } from '../../types/AnsibleExecutionEnvTypes';
+import {
+  ExecutionEnvironment as ExecutionEnvironmentType,
+  ExecutionEnvironmentDraft,
+} from '../../types/AnsibleExecutionEnvTypes';
 import { ApiResponse, backendRequest } from '../backendClient';
 import { Organizable } from '../types';
 import { Task } from '../../types/common';
 
 export interface ExecutionEnvironmentCreatePayload extends Organizable {
+  execution_environment: ExecutionEnvironmentDraft;
+}
+
+export interface ExecutionEnvironmentImportPayload extends Organizable {
   execution_environment: Pick<
-    AnsibleExecutionEnv,
-    'name' | 'container_image_url' | 'ansible_version'
+    ExecutionEnvironmentDraft,
+    'name' | 'container_image_url'
   >;
 }
 
-export interface ExecutionEnvironmentUpdatePayload {
-  execution_environment: Partial<
-    ExecutionEnvironmentCreatePayload['execution_environment']
-  >;
+export interface ExecutionEnvironmentUpdateFullPayload {
+  execution_environment: Partial<ExecutionEnvironmentDraft>;
+}
+
+export interface ExecutionEnvironmentUpdatePartialPayload {
+  execution_environment: Partial<ExecutionEnvironmentUpdateFullPayload>;
 }
 
 export class ExecutionEnvironment {
   static create (
     createParams: ExecutionEnvironmentCreatePayload
-  ): Promise<ApiResponse<AnsibleExecutionEnv, never, never, never, never>> {
+  ): Promise<
+    ApiResponse<ExecutionEnvironmentType, never, never, never, never>
+  > {
     return backendRequest<
-      AnsibleExecutionEnv,
+      ExecutionEnvironmentType,
       never,
       never,
       never,
@@ -35,17 +46,70 @@ export class ExecutionEnvironment {
     });
   }
 
+  static import (
+    importParams: ExecutionEnvironmentImportPayload
+  ): Promise<
+    ApiResponse<
+      ExecutionEnvironmentType,
+      never,
+      never,
+      never,
+      never
+    >
+  > {
+    return backendRequest<
+      ExecutionEnvironmentType,
+      never,
+      never,
+      never,
+      never,
+      ExecutionEnvironmentImportPayload,
+      never,
+      never
+    >({
+      method: 'POST',
+      path: '/api/v2/ansible_director/execution_environments/import',
+      payload: importParams,
+    });
+  }
+
   static update (
     id: number,
-    updateParams: ExecutionEnvironmentUpdatePayload
-  ): Promise<ApiResponse<never, AnsibleExecutionEnv, never, never, never>> {
+    updateParams: ExecutionEnvironmentUpdateFullPayload
+  ): Promise<
+    ApiResponse<never, ExecutionEnvironmentType, never, never, never>
+  > {
     return backendRequest<
       never,
-      AnsibleExecutionEnv,
+      ExecutionEnvironmentType,
       never,
       never,
       never,
-      ExecutionEnvironmentUpdatePayload,
+      ExecutionEnvironmentUpdateFullPayload,
+      { id: number }
+    >({
+      method: 'PUT',
+      path: '/api/v2/ansible_director/execution_environments/:id',
+      payload: updateParams,
+      queryParams: {
+        id,
+      },
+    });
+  }
+
+  static update_partial (
+    id: number,
+    updateParams: ExecutionEnvironmentUpdatePartialPayload
+  ): Promise<
+    ApiResponse<never, ExecutionEnvironmentType, never, never, never>
+  > {
+    return backendRequest<
+      never,
+      ExecutionEnvironmentType,
+      never,
+      never,
+      never,
+      ExecutionEnvironmentUpdatePartialPayload,
       { id: number }
     >({
       method: 'PATCH',
@@ -59,11 +123,13 @@ export class ExecutionEnvironment {
 
   static destroy (
     id: number
-  ): Promise<ApiResponse<never, never, AnsibleExecutionEnv, never, never>> {
+  ): Promise<
+    ApiResponse<never, never, ExecutionEnvironmentType, never, never>
+  > {
     return backendRequest<
       never,
       never,
-      AnsibleExecutionEnv,
+      ExecutionEnvironmentType,
       never,
       never,
       never,

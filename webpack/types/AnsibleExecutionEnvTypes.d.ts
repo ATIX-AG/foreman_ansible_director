@@ -26,6 +26,12 @@ export interface ExecutionEnvironmentBuilt extends ExecutionEnvironment {
   content: AnsibleContentUnitAssignment[];
 }
 
+export interface ExecutionEnvironmentImported extends ExecutionEnvironment {
+  source: 'image_import';
+  ansible_version: string | null;
+  content: null;
+}
+
 export interface ExecutionEnvironmentDraft {
   name: string;
   container_image_url: string;

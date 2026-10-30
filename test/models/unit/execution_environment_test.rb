@@ -148,7 +148,7 @@ module ForemanAnsibleDirectorTests
             assert error.message.include? 'Repository'
           end
 
-          test 'returns pullable path of image' do
+          test 'image_build: returns pullable path with :latest tag' do
             as_admin do
               repository_type_manager = ::Katello::RepositoryTypeManager
               partial_repository_types = {
@@ -171,10 +171,87 @@ module ForemanAnsibleDirectorTests
                 product: product
               )
 
+              @execution_environment.update!(source: :image_build)
               expected_path = "#{SETTINGS[:fqdn]}/id/#{@organization.id}/#{product.id}/#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}:latest"
               assert_equal expected_path, @execution_environment.registry_url!
             end
 
+          end
+
+          test 'image_import: returns child repo full_path with tag from container_image_url' do
+            as_admin do
+              repository_type_manager = ::Katello::RepositoryTypeManager
+              partial_repository_types = {
+                'docker' => repository_type_manager.find_defined('docker'),
+              }
+              repository_type_manager.instance_variable_set(:@enabled_repository_types, partial_repository_types)
+
+              provider = FactoryBot.create(:katello_provider, organization: @organization)
+              product = FactoryBot.create(
+                :katello_product,
+                :organization => @organization,
+                :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+                :provider => provider,
+                :cp_id => '12345',
+                )
+              FactoryBot.create(
+                :katello_root_repository,
+                :docker_root,
+                name: "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}",
+                product: product
+              )
+
+              fake_repo = OpenStruct.new
+              fake_repo.full_path = "foreman.example.com/org/product/repo"
+
+              Katello::RootRepository.any_instance.stubs(:repositories).returns([fake_repo])
+
+              @execution_environment.update!(source: :image_import,
+                                             container_image_url: 'https://ghcr.io/ansible-community/community-ee-base:2.21.5-1'
+              )
+              assert_equal 'foreman.example.com/org/product/repo:2.21.5-1', @execution_environment.registry_url!
+            end
+          end
+
+          test 'image_import: raises when multiple child repos exist' do
+            as_admin do
+              repository_type_manager = ::Katello::RepositoryTypeManager
+              partial_repository_types = {
+                'docker' => repository_type_manager.find_defined('docker'),
+              }
+              repository_type_manager.instance_variable_set(:@enabled_repository_types, partial_repository_types)
+
+              provider = FactoryBot.create(:katello_provider, organization: @organization)
+              product = FactoryBot.create(
+                :katello_product,
+                :organization => @organization,
+                :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+                :provider => provider,
+                :cp_id => '12345',
+                )
+              FactoryBot.create(
+                :katello_root_repository,
+                :docker_root,
+                name: "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}",
+                product: product
+              )
+
+              fake_repo_1 = OpenStruct.new
+              fake_repo_2 = OpenStruct.new
+              fake_repo_1.full_path = "foreman.example.com/org/product/repo1"
+              fake_repo_2.full_path = "foreman.example.com/org/product/repo2"
+
+              Katello::RootRepository.any_instance.stubs(:repositories).returns([fake_repo_1, fake_repo_2])
+
+              @execution_environment.update!(source: :image_import,
+                                             container_image_url: 'https://ghcr.io/ansible-community/community-ee-base:2.21.5-1'
+              )
+              error = assert_raises(::ForemanTasks::Task::TaskCancelledException) do
+                @execution_environment.registry_url!
+              end
+              puts error.message
+              assert error.message.include? 'supplies multiple container images'
+            end
           end
         end
 

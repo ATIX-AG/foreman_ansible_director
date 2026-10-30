@@ -20,6 +20,7 @@ import { PaginationProps } from 'foremanReact/common/hooks/API/APIHooks';
 import Pagination from 'foremanReact/components/Pagination';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
 
+import { translate as _ } from 'foremanReact/common/I18n';
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';
 import { ExecutionEnvCreateCard } from './components/ExecutionEnvCreateCard';
 import {
@@ -28,6 +29,7 @@ import {
 } from '../../types/AnsibleExecutionEnvTypes';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
 import { ExecutionEnvCardWrapper } from './components/ExecutionEnvCardWrapper';
+import { PermittedButton } from '../common/PermittedButton';
 
 interface ExecutionEnvGridProps {
   apiResponse: GetAnsibleExecutionEnvResponse;
@@ -36,6 +38,7 @@ interface ExecutionEnvGridProps {
   onSearch: (search: string) => void;
   createEnvAction: (draft: ExecutionEnvironmentDraft) => Promise<void>;
   refreshRequest: () => void;
+  onImportButtonClick: () => void;
 }
 
 export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
@@ -43,6 +46,7 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   onPagination,
   createEnvAction,
   refreshRequest,
+  onImportButtonClick,
 }) => {
   const [executionEnvironments, setExecutionEnvironments] = React.useState<
     ExecutionEnvironment[]
@@ -123,6 +127,13 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
             >
               Create Execution Environment
             </Button>
+            <PermittedButton
+              onClick={() => onImportButtonClick()}
+              requiredPermissions={[AdPermissions.executionEnvironments.create]}
+              variant={'secondary'}
+            >
+              {_('Import Execution Environment')}
+            </PermittedButton>
           </EmptyStateActions>
         </EmptyStateFooter>
       </EmptyState>
