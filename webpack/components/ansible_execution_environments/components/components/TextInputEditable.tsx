@@ -5,7 +5,7 @@ interface TextInputEditableProps {
   validated?: 'success' | 'warning' | 'error' | 'default';
   isEditable: boolean;
   value: string | number;
-  setValue: (event: FormEvent<HTMLInputElement>, value: string) => void;
+  setValue?: (event: FormEvent<HTMLInputElement>, value: string) => void;
 }
 
 export const TextInputEditable: React.FC<TextInputEditableProps> = ({
@@ -19,7 +19,7 @@ export const TextInputEditable: React.FC<TextInputEditableProps> = ({
     isDisabled={!isEditable}
     value={value}
     type="text"
-    onChange={setValue}
+    onChange={(_event, newValue) => setValue?.(_event, newValue)}
     aria-label="text input example"
   />
 );
