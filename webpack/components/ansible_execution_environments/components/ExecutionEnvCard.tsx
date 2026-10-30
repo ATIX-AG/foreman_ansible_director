@@ -1,78 +1,31 @@
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 
-import { ExecutionEnvEditCard } from './ExecutionEnvEditCard';
-
-import { AnsibleExecutionEnv } from '../../../types/AnsibleExecutionEnvTypes';
+import {
+  ExecutionEnvironment,
+  ExecutionEnvironmentDraft,
+} from '../../../types/AnsibleExecutionEnvTypes';
+import { executionEnvCardConfigs } from './executionEnvCardConfig';
+import { ExecutionEnvEditableCard } from './ExecutionEnvEditableCard';
 
 interface ExecutionEnvCardProps {
-  executionEnv: AnsibleExecutionEnv;
-  handleDestroy: (env: AnsibleExecutionEnv) => void;
-  handleUpdate: (env: AnsibleExecutionEnv) => void;
-  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  executionEnv: ExecutionEnvironment;
+  onDelete: () => void;
+  onSave: (draft: ExecutionEnvironmentDraft) => Promise<boolean>;
 }
 
-export const ExecutionEnvCard: React.FC<ExecutionEnvCardProps> = ({
+export const ExecutionEnvCard = ({
   executionEnv,
-  handleDestroy,
-  handleUpdate,
-  setIsContentUnitModalOpen,
-}) => {
-  const [editMode, setEditMode] = React.useState<boolean>(false);
-  const [executionEnvironment, setExecutionEnvironment] = React.useState<
-    AnsibleExecutionEnv
-  >(executionEnv);
-
-  useEffect(() => {
-    setExecutionEnvironment(executionEnv);
-  }, [executionEnv]);
-
-  const askConfirmUpdate = async (): Promise<void> => {
-    if (editMode) {
-      if (
-        JSON.stringify(executionEnv) !== JSON.stringify(executionEnvironment)
-      ) {
-        executionEnvironment && handleUpdate(executionEnvironment);
-      } else {
-        setEditMode(false);
-      }
-    } else {
-      setEditMode(true);
-    }
-  };
-
-  if (!executionEnvironment) {
-    return null;
-  }
+  onDelete,
+  onSave,
+}: ExecutionEnvCardProps): ReactElement | null => {
+  const config = executionEnvCardConfigs[executionEnv.source];
 
   return (
-    <ExecutionEnvEditCard
-      editMode={editMode}
-      executionEnvironment={executionEnvironment}
-      handleEdit={askConfirmUpdate}
-      handleDestroy={() => handleDestroy(executionEnvironment)}
-      onNameChange={(name: string) => {
-        setExecutionEnvironment({
-          ...executionEnvironment,
-          name,
-        });
-      }}
-      onBaseImageUrlChange={(baseImageUrl: string) => {
-        setExecutionEnvironment({
-          ...executionEnvironment,
-          container_image_url: baseImageUrl,
-        });
-      }}
-      onAnsibleVersionChange={(ansibleVersion: string) => {
-        setExecutionEnvironment({
-          ...executionEnvironment,
-          ansible_version: ansibleVersion,
-        });
-      }}
-      setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-      handleAbort={() => {
-        setExecutionEnvironment(executionEnv);
-        setEditMode(false);
-      }}
+    <ExecutionEnvEditableCard
+      executionEnv={executionEnv}
+      config={config}
+      onDelete={onDelete}
+      onSave={onSave}
     />
   );
 };

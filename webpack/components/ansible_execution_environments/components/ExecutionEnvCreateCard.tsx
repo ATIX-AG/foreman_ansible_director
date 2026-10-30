@@ -1,73 +1,61 @@
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import {
+  Bullseye,
   Card,
   CardBody,
-  CardFooter,
-  Bullseye,
   CardHeader,
   Tooltip,
 } from '@patternfly/react-core';
-import { translate as _ } from 'foremanReact/common/I18n';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
-import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
-} from '../../../types/AnsibleExecutionEnvTypes';
-import { ExecutionEnvEditCard } from './ExecutionEnvEditCard';
+
+import { translate as _ } from 'foremanReact/common/I18n';
+
+import { ExecutionEnvironmentDraft } from '../../../types/AnsibleExecutionEnvTypes';
 import { useAdContext } from '../../../helpers/adContext';
+import { ExecutionEnvCardShell } from './ExecutionEnvCardShell';
+import { ExecutionEnvCardActions } from './ExecutionEnvCardActions';
+import {
+  allExecutionEnvFields,
+  executionEnvCardConfigs,
+} from './executionEnvCardConfig';
+import {
+  ExecutionEnvFieldsForm,
+  ExecutionEnvNameField,
+  isDraftValid,
+} from './ExecutionEnvFieldsForm';
 
 interface ExecutionEnvCreateCardProps {
-  createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
-  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
-  setSelectedEnv: Dispatch<
-    SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
-  >;
+  createEnvAction: (draft: ExecutionEnvironmentDraft) => Promise<void>;
   createModeOverride: boolean;
 }
 
-export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
+export const ExecutionEnvCreateCard = ({
   createEnvAction,
-  setIsContentUnitModalOpen,
-  setSelectedEnv,
   createModeOverride,
-}) => {
+}: ExecutionEnvCreateCardProps): ReactElement => {
   const ctx = useAdContext();
+
+  const emptyDraft = (): ExecutionEnvironmentDraft => ({
+    name: '',
+    ansible_version: ctx.settings.ansible_director_default_ansible_core_version,
+    container_image_url:
+      ctx.settings.ansible_director_default_container_image_url,
+  });
 
   const [createMode, setCreateMode] = React.useState<boolean>(
     createModeOverride
   );
+  const [draft, setDraft] = React.useState<ExecutionEnvironmentDraft>(
+    emptyDraft
+  );
 
-  useEffect(() => {
-    setCreateMode(createModeOverride);
-  }, [createModeOverride]);
-
-  const [executionEnvironment, setExecutionEnvironment] = React.useState<
-    AnsibleExecutionEnvCreate
-  >({
-    name: '',
-    ansible_version: ctx.settings.ansible_director_default_ansible_core_version,
-    container_image_url: ctx.settings.ansible_director_default_container_image_url,
-    content: [],
-  });
-
-  const resetEditForm = (): void => {
+  const reset = (): void => {
+    setDraft(emptyDraft());
     setCreateMode(false);
-    setExecutionEnvironment({
-      name: '',
-      ansible_version:
-        ctx.settings.ansible_director_default_ansible_core_version,
-      container_image_url: ctx.settings.ansible_director_default_container_image_url,
-      content: [],
-    });
   };
 
-  const createExecutionEnv = async (): Promise<void> => {
-    await createEnvAction(executionEnvironment);
-    resetEditForm();
-  };
-
-  return !createMode
-    ? (
+  if (!createMode) {
+    return (
       <Tooltip content={<div>{_('Create new Execution Environment')}</div>}>
         <Card ouiaId="BasicCard" isClickable isRounded isLarge>
           <CardHeader>
@@ -103,36 +91,41 @@ export const ExecutionEnvCreateCard: React.FC<ExecutionEnvCreateCardProps> = ({
               <PlusIcon style={{ width: '100px', height: '100px' }} />
             </Bullseye>
           </CardBody>
-          <CardFooter />
         </Card>
       </Tooltip>
-    )
-    : (
-      <ExecutionEnvEditCard
-        editMode
-        executionEnvironment={executionEnvironment}
-        handleEdit={createExecutionEnv}
-        handleDestroy={resetEditForm}
-        onNameChange={(name: string) => {
-          setExecutionEnvironment({
-            ...executionEnvironment,
-            name,
-          });
-        }}
-        onBaseImageUrlChange={(baseImageUrl: string) => {
-          setExecutionEnvironment({
-            ...executionEnvironment,
-            container_image_url: baseImageUrl,
-          });
-        }}
-        onAnsibleVersionChange={(ansibleVersion: string) => {
-          setExecutionEnvironment({
-            ...executionEnvironment,
-            ansible_version: ansibleVersion,
-          });
-        }}
-        setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-        handleAbort={resetEditForm}
-      />
     );
+  }
+
+  return (
+    <ExecutionEnvCardShell
+      actions={
+        <ExecutionEnvCardActions
+          mode="edit"
+          config={executionEnvCardConfigs.image_build}
+          inputValid={isDraftValid(draft, allExecutionEnvFields)}
+          onSave={async () => {
+            await createEnvAction(draft);
+            reset();
+
+            return true;
+          }}
+          onAbort={reset}
+        />
+      }
+      title={
+        <ExecutionEnvNameField
+          isEditable
+          name={draft.name}
+          onChange={name => setDraft({ ...draft, name })}
+        />
+      }
+    >
+      <ExecutionEnvFieldsForm
+        editableFields={allExecutionEnvFields}
+        isEditing
+        draft={draft}
+        onChange={patch => setDraft({ ...draft, ...patch })}
+      />
+    </ExecutionEnvCardShell>
+  );
 };
