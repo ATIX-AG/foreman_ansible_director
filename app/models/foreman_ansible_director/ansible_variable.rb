@@ -3,6 +3,9 @@
 module ForemanAnsibleDirector
   class AnsibleVariable < AnsibleDirectorModel
     include ::ForemanAnsibleDirector::AnsibleVariableValue::ValueResolution
+    extend FriendlyId
+    friendly_id :name
+
     belongs_to :ownable, polymorphic: true, optional: false
     belongs_to :organization, inverse_of: :ansible_variables
 

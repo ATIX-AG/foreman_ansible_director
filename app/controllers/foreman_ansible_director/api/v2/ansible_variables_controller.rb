@@ -15,7 +15,7 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: GET /api/v2/ansible_director/ansible_variables/:id
         api :GET, '/v2/ansible_director/ansible_variables/:id', N_('Show details of an Ansible variable')
-        param :id, :number, desc: N_('Variable identifier.'), required: true
+        param :id, String, desc: N_('Variable identifier.'), required: true
         # endregion
         def show
         end
