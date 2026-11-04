@@ -36,6 +36,8 @@ module ForemanAnsibleDirector
     validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }
     # validates :position, uniqueness: { scope: :lifecycle_environment_path_id }
 
+    before_destroy :cleanup_content_snapshot
+
     # scope :by_path, ->(path_id) { where(lifecycle_environment_path_id: path_id) }
     # scope :ordered, -> { order(:position) }
     # scope :roots, -> { where(parent_id: nil) }
@@ -153,6 +155,12 @@ module ForemanAnsibleDirector
           end
         end,
       }
+    end
+
+    private
+
+    def cleanup_content_snapshot
+      content_snapshot&.decrement_references
     end
   end
 end
