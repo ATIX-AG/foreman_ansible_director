@@ -13,17 +13,13 @@ import {
 import { InnerScrollContainer, OuterScrollContainer, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { sprintf as __, translate as _ } from 'foremanReact/common/I18n';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
-import TrashIcon from '@patternfly/react-icons/dist/esm/icons/trash-icon';
 import EditIcon from '@patternfly/react-icons/dist/esm/icons/edit-icon';
 import { hierarchyIconMap } from '../../../../../common/AnsibleContentAssignment/AnsibleContentAssignment';
 import { AnsibleVariable, AnsibleVariableBinding as AnsibleVariableBindingType } from '../../../../../../types/AnsibleVariableTypes';
-import { ConfirmableAction, ConfirmationModal } from '../../../../../../helpers/components/ConfirmationModal';
-import { useToasts } from '../../../../../../helpers/toasts/useToasts';
-import { AnsibleVariableBinding } from '../../../../../../resources/clients/AnsibleVariableBinding';
+import { BindingDeleteButton } from '../../../../../../helpers/components/BindingDeleteButton';
 import {
   InlineValueRenderer,
 } from '../../../../../common/AnsibleContentAssignment/components/Variables/components/InlineValueRenderer';
-import { crnTypeUiString } from '../../../../../common/AnsibleContentAssignment/helpers';
 import { dataTypeDisplayNameMap } from '../../../../../common/AnsibleContentAssignment/components/Variables/utils';
 
 interface BindingIndexContentProps {
@@ -41,9 +37,6 @@ export const BindingIndexContent = ({
 }: BindingIndexContentProps): ReactElement => {
 
   const [boundNodeFilter, setBoundNodeFilter] = React.useState<string>('');
-  const [confirmableAction, setConfirmableAction] = React.useState<ConfirmableAction | null>(null);
-
-  const { withToast } = useToasts();
 
   return (
     <>
@@ -114,34 +107,11 @@ export const BindingIndexContent = ({
                                     </Popover>
                                   </OverflowMenuItem>
                                   <OverflowMenuItem>
-                                    <Popover bodyContent={_('Delete binding')} triggerAction="hover">
-                                      <Button
-                                        variant="plain"
-                                        aria-label={_('Delete binding')}
-                                        icon={<TrashIcon />}
-                                        onClick={() => {
-                                          setConfirmableAction({
-                                            title: _('Delete binding?'),
-                                            body: __(_('Delete binding of variable %(variableName)s to %(nodeType)s %(nodeName)s?'), {
-                                              variableName: variable.name,
-                                              nodeType: crnTypeUiString[binding.consumable_type],
-                                              nodeName: binding.consumable_name,
-                                            }),
-                                            onAbort: () => setConfirmableAction(null),
-                                            onConfirm: async () => {
-                                              await withToast(
-                                                {
-                                                  type: 'delete',
-                                                  resource: 'ansible_variable_binding',
-                                                  func: AnsibleVariableBinding.destroy(binding.id),
-                                                }
-                                              );
-                                              onSuccess();
-                                            },
-                                          });
-                                        }}
-                                      />
-                                    </Popover>
+                                    <BindingDeleteButton
+                                      binding={binding}
+                                      variableName={variable.name}
+                                      onDeleted={onSuccess}
+                                    />
                                   </OverflowMenuItem>
                                 </OverflowMenuGroup>
                               </OverflowMenuContent>
@@ -167,15 +137,6 @@ export const BindingIndexContent = ({
           </EmptyState>
         )}
       </StackItem>
-      {confirmableAction !== null && (
-        <ConfirmationModal
-          isConfirmationModalOpen
-          title={confirmableAction.title}
-          body={confirmableAction.body}
-          onConfirm={confirmableAction.onConfirm}
-          onAbort={confirmableAction.onAbort}
-        />
-      )}
     </>
   );
 };
