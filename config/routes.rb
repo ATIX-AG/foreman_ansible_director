@@ -28,11 +28,13 @@ Rails.application.routes.draw do
             collection do
               get '/', action: :index
               post '/', action: :create
+              post '/import', action: :import
               get 'auto_complete_search'
             end
             member do
               get '/', action: :show
-              patch '/', action: :update
+              patch '/', action: :update_partial
+              put '/', action: :update_full
               delete '/', action: :destroy
             end
           end

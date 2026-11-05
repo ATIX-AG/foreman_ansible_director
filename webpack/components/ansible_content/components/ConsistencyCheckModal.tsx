@@ -10,12 +10,9 @@ import {
   TextContent,
 } from '@patternfly/react-core';
 
-import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
-import axios, { AxiosResponse } from 'axios';
-import { foremanUrl } from 'foremanReact/common/helpers';
-import { addToast } from 'foremanReact/components/ToastsList';
-import { useDispatch } from 'react-redux';
-import { DefaultResponse, Task } from '../../../types/common';
+import { translate as _ } from 'foremanReact/common/I18n';
+import { AnsibleContent } from '../../../resources/clients/AnsibleContent';
+import { useToasts } from '../../../helpers/toasts/useToasts';
 
 interface ConsistencyCheckModalProps {
   onAbort: () => void;
@@ -30,61 +27,16 @@ export const ConsistencyCheckModal = ({
     false
   );
 
-  const dispatch = useDispatch();
+  const { withToast } = useToasts();
 
   const handleTrigger = async (): Promise<void> => {
     setIsConfirmLoading(true);
-    try {
-      const triggeredTask: AxiosResponse<DefaultResponse<
-        never,
-        never,
-        { task: Task }
-      >> = await axios.post(
-        foremanUrl(
-          '/api/v2/ansible_director/ansible_content/consistency_check'
-        ),
-        {}
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: 'CONSISTENCY_CHECK_SUCC',
-          message: (
-            <span>
-              {_('Consistency check started!')}
-              <br />
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={foremanUrl(
-                  `/foreman_tasks/tasks/${triggeredTask.data.results.task.id}`
-                )}
-              >
-                {_('View the task page for more details.')}
-              </a>
-            </span>
-          ),
-          sticky: false,
-        })
-      );
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: 'CONSISTENCY_CHECK_SUCC',
-          message: __(
-            _(
-              'Triggering of consistency check failed with error code "%(error)s".'
-            ),
-            { error: (e as { response: AxiosResponse }).response.status }
-          ),
-          sticky: false,
-        })
-      );
-    } finally {
-      setIsConfirmLoading(false);
-      onTriggered();
-    }
+    await withToast({
+      type: 'task',
+      func: AnsibleContent.consistencyCheck(),
+    });
+    setIsConfirmLoading(false);
+    onTriggered();
   };
 
   return (

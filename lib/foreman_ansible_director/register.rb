@@ -118,11 +118,11 @@ Foreman::Plugin.register :foreman_ansible_director do
       resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Create
     permission :create_ansible_execution_environments,
-      { 'foreman_ansible_director/api/v2/execution_environments': [:create] },
+      { 'foreman_ansible_director/api/v2/execution_environments': %i[create import] },
       resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Edit
     permission :edit_ansible_execution_environments,
-      { 'foreman_ansible_director/api/v2/execution_environments': [:update] },
+      { 'foreman_ansible_director/api/v2/execution_environments': %i[update_full update_partial] },
       resource_type: 'ForemanAnsibleDirector::ExecutionEnvironment'
     # Destroy
     permission :destroy_ansible_execution_environments,
@@ -200,13 +200,20 @@ Foreman::Plugin.register :foreman_ansible_director do
                        (check history: https://pypi.org/project/ansible-core/#history).',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_ANSIBLE_VERSION,
         full_name: 'Execution Environments - Default ansible-core version'
-      setting 'ansible_director_default_base_image_url',
+      setting 'ansible_director_default_container_image_url',
         type: :string,
-        description: 'Default base image used for Execution Environments.
+        description: 'Default container image used for building Execution Environments on top of.
                        A fully-qualified image reference is strongly recommended.
                        Run "man containers-registries.conf" to find more details.',
-        default: ::ForemanAnsibleDirector::Constants::DEFAULT_BASE_IMAGE_URL,
-        full_name: 'Execution Environments - Default base image URL'
+        default: ::ForemanAnsibleDirector::Constants::DEFAULT_CONTAINER_IMAGE_URL,
+        full_name: 'Execution Environments - Default container image URL'
+      setting 'ansible_director_ee_import_verify_ssl',
+        type: :boolean,
+        description: 'Verify the SSL certificate of the container registry.
+                       If your container registry uses a self-signed certificate, ensure the CA certificate
+                       is part of the trust store of Foreman server.',
+        default: true,
+        full_name: 'Execution Environments - Import - Verify registry SSL certificate'
       setting 'ansible_director_default_ee_rex',
         type: :integer,
         description: 'Default Execution Environment used for execution of Remote Execution jobs.',
@@ -283,8 +290,8 @@ Foreman::Plugin.register :foreman_ansible_director do
                     Setting[:ansible_director_default_galaxy_url],
                   ansible_director_default_ansible_core_version:
                     Setting[:ansible_director_default_ansible_core_version],
-                  ansible_director_default_base_image_url:
-                    Setting[:ansible_director_default_base_image_url],
+                  ansible_director_default_container_image_url:
+                    Setting[:ansible_director_default_container_image_url],
                   ansible_director_ui_refresh_interval:
                     Setting[:ansible_director_ui_refresh_interval],
                   ansible_director_ui_search_cache_size:

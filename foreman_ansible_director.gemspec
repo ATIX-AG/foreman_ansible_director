@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'git', '>= 1.18.0', '< 3.0.0'
 
   s.add_development_dependency 'rdoc'
+  s.add_development_dependency 'simplecov'
 end

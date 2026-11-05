@@ -12,17 +12,21 @@ import {
 import { translate as _ } from 'foremanReact/common/I18n';
 
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
+import SearchBar from 'foremanReact/components/SearchBar';
 import { ExecutionEnvGrid } from '../ExecutionEnvGrid';
 import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
+  ExecutionEnvironment,
+  ExecutionEnvironmentDraft,
 } from '../../../types/AnsibleExecutionEnvTypes';
-import { ContentUnitModal } from './ContentUnitModal';
-import { ExecutionEnvironment } from '../../../resources/clients/ExecutionEnvironment';
+import { ExecutionEnvironment as ExecutionEnvironmentClient } from '../../../resources/clients/ExecutionEnvironment';
 import { useToasts } from '../../../helpers/toasts/useToasts';
+import { Page } from '../../common/Page';
+import { PermittedButton } from '../../common/PermittedButton';
+import { AdPermissions } from '../../../constants/foremanAnsibleDirectorPermissions';
+import { ExecutionEnvImportModal } from './ExecutionEnvImportModal';
 
 export interface GetAnsibleExecutionEnvResponse extends IndexResponse {
-  results: AnsibleExecutionEnv[];
+  results: ExecutionEnvironment[];
 }
 
 interface ExecutionEnvGridWrapperProps {
@@ -32,13 +36,8 @@ interface ExecutionEnvGridWrapperProps {
 const ExecutionEnvGridWrapper = ({
   initialSearch,
 }: ExecutionEnvGridWrapperProps): ReactElement | null => {
-  const [selectedEnv, setSelectedEnv] = React.useState<
-    AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined
-  >();
 
-  const [isContentUnitModalOpen, setIsIsContentUnitModalOpen] = React.useState<
-    boolean
-  >(false);
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState<boolean>(false);
 
   const organization = useForemanOrganization();
   const { withToast } = useToasts();
@@ -71,18 +70,14 @@ const ExecutionEnvGridWrapper = ({
   };
 
   const createEnvAction = async (
-    env: AnsibleExecutionEnvCreate
+    draft: ExecutionEnvironmentDraft
   ): Promise<void> => {
     await withToast({
       type: 'create',
       resource: 'execution_environment',
-      func: ExecutionEnvironment.create({
+      func: ExecutionEnvironmentClient.create({
         organization_id: organization.id,
-        execution_environment: {
-          name: env.name,
-          base_image_url: env.base_image_url,
-          ansible_version: env.ansible_version,
-        },
+        execution_environment: draft,
       }),
     });
     refreshRequest();
@@ -91,27 +86,54 @@ const ExecutionEnvGridWrapper = ({
   if (executionEnvResponse.status === 'RESOLVED') {
     if (executionEnvResponse.response.results.length > -1) {
       return (
-        <>
-          <ExecutionEnvGrid
-            apiResponse={executionEnvResponse.response}
-            onPagination={onPagination}
-            search={params.search as string}
-            onSearch={onSearch}
-            setSelectedEnv={setSelectedEnv}
-            createEnvAction={createEnvAction}
-            setIsContentUnitModalOpen={setIsIsContentUnitModalOpen}
-            refreshRequest={refreshRequest}
-          />
-          {selectedEnv && (
-            <ContentUnitModal
-              isContentUnitModalOpen={isContentUnitModalOpen}
-              setIsContentUnitModalOpen={setIsIsContentUnitModalOpen}
-              target={selectedEnv}
-              setTarget={setSelectedEnv}
-              refreshRequest={refreshRequest}
+
+        <Page
+          header={_('Ansible Execution Environments')}
+          customToolbarItems={[
+            <PermittedButton
+              onClick={() => setIsImportModalOpen(true)}
+              requiredPermissions={[AdPermissions.executionEnvironments.create]}
+              variant={'secondary'}
+            >
+              {_('Import Execution Environment')}
+            </PermittedButton>,
+          ]}
+          hasDocumentation={false}
+          searchBar={
+            <SearchBar
+              data={{
+                autocomplete: {
+                  id: 'name',
+                  url: '/api/v2/ansible_director/execution_environments/auto_complete_search',
+                  searchQuery: params.search as string,
+                },
+              }}
+              onSearch={onSearch}
+              name="ad_execution_environment"
             />
-          )}
-        </>
+          }
+        >
+          <>
+            <ExecutionEnvGrid
+              apiResponse={executionEnvResponse.response}
+              onPagination={onPagination}
+              search={params.search as string}
+              onSearch={onSearch}
+              createEnvAction={createEnvAction}
+              refreshRequest={refreshRequest}
+              onImportButtonClick={() => setIsImportModalOpen(true)}
+            />
+            {isImportModalOpen && (
+              <ExecutionEnvImportModal
+                onAbort={() => setIsImportModalOpen(false)}
+                onImportSuccess={() => {
+                  setIsImportModalOpen(false);
+                  refreshRequest();
+                }}
+              />
+            )}
+          </>
+        </Page>
       );
     }
   } else if (executionEnvResponse.status === 'ERROR') {
