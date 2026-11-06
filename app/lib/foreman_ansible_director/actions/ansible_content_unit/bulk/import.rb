@@ -30,6 +30,15 @@ module ForemanAnsibleDirector
           def total_count
             input[:resolved_content_units].size
           end
+
+          # Reclassify warning-only sub-plans as successes so :failed_count reflects only
+          # genuine errors (which should still pause, as usual).
+          def recalculate_counts
+            super
+            stopped_with_warning = sub_plans_count('state' => %w[stopped], 'result' => 'warning')
+            output[:failed_count] -= stopped_with_warning
+            output[:success_count] += stopped_with_warning
+          end
         end
       end
     end
