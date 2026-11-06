@@ -46,6 +46,10 @@ class AdVariableRedesign < ActiveRecord::Migration[6.1]
   end
 
   def down
-    raise ActiveRecord::IrreversibleMigration
+    drop_table :ad_ansible_variable_bindings
+    drop_table :ad_ansible_variables
+
+    # restores columns similar to db/migrate/20260316000001_ansible_director_schema.rb, line 284
+    add_reference :lookup_keys, :ownable, polymorphic: true, null: true, index: true
   end
 end
