@@ -248,11 +248,11 @@ export const BindingDetailModal = ({
                 });
               }
               else {
-                changesMade = true;
+                changesMade = variable.raw_value !== draft.value || variable.data_type !== draft.type;
                 onRevertClick = () => updateDraft(tabKey, {
                   type: variable.data_type,
                   value: variable.raw_value,
-                  operation: null,
+                  operation: 'createBinding',
                 });
               }
 
