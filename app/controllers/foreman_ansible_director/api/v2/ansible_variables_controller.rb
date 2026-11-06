@@ -8,10 +8,20 @@ module ForemanAnsibleDirector
         before_action :find_collection_role, only: [:index_acr]
 
         # rubocop:disable Rails/LexicallyScopedActionFilter
-        before_action :find_optional_organization, only: %i[show index_acr variables_for_target auto_complete_search]
+        before_action :find_optional_organization,
+          only: %i[show index index_acr variables_for_target auto_complete_search]
         # rubocop:enable Rails/LexicallyScopedActionFilter
 
         resource_description { resource_id 'AD Ansible Variables' }
+
+        # region ApiDoc: GET /api/v2/ansible_director/ansible_variables
+        api :GET, '/v2/ansible_director/ansible_variables/', N_('List Ansible variables')
+        param :organization_id, :number, desc: N_('Organization identifier.'), required: false
+        param_group :search_and_pagination, ::Api::V2::BaseController
+        # endregion
+        def index
+          @ansible_variables = resource_scope_for_index
+        end
 
         # region ApiDoc: GET /api/v2/ansible_director/ansible_variables/:id
         api :GET, '/v2/ansible_director/ansible_variables/:id', N_('Show details of an Ansible variable')
