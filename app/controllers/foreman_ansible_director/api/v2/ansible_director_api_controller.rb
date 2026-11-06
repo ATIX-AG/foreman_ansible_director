@@ -26,6 +26,11 @@ module ForemanAnsibleDirector
           render_default_response
         end
 
+        rescue_from ActiveRecord::RecordInvalid do |error|
+          @ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::ModelValidationError.new(exception: error))
+          render_default_response
+        end
+
         rescue_from ActionController::ParameterMissing do |error|
           @ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::ParameterMissingError.new(exception: error))
           render_default_response
