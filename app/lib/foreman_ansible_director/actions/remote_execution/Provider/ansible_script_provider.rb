@@ -16,10 +16,10 @@ if defined? ForemanRemoteExecution
               end
 
               def proxy_command_options(template_invocation, host)
-                inventory = ForemanAnsibleDirector::Generators::InventoryGenerator.generate(
+                inventory, options = ForemanAnsibleDirector::Generators::InventoryGenerator.generate(
                   host: host,
-                  ansible_user: template_invocation.job_invocation&.ssh_user ||
-                    host.host_param('remote_execution_ssh_user')
+                  host_address: find_ip_or_hostname(host),
+                  template_invocation: template_invocation
                 )
                 begin
                   environment = host&.ansible_lifecycle_environment&.execution_environment ||
@@ -36,8 +36,13 @@ if defined? ForemanRemoteExecution
                 # As the templates currently do not have an execution environment input, this suffices
                 super(template_invocation, host).merge(
                   inventory: inventory,
+                  options: options,
                   execution_environment: environment.registry_url!
                 )
+              end
+
+              def supports_effective_user?
+                true
               end
 
               def proxy_feature
