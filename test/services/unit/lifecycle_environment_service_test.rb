@@ -136,6 +136,34 @@ module ForemanAnsibleDirectorTests
             assert_equal @parent_env.id, @child_env.parent_id
           end
 
+          test 'decrements content snapshot references on destroy' do
+            content_snapshot = FactoryBot.create(:content_snapshot, references: 2)
+            @environment.update!(content_snapshot: content_snapshot)
+
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.destroy_environment(@environment)
+
+            content_snapshot.reload
+            assert_equal 1, content_snapshot.references
+          end
+
+          test 'destroys content snapshot when references reach zero' do
+            content_snapshot = FactoryBot.create(:content_snapshot, references: 1)
+            @environment.update!(content_snapshot: content_snapshot)
+            snapshot_id = content_snapshot.id
+
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.destroy_environment(@environment)
+
+            assert_nil ::ForemanAnsibleDirector::ContentSnapshot.find_by(id: snapshot_id)
+          end
+
+          test 'handles environment destruction when no content snapshot exists' do
+            env_id = @environment.id
+
+            ::ForemanAnsibleDirector::LifecycleEnvironmentService.destroy_environment(@environment)
+
+            assert_nil ::ForemanAnsibleDirector::LifecycleEnvironment.find_by(id: env_id)
+          end
+
           test 'handles root environment destruction' do
             # TODO: Determine whether this should be allowed at all
             #root_env = FactoryBot.create(:lifecycle_environment, organization: @organization, lifecycle_environment_path: @path, parent: nil)
