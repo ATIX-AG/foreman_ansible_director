@@ -26,7 +26,9 @@ module ForemanAnsibleDirector
           unit_identifier = "#{input[:unit_namespace]}.#{input[:unit_name]}"
           distribution_path = unit_identifier
           distribution_path = "#{unit_identifier}-#{input[:unit_name_suffix]}" if input[:unit_name_suffix]
-          imported_versions = input.dig(:list_action_output, :repository_artifacts, :results)
+          imported_versions = input.dig(:list_action_output, :repository_artifacts, :results).select do |artifact|
+            artifact[:namespace] == input[:unit_namespace] && artifact[:name] == input[:unit_name]
+          end
 
           results = {}
           imported_versions.each do |version|
