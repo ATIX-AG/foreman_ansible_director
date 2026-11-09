@@ -92,6 +92,7 @@ Rails.application.routes.draw do
               end
             end
             collection do
+              get '/', action: :index
               resources :ansible_variable_bindings, path: 'bindings', only: [] do
                 member do
                   get '/', action: :show

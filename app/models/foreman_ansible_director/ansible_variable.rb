@@ -9,6 +9,8 @@ module ForemanAnsibleDirector
     enum query: { local: 0 }
     enum transformer: { static: 0 }
 
+    scoped_search on: :name, complete_value: true
+
     def bound_by
       if ownable.instance_of?(ForemanAnsibleDirector::AnsibleCollectionRole)
         ::ForemanAnsibleDirector::AnsibleVariableBinding.where(

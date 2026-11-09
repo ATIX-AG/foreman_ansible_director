@@ -49,7 +49,8 @@ Foreman::Plugin.register :foreman_ansible_director do
     ## Ansible Variables
     # View
     permission :view_ansible_director_variables,
-      { 'foreman_ansible_director/api/v2/ansible_variables': %i[show variables_for_target index_acr resolve_single] },
+      { 'foreman_ansible_director/api/v2/ansible_variables':
+        %i[show variables_for_target index index_acr resolve_single] },
       resource_type: 'ForemanAnsibleDirector::AnsibleVariable'
     # Edit
     permission :edit_ansible_director_variables,
