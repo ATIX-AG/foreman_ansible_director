@@ -87,10 +87,11 @@ module ForemanAnsibleDirector
             all_defaults = {}
             v[:defaults]&.each do |defaults_yaml_str|
               ast = YAML.parse(defaults_yaml_str)
-              if ast.root.children.length.odd?
+              # If the document does not have children, the role does not supply default variables
+              if !ast.root.children || ast.root.children.length.odd?
                 # Variables are always k: v
                 # If the number of nodes is not even, something is wrong i.e. the YAML is not valid
-                return {}
+                break {}
               end
 
               scanner = Psych::ScalarScanner.new(Psych::ClassLoader.new)
