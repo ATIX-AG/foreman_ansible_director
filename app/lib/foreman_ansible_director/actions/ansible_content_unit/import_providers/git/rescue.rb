@@ -26,19 +26,20 @@ module ForemanAnsibleDirector
               distribution_href = distribution_create_action['distribution_create_response']['pulp_href']
               remote_href = collection_remote_create_action['git_remote_create_response']['pulp_href']
 
-              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
-                repository_href: repository_href,
-                skip: args[:skip_repository_cleanup])
-              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
-                distribution_href: distribution_href,
-                skip: args[:skip_distribution_cleanup])
-              plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Destroy,
-                git_remote_href: remote_href,
-                skip: args[:skip_remote_cleanup])
-
-              plan_self(
-                pulp_failure: args[:pulp_failure]
-              )
+              sequence do
+                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Distribution::Destroy,
+                  distribution_href: distribution_href,
+                  skip: args[:skip_distribution_cleanup])
+                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Repository::Destroy,
+                  repository_href: repository_href,
+                  skip: args[:skip_repository_cleanup])
+                plan_action(::ForemanAnsibleDirector::Actions::Pulp3::Ansible::Remote::Git::Destroy,
+                  git_remote_href: remote_href,
+                  skip: args[:skip_remote_cleanup])
+                plan_self(
+                  pulp_failure: args[:pulp_failure]
+                )
+              end
             end
 
             def run
