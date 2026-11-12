@@ -288,31 +288,44 @@ module ForemanAnsibleDirectorTests
             assert_equal initial_references, source_snapshot.references
           end
 
-          test 'fails when promotion direction is wrong' do
-
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
-              lce_path: @path,
-              source_environment_id: @target_env.id,
-              target_environment_id: @source_env.id
-            )
-
-            assert_not result
-          end
-
-          test 'fails when promotion spans more than one environment' do
-            # Create an intermediate environment
+          test 'succeeds for multi-hop promotion when force_incremental is false' do
+            # Create an intermediate environment at position 1
             intermediate_env = FactoryBot.create(:lifecycle_environment, organization: @organization, lifecycle_environment_path: @path, position: 1, parent: @source_env)
             @target_env.update!(position: 2, parent: intermediate_env)
             @source_env.update!(child: intermediate_env)
             intermediate_env.update!(child: @target_env)
 
-            result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+            source_snapshot = FactoryBot.create(:content_snapshot, references: 0)
+            @source_env.update!(content_snapshot: source_snapshot)
+
+            with_setting_stub(setting: 'ansible_director_lce_path_force_incremental', value: false) do
+              result = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
+                lce_path: @path,
+                source_environment_id: @source_env.id,
+                target_environment_id: @target_env.id
+              )
+
+              assert result
+              intermediate_env.reload
+              @target_env.reload
+
+              assert_equal source_snapshot, intermediate_env.content_snapshot
+              assert_equal source_snapshot, @target_env.content_snapshot
+            end
+          end
+
+          test 'initializes snapshot references to recipient count' do
+            source_snapshot = FactoryBot.create(:content_snapshot, references: 1)
+            @source_env.update!(content_snapshot: source_snapshot)
+
+            ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
               lce_path: @path,
               source_environment_id: @source_env.id,
               target_environment_id: @target_env.id
             )
 
-            assert_not result
+            source_snapshot.reload
+            assert_equal 2, source_snapshot.references
           end
 
           test 'decrements references of existing target content snapshot' do
@@ -338,6 +351,98 @@ module ForemanAnsibleDirectorTests
         describe 'private methods' do
           setup do
             @path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
+          end
+
+          describe '#valid_promotion?' do
+            setup do
+              @source_env = FactoryBot.build(
+                :lifecycle_environment,
+                organization: @organization,
+                lifecycle_environment_path: @path,
+                position: 0
+              )
+              @target_env = FactoryBot.build(
+                :lifecycle_environment,
+                organization: @organization,
+                lifecycle_environment_path: @path,
+                position: 1
+              )
+            end
+
+            test 'returns single-element array for adjacent forward promotion' do
+              recipients = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.send(
+                :valid_promotion?, @source_env, @target_env
+              )
+
+              assert_equal [@target_env], recipients
+            end
+
+            test 'raises PromotionSourceTargetIdenticalError when source and target have same position' do
+              assert_raises(ForemanAnsibleDirector::Issues::CriticalErrorException) do
+                ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.send(
+                  :valid_promotion?, @source_env, @source_env
+                )
+              end
+
+              assert_equal 1, ctx.errors.length
+              assert_instance_of(ForemanAnsibleDirector::Issues::Errors::PromotionSourceTargetIdenticalError, ctx.errors.first)
+            end
+
+            test 'raises UnsupportedRollbackError when source position is greater than target position' do
+              assert_raises(ForemanAnsibleDirector::Issues::CriticalErrorException) do
+                ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.send(
+                  :valid_promotion?, @target_env, @source_env
+                )
+              end
+
+              assert_equal 1, ctx.errors.length
+              assert_instance_of(ForemanAnsibleDirector::Issues::Errors::UnsupportedRollbackError, ctx.errors.first)
+            end
+
+            test 'returns all recipients for multi-hop promotion when force_incremental is false' do
+              @source_env.update(position: 0)
+              @target_env.update(position: 2)
+              intermediate_env = FactoryBot.create(
+                :lifecycle_environment,
+                organization: @organization,
+                lifecycle_environment_path: @path,
+                position: 1
+              )
+
+              with_setting_stub(setting: 'ansible_director_lce_path_force_incremental', value: false) do
+                recipients = ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.send(
+                  :valid_promotion?, @source_env, @target_env
+                )
+
+                assert_includes(recipients.map(&:id), @target_env.id)
+                assert_includes(recipients.map(&:id), intermediate_env.id)
+              end
+            end
+
+            test 'raises IllegalImplicitPromotionError for multi-hop when force_incremental is true' do
+              @source_env.update(position: 0)
+              @target_env.update(position: 2)
+              FactoryBot.create(
+                :lifecycle_environment,
+                organization: @organization,
+                lifecycle_environment_path: @path,
+                position: 1
+              )
+
+              with_setting_stub(setting: 'ansible_director_lce_path_force_incremental', value: true) do
+                assert_raises(ForemanAnsibleDirector::Issues::CriticalErrorException) do
+                  ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.send(
+                    :valid_promotion?, @source_env, @target_env
+                  )
+                end
+
+                assert_equal 1, ctx.errors.length
+                assert_instance_of(
+                  ForemanAnsibleDirector::Issues::Errors::IllegalImplicitPromotionError,
+                  ctx.errors.first
+                )
+              end
+            end
           end
 
           describe '#environment_at_position' do
