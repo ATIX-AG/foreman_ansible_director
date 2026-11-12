@@ -117,7 +117,7 @@ module ForemanAnsibleDirector
         # TRANSLATORS: ApiDoc, do not translate!
         description <<~DESC
           Promote content between environments in a lifecycle path.
-          If the 'ansible_director_lce_path_force_incremental' setting is false, 'target_environment' must be the immediate successor to 'source_environment'.
+          If the 'ansible_director_lce_path_force_incremental' setting is enabled, 'target_environment' must be the immediate successor to 'source_environment'.
         DESC
         param :promote, Hash, desc: N_('Promotion parameters'), required: true do
           param :source_environment_id,
@@ -135,8 +135,8 @@ module ForemanAnsibleDirector
         example <<~EXAMPLE
           {
             "promote": {
-              "source_environment_id": 3, # Library
-              "target_environment_id": 4  # Dev
+              "source_environment_id": 3,
+              "target_environment_id": 4
             }
           }
         EXAMPLE
@@ -144,10 +144,16 @@ module ForemanAnsibleDirector
         def promote
           permitted_params = promote_params
 
+          source_environment = @lifecycle_environment_path
+                               .lifecycle_environments
+                               .find_by!(id: permitted_params[:source_environment_id])
+          target_environment = @lifecycle_environment_path
+                               .lifecycle_environments
+                               .find_by!(id: permitted_params[:target_environment_id])
+
           ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
-            lce_path: @lifecycle_environment_path,
-            source_environment_id: permitted_params[:source_environment_id],
-            target_environment_id: permitted_params[:target_environment_id]
+            source_environment: source_environment,
+            target_environment: target_environment
           )
         end
 
