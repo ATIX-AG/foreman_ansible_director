@@ -41,6 +41,10 @@ module ForemanAnsibleDirector
 
       ::HostgroupsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostgroupExtensions
       ::HostsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostExtensions
+      ::Api::V2::HostsController.include ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostExtensions::ApiDoc
+      ::Api::V2::HostgroupsController.include(
+        ::ForemanAnsibleDirector::Concerns::Foreman::Controller::HostgroupExtensions::ApiDoc
+      )
 
       ::Host::Managed.prepend ::ForemanAnsibleDirector::Concerns::AnsibleExecutionExtensions
 

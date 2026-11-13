@@ -9,7 +9,6 @@ module ForemanAnsibleDirector
         before_action :find_resource, only: %i[show update destroy update_content content]
         before_action :find_path, only: %i[create]
         before_action :find_organization, only: %i[create update_content]
-        before_action :find_assignment_target, only: %i[assign]
 
         resource_description { resource_id 'AD Ansible Lifecycle Environments' }
 
@@ -204,46 +203,6 @@ module ForemanAnsibleDirector
           )
         end
 
-        # region ApiDoc: POST /api/v2/ansible_director/lifecycle_environments/:id/assign
-        api :POST, '/v2/ansible_director/lifecycle_environments/:id/assign',
-          N_('Assign a lifecycle environment to a consumer of Ansible content.')
-        # TRANSLATORS: ApiDoc, do not translate!
-        description <<~DESC
-          Assign a lifecycle environment to a content consumer.
-          If successful, the consumer can only use Ansible content staged in the environment.
-          Content consumers are hosts (HOST) and hostgroups (HOSTGROUP).
-        DESC
-        param :target_type,
-          %w[HOST HOSTGROUP],
-          desc: N_('Type of the target entity.'),
-          required: true
-        param :target_id,
-          :number,
-          desc: N_('ID of the target entity. Special values are "none" and "inherit".'),
-          required: true
-        # TRANSLATORS: ApiDoc, do not translate!
-        example <<~EXAMPLE
-          {
-            "target_type": "host",
-            "target_id": 7
-          }
-        EXAMPLE
-        # endregion
-        def assign
-          case params[:id]
-          when 'none'
-            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_none(target: @target)
-          when 'inherit'
-            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_inherit(target: @target)
-          else
-            lce = ::ForemanAnsibleDirector::LifecycleEnvironment.find_by(id: params[:id])
-            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign(
-              lce,
-              @target
-            )
-          end
-        end
-
         # region ApiDoc: DELETE /api/v2/ansible_director/lifecycle_environments/:id
         api :DELETE, '/v2/ansible_director/lifecycle_environments/:id', N_('Delete a lifecycle environment')
         # endregion
@@ -260,21 +219,6 @@ module ForemanAnsibleDirector
         end
 
         private
-
-        def find_assignment_target
-          case params[:target_type]
-          when 'HOST'
-            @target = Host.find(params[:target_id])
-          when 'HOSTGROUP'
-            @target = Hostgroup.find(params[:target_id])
-          else
-            render_error(
-              'custom_error',
-              status: :unprocessable_entity,
-              locals: { message: "Unknown target type #{params[:target_type]}" }
-            )
-          end
-        end
 
         def lifecycle_environment_params
           params.require(:lifecycle_environment).permit(
