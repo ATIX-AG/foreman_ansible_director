@@ -72,24 +72,6 @@ module ForemanAnsibleDirector
         end
       end
 
-      def assign(environment, target)
-        ActiveRecord::Base.transaction do
-          target.update!(ansible_lifecycle_environment_id: environment.id)
-        end
-      end
-
-      def assign_none(target:)
-        ActiveRecord::Base.transaction do
-          target.update!(ansible_lifecycle_environment_id: nil, ansible_lifecycle_environment_state: 'none')
-        end
-      end
-
-      def assign_inherit(target:)
-        ActiveRecord::Base.transaction do
-          target.update!(ansible_lifecycle_environment_id: nil, ansible_lifecycle_environment_state: 'inherit')
-        end
-      end
-
       def assign_content(environment, content_assignments, execution_environment_id)
         ActiveRecord::Base.transaction do
           environment.direct_content_unit_versions.clear
