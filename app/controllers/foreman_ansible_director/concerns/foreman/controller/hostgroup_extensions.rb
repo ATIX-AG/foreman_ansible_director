@@ -27,6 +27,30 @@ module ForemanAnsibleDirector
           def filter_parameters
             @ansible_director_assignment_data = params[:hostgroup].delete(:ansible_director_assignment_data)
           end
+
+          module ApiDoc
+            extend Apipie::DSL::Concern
+
+            update_api(:create, :update) do
+              param :hostgroup, Hash do
+                param :ansible_lifecycle_environment_id,
+                  :number,
+                  desc: N_('Ansible lifecycle environment identifier.'),
+                  required: false
+                param :ansible_lifecycle_environment_state,
+                  %w[none inherit],
+                  desc: <<~DESCRIPTION,
+                    If you want to remove the Ansible lifecycle environment from this host group, set
+                    "ansible_lifecycle_environment_state" to "none".
+                    By default, Ansible lifecycle environments are, if applicable, inherited from parent host groups.
+
+                    This parameter is only effective if "ansible_lifecycle_environment_id" is not set.
+                    Default: "inherit"
+                  DESCRIPTION
+                  required: false
+              end
+            end
+          end
         end
       end
     end
