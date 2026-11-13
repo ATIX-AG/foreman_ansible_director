@@ -54,9 +54,6 @@ Rails.application.routes.draw do
               end
             end
             member do
-              post '/assign/:target_type/:target_id', action: :assign
-            end
-            member do
               get '/', action: :show
               get '/content', action: :content
               delete '/', action: :destroy

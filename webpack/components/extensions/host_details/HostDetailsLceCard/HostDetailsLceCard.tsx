@@ -157,11 +157,29 @@ export const HostDetailsLceCard = ({
     lceIdentifier: number | 'inherit' | 'none'
   ): Promise<void> => {
     try {
-      await axios.post(
+      await axios.patch(
         foremanUrl(
-          `/api/v2/ansible_director/lifecycle_environments/${lceIdentifier}/assign/HOST/${hostDetails.id}`
+          `/api/v2/hosts/${hostDetails.id}`
         ),
-        {}
+        (() => {
+          if (lceIdentifier === 'none') {
+            return {
+              ansible_lifecycle_environment_id: null,
+              ansible_lifecycle_environment_state: 'none',
+            };
+          }
+          else if (lceIdentifier === 'inherit') {
+            return {
+              ansible_lifecycle_environment_id: null,
+              ansible_lifecycle_environment_state: 'inherit',
+            };
+          }
+          else {
+            return {
+              ansible_lifecycle_environment_id: lceIdentifier,
+            };
+          }
+        })()
       );
       dispatch(
         addToast({

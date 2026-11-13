@@ -27,6 +27,23 @@ module ForemanAnsibleDirector
           def filter_parameters
             @ansible_director_assignment_data = params[:hostgroup].delete(:ansible_director_assignment_data)
           end
+
+          module ApiDoc
+            extend Apipie::DSL::Concern
+
+            update_api(:create, :update) do
+              param :hostgroup, Hash do
+                param :ansible_lifecycle_environment_id,
+                  :number,
+                  desc: N_('Ansible lifecycle environment identifier.'),
+                  required: false
+                param :ansible_lifecycle_environment_state,
+                  %w[none inherit],
+                  desc: N_('Control parameter to specify how to interpret "ansible_lifecycle_environment_id == null".'),
+                  required: false
+              end
+            end
+          end
         end
       end
     end

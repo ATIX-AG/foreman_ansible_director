@@ -201,23 +201,6 @@ module ForemanAnsibleDirectorTests
           end
         end
 
-        describe '#assign' do
-          setup do
-            @path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
-            @environment = FactoryBot.create(:lifecycle_environment, organization: @organization, lifecycle_environment_path: @path)
-            as_admin do
-              @host = FactoryBot.create(:host, organization: @organization)
-            end
-          end
-
-          test 'assigns environment to target successfully' do
-            ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign(@environment, @host)
-
-            @host.reload
-            assert_equal @environment.id, @host.ansible_lifecycle_environment_id
-          end
-        end
-
         describe '#assign_content' do
           setup do
             @path = FactoryBot.create(:lifecycle_environment_path, organization: @organization)
