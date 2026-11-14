@@ -18,11 +18,11 @@ import {
   Modal,
   ModalVariant,
 } from '@patternfly/react-core';
-import { AnsibleExecutionEnv } from '../../../../types/AnsibleExecutionEnvTypes';
+import { ExecutionEnvironment } from '../../../../types/AnsibleExecutionEnvTypes';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 
 interface AnsibleExecutionEnvSelectionModalProps {
-  executionEnvironments: AnsibleExecutionEnv[];
+  executionEnvironments: ExecutionEnvironment[];
   setIsExecutionEnvModalOpen: Dispatch<SetStateAction<boolean>>;
   lifecycleEnv: AnsibleLce;
   refreshRequest: () => void;
@@ -42,7 +42,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
 
   const assignEeToLce = async (
     env: AnsibleLce,
-    executionEnv: AnsibleExecutionEnv
+    executionEnv: ExecutionEnvironment
   ): Promise<void> => {
     try {
       await axios.put(
@@ -105,7 +105,7 @@ export const AnsibleExecutionEnvSelectionModal = ({
                       </span>
                     </DataListCell>,
                     <DataListCell key="secondary content">
-                      {executionEnvironment.ansible_version}
+                      {executionEnvironment.ansible_version ?? '-'}
                     </DataListCell>,
                   ]}
                 />

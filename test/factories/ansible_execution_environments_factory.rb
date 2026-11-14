@@ -2,7 +2,7 @@ FactoryBot.define do
 
   factory :execution_environment, class: "::ForemanAnsibleDirector::ExecutionEnvironment" do
     sequence(:name) { |n| "execution_environment_#{n}" }
-    sequence(:base_image_url) { |n| "quay.io/ansible/base-ee:latest" }
+    sequence(:container_image_url) { |n| "quay.io/ansible/base-ee:latest" }
     ansible_version { '2.20.0' }
     association :organization
 

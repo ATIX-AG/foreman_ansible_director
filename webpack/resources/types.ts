@@ -1,11 +1,11 @@
-import { AnsibleExecutionEnv } from '../types/AnsibleExecutionEnvTypes';
+import { ExecutionEnvironment } from '../types/AnsibleExecutionEnvTypes';
 
 export interface Organizable {
   organization_id: number;
 }
 
 interface TypeRegistry {
-  execution_environments: AnsibleExecutionEnv;
+  execution_environments: ExecutionEnvironment;
 }
 
 export type ExtractRecordFromUnion<Union> = {

@@ -7,7 +7,7 @@ module ForemanAnsibleDirector
 
     DEFAULT_GALAXY_URL = 'https://galaxy.ansible.com/'
     DEFAULT_ANSIBLE_VERSION = '2.19.3'
-    DEFAULT_BASE_IMAGE_URL = 'quay.io/fedora/fedora:44'
+    DEFAULT_CONTAINER_IMAGE_URL = 'quay.io/fedora/fedora:44'
 
     PULP_OBJECT_LABELS = {
       katello_orphan_cleanup: 'false',

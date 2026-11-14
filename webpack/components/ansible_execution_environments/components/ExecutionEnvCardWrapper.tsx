@@ -1,7 +1,5 @@
 import React, {
-  Dispatch,
   ReactElement,
-  SetStateAction,
   useCallback,
   useEffect,
   useRef,
@@ -21,30 +19,31 @@ import { foremanUrl } from 'foremanReact/common/helpers';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { DefaultResponse } from '../../../types/common';
-import { AnsibleExecutionEnv } from '../../../types/AnsibleExecutionEnvTypes';
+import {
+  ExecutionEnvironment,
+  ExecutionEnvironmentDraft,
+} from '../../../types/AnsibleExecutionEnvTypes';
+import { ExecutionEnvironment as ExecutionEnvironmentClient } from '../../../resources/clients/ExecutionEnvironment';
 import { ExecutionEnvCard } from './ExecutionEnvCard';
+import { executionEnvCardConfigs } from './executionEnvCardConfig';
 import { ConfirmationModal } from '../../../helpers/components/ConfirmationModal';
-import { ExecutionEnvironment } from '../../../resources/clients/ExecutionEnvironment';
 import { useToasts } from '../../../helpers/toasts/useToasts';
 import { useAdContext } from '../../../helpers/adContext';
 
 interface ExecutionEnvCardWrapperProps {
-  executionEnv: AnsibleExecutionEnv;
-  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  executionEnv: ExecutionEnvironment;
   onDestroy: () => void;
 }
 
 interface ConfirmableAction {
   title: string;
   body: string;
-  mode: 'destroy' | 'update';
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
   onAbort: () => void;
 }
 
 export const ExecutionEnvCardWrapper = ({
   executionEnv,
-  setIsContentUnitModalOpen,
   onDestroy,
 }: ExecutionEnvCardWrapperProps): ReactElement => {
   const [
@@ -59,7 +58,7 @@ export const ExecutionEnvCardWrapper = ({
   const ctx = useAdContext();
 
   const getExecutionEnvResponse = useAPI<
-    DefaultResponse<never, never, AnsibleExecutionEnv>
+    DefaultResponse<never, never, ExecutionEnvironment>
   >(
     'get',
     foremanUrl(
@@ -97,7 +96,7 @@ export const ExecutionEnvCardWrapper = ({
   useEffect(() => {
     if (
       getExecutionEnvResponse.status === 'RESOLVED' &&
-      getExecutionEnvResponse.response?.results?.build_status === 'running'
+      getExecutionEnvResponse.response?.results?.status === 'running'
     ) {
       startPolling();
     } else {
@@ -110,35 +109,91 @@ export const ExecutionEnvCardWrapper = ({
     stopPolling,
   ]);
 
-  const updateEnvironment = async (env: AnsibleExecutionEnv): Promise<void> => {
-    await withToast({
-      type: 'update',
-      resource: 'execution_environment',
-      func: ExecutionEnvironment.update(env.id, {
-        execution_environment: {
-          name: env.name,
-          base_image_url: env.base_image_url,
-          ansible_version: env.ansible_version,
-        },
-      }),
-    });
-    refreshRequest();
-  };
-
-  const destroyEnvironment = async (
-    env: AnsibleExecutionEnv
-  ): Promise<void> => {
-    await withToast({
-      type: 'delete',
-      resource: 'execution_environment',
-      func: ExecutionEnvironment.destroy(env.id),
-    });
-  };
-
   const currentEnv =
     getExecutionEnvResponse.status === 'RESOLVED'
       ? getExecutionEnvResponse.response.results
       : executionEnv;
+
+  const confirm = (
+    title: string,
+    body: string,
+    onConfirm: () => Promise<boolean>
+  ): Promise<boolean> =>
+    new Promise(resolve => {
+      setActionPendingConfirmation({
+        title,
+        body,
+        onConfirm: async () => {
+          const confirmed = await onConfirm();
+          setActionPendingConfirmation(null);
+          resolve(confirmed);
+        },
+        onAbort: () => {
+          setActionPendingConfirmation(null);
+          resolve(false);
+        },
+      });
+    });
+
+  const updateEnvironment = async (
+    draft: ExecutionEnvironmentDraft
+  ): Promise<boolean> => {
+    const response = await withToast({
+      type: 'update',
+      resource: 'execution_environment',
+      func: ExecutionEnvironmentClient.update(currentEnv.id, {
+        execution_environment: draft,
+      }),
+    });
+    refreshRequest();
+
+    return response.ok;
+  };
+
+  const destroyEnvironment = async (): Promise<void> => {
+    await withToast({
+      type: 'delete',
+      resource: 'execution_environment',
+      func: ExecutionEnvironmentClient.destroy(currentEnv.id),
+    });
+  };
+
+  const requestUpdate = (draft: ExecutionEnvironmentDraft): Promise<boolean> => {
+    const rebuilds = executionEnvCardConfigs[currentEnv.source].rebuildsOnChange;
+    const body = rebuilds
+      ? __(
+        _(
+          'Are you sure you want to update %(name)s? This will require a rebuild of the associated image.'
+        ),
+        { name: currentEnv.name }
+      )
+      : __(
+        _(
+          'Are you sure you want to update %(name)s?'
+        ),
+        { name: currentEnv.name }
+      );
+
+    return confirm(
+      __(_('Confirm update of %(name)s'), { name: currentEnv.name }),
+      body,
+      async () => updateEnvironment(draft)
+    );
+  };
+
+  const requestDestroy = (): Promise<boolean> =>
+    confirm(
+      __(_('Confirm deletion of %(name)s'), { name: currentEnv.name }),
+      __(_('Are you sure you want to delete %(name)s?'), {
+        name: currentEnv.name,
+      }),
+      async () => {
+        await destroyEnvironment();
+        onDestroy();
+
+        return true;
+      }
+    );
 
   if (getExecutionEnvResponse.status === 'ERROR') {
     // TODO: Handle error
@@ -156,41 +211,8 @@ export const ExecutionEnvCardWrapper = ({
         )}
         <ExecutionEnvCard
           executionEnv={currentEnv}
-          handleDestroy={env =>
-            setActionPendingConfirmation({
-              title: __(_('Confirm deletion of %(name)s'), { name: env.name }),
-              body: __(_('Are you sure you want to delete %(name)s?'), {
-                name: env.name,
-              }),
-              mode: 'destroy',
-              onConfirm: async () => {
-                await destroyEnvironment(env);
-                setActionPendingConfirmation(null);
-                onDestroy();
-              },
-              onAbort: () => {
-                setActionPendingConfirmation(null);
-              },
-            })}
-          handleUpdate={env =>
-            setActionPendingConfirmation({
-              title: __(_('Confirm update of %(name)s'), { name: env.name }),
-              body: __(
-                _(
-                  'Are you sure you want to update %(name)s? This will require a rebuild of the associated image.'
-                ),
-                { name: env.name }
-              ),
-              mode: 'update',
-              onConfirm: async () => {
-                await updateEnvironment(env);
-                setActionPendingConfirmation(null);
-              },
-              onAbort: () => {
-                setActionPendingConfirmation(null);
-              },
-            })}
-          setIsContentUnitModalOpen={setIsContentUnitModalOpen}
+          onDelete={requestDestroy}
+          onSave={requestUpdate}
         />
       </>
     );

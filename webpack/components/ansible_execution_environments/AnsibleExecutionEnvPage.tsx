@@ -9,13 +9,7 @@ import { Page } from '../common/Page';
 const AnsibleExecutionEnvPage: React.FC = () => {
   const { searchParam } = useUrlParams();
   return (
-    <Page
-      header={_('Ansible Execution Environments')}
-      hasDocumentation={false}
-      customToolbarItems={[]}
-    >
-      <ExecutionEnvGridWrapper initialSearch={searchParam} />
-    </Page>
+    <ExecutionEnvGridWrapper initialSearch={searchParam} />
   );
 };
 
