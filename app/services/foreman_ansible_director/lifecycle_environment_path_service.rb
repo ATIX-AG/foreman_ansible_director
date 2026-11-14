@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanAnsibleDirector
-  class LifecycleEnvironmentPathService
+  class LifecycleEnvironmentPathService < AnsibleDirectorService
     class << self
       def create_path(name:,
                       description:,
@@ -94,20 +94,20 @@ module ForemanAnsibleDirector
             raise ActiveRecord::Rollback
           end
 
-          valid_promotion?(source_env, target_env)
+          recipient_lces = valid_promotion?(source_env, target_env)
 
-          if source_env.using_snapshot_content?
-            source_env.content_snapshot.increment_references
-            target_env.content_snapshot&.decrement_references
-            target_env.update!(content_snapshot: source_env.content_snapshot)
-          else
-            snapshot = create_snapshot source_env
-            target_env.content_snapshot&.decrement_references
-            target_env.update!(content_snapshot: snapshot)
-          end
+          source_snapshot = if source_env.using_snapshot_content?
+                              source_env.content_snapshot.increment_references(recipient_lces.length)
+                              source_env.content_snapshot
+                            else
+                              create_snapshot(source_env, initial_references: recipient_lces.length)
+                            end
+          source_ee_id = source_env.execution_environment&.id
 
-          if (ee_id = source_env.execution_environment&.id)
-            target_env.update!(execution_environment_id: ee_id)
+          recipient_lces.each do |recipient_lce|
+            recipient_lce.content_snapshot&.decrement_references
+            recipient_lce.update!(content_snapshot: source_snapshot)
+            recipient_lce.update!(execution_environment_id: source_ee_id) if source_ee_id
           end
 
           success = true
@@ -155,27 +155,43 @@ module ForemanAnsibleDirector
       end
 
       def valid_promotion?(source_env, target_env)
-        # Disabling linter rule for this because this will be needed once explicit error handling is implemented
-        # rubocop:disable Style/GuardClause
-        if source_env.leaf?
-          # errors.add(:source_env, 'Source environment is the final link in chain.')
-          raise ActiveRecord::Rollback
-        elsif source_env.position > target_env.position
-          # errors.add(:source_env,
-          #           "Wrong promotion direction. Source environment position is greater than target
-          # environment position. (#{source_env.position} > #{target_env.position}).")
-          raise ActiveRecord::Rollback
-          # rubocop:disable Lint/LiteralAsCondition
-        elsif target_env.position != (source_env.position + 1) && !false # TODO: Setting: Force incremental promotion
-          # rubocop:enable Lint/LiteralAsCondition
-          # errors.add(:source_env, 'Promotion spans more than two environments and $SETTING_NAME is set to false.')
-          raise ActiveRecord::Rollback
+        if source_env.position > target_env.position
+          ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::UnsupportedRollbackError.new(
+            source_environment: source_env,
+            target_environment: target_env
+          ), critical: true)
+
+        elsif source_env.position == target_env.position
+          ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::PromotionSourceTargetIdenticalError.new(
+            environment: target_env
+          ), critical: true)
+
+        elsif target_env.position - source_env.position == 1
+          [target_env]
+
+          # ((p_source + 1)..(p_target - 1)).to_a.length > 0
+          # ((p_source + 1)..(p_target - 1)).length > 0 <=> (p_target - 1) - (p_source + 1) + 1 > 0
+          # (p_target - 1) - (p_source + 1) + 1 > 0 <=> p_target - p_source > 1
+          # Ex.: Promotion of 1 to 3, implicit promotion of 2
+          # ((1 + 1)..(3-1)).length <=> [2].length = 1
+          # Ex.: Promotion of 1 to 2, no implicit promotion
+          # ((1 + 1)..(2-1)).length = 0, p_target - p_source = 1 !> 1, guard does not fire
+        elsif target_env.position - source_env.position > 1
+          if Setting[:ansible_director_lce_path_force_incremental]
+            ctx.add_error(::ForemanAnsibleDirector::Issues::Errors::IllegalImplicitPromotionError.new(
+              source_environment: source_env,
+              target_environment: target_env
+            ), critical: true)
+          else
+            target_env.lifecycle_environment_path.lifecycle_environments.where(position: (
+              (source_env.position + 1)..(target_env.position - 1)
+            ).to_a) + [target_env]
+          end
         end
-        # rubocop:enable Style/GuardClause
       end
 
-      def create_snapshot(environment)
-        snapshot = ::ForemanAnsibleDirector::ContentSnapshot.create!(references: 1,
+      def create_snapshot(environment, initial_references: 1)
+        snapshot = ::ForemanAnsibleDirector::ContentSnapshot.create!(references: initial_references,
           content_hash: environment.content_hash)
         content_unit_version_ids = environment.content_unit_versions.pluck(:id)
         content_unit_version_ids.each do |content_unit_version_id|
