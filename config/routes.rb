@@ -57,8 +57,8 @@ Rails.application.routes.draw do
               get '/', action: :show
               get '/content', action: :content
               delete '/', action: :destroy
-              put '/', action: :update
-              patch '/', action: :update_content
+              put '/', action: :update_full
+              patch '/', action: :update_partial
             end
           end
           resources :status, only: [] do
