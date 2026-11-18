@@ -97,7 +97,7 @@ module ForemanAnsibleDirector
             end
 
             input.update(indexed_unit_versions: unit_versions)
-            output.update(indexed_unit_versions: unit_versions)
+            output.update(indexed_unit_versions: unit_versions, skip_cleanup: !unit_versions.empty?)
           end
 
           def finalize
@@ -107,6 +107,7 @@ module ForemanAnsibleDirector
 
             case input[:index_mode]
             when 'import'
+              return if unit_versions.empty?
 
               unit_record = ::ForemanAnsibleDirector::AnsibleCollection.find_by(name: input[:unit_name],
                 namespace: input[:unit_namespace],
