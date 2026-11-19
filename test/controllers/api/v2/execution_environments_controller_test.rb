@@ -116,7 +116,7 @@ module ForemanAnsibleDirectorTests
                 organization_id: @organization.id,
                 execution_environment: {
                   name: 'created-ee',
-                  base_image_url: 'quay.io/fedora/fedora:42',
+                  container_image_url: 'quay.io/fedora/fedora:42',
                   ansible_version: '2.20.0',
                 },
               },

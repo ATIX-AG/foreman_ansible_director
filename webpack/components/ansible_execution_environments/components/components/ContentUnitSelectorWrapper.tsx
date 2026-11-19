@@ -10,17 +10,11 @@ import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { ContentUnitSelector } from './components/ContentUnitSelector';
 import { AnsibleContentUnit } from '../../../../types/AnsibleContentTypes';
-import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
-} from '../../../../types/AnsibleExecutionEnvTypes';
+import { ExecutionEnvironmentBuilt } from '../../../../types/AnsibleExecutionEnvTypes';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
 
 interface ContentUnitSelectorWrapperProps {
-  executionEnvironment:
-    | AnsibleExecutionEnv
-    | AnsibleExecutionEnvCreate
-    | AnsibleLce;
+  executionEnvironment: ExecutionEnvironmentBuilt | AnsibleLce;
   chosenUnits: {
     [unit: number]: string;
   };
