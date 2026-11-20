@@ -77,7 +77,7 @@ Foreman::Plugin.register :foreman_ansible_director do
     # Ansible lifecycle environments
     # View
     permission :view_ansible_lifecycle_environments,
-      { 'foreman_ansible_director/api/v2/lifecycle_environments': %i[show content] },
+      { 'foreman_ansible_director/api/v2/lifecycle_environments': [:show] },
       resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     # Create
     permission :create_ansible_lifecycle_environments,

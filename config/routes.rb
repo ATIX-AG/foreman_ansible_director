@@ -55,7 +55,6 @@ Rails.application.routes.draw do
             end
             member do
               get '/', action: :show
-              get '/content', action: :content
               delete '/', action: :destroy
               put '/', action: :update_full
               patch '/', action: :update_partial
