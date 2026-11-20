@@ -97,7 +97,7 @@ module ForemanAnsibleDirector
             desc: N_('ID of the execution environment to associate with this lifecycle environment.'),
             example: 3,
             required: true
-          param :content_assignments,
+          param :content_unit_version_ids,
             Array,
             desc: N_('Array of content assignments'),
             required: false do
@@ -114,7 +114,7 @@ module ForemanAnsibleDirector
             "lifecycle_environment": {
               "name": "Production",
               "execution_environment_id": 5,
-              "content_assignments": [
+              "content_unit_version_ids": [
                 { "content_unit_version_id": 101 },
                 { "id": 43, "version": "2.1.0" }
               ]
@@ -150,7 +150,7 @@ module ForemanAnsibleDirector
             desc: N_('ID of the execution environment to associate with this lifecycle environment.'),
             example: 3,
             required: false
-          param :content_assignments,
+          param :content_unit_version_ids,
             Array,
             desc: N_('Array of content assignments'),
             required: false do
@@ -176,7 +176,7 @@ module ForemanAnsibleDirector
           {
             "lifecycle_environment": {
               "name": "Production",
-              "content_assignments": [
+              "content_unit_version_ids": [
                 { "content_unit_version_id": 101 }
               ]
             }
@@ -214,7 +214,7 @@ module ForemanAnsibleDirector
             :name,
             :description,
             :execution_environment_id,
-            content_assignments: %i[content_unit_version_id]
+            content_unit_version_ids: []
           )
         end
 
@@ -225,7 +225,7 @@ module ForemanAnsibleDirector
             {
               name: root_node.require(:name),
               execution_environment_id: root_node.require(:execution_environment_id),
-              content_assignments: root_node.require(:content_assignments),
+              content_unit_version_ids: root_node.require(:content_unit_version_ids),
             }
           else
             {
@@ -241,7 +241,7 @@ module ForemanAnsibleDirector
             {
               name: root_node[:name],
               execution_environment_id: root_node[:execution_environment_id],
-              content_assignments: root_node[:content_assignments],
+              content_unit_version_ids: root_node[:content_unit_version_ids],
             }.compact
           else
             {
@@ -257,7 +257,7 @@ module ForemanAnsibleDirector
             :position
             # content: [
             #  :execution_environment_id,
-            #  { content_assignments: %i[id version] },
+            #  { content_unit_version_ids: %i[id version] },
             # ]
           ).merge(
             # lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
