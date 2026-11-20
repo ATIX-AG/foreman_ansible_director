@@ -9,14 +9,12 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 
-import axios, { AxiosResponse } from 'axios';
-import { useDispatch } from 'react-redux';
-import { foremanUrl } from 'foremanReact/common/helpers';
-import { addToast } from 'foremanReact/components/ToastsList';
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
 import { AnsibleLceComponentHeaderActions } from './AnsibleLceComponentHeaderActions';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
+import { useToasts } from '../../../../helpers/toasts/useToasts';
+import { LifecycleEnvironment } from '../../../../resources/clients/LifecycleEnvironment';
 
 interface AnsibleLceComponentProps {
   lce: AnsibleLce;
@@ -52,7 +50,7 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
     setLifecycleEnvironment(lce);
   }, [lce]);
 
-  const dispatch = useDispatch();
+  const { withToast } = useToasts();
 
   const handleLceUpdate = (): void => {
     if (editMode) {
@@ -78,71 +76,25 @@ export const AnsibleLceComponent: React.FC<AnsibleLceComponentProps> = ({
   };
 
   const updateLce = async (env: AnsibleLce): Promise<void> => {
-    try {
-      await axios.put(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${
-          env.id
-        }`,
-        {
-          lifecycle_environment: lifecycleEnvironment,
-        }
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `UPDATE_LCE_${env.name}_SUCC`,
-          message: `Successfully updated Ansible environment "${env.name}"!`,
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `UPDATE_LCE_${env.name}_ERR`,
-          message: `Updating of Ansible environment "${
-            env.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'update',
+      resource: 'lifecycle_environment',
+      func: LifecycleEnvironment.updatePartial(env.id, {
+        lifecycle_environment: {
+          name: lifecycleEnvironment?.name,
+        },
+      }),
+    });
+    refreshRequest();
   };
 
-  // TODO: implement
   const destroyLce = async (lceRef: AnsibleLce): Promise<void> => {
-    try {
-      await axios.delete(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${
-          lceRef.id
-        }`
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `DESTROY_LCE_${lceRef.name}_SUCC`,
-          message: `Successfully deleted Ansible environment "${lceRef.name}"!`,
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `DESTROY_LCE_${lceRef.name}_ERR`,
-          message: `Deletion of Ansible environment "${
-            lceRef.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'delete',
+      resource: 'lifecycle_environment',
+      func: LifecycleEnvironment.destroy(lceRef.id),
+    });
+    refreshRequest();
   };
 
   const contentUnitCountString = (lceObj: AnsibleLce): string => {

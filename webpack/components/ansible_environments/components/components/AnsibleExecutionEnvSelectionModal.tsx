@@ -1,10 +1,4 @@
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
-
-import axios, { AxiosResponse } from 'axios';
-import { addToast } from 'foremanReact/components/ToastsList';
-import { useDispatch } from 'react-redux';
-
-import { foremanUrl } from 'foremanReact/common/helpers';
 import { translate as _ } from 'foremanReact/common/I18n';
 
 import {
@@ -20,6 +14,8 @@ import {
 } from '@patternfly/react-core';
 import { AnsibleExecutionEnv } from '../../../../types/AnsibleExecutionEnvTypes';
 import { AnsibleLce } from '../../../../types/AnsibleEnvironmentsTypes';
+import { LifecycleEnvironment } from '../../../../resources/clients/LifecycleEnvironment';
+import { useToasts } from '../../../../helpers/toasts/useToasts';
 
 interface AnsibleExecutionEnvSelectionModalProps {
   executionEnvironments: AnsibleExecutionEnv[];
@@ -38,48 +34,22 @@ export const AnsibleExecutionEnvSelectionModal = ({
     false
   );
 
-  const dispatch = useDispatch();
+  const { withToast } = useToasts();
 
   const assignEeToLce = async (
     env: AnsibleLce,
     executionEnv: AnsibleExecutionEnv
   ): Promise<void> => {
-    try {
-      await axios.put(
-        `${foremanUrl('/api/v2/ansible_director/lifecycle_environments')}/${
-          env.id
-        }`,
-        {
-          lifecycle_environment: {
-            description: env.description,
-            name: env.name,
-            execution_environment_id: executionEnv.id,
-          },
-        }
-      );
-      dispatch(
-        addToast({
-          type: 'success',
-          key: `UPDATE_LCE_EE_${env.name}_SUCC`,
-          message: `Successfully updated Ansible Execution Environment for environment "${env.name}"!`,
-          sticky: false,
-        })
-      );
-      refreshRequest();
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: `UPDATE_LCE_EE_${env.name}_ERR`,
-          message: `Updating of Ansible Execution Environment "${
-            env.name
-          }" failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    }
+    await withToast({
+      type: 'update',
+      resource: 'lifecycle_environment',
+      func: LifecycleEnvironment.updatePartial(env.id, {
+        lifecycle_environment: {
+          execution_environment_id: executionEnv.id,
+        },
+      }),
+    });
+    refreshRequest();
   };
 
   return (

@@ -6,8 +6,6 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { useDispatch } from 'react-redux';
 
 import {
   Bullseye,
@@ -22,9 +20,7 @@ import ArrowRightIcon from '@patternfly/react-icons/dist/esm/icons/arrow-right-i
 import BarsIcon from '@patternfly/react-icons/dist/esm/icons/bars-icon';
 import PlusIcon from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 
-import { foremanUrl } from 'foremanReact/common/helpers';
 import { useForemanOrganization } from 'foremanReact/Root/Context/ForemanContext';
-import { addToast } from 'foremanReact/components/ToastsList';
 
 import { translate as _, sprintf as __ } from 'foremanReact/common/I18n';
 
@@ -41,6 +37,7 @@ import { PermittedButton } from '../../../common/PermittedButton';
 import { Permitted } from '../../../common/Permitted';
 import { useToasts } from '../../../../helpers/toasts/useToasts';
 import { LifecycleEnvironmentPath } from '../../../../resources/clients/LifecycleEnvironmentPath';
+import { LifecycleEnvironment } from '../../../../resources/clients/LifecycleEnvironment';
 
 interface AnsibleLcePathProps {
   lcePath: AnsibleLcePath;
@@ -77,7 +74,6 @@ export const AnsibleLcePathComponent = ({
   const organization = useForemanOrganization();
 
   const { withToast } = useToasts();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     setLifecycleEnvironmentPath(lcePath);
@@ -162,63 +158,36 @@ export const AnsibleLcePathComponent = ({
     lce: SparseAnsibleLce,
     name?: string
   ): Promise<void> => {
-    try {
-      await axios.post(
-        foremanUrl('/api/v2/ansible_director/lifecycle_environments/'),
-        {
-          lifecycle_environment: {
-            name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
-            position: pos === 'before' ? lce.position : lce.position + 1,
-          },
-          lifecycle_environment_path_id: lcePath.id,
-          organization_id: organization?.id,
-        }
-      );
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: 'INSERT_ENV_ERR',
-          message: `Insertion of environment ${pos} ${
-            lce.name
-          } failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    } finally {
-      refreshRequest();
-    }
+    await withToast({
+      type: 'create',
+      resource: 'lifecycle_environment',
+      func: LifecycleEnvironment.create({
+        lifecycle_environment: {
+          name: name || `${pos === 'before' ? 'PRE' : 'POST'}-${lce.name}`,
+          position: pos === 'before' ? lce.position : lce.position + 1,
+          content_unit_version_ids: [],
+        },
+        lifecycle_environment_path_id: lcePath.id,
+        organization_id: organization?.id,
+      }),
+    });
+    refreshRequest();
   };
 
   const insertFirstEnv = async (name: string): Promise<void> => {
-    try {
-      await axios.post(
-        foremanUrl('/api/v2/ansible_director/lifecycle_environments/'),
-        {
-          lifecycle_environment: {
-            name,
-            position: 0,
-          },
-          lifecycle_environment_path_id: lcePath.id,
-          organization_id: organization?.id,
-        }
-      );
-    } catch (e) {
-      dispatch(
-        addToast({
-          type: 'danger',
-          key: 'INSERT_ENV_ERR',
-          message: `Insertion of environment ${name} failed with error code "${
-            (e as { response: AxiosResponse }).response.status
-          }".`,
-          sticky: false,
-        })
-      );
-    } finally {
-      refreshRequest();
-    }
+    await withToast({
+      type: 'create',
+      resource: 'lifecycle_environment',
+      func: LifecycleEnvironment.create({
+        lifecycle_environment: {
+          name: name,
+          position: 0,
+          content_unit_version_ids: [],
+        },
+        lifecycle_environment_path_id: lcePath.id,
+        organization_id: organization?.id,
+      }),
+    });
   };
 
   const connectionIcon = (
