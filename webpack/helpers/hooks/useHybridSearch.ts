@@ -32,13 +32,14 @@ interface NoDebounce {
   debounceDelay?: never;
 }
 
-interface UseHybridSearchResult<TOption> {
+export interface UseHybridSearchResult<TOption> {
   status: UseAPIReturn<never>['status'];
   isUsingApi: boolean;
   options: TOption[];
   overflow: boolean;
   overflowCount: number;
   effectiveCacheSize: number;
+  total: number;
   triggerApiSearch: () => void;
 }
 
@@ -77,6 +78,7 @@ interface ApiGetResponse<TEntity> extends IndexResponse {
  * @property {TOption[]} options - The filtered and transformed list of options.
  * @property {boolean} overflow - `true` if the server-side subtotal exceeds `effectiveCacheSize`.
  * @property {number} overflowCount - Number of additional items available on the server beyond `effectiveCacheSize`.
+ * @property {number} total - Total number of items available on the server.
  * @property {number} effectiveCacheSize - The effective cache size used (`searchCacheSize` or default).
  * @property {() => void} triggerApiSearch - Imperative function to trigger an API-based search, regardless of the results of localSearchFn.
  *
@@ -87,6 +89,7 @@ interface ApiGetResponse<TEntity> extends IndexResponse {
  *   options,
  *   overflow,
  *   overflowCount,
+ *   total,
  *   effectiveCacheSize
  * } = useHybridSearch({
  *   url: '/api/v2/hosts',
@@ -126,6 +129,7 @@ export const useHybridSearch = <TEntity, TOption>({
   const [options, setOptions] = useState<TEntity[]>([]);
   const [isOverflowing, setIsOverflowing] = useState<boolean>(false);
   const [overflowCount, setOverflowCount] = useState<number>(0);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [isUsingApi, setIsUsingApi] = useState<boolean>(false);
 
   const isUsingApiRef = useRef<boolean>(false);
@@ -198,6 +202,7 @@ export const useHybridSearch = <TEntity, TOption>({
     const oFlow = apiRequest.response.subtotal - maxResults;
     setIsOverflowing(oFlow > 0);
     setOverflowCount(oFlow);
+    setTotalCount(apiRequest.response.total);
 
     if (isUsingApiRef.current) {
       setOptions(results);
@@ -257,5 +262,6 @@ export const useHybridSearch = <TEntity, TOption>({
     overflowCount,
     effectiveCacheSize: maxResults,
     triggerApiSearch,
-  };
+    total: totalCount,
+  } satisfies UseHybridSearchResult<TOption>;
 };

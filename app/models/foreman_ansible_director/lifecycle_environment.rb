@@ -135,6 +135,7 @@ module ForemanAnsibleDirector
               .map do |v|
                 {
                   id: v.versionable.id,
+                  content_unit_version_id: v.id,
                   type: v.content_unit_type,
                   identifier: v.versionable.full_name,
                   version: v.version,
