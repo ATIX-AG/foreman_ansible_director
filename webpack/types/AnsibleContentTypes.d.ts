@@ -59,6 +59,7 @@ export interface AnsibleContentVersionFull
 // TODO: Split this into Role and Collection types.
 // As is, the UI has to rely on the fact that the roles key only exists for Collection roles.
 export interface AnsibleContentUnitAssignment extends Identifiable {
+  content_unit_version_id: number;
   type: 'collection' | 'role';
   identifier: string;
   version: string;
