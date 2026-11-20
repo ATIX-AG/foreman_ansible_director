@@ -85,7 +85,7 @@ Foreman::Plugin.register :foreman_ansible_director do
       resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     # Edit
     permission :edit_ansible_lifecycle_environments,
-      { 'foreman_ansible_director/api/v2/lifecycle_environments': %i[update_full update_partial] },
+      { 'foreman_ansible_director/api/v2/lifecycle_environments': %i[update_full] },
       resource_type: 'ForemanAnsibleDirector::LifecycleEnvironment'
     # Destroy
     permission :destroy_ansible_lifecycle_environments,
