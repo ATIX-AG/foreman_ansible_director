@@ -7,8 +7,8 @@ module ForemanAnsibleDirector
 
     has_many :lifecycle_environments, dependent: :nullify
 
-    def increment_references
-      update!(references: self.references += 1)
+    def increment_references(count = 1)
+      update!(references: self[:references] + count)
     end
 
     def decrement_references

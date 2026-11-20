@@ -144,10 +144,16 @@ module ForemanAnsibleDirector
         def promote
           permitted_params = promote_params
 
+          source_environment = @lifecycle_environment_path
+                               .lifecycle_environments
+                               .find_by!(id: permitted_params[:source_environment_id])
+          target_environment = @lifecycle_environment_path
+                               .lifecycle_environments
+                               .find_by!(id: permitted_params[:target_environment_id])
+
           ::ForemanAnsibleDirector::LifecycleEnvironmentPathService.promote(
-            lce_path: @lifecycle_environment_path,
-            source_environment_id: permitted_params[:source_environment_id],
-            target_environment_id: permitted_params[:target_environment_id]
+            source_environment: source_environment,
+            target_environment: target_environment
           )
         end
 

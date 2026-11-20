@@ -28,11 +28,11 @@ class ForemanAnsibleDirectorTestCase < ActiveSupport::TestCase
   end
 
   def with_setting_stub(setting:, value:)
-    original = Setting[setting]
-    Setting[setting] = value
+    original = ::Setting[setting]
+    ::Setting[setting] = value
     yield
   ensure
-    Setting[setting] = original
+    ::Setting[setting] = original
   end
 
   class << self
