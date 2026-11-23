@@ -10,13 +10,14 @@ module ForemanAnsibleDirector
         end
 
         def title
-          _('Invalid container registry url')
+          _('Invalid container image url')
         end
 
         def message
           <<~MESSAGE
-            Container registry URL "#{@container_image_url}" is invalid.
-            It must include an http(s):// scheme, a repository and a tag (e.g. "https://registry.io/repo/image:latest").
+            Container image URL "#{@container_image_url}" is invalid.
+            It must include a scheme ("http://" or "https://"), a repository and a tag.
+            Example: "https://registry.example.com/repository/container-image:1.2.3".
           MESSAGE
         end
 

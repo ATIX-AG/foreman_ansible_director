@@ -95,8 +95,9 @@ module ForemanAnsibleDirector
           param :container_image_url,
             String,
             desc: <<~DESC,
-              Fully-qualified container registry path where the Execution Environment image is located.
+              Fully-qualified container image URL of the Execution Environment image.
               The URL must contain a scheme and an image tag.
+              The container image must be pullable by an unauthenticated user.
             DESC
             example: 'https://ghcr.io/ansible-community/community-ee-base:latest',
             required: true
@@ -139,7 +140,7 @@ module ForemanAnsibleDirector
             #   2. ApiPie does not support conditional parameters.
             #      Refs: https://github.com/Apipie/apipie-rails/issues/550
             desc: <<~DESC,
-              Fully-qualified container registry path where the Execution Environment image is located.
+              Fully-qualified container image URL of the Execution Environment's base image.
               The URL must contain a scheme and an image tag.
               This argument is ignored for imported Execution Environments.
             DESC
@@ -149,7 +150,7 @@ module ForemanAnsibleDirector
           param :ansible_version,
             String,
             desc: <<~DESC,
-              Version of "ansible-core" to be used in this execution environment.
+              Version of "ansible-core" for this Execution Environment.
               The version must match one of the available releases.
               See: https://pypi.org/project/ansible-core/#history
               This argument is ignored for imported Execution Environments.
@@ -188,7 +189,7 @@ module ForemanAnsibleDirector
           param :container_image_url,
             String,
             desc: <<~DESC,
-              Execution Environment container image URL.
+              Fully-qualified container image URL of the Execution Environment's base image.
               The container image must be pullable by an unauthenticated user.
               This argument is ignored for imported Execution Environments.
             DESC

@@ -214,7 +214,7 @@ Foreman::Plugin.register :foreman_ansible_director do
                        If your container registry uses a self-signed certificate, ensure the CA certificate
                        is part of the trust store of Foreman server.',
         default: true,
-        full_name: 'Execution Environments - Import - Verify registry SSL certificate'
+        full_name: 'Execution Environments - Import - Verify SSL certificate of the container registry'
       setting 'ansible_director_default_ee_rex',
         type: :integer,
         description: 'Default Execution Environment used for execution of Remote Execution jobs.',
