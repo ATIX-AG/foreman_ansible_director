@@ -4,7 +4,8 @@ module ForemanAnsibleDirector
   module Actions
     module ExecutionEnvironment
       class Import < ::ForemanAnsibleDirector::Actions::Base::AnsibleDirectorAction
-        include Dynflow::Action::V2::WithSubPlans
+        execution_plan_hooks.use :update_failed, on: :paused
+        execution_plan_hooks.use :update_success, on: :success
 
         input_format do
           param :execution_environment_id
@@ -15,38 +16,67 @@ module ForemanAnsibleDirector
           execution_environment_id = args[:execution_environment_id]
           katello_repository_options = args[:katello_repository_options]
 
-          staging_product = ::Katello::Product.find_by(id: katello_repository_options[:product_id])
-          root_repository = staging_product.add_repo(katello_repository_options)
-
           sequence do
-            plan_action(::Actions::Katello::Repository::CreateRoot, root_repository)
+            katello_action_wrapper = plan_action(
+              ::ForemanAnsibleDirector::Actions::ExecutionEnvironment::ImportExecutionEnvironment,
+              execution_environment_id: execution_environment_id,
+              katello_repository_options: katello_repository_options
+            )
+
             plan_self(
-              repository_name: katello_repository_options[:name],
-              execution_environment_id: execution_environment_id
+              execution_environment_id: execution_environment_id,
+              katello_action_wrapper: katello_action_wrapper.output,
+              katello_repository_options: katello_repository_options
             )
           end
         end
 
-        def create_sub_plans
-          root_repository = ::Katello::RootRepository.find_by!(name: input[:repository_name])
+        def finalize
+          katello_repository_options = input[:katello_repository_options]
+          katello_action_wrapper_output = input[:katello_action_wrapper]
+          ee_id = input[:execution_environment_id]
+          env = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by!(id: ee_id)
+          root_repository = ::Katello::RootRepository.find_by!(name: katello_repository_options[:name])
 
-          if (repositories = root_repository.repositories).length != 1
+          unless katello_action_wrapper_output[:success_count] == katello_action_wrapper_output[:total_count]
+            raise "Foreman failed to download the container image from #{env.container_image_url}.
+                    Check the subtask's logs for more details."
+          end
+
+          container_repository = root_repository.repositories.first
+          unless container_repository
             raise "Unexpected repository count. Please delete #{root_repository.name} and try again."
           end
 
-          trigger(::Actions::Katello::Repository::Sync, repositories.first)
+          planned_tags_count = container_repository
+                               .docker_tags
+                               .where(name: katello_repository_options[:include_tags])
+                               .size
+          unless planned_tags_count == 1
+            raise "Foreman did not find the container image \"#{env.container_image_url}\".
+                      Ensure the repository and tag are correct."
+          end
+          nil
         end
 
-        def finalize
-          env = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(id: input[:execution_environment_id])
-
-          env.update!(
+        def update_success(execution_plan)
+          ee_id = execution_plan.entry_action.input[:execution_environment_id]
+          ee = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by!(id: ee_id)
+          ee.update!(
             status: 'success'
           )
         end
 
-        def total_count
-          1
+        def update_failed(execution_plan)
+          ee_id = execution_plan.entry_action.input[:execution_environment_id]
+          ee = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by!(id: ee_id)
+          ee.update!(
+            status: 'failed'
+          )
+        end
+
+        def rescue_strategy_for_self
+          Dynflow::Action::Rescue::Fail
         end
       end
     end

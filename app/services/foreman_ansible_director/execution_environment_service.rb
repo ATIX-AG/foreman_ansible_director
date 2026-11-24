@@ -55,10 +55,12 @@ module ForemanAnsibleDirector
         execution_environment.update!(
           args
         )
-        new_hash = execution_environment.generate_content_hash
-        if new_hash != execution_environment.content_hash
-          task = build_execution_environment execution_environment
-          execution_environment.update!(content_hash: new_hash, latest_task_id: task.id)
+        if execution_environment.source == 'image_build'
+          new_hash = execution_environment.generate_content_hash
+          if new_hash != execution_environment.content_hash
+            task = build_execution_environment execution_environment
+            execution_environment.update!(content_hash: new_hash, latest_task_id: task.id)
+          end
         end
         execution_environment
         # end
@@ -154,7 +156,8 @@ module ForemanAnsibleDirector
           task_args: {
             execution_environment_id: execution_environment.id,
             katello_repository_options: opts,
-          }
+          },
+          mode: :async
         )
       end
 
