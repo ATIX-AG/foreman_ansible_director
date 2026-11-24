@@ -89,7 +89,7 @@ const ExecutionEnvGridWrapper = ({
 
         <Page
           header={_('Ansible Execution Environments')}
-          customToolbarItems={[
+          customToolbarItems={executionEnvResponse.response.results.length > 0 ? [
             <PermittedButton
               onClick={() => setIsImportModalOpen(true)}
               requiredPermissions={[AdPermissions.executionEnvironments.create]}
@@ -97,7 +97,7 @@ const ExecutionEnvGridWrapper = ({
             >
               {_('Import Execution Environment')}
             </PermittedButton>,
-          ]}
+          ] : []}
           hasDocumentation={false}
           searchBar={
             <SearchBar
