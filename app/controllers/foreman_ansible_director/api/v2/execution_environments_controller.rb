@@ -280,11 +280,11 @@ module ForemanAnsibleDirector
               name: root_node[:name],
               ansible_version: root_node[:ansible_version],
               container_image_url: root_node[:container_image_url],
-            }
+            }.compact
           else
             {
               name: root_node[:name],
-            }
+            }.compact
           end
         end
 
