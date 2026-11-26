@@ -26,15 +26,13 @@ if defined? ForemanRemoteExecution
                       { host_name: host.name })
                   end
 
-                  execution_environment = content_source.cs_execution_environment
-
-                  execution_environment ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-                    id: Setting[:ansible_director_default_ee_internal]
-                  )
+                  execution_environment = content_source.cs_execution_environment ||
+                                          default_execution_environment(host)
 
                   unless execution_environment
-                    raise format('Host %<host_name>s does not have an execution environment assigned to it.',
-                      { host_name: host.name })
+                    raise "No Execution Environment found.
+                    You must either assign your host #{host.name} to an Ansible environment or configure a default
+                      Execution Environment through the 'ansible_director_default_ee_id' parameter."
                   end
 
                   pull_url = execution_environment.registry_url!
@@ -105,6 +103,15 @@ if defined? ForemanRemoteExecution
 
               def required_proxy_selector_for(_template)
                 ::ForemanAnsibleDirector::AnsibleDirectorRunProxySelector.new
+              end
+
+              def default_execution_environment(host)
+                ee_id = host&.host_param('ansible_director_default_ee_id')
+                return nil unless ee_id
+                ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+                  id: ee_id,
+                  organization_id: host.organization_id
+                )
               end
             end
           end

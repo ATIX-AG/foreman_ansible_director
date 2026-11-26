@@ -208,34 +208,6 @@ Foreman::Plugin.register :foreman_ansible_director do
                        Run "man containers-registries.conf" to find more details.',
         default: ::ForemanAnsibleDirector::Constants::DEFAULT_BASE_IMAGE_URL,
         full_name: 'Execution Environments - Default base image URL'
-      setting 'ansible_director_default_ee_rex',
-        type: :integer,
-        description: 'Default Execution Environment used for execution of Remote Execution jobs.',
-        default: nil,
-        full_name: 'Execution Environments - Default Ansible Execution Environment for Remote Execution',
-        collection: proc {
-                      Hash[[[nil,
-                             'No default Execution Environment']].concat(
-                               ::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map do |ee|
-                                 [ee.id, ee.name]
-                               end
-                             )
-                      ]
-                    }
-      setting 'ansible_director_default_ee_internal',
-        type: :integer,
-        description: 'Default Execution Environment used for execution of default Ansible jobs.',
-        default: nil,
-        full_name: 'Execution Environments - Default Ansible Execution Environment for Ansible jobs',
-        collection: proc {
-                      Hash[[[nil,
-                             'No default Execution Environment']].concat(
-                               ::ForemanAnsibleDirector::ExecutionEnvironment.unscoped.map do |ee|
-                                 [ee.id, ee.name]
-                               end
-                             )
-                      ]
-                    }
       setting 'ansible_director_lce_path_force_incremental',
         type: :boolean,
         description: 'When enabled, lifecycle environment promotions must follow the defined path incrementally

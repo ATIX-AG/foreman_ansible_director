@@ -23,13 +23,11 @@ if defined? ForemanRemoteExecution
                 )
                 begin
                   environment = host&.ansible_lifecycle_environment&.execution_environment ||
-                                ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-                                  id: Setting[:ansible_director_default_ee_rex]
-                                )
+                                default_execution_environment(host)
                   unless environment
                     raise "No Execution Environment found.
-                    You must either assign your host #{host.name} to an Ansible environment
-                    or configure a default Execution Environment through the 'ansible_director_default_ee_rex' setting."
+                    You must either assign your host #{host.name} to an Ansible environment or configure a default
+                      Execution Environment through the 'ansible_director_default_ee_id' parameter."
                   end
                 end
 
@@ -59,6 +57,15 @@ if defined? ForemanRemoteExecution
 
               def required_proxy_selector_for(_template)
                 ::ForemanAnsibleDirector::AnsibleDirectorRunProxySelector.new
+              end
+
+              def default_execution_environment(host)
+                ee_id = host&.host_param('ansible_director_default_ee_id')
+                return nil unless ee_id
+                ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+                  id: ee_id,
+                  organization_id: host.organization_id
+                )
               end
             end
           end
