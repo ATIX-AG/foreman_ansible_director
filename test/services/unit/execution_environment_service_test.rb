@@ -389,7 +389,6 @@ module ForemanAnsibleDirectorTests
               ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.import_execution_environment(
                 name: 'imported_ee',
                 container_image_url: 'https://ghcr.io/ansible-community/community-ee-base:latest',
-                verify_ssl: true,
                 organization_id: @organization.id
               )
 
@@ -412,7 +411,6 @@ module ForemanAnsibleDirectorTests
               ee = ::ForemanAnsibleDirector::ExecutionEnvironmentService.import_execution_environment(
                 name: 'imported_ee',
                 container_image_url: 'https://ghcr.io/ansible-community/community-ee-base:latest',
-                verify_ssl: true,
                 organization_id: @organization.id
               )
               imported_ee_id = ee.id
@@ -431,7 +429,6 @@ module ForemanAnsibleDirectorTests
               ::ForemanAnsibleDirector::ExecutionEnvironmentService.import_execution_environment(
                 name: 'invalid_ee',
                 container_image_url: 'docker://quay.io/namespace/image:latest',
-                verify_ssl: true,
                 organization_id: @organization.id
               )
             end
@@ -455,16 +452,18 @@ module ForemanAnsibleDirectorTests
             import_triggered = false
             received_task_args = nil
 
-            ::ForemanAnsibleDirector::ActionService.stub(:trigger, ->(action_class, task_args: {}, mode: :auto) {
-              import_triggered = true
-              received_task_args = task_args
-            }) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.clone_execution_environment_image(
-                execution_environment: ee,
-                container_image_url_components: url_components,
-                verify_ssl: true
-              )
+            with_setting_stub(setting: :ansible_director_ee_import_verify_ssl, value: true) do
+              ::ForemanAnsibleDirector::ActionService.stub(:trigger, ->(action_class, task_args: {}, mode: :auto) {
+                import_triggered = true
+                received_task_args = task_args
+              }) do
+                ::ForemanAnsibleDirector::ExecutionEnvironmentService.clone_execution_environment_image(
+                  execution_environment: ee,
+                  container_image_url_components: url_components,
+                )
+              end
             end
+
 
             assert import_triggered
             assert_not_nil received_task_args[:katello_repository_options]
@@ -484,34 +483,6 @@ module ForemanAnsibleDirectorTests
             assert_includes opts[:include_tags], '2.21.5-1'
             assert_equal true, opts[:verify_ssl_on_sync]
           end
-
-          test 'sets verify_ssl_on_sync based on parameter' do
-            ee = FactoryBot.create(:execution_environment, organization: @organization)
-
-            url_components = {
-              base: 'https://ghcr.io/',
-              repository: 'ansible-community/community-ee-base',
-              tag: '2.21.5-1',
-            }
-
-            import_triggered = false
-            received_task_args = nil
-
-            ::ForemanAnsibleDirector::ActionService.stub(:trigger, ->(action_class, task_args: {}, mode: :auto) {
-              import_triggered = true
-              received_task_args = task_args
-            }) do
-              ::ForemanAnsibleDirector::ExecutionEnvironmentService.clone_execution_environment_image(
-                execution_environment: ee,
-                container_image_url_components: url_components,
-                verify_ssl: false
-              )
-            end
-
-            assert import_triggered
-            opts = received_task_args[:katello_repository_options]
-            assert_equal false, opts[:verify_ssl_on_sync]
-          end
         end
 
         describe '#katello_repository_options' do
@@ -529,7 +500,6 @@ module ForemanAnsibleDirectorTests
               execution_environment: ee,
               staging_product_id: @staging_product.id,
               container_image_url_components: url_components,
-              verify_ssl: true
             )
 
             assert_instance_of ActiveSupport::HashWithIndifferentAccess, result
@@ -549,7 +519,6 @@ module ForemanAnsibleDirectorTests
               execution_environment: ee,
               staging_product_id: @staging_product.id,
               container_image_url_components: url_components,
-              verify_ssl: false
             )
 
             assert_equal "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_42", result[:name]
@@ -570,7 +539,6 @@ module ForemanAnsibleDirectorTests
               execution_environment: ee,
               staging_product_id: @staging_product.id,
               container_image_url_components: url_components,
-              verify_ssl: true
             )
 
             assert_equal 'https://localhost:5000/', result[:url]
@@ -592,7 +560,6 @@ module ForemanAnsibleDirectorTests
               execution_environment: ee,
               staging_product_id: @staging_product.id,
               container_image_url_components: url_components,
-              verify_ssl: true
             )
 
             expected_keys = [

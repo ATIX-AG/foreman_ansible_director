@@ -119,7 +119,6 @@ module ForemanAnsibleDirector
           ::ForemanAnsibleDirector::ExecutionEnvironmentService.import_execution_environment(
             name: permitted_params[:name],
             container_image_url: permitted_params[:container_image_url],
-            verify_ssl: permitted_params[:verify_ssl],
             organization_id: @organization.id
           )
         end
@@ -247,8 +246,7 @@ module ForemanAnsibleDirector
           params.require(:execution_environment).permit(
             :name,
             :container_image_url,
-            :ansible_version,
-            :verify_ssl
+            :ansible_version
           )
         end
 
@@ -265,11 +263,9 @@ module ForemanAnsibleDirector
           root_node = base_params
           name = root_node.require(:name)
           container_image_url = root_node.require(:container_image_url)
-          verify_ssl = params[:verify_ssl]
           {
             name: name,
             container_image_url: container_image_url,
-            verify_ssl: verify_ssl || Setting[:ansible_director_ee_import_verify_ssl],
           }
         end
 

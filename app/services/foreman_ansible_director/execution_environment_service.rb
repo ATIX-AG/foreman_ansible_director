@@ -25,7 +25,6 @@ module ForemanAnsibleDirector
 
       def import_execution_environment(name:,
                                        container_image_url:,
-                                       verify_ssl:,
                                        organization_id:)
 
         container_image_url_components = verify_pull_url!(container_image_url: container_image_url)
@@ -41,8 +40,7 @@ module ForemanAnsibleDirector
 
         task = clone_execution_environment_image(
           execution_environment: env,
-          container_image_url_components: container_image_url_components,
-          verify_ssl: verify_ssl
+          container_image_url_components: container_image_url_components
         )
         env.update!(latest_task_id: task.id)
         env
@@ -139,16 +137,14 @@ module ForemanAnsibleDirector
       end
 
       def clone_execution_environment_image(execution_environment:,
-                                            container_image_url_components:,
-                                            verify_ssl:)
+                                            container_image_url_components:)
 
         staging_product = find_staging_product!(execution_environment: execution_environment)
 
         opts = katello_repository_options(
           execution_environment: execution_environment,
           staging_product_id: staging_product.id,
-          container_image_url_components: container_image_url_components,
-          verify_ssl: verify_ssl
+          container_image_url_components: container_image_url_components
         )
 
         ::ForemanAnsibleDirector::ActionService.trigger(
@@ -233,8 +229,7 @@ module ForemanAnsibleDirector
 
       def katello_repository_options(execution_environment:,
                                      staging_product_id:,
-                                     container_image_url_components:,
-                                     verify_ssl:)
+                                     container_image_url_components:)
         ActiveSupport::HashWithIndifferentAccess.new(
           {
             name: "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{execution_environment.id}",
@@ -247,7 +242,7 @@ module ForemanAnsibleDirector
             docker_upstream_name: container_image_url_components[:repository],
             include_tags: [container_image_url_components[:tag]],
             mirroring_policy: 'mirror_content_only',
-            verify_ssl_on_sync: verify_ssl,
+            verify_ssl_on_sync: Setting[:ansible_director_ee_import_verify_ssl],
           }
         )
       end
