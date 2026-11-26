@@ -20,16 +20,14 @@ module ForemanAnsibleDirector
 
         execution_environment = content_source.cs_execution_environment
 
-        execution_environment ||= ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
-          id: Setting[:ansible_director_default_ee_internal]
-        )
+        execution_environment ||= default_execution_environment
 
         unless execution_environment
           logger.warn(
             <<~MSG
               ANSIBLE: Configuration job NOT planned! No Execution Environment is associated with host #{name}.
               Assign an Execution Environment to #{content_source.cs_name} or set the
-              "ansible_director_default_ee_internal" setting.
+              "ansible_director_default_ee_id" parameter.
             MSG
           )
           return
@@ -50,6 +48,17 @@ module ForemanAnsibleDirector
             ANSIBLE: An error occurred trying to plan the configuration job for host #{name}!
             Message: #{e.message}
           MSG
+        )
+      end
+
+      private
+
+      def default_execution_environment
+        ee_id = host_param('ansible_director_default_ee_id')
+        return nil unless ee_id
+        ::ForemanAnsibleDirector::ExecutionEnvironment.find_by(
+          id: ee_id,
+          organization_id: self[:organization_id]
         )
       end
     end
