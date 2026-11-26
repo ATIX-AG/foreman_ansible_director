@@ -25,15 +25,35 @@ module ForemanAnsibleDirector
       end
 
       def edit_environment(environment:,
-                           name:,
-                           description:,
-                           execution_environment_id:)
+                           **args)
         ActiveRecord::Base.transaction do
-          environment.update!(
-            name: name,
-            description: description,
-            execution_environment_id: execution_environment_id
-          )
+          content_assignments = args.delete(:content_unit_version_ids)
+          execution_environment_id = args.delete(:execution_environment_id)
+          environment.update!(args)
+
+          if execution_environment_id.present?
+            ee = ::ForemanAnsibleDirector::ExecutionEnvironment.find_by!(id: execution_environment_id)
+            environment.update!(
+              execution_environment_id: ee.id
+            )
+          end
+
+          unless content_assignments.nil?
+            environment.direct_content_unit_versions.clear
+            content_assignments.each do |cuv_id|
+              cuv = ::ForemanAnsibleDirector::ContentUnitVersion
+                    .joins('INNER JOIN ad_content_units cus ON cus.id = ad_content_unit_versions.versionable_id')
+                    .find_by!(
+                      {
+                        cus: { organization_id: environment.organization_id },
+                        id: cuv_id,
+                      }
+                    )
+              environment.lifecycle_environment_content_unit_versions.find_or_create_by(
+                content_unit_version: cuv
+              )
+            end
+          end
         end
       end
 

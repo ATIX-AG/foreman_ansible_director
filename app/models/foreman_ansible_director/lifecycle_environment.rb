@@ -73,15 +73,11 @@ module ForemanAnsibleDirector
       update(execution_environment_id: execution_env.id)
     end
 
-    # TODO: This does not work. Add the content_unit_id to the join table for checking
     def assign_content_unit_version!(content_unit_version)
       existing_version = lifecycle_environment_content_unit_versions
                          .find_by(content_unit_version_id: content_unit_version.id)
 
-      if existing_version
-        raise ArgumentError, "LifecycleEnvironment already has ContentUnit #{content_unit_version.versionable_id} " \
-          "(existing version: #{existing_version.id}, attempted: #{content_unit_version.id})"
-      end
+      return existing_version if existing_version
 
       # Create the association
       lifecycle_environment_content_unit_versions.create!(content_unit_version: content_unit_version)
@@ -139,6 +135,7 @@ module ForemanAnsibleDirector
               .map do |v|
                 {
                   id: v.versionable.id,
+                  content_unit_version_id: v.id,
                   type: v.content_unit_type,
                   identifier: v.versionable.full_name,
                   version: v.version,

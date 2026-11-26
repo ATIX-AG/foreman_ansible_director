@@ -6,9 +6,9 @@ module ForemanAnsibleDirector
       class LifecycleEnvironmentsController < AnsibleDirectorApiController
         include ::Api::Version2
 
-        before_action :find_resource, only: %i[show update destroy update_content content]
+        before_action :find_resource, only: %i[show update_full update_partial destroy]
         before_action :find_path, only: %i[create]
-        before_action :find_organization, only: %i[create update_content]
+        before_action :find_organization, only: %i[create]
 
         resource_description { resource_id 'AD Ansible Lifecycle Environments' }
 
@@ -16,24 +16,6 @@ module ForemanAnsibleDirector
         api :GET, '/v2/ansible_director/lifecycle_environments/:id', N_('Show details of a lifecycle environment')
         # endregion
         def show
-        end
-
-        # region ApiDoc: GET /api/v2/ansible_director/lifecycle_environments/:id/content
-        api :GET, '/v2/ansible_director/lifecycle_environments/:id/content',
-          N_('List Ansible content assigned to a lifecycle environment')
-        # TRANSLATORS: ApiDoc, do not translate!
-        description <<~DESC
-          Retrieve Ansible content units assigned to this lifecycle environment.
-          If 'full=true', include detailed version and execution environment information.
-        DESC
-        param :full,
-          [true, false],
-          desc: N_('Include full details.'),
-          example: true,
-          required: false
-        # endregion
-        def content
-          @full_content = Foreman::Cast.to_bool params[:full]
         end
 
         # region ApiDoc: POST /api/v2/ansible_director/lifecycle_environments
@@ -86,7 +68,52 @@ module ForemanAnsibleDirector
 
         # region ApiDoc: PUT /api/v2/ansible_director/lifecycle_environments/:id
         api :PUT, '/v2/ansible_director/lifecycle_environments/:id',
-          N_('Update a lifecycle environment\'s basic information')
+          N_('Update an Ansible lifecycle environment')
+        param :lifecycle_environment, Hash, desc: N_('Lifecycle environment updates'), required: true do
+          param :name,
+            String,
+            desc: N_('New name for the lifecycle environment.'),
+            example: 'Prod',
+            required: true
+          param :description,
+            String,
+            desc: N_('Description of the lifecycle environment.'),
+            example: 'Development environment',
+            required: true
+          param :execution_environment_id,
+            :number,
+            desc: N_('ID of the execution environment to associate with this lifecycle environment.'),
+            example: 3,
+            required: true
+          param :content_unit_version_ids,
+            Array,
+            of: Integer,
+            desc: N_('Array of content unit version IDs'),
+            required: true
+        end
+        # TRANSLATORS: ApiDoc, do not translate!
+        example <<~EXAMPLE
+          {
+            "lifecycle_environment": {
+              "name": "Production",
+              "execution_environment_id": 5,
+              "content_unit_version_ids": [ 1, 2, 3 ]
+            }
+          }
+        EXAMPLE
+        # endregion
+        def update_full
+          permitted_params = lce_full_params(mutable: @lifecycle_environment.root?)
+
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
+            environment: @lifecycle_environment,
+            **permitted_params
+          )
+        end
+
+        # region ApiDoc: PATCH /api/v2/ansible_director/lifecycle_environments/:id
+        api :PATCH, '/v2/ansible_director/lifecycle_environments/:id',
+          N_('Partially update a lifecycle environment\'s basic information')
         param :lifecycle_environment, Hash, desc: N_('Lifecycle environment updates'), required: true do
           param :name,
             String,
@@ -103,103 +130,27 @@ module ForemanAnsibleDirector
             desc: N_('ID of the execution environment to associate with this lifecycle environment.'),
             example: 3,
             required: false
-        end
-        # TRANSLATORS: ApiDoc, do not translate!
-        example <<~EXAMPLE
-          {
-            "lifecycle_environment": {
-              "name": "Production",
-              "description": "Production environment",
-              "execution_environment_id": 5
-            }
-          }
-        EXAMPLE
-        # endregion
-        def update
-          permitted_params = lifecycle_environment_update_params
-
-          ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
-            environment: @lifecycle_environment,
-            name: permitted_params[:name],
-            description: permitted_params[:description],
-            execution_environment_id: permitted_params[:execution_environment_id]
-          )
-        end
-
-        # region ApiDoc: PATCH /api/v2/ansible_director/lifecycle_environments/:id
-        api :PATCH, '/v2/ansible_director/lifecycle_environments/:id',
-          N_('Assign Ansible content to a lifecycle environment')
-        # TRANSLATORS: ApiDoc, do not translate!
-        description <<~DESC
-          Assign Ansible content units to a lifecycle environment.
-          Only the first environment in a path may be updated with content.
-        DESC
-        param :organization_id, :number, desc: N_('Organization identifier.'), required: true
-        param :execution_environment_id,
-          :number,
-          desc: N_('ID of the execution environment to associate with the assigned content.'),
-          example: 4,
-          required: true
-        param :content_assignments,
-          Array,
-          desc: N_('Array of content assignments'),
-          required: true do
-          param :id,
-            :number,
-            desc: N_('ID of the Ansible content unit.'),
-            example: 12,
-            required: true
-          param :version,
-            String,
-            desc: N_('Version of the content unit to assign.'),
-            example: '1.3.0',
-            required: true,
-            deprecated: {
-              in: '0.5.0',
-              info: N_('This parameter group will be removed in favour of ID-based assigning.'),
-              sunset: '0.6.0',
-            }
-          param :content_unit_version_id,
-            :number,
-            desc: N_('ID of the specific content unit version (alternative to `id` + `version`).'),
-            example: 101,
+          param :content_unit_version_ids,
+            Array,
+            of: Integer,
+            desc: N_('Array of content unit version IDs'),
             required: false
         end
         # TRANSLATORS: ApiDoc, do not translate!
         example <<~EXAMPLE
           {
-            "organization_id": 1,
-            "execution_environment_id": 5,
-            "content_assignments": [
-              {
-                "content_unit_version_id": 101
-              },
-              {
-                "id": 43,
-                "version": "2.1.0"
-              }
-            ]
+            "lifecycle_environment": {
+              "content_unit_version_ids": [ 1, 2, 3 ]
+            }
           }
         EXAMPLE
         # endregion
-        def update_content
-          content_params = content_assignments_params
+        def update_partial
+          permitted_params = lce_partial_params(mutable: @lifecycle_environment.root?)
 
-          unless @lifecycle_environment.root?
-            ancestor_names = @lifecycle_environment.ancestors.pluck(:name).join(', ')
-            error_message = "LCE #{@lifecycle_environment.name} is not the head link in path " \
-              "#{@lifecycle_environment_path.name}. It is preceded by #{ancestor_names}."
-
-            render_error('custom_error',
-              status: :unprocessable_entity,
-              locals: { message: error_message })
-            return
-          end
-
-          ::ForemanAnsibleDirector::LifecycleEnvironmentService.assign_content(
-            @lifecycle_environment,
-            content_params[:content_assignments],
-            content_params[:execution_environment_id]
+          ::ForemanAnsibleDirector::LifecycleEnvironmentService.edit_environment(
+            environment: @lifecycle_environment,
+            **permitted_params
           )
         end
 
@@ -220,6 +171,51 @@ module ForemanAnsibleDirector
 
         private
 
+        def base_params
+          params.require(:lifecycle_environment).permit(
+            :name,
+            :description,
+            :execution_environment_id,
+            content_unit_version_ids: []
+          )
+        end
+
+        def lce_full_params(mutable:)
+          root_node = base_params
+
+          if mutable
+            {
+              name: root_node.require(:name),
+              execution_environment_id: root_node.require(:execution_environment_id),
+              content_unit_version_ids: root_node.require(:content_unit_version_ids),
+              description: root_node.require(:description),
+            }
+          else
+            {
+              name: root_node.require(:name),
+              description: root_node.require(:description),
+            }
+          end
+        end
+
+        def lce_partial_params(mutable:)
+          root_node = base_params
+
+          if mutable
+            {
+              name: root_node[:name],
+              execution_environment_id: root_node[:execution_environment_id],
+              content_unit_version_ids: root_node[:content_unit_version_ids],
+              description: root_node[:description],
+            }.compact
+          else
+            {
+              name: root_node[:name],
+              description: root_node[:description],
+            }.compact
+          end
+        end
+
         def lifecycle_environment_params
           params.require(:lifecycle_environment).permit(
             :name,
@@ -227,26 +223,12 @@ module ForemanAnsibleDirector
             :position
             # content: [
             #  :execution_environment_id,
-            #  { content_assignments: %i[id version] },
+            #  { content_unit_version_ids: %i[id version] },
             # ]
           ).merge(
             # lifecycle_environment_path_id: params[:lifecycle_environment_path_id],
             organization_id: params[:organization_id]
           )
-        end
-
-        def lifecycle_environment_update_params
-          params.require(:lifecycle_environment).permit(
-            :name,
-            :description,
-            :execution_environment_id
-          )
-        end
-
-        def content_assignments_params
-          params.permit(:organization_id,
-            :execution_environment_id,
-            content_assignments: %i[id version content_unit_version_id])
         end
 
         def find_path
