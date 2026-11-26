@@ -108,7 +108,7 @@ module ForemanAnsibleDirector
             "organization_id": 1,
             "execution_environment": {
               "name": "Ansible Community-EE",
-              "container_image_url": "https://ghcr.io/ansible-community/community-ee-base:latest",
+              "container_image_url": "https://ghcr.io/ansible-community/community-ee-base:latest"
             }
           }
         EXAMPLE
