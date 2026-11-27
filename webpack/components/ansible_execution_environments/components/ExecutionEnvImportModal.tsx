@@ -134,10 +134,11 @@ export const ExecutionEnvImportModal = ({
               bodyContent={_(
                 'Ensure this image is pullable without authentication.'
               )}
+              triggerAction={"hover"}
             >
               <button
                 type="button"
-                aria-label="More info for name field"
+                aria-label={_("More info for image url field")}
                 onClick={e => e.preventDefault()}
                 aria-describedby="simple-form-name-01"
                 className={styles.formGroupLabelHelp}
