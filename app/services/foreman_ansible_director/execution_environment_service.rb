@@ -70,15 +70,30 @@ module ForemanAnsibleDirector
           name: ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME
         )
         if staging_product
-          image_base_path = "id/#{execution_environment.organization_id}/#{staging_product.id}"
           image_name = "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{execution_environment.id}"
-          image_path = "#{image_base_path}/#{image_name}"
 
-          environment_repo = staging_product.repositories.find_by(container_repository_name: image_path)
-          if environment_repo
+          env_root_repository = staging_product.root_repositories.find_by(name: image_name)
+          if env_root_repository.repositories.size == 1
             ::ForemanTasks.async_task(
-              ::Actions::Katello::Repository::Destroy, environment_repo
+              ::Actions::Katello::Repository::Destroy, env_root_repository.repositories[0]
             )
+          else
+            applicable_images = env_root_repository.repositories.select do |repo|
+              repo.container_repository_name.end_with?(image_name)
+            end
+            if applicable_images.size == 1
+              ::ForemanTasks.async_task(
+                ::Actions::Katello::Repository::Destroy, applicable_images[0]
+              )
+            else
+              ctx.add_error(
+                ::ForemanAnsibleDirector::Issues::Errors::UnexpectedRepositoryCount.new(
+                  execution_environment: execution_environment,
+                  image_name: image_name,
+                ),
+                critical: true
+              )
+            end
           end
         end
 
