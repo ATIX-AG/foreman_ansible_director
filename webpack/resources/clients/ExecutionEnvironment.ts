@@ -18,7 +18,7 @@ export interface ExecutionEnvironmentImportPayload extends Organizable {
 }
 
 export interface ExecutionEnvironmentUpdateFullPayload {
-  execution_environment: Partial<ExecutionEnvironmentDraft>;
+  execution_environment: ExecutionEnvironmentDraft;
 }
 
 export interface ExecutionEnvironmentUpdatePartialPayload {
