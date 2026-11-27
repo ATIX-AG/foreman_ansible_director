@@ -9,57 +9,47 @@ import {
   EmptyStateVariant,
   Gallery,
   GalleryItem,
-  Panel,
-  PanelMain,
-  PanelMainBody,
 } from '@patternfly/react-core';
 import ResourcesEmptyIcon from '@patternfly/react-icons/dist/esm/icons/resources-empty-icon';
 
 import React, {
-  Dispatch,
   ReactElement,
-  SetStateAction,
   useEffect,
 } from 'react';
 import { PaginationProps } from 'foremanReact/common/hooks/API/APIHooks';
 import Pagination from 'foremanReact/components/Pagination';
 import { usePermissions } from 'foremanReact/common/hooks/Permissions/permissionHooks';
-import SearchBar from 'foremanReact/components/SearchBar';
 
+import { translate as _ } from 'foremanReact/common/I18n';
 import { GetAnsibleExecutionEnvResponse } from './components/ExecutionEnvGridWrapper';
 import { ExecutionEnvCreateCard } from './components/ExecutionEnvCreateCard';
 import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
+  ExecutionEnvironment,
+  ExecutionEnvironmentDraft,
 } from '../../types/AnsibleExecutionEnvTypes';
 import { AdPermissions } from '../../constants/foremanAnsibleDirectorPermissions';
 import { ExecutionEnvCardWrapper } from './components/ExecutionEnvCardWrapper';
+import { PermittedButton } from '../common/PermittedButton';
 
 interface ExecutionEnvGridProps {
   apiResponse: GetAnsibleExecutionEnvResponse;
   onPagination: (newPagination: PaginationProps) => void;
   search: string;
   onSearch: (search: string) => void;
-  setSelectedEnv: Dispatch<
-    SetStateAction<AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined>
-  >;
-  createEnvAction: (env: AnsibleExecutionEnvCreate) => Promise<void>;
-  setIsContentUnitModalOpen: Dispatch<SetStateAction<boolean>>;
+  createEnvAction: (draft: ExecutionEnvironmentDraft) => Promise<void>;
   refreshRequest: () => void;
+  onImportButtonClick: () => void;
 }
 
 export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   apiResponse,
   onPagination,
-  search,
-  onSearch,
-  setSelectedEnv,
   createEnvAction,
-  setIsContentUnitModalOpen,
   refreshRequest,
+  onImportButtonClick,
 }) => {
   const [executionEnvironments, setExecutionEnvironments] = React.useState<
-    Array<AnsibleExecutionEnv>
+    ExecutionEnvironment[]
   >();
   const [totalItemsCount, setTotalItemsCount] = React.useState<number>();
   const [showCreateCard, setShowCreateCard] = React.useState<boolean>(false);
@@ -95,8 +85,6 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
   const createCard = (createModeOverride: boolean = false): ReactElement => (
     <ExecutionEnvCreateCard
       createEnvAction={createEnvAction}
-      setIsContentUnitModalOpen={setIsContentUnitModalOpen}
-      setSelectedEnv={setSelectedEnv}
       createModeOverride={createModeOverride}
     />
   );
@@ -108,7 +96,6 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
           <GalleryItem key={ee.id}>
             <ExecutionEnvCardWrapper
               executionEnv={ee}
-              setIsContentUnitModalOpen={setIsContentUnitModalOpen}
               onDestroy={() => refreshRequest()}
             />
           </GalleryItem>
@@ -140,6 +127,13 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
             >
               Create Execution Environment
             </Button>
+            <PermittedButton
+              onClick={() => onImportButtonClick()}
+              requiredPermissions={[AdPermissions.executionEnvironments.create]}
+              variant={'secondary'}
+            >
+              {_('Import Execution Environment')}
+            </PermittedButton>
           </EmptyStateActions>
         </EmptyStateFooter>
       </EmptyState>
@@ -148,25 +142,6 @@ export const ExecutionEnvGrid: React.FC<ExecutionEnvGridProps> = ({
 
   return (
     <>
-      <Panel>
-        <PanelMain>
-          <PanelMainBody style={{ width: '50%' }}>
-            <SearchBar
-              data={{
-                autocomplete: {
-                  id: 'name',
-                  url:
-                    '/api/v2/ansible_director/execution_environments/auto_complete_search',
-                  searchQuery: search,
-                },
-              }}
-              onSearch={onSearch}
-              name="ad_ee"
-            />
-          </PanelMainBody>
-        </PanelMain>
-      </Panel>
-
       {gridContent()}
       {totalItemsCount !== undefined && totalItemsCount > 0 && (
         <Pagination itemCount={totalItemsCount} onChange={onPagination} />

@@ -9,22 +9,15 @@ import { Modal, ModalVariant, Button } from '@patternfly/react-core';
 import { translate as _ } from 'foremanReact/common/I18n';
 
 import { ContentUnitSelectorWrapper } from './components/ContentUnitSelectorWrapper';
-import {
-  AnsibleExecutionEnv,
-  AnsibleExecutionEnvCreate,
-} from '../../../types/AnsibleExecutionEnvTypes';
+import { ExecutionEnvironmentBuilt } from '../../../types/AnsibleExecutionEnvTypes';
 import { AnsibleLce } from '../../../types/AnsibleEnvironmentsTypes';
 
 interface ContentUnitModalProps {
   isContentUnitModalOpen: boolean;
   setIsContentUnitModalOpen: (isOpen: boolean) => void;
-  target: AnsibleExecutionEnv | AnsibleExecutionEnvCreate | AnsibleLce;
+  target: ExecutionEnvironmentBuilt | AnsibleLce;
   setTarget:
-    | Dispatch<
-      SetStateAction<
-          AnsibleExecutionEnv | AnsibleExecutionEnvCreate | undefined
-      >
-    >
+    | Dispatch<SetStateAction<ExecutionEnvironmentBuilt | undefined>>
     | Dispatch<SetStateAction<AnsibleLce | undefined>>;
   refreshRequest: () => void;
 }

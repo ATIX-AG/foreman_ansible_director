@@ -33,7 +33,7 @@ module ForemanAnsibleDirectorTests
           test 'must be unique within an organization' do
             duplicate = described_class.new(
               name: @execution_environment.name,
-              base_image_url: 'quay.io/ansible/another-ee:latest',
+              container_image_url: 'quay.io/ansible/another-ee:latest',
               ansible_version: '2.20.0',
               organization: @organization
             )
@@ -46,7 +46,7 @@ module ForemanAnsibleDirectorTests
             other_organization = Organization.find_by(name: 'Organization 2')
             duplicate = described_class.new(
               name: @execution_environment.name,
-              base_image_url: 'quay.io/ansible/another-ee:latest',
+              container_image_url: 'quay.io/ansible/another-ee:latest',
               ansible_version: '2.20.0',
               organization: other_organization
             )
@@ -55,22 +55,22 @@ module ForemanAnsibleDirectorTests
           end
         end
 
-        describe '#base_image_url' do
+        describe '#container_image_url' do
           test 'must not be empty' do
             ee = described_class.create(
                 name: "MyEE",
               )
             assert_not ee.valid?
-            assert_includes ee.errors[:base_image_url], 'Execution Environment base image URL cannot be blank.'
+            assert_includes ee.errors[:container_image_url], 'Execution Environment container image URL cannot be blank.'
           end
 
           test 'must not exceed 255 characters' do
             ee = described_class.create(
                 name: "MyEE",
-                base_image_url: "A" * 256,
+                container_image_url: "A" * 256,
               )
             assert_not ee.valid?
-            assert_includes ee.errors[:base_image_url], 'is too long (maximum is 255 characters)'
+            assert_includes ee.errors[:container_image_url], 'is too long (maximum is 255 characters)'
           end
         end
 
@@ -78,7 +78,7 @@ module ForemanAnsibleDirectorTests
           test 'must not be empty' do
             ee = described_class.create(
               name: "MyEE",
-              base_image_url: "https://quay.io/fedora/fedora:42"
+              container_image_url: "https://quay.io/fedora/fedora:42"
             )
             assert_not ee.valid?
             assert_includes ee.errors[:ansible_version], 'Ansible Version cannot be blank.'
@@ -89,7 +89,7 @@ module ForemanAnsibleDirectorTests
           test 'must not be empty' do
             ee = described_class.create(
               name: 'MyEE',
-              base_image_url: 'https://quay.io/fedora/fedora:42',
+              container_image_url: 'https://quay.io/fedora/fedora:42',
               ansible_version: '2.20.0'
             )
 
@@ -148,7 +148,7 @@ module ForemanAnsibleDirectorTests
             assert error.message.include? 'Repository'
           end
 
-          test 'returns pullable path of image' do
+          test 'image_build: returns pullable path with :latest tag' do
             as_admin do
               repository_type_manager = ::Katello::RepositoryTypeManager
               partial_repository_types = {
@@ -171,10 +171,87 @@ module ForemanAnsibleDirectorTests
                 product: product
               )
 
+              @execution_environment.update!(source: :image_build)
               expected_path = "#{SETTINGS[:fqdn]}/id/#{@organization.id}/#{product.id}/#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}:latest"
               assert_equal expected_path, @execution_environment.registry_url!
             end
 
+          end
+
+          test 'image_import: returns child repo full_path with tag from container_image_url' do
+            as_admin do
+              repository_type_manager = ::Katello::RepositoryTypeManager
+              partial_repository_types = {
+                'docker' => repository_type_manager.find_defined('docker'),
+              }
+              repository_type_manager.instance_variable_set(:@enabled_repository_types, partial_repository_types)
+
+              provider = FactoryBot.create(:katello_provider, organization: @organization)
+              product = FactoryBot.create(
+                :katello_product,
+                :organization => @organization,
+                :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+                :provider => provider,
+                :cp_id => '12345',
+                )
+              FactoryBot.create(
+                :katello_root_repository,
+                :docker_root,
+                name: "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}",
+                product: product
+              )
+
+              fake_repo = OpenStruct.new
+              fake_repo.full_path = "foreman.example.com/org/product/repo"
+
+              Katello::RootRepository.any_instance.stubs(:repositories).returns([fake_repo])
+
+              @execution_environment.update!(source: :image_import,
+                                             container_image_url: 'https://ghcr.io/ansible-community/community-ee-base:2.21.5-1'
+              )
+              assert_equal 'foreman.example.com/org/product/repo:2.21.5-1', @execution_environment.registry_url!
+            end
+          end
+
+          test 'image_import: raises when multiple child repos exist' do
+            as_admin do
+              repository_type_manager = ::Katello::RepositoryTypeManager
+              partial_repository_types = {
+                'docker' => repository_type_manager.find_defined('docker'),
+              }
+              repository_type_manager.instance_variable_set(:@enabled_repository_types, partial_repository_types)
+
+              provider = FactoryBot.create(:katello_provider, organization: @organization)
+              product = FactoryBot.create(
+                :katello_product,
+                :organization => @organization,
+                :name => ::ForemanAnsibleDirector::Constants::EE_STAGING_PRODUCT_NAME,
+                :provider => provider,
+                :cp_id => '12345',
+                )
+              FactoryBot.create(
+                :katello_root_repository,
+                :docker_root,
+                name: "#{::ForemanAnsibleDirector::Constants::EE_IMAGE_BASENAME}_#{@execution_environment.id}",
+                product: product
+              )
+
+              fake_repo_1 = OpenStruct.new
+              fake_repo_2 = OpenStruct.new
+              fake_repo_1.full_path = "foreman.example.com/org/product/repo1"
+              fake_repo_2.full_path = "foreman.example.com/org/product/repo2"
+
+              Katello::RootRepository.any_instance.stubs(:repositories).returns([fake_repo_1, fake_repo_2])
+
+              @execution_environment.update!(source: :image_import,
+                                             container_image_url: 'https://ghcr.io/ansible-community/community-ee-base:2.21.5-1'
+              )
+              error = assert_raises(::ForemanTasks::Task::TaskCancelledException) do
+                @execution_environment.registry_url!
+              end
+              puts error.message
+              assert error.message.include? 'supplies multiple container images'
+            end
           end
         end
 
@@ -199,7 +276,7 @@ module ForemanAnsibleDirectorTests
           test 'changes when base image changes' do
             original_hash = @execution_environment.generate_content_hash
 
-            @execution_environment.base_image_url = 'quay.io/ansible/other-ee:latest'
+            @execution_environment.container_image_url = 'quay.io/ansible/other-ee:latest'
             @execution_environment.save!
 
             assert_not_equal original_hash, @execution_environment.generate_content_hash
@@ -209,14 +286,14 @@ module ForemanAnsibleDirectorTests
             @collection2 = FactoryBot.create(:ansible_collection, organization: @organization)
             @version2 = FactoryBot.create(:content_unit_version, versionable: @collection2, version: '1.0.0')
 
-            original_base_image_url = @execution_environment.base_image_url
+            original_container_image_url = @execution_environment.container_image_url
             original_ansible_version = @execution_environment.ansible_version
             assignment_1 = @execution_environment.add_content_unit(@collection, @version)
             @execution_environment.add_content_unit(@collection2, @version2)
 
             original_hash = @execution_environment.generate_content_hash
 
-            @execution_environment.base_image_url = 'quay.io/ansible/other-ee:latest'
+            @execution_environment.container_image_url = 'quay.io/ansible/other-ee:latest'
             @execution_environment.ansible_version = 'MyEE'
             @execution_environment.save!
             assignment_1.destroy!
@@ -224,7 +301,7 @@ module ForemanAnsibleDirectorTests
 
             assert_not_equal original_hash, @execution_environment.generate_content_hash
 
-            @execution_environment.base_image_url = original_base_image_url
+            @execution_environment.container_image_url = original_container_image_url
             @execution_environment.ansible_version = original_ansible_version
             @execution_environment.save!
             @execution_environment.add_content_unit(@collection, @version)

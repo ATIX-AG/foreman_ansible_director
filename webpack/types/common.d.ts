@@ -8,6 +8,12 @@ export type pfAlertVariant =
   | 'custom'
   | undefined;
 
+export type pfValidationState =
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'default';
+
 export type pfLabelColorType =
   | 'blue'
   | 'cyan'
